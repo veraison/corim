@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/veraison/swid"
 )
 
 func Example_encode_to_CBOR() {
@@ -34,8 +35,8 @@ func Example_encode_to_CBOR() {
 							SetKeyUUID(TestUUID).
 							SetRawValue([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetSVN(2).
-							AddDigest(Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
-							AddDigest(Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
+							AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
+							AddDigest(swid.Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetOpFlags(OpFlagNotSecure, OpFlagDebug).
 							SetSerialNumber("C02X70VHJHD5").
 							SetUEID(TestUEID).
@@ -62,8 +63,8 @@ func Example_encode_to_CBOR() {
 							SetKeyUUID(TestUUID).
 							SetRawValue([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetSVN(2).
-							AddDigest(Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
-							AddDigest(Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
+							AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
+							AddDigest(swid.Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetOpFlags(OpFlagNotSecure, OpFlagDebug, OpFlagNotConfigured).
 							SetSerialNumber("C02X70VHJHD5").
 							SetUEID(TestUEID).
@@ -126,14 +127,14 @@ func Example_encode_PSA() {
 							*NewPSARefValID(TestSignerID).
 								SetLabel("BL").
 								SetVersion("5.0.5"),
-						).AddDigest(Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}),
+						).AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}),
 					).
 					AddMeasurement(
 						NewPSAMeasurement(
 							*NewPSARefValID(TestSignerID).
 								SetLabel("PRoT").
 								SetVersion("1.3.5"),
-						).AddDigest(Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}),
+						).AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}),
 					),
 			},
 		).

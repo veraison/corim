@@ -316,10 +316,10 @@ func (o *Measurement) SetUEID(ueid eat.UEID) *Measurement {
 
 // SetUUID sets the supplied uuid in the measurement-values-map
 // of the target measurement
-func (o *Measurement) SetUUID(uuid UUID) *Measurement {
+func (o *Measurement) SetUUID(u UUID) *Measurement {
 	if o != nil {
 		// TODO(tho) check if uuid is valid
-		o.Val.UUID = &uuid
+		o.Val.UUID = &u
 	}
 	return o
 }
