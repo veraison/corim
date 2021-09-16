@@ -18,8 +18,6 @@ var (
 func corimTags() cbor.TagSet {
 	corimTagsMap := map[uint64]interface{}{
 		32: comid.TaggedURI(""),
-		// CoRIM tags
-		506: TaggedComid{},
 	}
 
 	opts := cbor.TagOptions{

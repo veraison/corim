@@ -51,6 +51,7 @@ func (o Triples) Valid() error {
 			}
 		}
 	}
+
 	return nil
 }
 

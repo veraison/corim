@@ -7,6 +7,10 @@ import "fmt"
 
 type TaggedURI string
 
+func (o TaggedURI) Empty() bool {
+	return o == ""
+}
+
 // Entity stores an entity-map capable of CBOR and JSON serializations.
 type Entity struct {
 	EntityName string     `cbor:"0,keyasint" json:"name"`
@@ -47,7 +51,7 @@ func (o Entity) Valid() error {
 		return fmt.Errorf("invalid entity: empty entity-name")
 	}
 
-	if o.RegID != nil && *o.RegID == "" {
+	if o.RegID != nil && o.RegID.Empty() {
 		return fmt.Errorf("invalid entity: empty reg-id")
 	}
 

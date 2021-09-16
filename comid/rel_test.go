@@ -98,12 +98,12 @@ func TestRel_FromCBOR_ok(t *testing.T) {
 		expected Rel
 	}{
 		{
-			// 00 = unsigned(0)
+			// 00 => unsigned(0)
 			cbor:     MustHexDecode(t, "00"),
 			expected: RelSupplements,
 		},
 		{
-			// 01 = unsigned(1)
+			// 01 => unsigned(1)
 			cbor:     MustHexDecode(t, "01"),
 			expected: RelReplaces,
 		},
