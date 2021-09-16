@@ -32,6 +32,14 @@ func (o UUID) Empty() bool {
 	return o == (UUID{})
 }
 
+// Valid checks that the target UUID is formatted as per RFC4122
+func (o UUID) Valid() error {
+	if variant := uuid.UUID(o).Variant(); variant != uuid.RFC4122 {
+		return fmt.Errorf("expecting RFC4122 UUID, got %s instead", variant)
+	}
+	return nil
+}
+
 // UnmarshalJSON deserializes the supplied string into the UUID target
 func (o *UUID) UnmarshalJSON(data []byte) error {
 	var s string

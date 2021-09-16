@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/veraison/eat"
+	"github.com/veraison/swid"
 )
 
 func TestMeasurement_NewUUIDMeasurement_good_uuid(t *testing.T) {
@@ -74,4 +76,33 @@ func TestMeasurement_NewUUIDMeasurement_one_value(t *testing.T) {
 
 	err := tv.Valid()
 	assert.Nil(t, err)
+}
+
+func TestMeasurement_NewUUIDMeasurement_bad_digest(t *testing.T) {
+	tv := NewUUIDMeasurement(TestUUID)
+	require.NotNil(t, tv)
+
+	assert.Nil(t, tv.AddDigest(swid.Sha256, []byte{0xff}))
+}
+
+func TestMeasurement_NewUUIDMeasurement_bad_ueid(t *testing.T) {
+	tv := NewUUIDMeasurement(TestUUID)
+	require.NotNil(t, tv)
+
+	badUEID := eat.UEID{
+		0xFF, // Invalid
+		0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef,
+	}
+
+	assert.Nil(t, tv.SetUEID(badUEID))
+}
+
+func TestMeasurement_NewUUIDMeasurement_bad_uuid(t *testing.T) {
+	tv := NewUUIDMeasurement(TestUUID)
+	require.NotNil(t, tv)
+
+	nonRFC4122UUID, err := ParseUUID("f47ac10b-58cc-4372-c567-0e02b2c3d479")
+	require.Nil(t, err)
+
+	assert.Nil(t, tv.SetUUID(nonRFC4122UUID))
 }

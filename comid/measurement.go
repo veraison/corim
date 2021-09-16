@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/google/uuid"
 	"github.com/veraison/eat"
 	"github.com/veraison/swid"
 )
@@ -189,8 +188,7 @@ func (o *Measurement) SetKeyUUID(u UUID) *Measurement {
 			return nil
 		}
 
-		// XXX(tho) this might be useless
-		if _, err := uuid.Parse(u.String()); err != nil {
+		if u.Valid() != nil {
 			return nil
 		}
 
@@ -256,12 +254,13 @@ func (o *Measurement) SetMinSVN(svn int64) *Measurement {
 // the target measurement
 func (o *Measurement) AddDigest(algID uint64, digest []byte) *Measurement {
 	if o != nil {
-		// TODO(tho) check len(digest) against algID
 		ds := o.Val.Digests
 		if ds == nil {
 			ds = NewDigests()
 		}
-		ds.AddDigest(algID, digest)
+		if ds.AddDigest(algID, digest) == nil {
+			return nil
+		}
 		o.Val.Digests = ds
 	}
 	return o
@@ -308,7 +307,9 @@ func (o *Measurement) SetSerialNumber(sn string) *Measurement {
 // of the target measurement
 func (o *Measurement) SetUEID(ueid eat.UEID) *Measurement {
 	if o != nil {
-		// TODO(tho) check if ueid is valid
+		if ueid.Validate() != nil {
+			return nil
+		}
 		o.Val.UEID = &ueid
 	}
 	return o
@@ -318,7 +319,9 @@ func (o *Measurement) SetUEID(ueid eat.UEID) *Measurement {
 // of the target measurement
 func (o *Measurement) SetUUID(u UUID) *Measurement {
 	if o != nil {
-		// TODO(tho) check if uuid is valid
+		if u.Valid() != nil {
+			return nil
+		}
 		o.Val.UUID = &u
 	}
 	return o
