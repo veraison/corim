@@ -130,6 +130,7 @@ func (o *UnsignedCorim) AddProfile(urlOrOID string) *UnsignedCorim {
 	return o
 }
 
+// Valid checks the validity (according to the spec) of the target unsigned CoRIM
 func (o UnsignedCorim) Valid() error {
 	if o.ID == (swid.TagID{}) {
 		return fmt.Errorf("empty id")
