@@ -16,7 +16,7 @@ var (
 	ContentType = "application/rim+cbor"
 )
 
-// SignedCorim encodes a signed-corim type (i.e., a COSE Sign1 wrapped CoRIM)
+// SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
 // with signature and verification methods
 type SignedCorim struct {
 	UnsignedCorim UnsignedCorim
@@ -52,7 +52,7 @@ func (o *SignedCorim) processHdrs() error {
 }
 
 // FromCOSE decodes and effects syntactic validation on the supplied
-// signed-corim, including the embedded unsigned-corim.
+// signed-corim message, including the embedded unsigned-corim.
 // On success, the unsigned-corim-map is made available via the UnsignedCorim
 // field.
 func (o *SignedCorim) FromCOSE(buf []byte) error {
