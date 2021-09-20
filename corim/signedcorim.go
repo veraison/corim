@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	ContentType = "application/rim+cbor"
+	ContentType    = "application/rim+cbor"
+	NoExternalData = []byte("")
 )
 
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
@@ -105,7 +106,7 @@ func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected[algID] = alg.Value
 	o.message.Headers.Protected[contentType] = ContentType
 
-	err = o.message.Sign(rand.Reader, []byte(""), *signer)
+	err = o.message.Sign(rand.Reader, NoExternalData, *signer)
 	if err != nil {
 		return nil, fmt.Errorf("COSE Sign1 signature failed: %w", err)
 	}
@@ -135,7 +136,7 @@ func (o *SignedCorim) Verify(pk crypto.PublicKey) error {
 		PublicKey: pk,
 	}
 
-	err = o.message.Verify([]byte(""), verifier)
+	err = o.message.Verify(NoExternalData, verifier)
 	if err != nil {
 		return err
 	}
