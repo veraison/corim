@@ -23,6 +23,11 @@ type SignedCorim struct {
 	message       *cose.Sign1Message
 }
 
+var (
+	algID       = cose.GetCommonHeaderTagOrPanic("alg")
+	contentType = cose.GetCommonHeaderTagOrPanic("content type")
+)
+
 func (o *SignedCorim) processHdrs() error {
 	var hdr = o.message.Headers
 
@@ -30,7 +35,7 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory protected header")
 	}
 
-	v, ok := hdr.Protected[3]
+	v, ok := hdr.Protected[contentType]
 	if !ok {
 		return errors.New("missing mandatory content type")
 	}
@@ -97,8 +102,8 @@ func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
 		return nil, errors.New("signer has no algorithm")
 	}
 
-	o.message.Headers.Protected[1] = alg.Value
-	o.message.Headers.Protected[3] = ContentType
+	o.message.Headers.Protected[algID] = alg.Value
+	o.message.Headers.Protected[contentType] = ContentType
 
 	err = o.message.Sign(rand.Reader, []byte(""), *signer)
 	if err != nil {
