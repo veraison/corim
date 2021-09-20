@@ -41,6 +41,7 @@ func (o *SignedCorim) processHdrs() error {
 
 	// TODO(tho) key id is apparently mandatory, which doesn't look right.
 	// TODO(tho) Check with the CoRIM design team.
+	// See https://github.com/veraison/corim/issues/14
 
 	return nil
 }
