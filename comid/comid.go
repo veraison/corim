@@ -56,7 +56,7 @@ func (o *Comid) SetTagIdentity(tagID interface{}, tagIDVersion uint) *Comid {
 	return o
 }
 
-func s2URI(s *string) (*TaggedURI, error) {
+func String2URI(s *string) (*TaggedURI, error) {
 	if s == nil {
 		return nil, nil
 	}
@@ -90,7 +90,7 @@ func (o *Comid) AddEntity(name string, regID *string, roles ...Role) *Comid {
 			return nil
 		}
 
-		uri, err := s2URI(regID)
+		uri, err := String2URI(regID)
 		if err != nil {
 			return nil
 		}
