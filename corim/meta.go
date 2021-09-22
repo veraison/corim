@@ -20,7 +20,7 @@ func NewSigner() *Signer {
 	return &Signer{}
 }
 
-// SetName sets the given name in Signer
+// SetName sets the target Signer's name to the supplied value
 func (o *Signer) SetName(name string) *Signer {
 	if o != nil {
 		if name == "" {
@@ -31,7 +31,7 @@ func (o *Signer) SetName(name string) *Signer {
 	return o
 }
 
-// SetURI sets the given uri in Signer
+// SetURI sets the target Signer's URI to the supplied value
 func (o *Signer) SetURI(uri string) *Signer {
 	if o != nil {
 		if uri == "" {
@@ -63,7 +63,10 @@ func (o Signer) Valid() error {
 	return nil
 }
 
-// Meta holds additional information about the Signer and Signature validity
+// Meta stores a corim-meta-map with JSON and CBOR serializations.  It carries
+// information about the CoRIM signer and, optionally, a validity period
+// associated with the signed assertion.  A corim-meta-map is serialized to CBOR
+// and added to the protected header structure in the signed-corim as a byte string
 type Meta struct {
 	Signer   Signer    `cbor:"0,keyasint" json:"signer"`
 	Validity *Validity `cbor:"1,keyasint,omitempty" json:"validity,omitempty"`
@@ -73,7 +76,8 @@ func NewMeta() *Meta {
 	return &Meta{}
 }
 
-// SetSigner sets a given name and uri into Signer element within Meta
+// SetSigner populates the Signer element in the target Meta with the supplied
+// name and optional URI
 func (o *Meta) SetSigner(name string, uri *string) *Meta {
 	if o != nil {
 		s := NewSigner().SetName(name)
@@ -91,7 +95,8 @@ func (o *Meta) SetSigner(name string, uri *string) *Meta {
 	return o
 }
 
-// SetValidity sets a specific time range of validity period into Validity element within Meta
+// SetValidity sets the validity period of the target Meta to the supplied time
+// range
 func (o *Meta) SetValidity(notAfter time.Time, notBefore *time.Time) *Meta {
 	if o != nil {
 		v := NewValidity().Set(notAfter, notBefore)
@@ -104,7 +109,7 @@ func (o *Meta) SetValidity(notAfter time.Time, notBefore *time.Time) *Meta {
 	return o
 }
 
-// Valid checks for validity of fields within Meta
+// Valid checks for validity of the fields within Meta
 func (o Meta) Valid() error {
 	if err := o.Signer.Valid(); err != nil {
 		return fmt.Errorf("invalid meta: %w", err)
@@ -119,10 +124,12 @@ func (o Meta) Valid() error {
 	return nil
 }
 
+// ToCBOR serializes the target Meta to CBOR
 func (o Meta) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
+// FromCBOR deserializes the supplied CBOR data into the target Meta
 func (o *Meta) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
