@@ -16,6 +16,7 @@ const (
 
 type Roles []Role
 
+// Add appends the supplied roles to Roles list.
 func (o *Roles) Add(roles ...Role) *Roles {
 	if o != nil {
 		for _, r := range roles {
@@ -32,6 +33,7 @@ func isRole(r Role) bool {
 	return r == RoleManifestCreator
 }
 
+// Valid iterates over the range of individual roles to check for validity
 func (o Roles) Valid() error {
 	if len(o) == 0 {
 		return errors.New("empty roles")

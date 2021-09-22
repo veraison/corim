@@ -20,6 +20,7 @@ func NewEntity() *Entity {
 	return &Entity{}
 }
 
+// SetEntityName is used to set the EntityName field of Entity using supplied name
 func (o *Entity) SetEntityName(name string) *Entity {
 	if o != nil {
 		if name == "" {
@@ -30,6 +31,7 @@ func (o *Entity) SetEntityName(name string) *Entity {
 	return o
 }
 
+// SetRegID is used to set the RegID field of Entity using supplied uri
 func (o *Entity) SetRegID(uri string) *Entity {
 	if o != nil {
 		if uri == "" {
@@ -46,7 +48,7 @@ func (o *Entity) SetRegID(uri string) *Entity {
 	return o
 }
 
-// SetRoles appends the supplied roles to the target entity.  Note that
+// SetRoles appends the supplied roles to the target entity.
 func (o *Entity) SetRoles(roles ...Role) *Entity {
 	if o != nil {
 		if o.Roles.Add(roles...) == nil {
@@ -56,6 +58,7 @@ func (o *Entity) SetRoles(roles ...Role) *Entity {
 	return o
 }
 
+// Valid checks for validity of the fields within each Entity
 func (o Entity) Valid() error {
 	if o.EntityName == "" {
 		return fmt.Errorf("invalid entity: empty entity-name")
@@ -88,6 +91,7 @@ func (o *Entities) AddEntity(e Entity) *Entities {
 	return o
 }
 
+// Valid iterates over the range of individual entities to check for validity
 func (o Entities) Valid() error {
 	for i, m := range o {
 		if err := m.Valid(); err != nil {
