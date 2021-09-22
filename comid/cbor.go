@@ -24,6 +24,7 @@ func comidTags() cbor.TagSet {
 		551: TaggedImplID{},
 		552: TaggedSVN(0),
 		553: TaggedMinSVN(0),
+		560: TaggedRawValueBytes{},
 		// PSA profile tags
 		600: TaggedPSARefValID{},
 	}

@@ -49,7 +49,6 @@ func (o *SVN) UnmarshalCBOR(data []byte) error {
 	}
 
 	return fmt.Errorf("unknown SVN (CBOR: %x)", data)
-
 }
 
 // Supported formats:
