@@ -17,6 +17,7 @@ func NewValidity() *Validity {
 	return &Validity{}
 }
 
+// Set instantiates a Validity object (using the supplied time inputs) & checks it been valid
 func (o *Validity) Set(notAfter time.Time, notBefore *time.Time) *Validity {
 	if o != nil {
 		v := Validity{
@@ -33,6 +34,7 @@ func (o *Validity) Set(notAfter time.Time, notBefore *time.Time) *Validity {
 	return o
 }
 
+// Valid checks for validity of fields inside the Validity object
 func (o Validity) Valid() error {
 	if o.NotBefore != nil {
 		if delta := o.NotAfter.Sub(*o.NotBefore); delta < 0 {
