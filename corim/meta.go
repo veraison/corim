@@ -55,8 +55,8 @@ func (o Signer) Valid() error {
 	}
 
 	if o.URI != nil {
-		if *o.URI == "" {
-			return errors.New("empty URI")
+		if err := comid.IsAbsoluteURI(string(*o.URI)); err != nil {
+			return fmt.Errorf("invalid URI: %w", err)
 		}
 	}
 

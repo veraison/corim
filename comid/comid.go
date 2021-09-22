@@ -56,21 +56,31 @@ func (o *Comid) SetTagIdentity(tagID interface{}, tagIDVersion uint) *Comid {
 	return o
 }
 
+func IsAbsoluteURI(s string) error {
+	var (
+		u   *url.URL
+		err error
+	)
+
+	if u, err = url.Parse(s); err != nil {
+		return fmt.Errorf("%q failed to parse as URI: %w", s, err)
+	}
+
+	if !u.IsAbs() {
+		return fmt.Errorf("%q is not an absolute URI", s)
+	}
+
+	return nil
+}
+
 func String2URI(s *string) (*TaggedURI, error) {
 	if s == nil {
 		return nil, nil
 	}
 
-	u, err := url.Parse(*s)
-	if err != nil {
-		return nil, fmt.Errorf("%s failed to parse as URI", *s)
+	if err := IsAbsoluteURI(*s); err != nil {
+		return nil, fmt.Errorf("expecting an absolute URI: %w", err)
 	}
-
-	if !u.IsAbs() {
-		return nil, fmt.Errorf("%s must be an absolute URI", *s)
-	}
-
-	// TODO(tho) do we need more checks here?
 
 	v := TaggedURI(*s)
 
