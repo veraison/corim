@@ -21,12 +21,14 @@ var (
 // with signature and verification methods
 type SignedCorim struct {
 	UnsignedCorim UnsignedCorim
+	Meta          Meta
 	message       *cose.Sign1Message
 }
 
 var (
 	algID       = cose.GetCommonHeaderTagOrPanic("alg")
 	contentType = cose.GetCommonHeaderTagOrPanic("content type")
+	corimMeta   = 8
 )
 
 func (o *SignedCorim) processHdrs() error {
@@ -49,13 +51,32 @@ func (o *SignedCorim) processHdrs() error {
 	// TODO(tho) Check with the CoRIM design team.
 	// See https://github.com/veraison/corim/issues/14
 
+	v, ok = hdr.Protected[corimMeta]
+	if !ok {
+		return errors.New("missing mandatory corim.meta")
+	}
+
+	metaCBOR, ok := v.([]byte)
+	if !ok {
+		return fmt.Errorf("expecting CBOR-encoded CoRIM Meta, got %T instead", v)
+	}
+
+	var meta Meta
+
+	err := meta.FromCBOR(metaCBOR)
+	if err != nil {
+		return fmt.Errorf("unable to decode CoRIM Meta: %w", err)
+	}
+
+	o.Meta = meta
+
 	return nil
 }
 
 // FromCOSE decodes and effects syntactic validation on the supplied
-// signed-corim message, including the embedded unsigned-corim.
+// signed-corim message, including the embedded unsigned-corim and corim-meta.
 // On success, the unsigned-corim-map is made available via the UnsignedCorim
-// field.
+// field while the corim-meta-map is decoded into the Meta field.
 func (o *SignedCorim) FromCOSE(buf []byte) error {
 	o.message = cose.NewSign1Message()
 
@@ -98,6 +119,11 @@ func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
 		return nil, fmt.Errorf("failed CBOR encoding of unsigned CoRIM: %w", err)
 	}
 
+	metaCBOR, err := o.Meta.ToCBOR()
+	if err != nil {
+		return nil, fmt.Errorf("failed CBOR encoding of CoRIM Meta: %w", err)
+	}
+
 	alg := signer.GetAlg()
 	if alg == nil {
 		return nil, errors.New("signer has no algorithm")
@@ -105,6 +131,7 @@ func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
 
 	o.message.Headers.Protected[algID] = alg.Value
 	o.message.Headers.Protected[contentType] = ContentType
+	o.message.Headers.Protected[corimMeta] = metaCBOR
 
 	err = o.message.Sign(rand.Reader, NoExternalData, *signer)
 	if err != nil {

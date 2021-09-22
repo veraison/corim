@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/eat"
@@ -20,6 +21,8 @@ type UnsignedCorim struct {
 	Tags          []Tag          `cbor:"1,keyasint" json:"tags"`
 	DependentRims *[]Locator     `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
 	Profiles      *[]eat.Profile `cbor:"3,keyasint,omitempty" json:"profiles,omitempty"`
+	RimValidity   *Validity      `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
+	Entities      *Entities      `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
 }
 
 // NewUnsignedCorim instantiates an empty UnsignedCorim
@@ -130,6 +133,50 @@ func (o *UnsignedCorim) AddProfile(urlOrOID string) *UnsignedCorim {
 	return o
 }
 
+// SetRimValidity can be used to set the validity period of the CoRIM.
+// The caller must supply a "not-after" timestamp and optionally a "not-before"
+// timestamp.
+func (o *UnsignedCorim) SetRimValidity(notAfter time.Time, notBefore *time.Time) *UnsignedCorim {
+	if o != nil {
+		v := NewValidity().Set(notAfter, notBefore)
+		if v == nil {
+			return nil
+		}
+
+		o.RimValidity = v
+	}
+	return o
+}
+
+// AddEntity adds an organizational entity, together with the roles this entity
+// claims with regards to the CoRIM, to the target UnsignerCorim.  name is the entity
+// name, regID is a URI that uniquely identifies the entity.  For the moment, roles
+// can only be RoleManifestCreator.
+func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *UnsignedCorim {
+	if o != nil {
+		e := NewEntity().
+			SetEntityName(name).
+			SetRoles(roles...)
+
+		if regID != nil {
+			e = e.SetRegID(*regID)
+		}
+
+		if e == nil {
+			return nil
+		}
+
+		if o.Entities == nil {
+			o.Entities = new(Entities)
+		}
+
+		if o.Entities.AddEntity(*e) == nil {
+			return nil
+		}
+	}
+	return o
+}
+
 // Valid checks the validity (according to the spec) of the target unsigned CoRIM
 func (o UnsignedCorim) Valid() error {
 	if o.ID == (swid.TagID{}) {
@@ -158,6 +205,20 @@ func (o UnsignedCorim) Valid() error {
 		for i, p := range *o.Profiles {
 			if err := ValidProfile(p); err != nil {
 				return fmt.Errorf("profile validation failed at pos %d: %w", i, err)
+			}
+		}
+	}
+
+	if o.RimValidity != nil {
+		if err := o.RimValidity.Valid(); err != nil {
+			return fmt.Errorf("RIM validity validation failed: %w", err)
+		}
+	}
+
+	if o.Entities != nil {
+		for i, e := range *o.Entities {
+			if err := e.Valid(); err != nil {
+				return fmt.Errorf("entity validation failed at pos %d: %w", i, err)
 			}
 		}
 	}

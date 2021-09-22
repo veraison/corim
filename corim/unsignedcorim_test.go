@@ -6,6 +6,7 @@ package corim
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -175,10 +176,106 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
 		AddProfile("https://arm.com/psa/iot/2.0.0").
-		AddComid(*c)
+		AddComid(*c).
+		SetRimValidity(time.Now().Add(time.Hour), nil).
+		AddEntity("ACME Ltd.", nil, RoleManifestCreator)
+
 	require.NotNil(t, tv)
 
 	err := tv.Valid()
 
 	assert.Nil(t, err)
+}
+
+func TestUnsignedCorim_SetRimValidity_invalid(t *testing.T) {
+	notBefore := time.Now().Add(time.Hour)
+	notAfter := time.Now()
+
+	tv := NewUnsignedCorim().
+		SetRimValidity(notAfter, &notBefore)
+
+	assert.Nil(t, tv)
+}
+
+func TestUnsignedCorim_SetRimValidity_full(t *testing.T) {
+	notBefore := time.Now()
+	notAfter := time.Now().Add(time.Hour)
+
+	actual := NewUnsignedCorim().
+		SetRimValidity(notAfter, &notBefore)
+
+	expected := UnsignedCorim{
+		RimValidity: &Validity{
+			NotBefore: &notBefore,
+			NotAfter:  notAfter,
+		},
+	}
+
+	assert.NotNil(t, actual)
+	assert.Equal(t, expected, *actual)
+}
+
+func TestUnsignedCorim_SetRimValidity_no_optional_not_before(t *testing.T) {
+	notAfter := time.Now().Add(time.Hour)
+
+	actual := NewUnsignedCorim().
+		SetRimValidity(notAfter, nil)
+
+	expected := UnsignedCorim{
+		RimValidity: &Validity{
+			NotBefore: nil,
+			NotAfter:  notAfter,
+		},
+	}
+
+	assert.NotNil(t, actual)
+	assert.Equal(t, expected, *actual)
+}
+
+func TestUnsignedCorim_AddEntity_full(t *testing.T) {
+	name := "ACME Ltd."
+	role := RoleManifestCreator
+	regID := "https://acme.example"
+	taggedRegID := comid.TaggedURI(regID)
+
+	actual := NewUnsignedCorim().
+		AddEntity(name, &regID, role)
+
+	expected := UnsignedCorim{
+		Entities: &Entities{
+			Entity{
+				EntityName: name,
+				Roles:      Roles{role},
+				RegID:      &taggedRegID,
+			},
+		},
+	}
+
+	assert.NotNil(t, actual)
+	assert.Equal(t, expected, *actual)
+}
+
+func TestUnsignedCorim_AddEntity_unknown_role(t *testing.T) {
+	tv := NewUnsignedCorim().
+		AddEntity("ACME Ltd.", nil, Role(666))
+
+	assert.Nil(t, tv)
+}
+
+func TestUnsignedCorim_AddEntity_empty_entity_name(t *testing.T) {
+	anEmptyName := ""
+
+	tv := NewUnsignedCorim().
+		AddEntity(anEmptyName, nil, RoleManifestCreator)
+
+	assert.Nil(t, tv)
+}
+
+func TestUnsignedCorim_AddEntity_non_nil_empty_URI(t *testing.T) {
+	anEmptyURI := ""
+
+	tv := NewUnsignedCorim().
+		AddEntity("ACME Ltd.", &anEmptyURI, RoleManifestCreator)
+
+	assert.Nil(t, tv)
 }

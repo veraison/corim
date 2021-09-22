@@ -47,6 +47,7 @@ func initCBOREncMode() (en cbor.EncMode, err error) {
 func initCBORDecMode() (dm cbor.DecMode, err error) {
 	decOpt := cbor.DecOptions{
 		IndefLength: cbor.IndefLengthForbidden,
+		TimeTag:     cbor.DecTagRequired,
 	}
 	return decOpt.DecModeWithTags(corimTags())
 }
