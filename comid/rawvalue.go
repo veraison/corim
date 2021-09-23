@@ -8,10 +8,12 @@ import (
 	"fmt"
 )
 
+// RawValue models a $raw-value-type-choice.  For now, the only available type is bytes.
 type RawValue struct {
 	val interface{}
 }
 
+// TaggedRawValueBytes is an alias for []byte to allow its automatic tagging
 type TaggedRawValueBytes []byte
 
 func NewRawValue() *RawValue {
