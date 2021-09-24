@@ -127,8 +127,6 @@ func (o Mval) Valid() error {
 		}
 	}
 
-	// XXX(tho) Not sure what restrictions (if any) apply to SVN
-
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
 			return err
@@ -143,7 +141,7 @@ func (o Mval) Valid() error {
 
 	// raw value and mask have no specific semantics
 
-	// TODO(tho) MAC addr & friends
+	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
 
 	return nil
 }
