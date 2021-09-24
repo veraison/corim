@@ -97,7 +97,7 @@ type Mval struct {
 	SVN          *SVN      `cbor:"1,keyasint,omitempty" json:"svn,omitempty"`
 	Digests      *Digests  `cbor:"2,keyasint,omitempty" json:"digests,omitempty"`
 	OpFlags      *OpFlags  `cbor:"3,keyasint,omitempty" json:"op-flags,omitempty"`
-	RawValue     *[]byte   `cbor:"4,keyasint,omitempty" json:"raw-value,omitempty"`
+	RawValue     *RawValue `cbor:"4,keyasint,omitempty" json:"raw-value,omitempty"`
 	RawValueMask *[]byte   `cbor:"5,keyasint,omitempty" json:"raw-value-mask,omitempty"`
 	MACAddr      *MACaddr  `cbor:"6,keyasint,omitempty" json:"mac-addr,omitempty"`
 	IPAddr       *net.IP   `cbor:"7,keyasint,omitempty" json:"ip-addr,omitempty"`
@@ -127,8 +127,6 @@ func (o Mval) Valid() error {
 		}
 	}
 
-	// XXX(tho) Not sure what restrictions (if any) apply to SVN
-
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
 			return err
@@ -143,7 +141,7 @@ func (o Mval) Valid() error {
 
 	// raw value and mask have no specific semantics
 
-	// TODO(tho) MAC addr & friends
+	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
 
 	return nil
 }
@@ -213,11 +211,11 @@ func NewUUIDMeasurement(uuid UUID) *Measurement {
 	return m.SetKeyUUID(uuid)
 }
 
-// SetRawValue sets the supplied raw-value and its mask in the
+// SetRawValueBytes sets the supplied raw-value and its mask in the
 // measurement-values-map of the target measurement
-func (o *Measurement) SetRawValue(rawValue, rawValueMask []byte) *Measurement {
+func (o *Measurement) SetRawValueBytes(rawValue, rawValueMask []byte) *Measurement {
 	if o != nil {
-		o.Val.RawValue = &rawValue
+		o.Val.RawValue = NewRawValue().SetBytes(rawValue)
 		o.Val.RawValueMask = &rawValueMask
 	}
 	return o
