@@ -6,6 +6,7 @@ GO111MODULE := on
 
 GOPKG := github.com/veraison/corim/corim
 GOPKG += github.com/veraison/corim/comid
+GOPKG += github.com/veraison/corim/cli/cmd
 
 GOLINT ?= golangci-lint
 
