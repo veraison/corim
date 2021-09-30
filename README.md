@@ -11,4 +11,4 @@ Specifically, the library supports following functions:
 * A user friendly interface to populate an unsigned CoRIM using an equivalent JSON representation
 * Signing an unsigned CoRIM with a private key to obtain a signed CoRIM message
 * Verifying a signed CoRIM using a public key
-* Decode a signed COSE buffer (containing a Signed CoRIM) to provide an Unsigned CoRIM structure
+* Extracting an unsigned CoRIM and CoRIM Meta structures from a serialized signed CoRIM
