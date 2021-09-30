@@ -43,7 +43,7 @@ func NewComidCreateCmd() *cobra.Command {
 				return err
 			}
 
-			filesList := filesList(comidCreateFiles, comidCreateDirs)
+			filesList := filesList(comidCreateFiles, comidCreateDirs, ".json")
 			if len(filesList) == 0 {
 				return errors.New("no files found")
 			}
@@ -55,6 +55,7 @@ func NewComidCreateCmd() *cobra.Command {
 				}
 				fmt.Printf("created %q from %q\n", cborFile, tmplFile)
 			}
+
 			return nil
 		},
 	}
@@ -79,31 +80,6 @@ func checkComidCreateArgs() error {
 		return errors.New("no templates supplied")
 	}
 	return nil
-}
-
-func filesList(files, dirs []string) []string {
-	var l []string
-
-	for _, file := range files {
-		if _, err := fs.Stat(file); err == nil {
-			l = append(l, file)
-		}
-	}
-
-	for _, dir := range dirs {
-		filesInfo, err := afero.ReadDir(fs, dir)
-		if err != nil {
-			continue
-		}
-
-		for _, fileInfo := range filesInfo {
-			if !fileInfo.IsDir() && filepath.Ext(fileInfo.Name()) == ".json" {
-				l = append(l, filepath.Join(dir, fileInfo.Name()))
-			}
-		}
-	}
-
-	return l
 }
 
 func templateToCBOR(tmplFile, outputDir string) (string, error) {
