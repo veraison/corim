@@ -24,6 +24,10 @@ type Mkey struct {
 	val interface{}
 }
 
+func (o Mkey) IsSet() bool {
+	return o.val != nil
+}
+
 func (o Mkey) Valid() error {
 	switch t := o.val.(type) {
 	case TaggedUUID:
@@ -326,7 +330,7 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 }
 
 func (o Measurement) Valid() error {
-	if o.Key != nil {
+	if o.Key.IsSet() {
 		if err := o.Key.Valid(); err != nil {
 			return err
 		}
