@@ -70,8 +70,14 @@ func TestMeasurement_NewUUIDMeasurement_no_values(t *testing.T) {
 	assert.EqualError(t, err, "no measurement value set")
 }
 
-func TestMeasurement_NewUUIDMeasurement_one_value(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID).SetMinSVN(2)
+func TestMeasurement_NewUUIDMeasurement_some_value(t *testing.T) {
+	var vs swid.VersionScheme
+	require.NoError(t, vs.SetCode(swid.VersionSchemeSemVer))
+
+	tv := NewUUIDMeasurement(TestUUID).
+		SetMinSVN(2).
+		SetOpFlags(OpFlagDebug).
+		SetVersion("1.2.3", swid.VersionSchemeSemVer)
 	require.NotNil(t, tv)
 
 	err := tv.Valid()

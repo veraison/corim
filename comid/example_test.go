@@ -10,7 +10,7 @@ import (
 	"github.com/veraison/swid"
 )
 
-func Example_encode_to_CBOR() {
+func Example_encode() {
 	comid := NewComid().
 		SetLanguage("en-GB").
 		SetTagIdentity("my-ns:acme-roadrunner-supplement", 0).
@@ -21,7 +21,7 @@ func Example_encode_to_CBOR() {
 		AddReferenceValue(
 			ReferenceValue{
 				Environment: Environment{
-					Class: NewClassUUID(TestUUID).
+					Class: NewClassOID(TestOID).
 						SetVendor("ACME Ltd.").
 						SetModel("RoadRunner").
 						SetLayer(0).
@@ -62,7 +62,7 @@ func Example_encode_to_CBOR() {
 						NewMeasurement().
 							SetKeyUUID(TestUUID).
 							SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
-							SetSVN(2).
+							SetMinSVN(2).
 							AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
 							AddDigest(swid.Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetOpFlags(OpFlagNotSecure, OpFlagDebug, OpFlagNotConfigured).
@@ -104,10 +104,17 @@ func Example_encode_to_CBOR() {
 
 	cbor, err := comid.ToCBOR()
 	if err == nil {
-		fmt.Printf("%x", cbor)
+		fmt.Printf("%x\n", cbor)
 	}
 
-	// Output: a50065656e2d474201a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740282a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c6502820100a20069454d4341204c74642e0281020382a200781a6d792d6e733a61636d652d726f616472756e6e65722d626173650100a20078196d792d6e733a61636d652d726f616472756e6e65722d6f6c64010104a4008182a300a500d8255031fb5abf023e4992aa4e95f9c1503bfa016941434d45204c74642e026a526f616452756e6e65720300040101d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa81a200d8255031fb5abf023e4992aa4e95f9c1503bfa01aa01d90228020282820644abcdef00820644ffffffff030a04d9023044010203040544ffffffff064802005e1000000001075020010db8000000000000000000000068086c43303258373056484a484435094702deadbeefdead0a5031fb5abf023e4992aa4e95f9c1503bfa018182a300a500d8255031fb5abf023e4992aa4e95f9c1503bfa016941434d45204c74642e026a526f616452756e6e65720300040101d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa81a200d8255031fb5abf023e4992aa4e95f9c1503bfa01aa01d90228020282820644abcdef00820644ffffffff030b04d9023044010203040544ffffffff064802005e1000000001075020010db8000000000000000000000068086c43303258373056484a484435094702deadbeefdead0a5031fb5abf023e4992aa4e95f9c1503bfa028182a101d8255031fb5abf023e4992aa4e95f9c1503bfa81a20075464748496a6b69736c646e415344787657592e2e2e0182744d454e477364686675676a5157457479582e2e2e744d4949456e6a43434134616741774942412e2e2e038182a101d902264702deadbeefdead81a200744d49476b416745424244436b3551626f422e2e2e0182744d4949446b6a43434178696741774942412e2e2e744d4949456e6a43434134616741774942412e2e2e
+	json, err := comid.ToJSON()
+	if err == nil {
+		fmt.Printf("%s\n", string(json))
+	}
+
+	// Output:
+	// a50065656e2d474201a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740282a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c6502820100a20069454d4341204c74642e0281020382a200781a6d792d6e733a61636d652d726f616472756e6e65722d626173650100a20078196d792d6e733a61636d652d726f616472756e6e65722d6f6c64010104a4008182a300a500d86f445502c000016941434d45204c74642e026a526f616452756e6e65720300040101d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa81a200d8255031fb5abf023e4992aa4e95f9c1503bfa01aa01d90228020282820644abcdef00820644ffffffff030a04d9023044010203040544ffffffff064802005e1000000001075020010db8000000000000000000000068086c43303258373056484a484435094702deadbeefdead0a5031fb5abf023e4992aa4e95f9c1503bfa018182a300a500d8255031fb5abf023e4992aa4e95f9c1503bfa016941434d45204c74642e026a526f616452756e6e65720300040101d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa81a200d8255031fb5abf023e4992aa4e95f9c1503bfa01aa01d90229020282820644abcdef00820644ffffffff030b04d9023044010203040544ffffffff064802005e1000000001075020010db8000000000000000000000068086c43303258373056484a484435094702deadbeefdead0a5031fb5abf023e4992aa4e95f9c1503bfa028182a101d8255031fb5abf023e4992aa4e95f9c1503bfa81a20075464748496a6b69736c646e415344787657592e2e2e0182744d454e477364686675676a5157457479582e2e2e744d4949456e6a43434134616741774942412e2e2e038182a101d902264702deadbeefdead81a200744d49476b416745424244436b3551626f422e2e2e0182744d4949446b6a43434178696741774942412e2e2e744d4949456e6a43434134616741774942412e2e2e
+	// {"lang":"en-GB","tag-identity":{"id":"my-ns:acme-roadrunner-supplement"},"entities":[{"name":"ACME Ltd.","regid":"https://acme.example","roles":["creator","tagCreator"]},{"name":"EMCA Ltd.","roles":["maintainer"]}],"linked-tags":[{"target":"my-ns:acme-roadrunner-base","rel":"supplements"},{"target":"my-ns:acme-roadrunner-old","rel":"replaces"}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.5.2.8192"},"vendor":"ACME Ltd.","model":"RoadRunner","layer":0,"index":1},"instance":{"type":"ueid","value":"At6tvu/erQ=="},"group":{"type":"ueid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}},"measurements":[{"key":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"value":{"svn":{"cmp":"==","value":2},"digests":["sha-256-32:q83vAA==","sha-256-32://///w=="],"op-flags":["notSecure","debug"],"raw-value":"AQIDBA==","raw-value-mask":"/////w==","mac-addr":"02:00:5e:10:00:00:00:01","ip-addr":"2001:db8::68","serial-number":"C02X70VHJHD5","ueid":"At6tvu/erQ==","uuid":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}]}],"endorsed-values":[{"environment":{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"vendor":"ACME Ltd.","model":"RoadRunner","layer":0,"index":1},"instance":{"type":"ueid","value":"At6tvu/erQ=="},"group":{"type":"ueid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}},"measurements":[{"key":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"value":{"svn":{"cmp":"\u003e=","value":2},"digests":["sha-256-32:q83vAA==","sha-256-32://///w=="],"op-flags":["notConfigured","notSecure","debug"],"raw-value":"AQIDBA==","raw-value-mask":"/////w==","mac-addr":"02:00:5e:10:00:00:00:01","ip-addr":"2001:db8::68","serial-number":"C02X70VHJHD5","ueid":"At6tvu/erQ==","uuid":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}]}],"attester-verification-keys":[{"environment":{"instance":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}},"verification-keys":[{"key":"FGHIjkisldnASDxvWY...","chain":["MENGsdhfugjQWEtyX...","MIIEnjCCA4agAwIBA..."]}]}],"dev-identity-keys":[{"environment":{"instance":{"type":"ueid","value":"At6tvu/erQ=="}},"verification-keys":[{"key":"MIGkAgEBBDCk5QboB...","chain":["MIIDkjCCAxigAwIBA...","MIIEnjCCA4agAwIBA..."]}]}]}}
 }
 
 func Example_encode_PSA() {
@@ -153,10 +160,17 @@ func Example_encode_PSA() {
 
 	cbor, err := comid.ToCBOR()
 	if err == nil {
-		fmt.Printf("%x", cbor)
+		fmt.Printf("%x\n", cbor)
 	}
 
-	// Output: a301a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740281a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028301000204a2008182a100a300d90227582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031016941434d45204c74642e026e526f616452756e6e657220322e3082a200d90258a30162424c0465352e302e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00a200d90258a3016450526f540465312e332e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00028182a101d902264702deadbeefdead81a100744d49476b416745424244436b3551626f422e2e2e
+	json, err := comid.ToJSON()
+	if err == nil {
+		fmt.Printf("%s\n", string(json))
+	}
+
+	// Output:
+	// a301a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740281a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028301000204a2008182a100a300d90227582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031016941434d45204c74642e026e526f616452756e6e657220322e3082a200d90258a30162424c0465352e302e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00a200d90258a3016450526f540465312e332e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00028182a101d902264702deadbeefdead81a100744d49476b416745424244436b3551626f422e2e2e
+	// {"tag-identity":{"id":"my-ns:acme-roadrunner-supplement"},"entities":[{"name":"ACME Ltd.","regid":"https://acme.example","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"psa.impl-id","value":"YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="},"vendor":"ACME Ltd.","model":"RoadRunner 2.0"}},"measurements":[{"key":{"type":"psa.refval-id","value":{"label":"BL","version":"5.0.5","signer-id":"rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="}},"value":{"digests":["sha-256-32:q83vAA=="]}},{"key":{"type":"psa.refval-id","value":{"label":"PRoT","version":"1.3.5","signer-id":"rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="}},"value":{"digests":["sha-256-32:q83vAA=="]}}]}],"attester-verification-keys":[{"environment":{"instance":{"type":"ueid","value":"At6tvu/erQ=="}},"verification-keys":[{"key":"MIGkAgEBBDCk5QboB..."}]}]}}
 }
 
 func Example_encode_PSA_attestation_verification() {
@@ -178,10 +192,17 @@ func Example_encode_PSA_attestation_verification() {
 
 	cbor, err := comid.ToCBOR()
 	if err == nil {
-		fmt.Printf("%x", cbor)
+		fmt.Printf("%x\n", cbor)
 	}
 
-	// Output: a301a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740281a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028301000204a1028182a101d902264702deadbeefdead81a1006f4d466b77457759484b6f5a492e2e2e
+	json, err := comid.ToJSON()
+	if err == nil {
+		fmt.Printf("%s", string(json))
+	}
+
+	// Output:
+	// a301a10078206d792d6e733a61636d652d726f616472756e6e65722d737570706c656d656e740281a3006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028301000204a1028182a101d902264702deadbeefdead81a1006f4d466b77457759484b6f5a492e2e2e
+	// {"tag-identity":{"id":"my-ns:acme-roadrunner-supplement"},"entities":[{"name":"ACME Ltd.","regid":"https://acme.example","roles":["creator","tagCreator","maintainer"]}],"triples":{"attester-verification-keys":[{"environment":{"instance":{"type":"ueid","value":"At6tvu/erQ=="}},"verification-keys":[{"key":"MFkwEwYHKoZI..."}]}]}}
 }
 
 func Example_decode_JSON() {
@@ -263,7 +284,12 @@ func Example_decode_JSON() {
 						"value": {
 							"digests": [
 								"sha-256:3q2+7w=="
-							]
+							],
+							"svn": {
+								"cmp": "==",
+								"value": 1
+							},
+							"mac-addr": "00:00:5e:00:53:01"
 						}
 					}
 				]

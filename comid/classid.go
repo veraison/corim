@@ -35,6 +35,27 @@ func (o *ClassID) SetUUID(uuid UUID) *ClassID {
 
 type ImplID [32]byte
 type TaggedImplID ImplID
+
+func (o ImplID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o[:])
+}
+
+func (o *ImplID) UnmarshalJSON(data []byte) error {
+	var b []byte
+
+	if err := json.Unmarshal(data, &b); err != nil {
+		return fmt.Errorf("bad ImplID: %w", err)
+	}
+
+	if nb := len(b); nb != 32 {
+		return fmt.Errorf("bad ImplID format: got %d bytes, want 32", nb)
+	}
+
+	copy(o[:], b)
+
+	return nil
+}
+
 type TaggedOID OID
 
 // SetImplID sets the value of the targed ClassID to the supplied PSA
@@ -122,10 +143,7 @@ func (o *ClassID) UnmarshalCBOR(data []byte) error {
 //     "value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 //   }
 func (o *ClassID) UnmarshalJSON(data []byte) error {
-	v := struct {
-		Type  string      `json:"type"`
-		Value interface{} `json:"value"`
-	}{}
+	var v tnv
 
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -133,28 +151,62 @@ func (o *ClassID) UnmarshalJSON(data []byte) error {
 
 	switch v.Type {
 	case "uuid": // nolint: goconst
-		var uuid UUID
-		if err := jsonDecodeUUID(v.Value, &uuid); err != nil {
+		var x UUID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.SetUUID(uuid)
+		o.val = TaggedUUID(x)
 	case "oid":
-		var berOID OID
-		if err := jsonDecodeOID(v.Value, &berOID); err != nil {
+		var x OID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.val = TaggedOID(berOID)
+		o.val = TaggedOID(x)
 	case "psa.impl-id":
-		var implID ImplID
-		if err := jsonDecodeImplID(v.Value, &implID); err != nil {
+		var x ImplID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.SetImplID(implID)
+		o.val = TaggedImplID(x)
 	default:
 		return fmt.Errorf("unknown type '%s' for class id", v.Type)
 	}
 
 	return nil
+}
+
+// MarshalJSON serializes the target ClassID to JSON
+func (o ClassID) MarshalJSON() ([]byte, error) {
+	var (
+		v   tnv
+		b   []byte
+		err error
+	)
+
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		b, err = UUID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "uuid", Value: b}
+	case TaggedOID:
+		b, err = OID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "oid", Value: b}
+	case TaggedImplID:
+		b, err = ImplID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "psa.impl-id", Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for class-id", t)
+	}
+
+	return json.Marshal(v)
 }
 
 // Type returns the type of the target ClassID, i.e., one of UUID, OID or PSA

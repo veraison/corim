@@ -75,10 +75,7 @@ func (o *Group) UnmarshalCBOR(data []byte) error {
 //     "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
 //   }
 func (o *Group) UnmarshalJSON(data []byte) error {
-	v := struct {
-		Type  string      `json:"type"`
-		Value interface{} `json:"value"`
-	}{}
+	var v tnv
 
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -86,14 +83,35 @@ func (o *Group) UnmarshalJSON(data []byte) error {
 
 	switch v.Type {
 	case "uuid":
-		var uuid UUID
-		if err := jsonDecodeUUID(v.Value, &uuid); err != nil {
+		var x UUID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.SetUUID(uuid)
+		o.val = TaggedUUID(x)
 	default:
 		return fmt.Errorf("unknown type %s for group", v.Type)
 	}
 
 	return nil
+}
+
+func (o Group) MarshalJSON() ([]byte, error) {
+	var (
+		v   tnv
+		b   []byte
+		err error
+	)
+
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		b, err = UUID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "ueid", Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for group", t)
+	}
+
+	return json.Marshal(v)
 }

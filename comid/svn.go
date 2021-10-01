@@ -51,14 +51,16 @@ func (o *SVN) UnmarshalCBOR(data []byte) error {
 	return fmt.Errorf("unknown SVN (CBOR: %x)", data)
 }
 
+type svnJSONRepr struct {
+	Cmp string `json:"cmp"`
+	Val int64  `json:"value"`
+}
+
 // Supported formats:
 // { "cmp": "==", "value": 123 } -> SVN
 // { "cmp": ">=", "value": 123 } -> MinSVN
 func (o *SVN) UnmarshalJSON(data []byte) error {
-	s := struct {
-		Cmp string `json:"cmp"`
-		Val int64  `json:"value"`
-	}{}
+	var s svnJSONRepr
 
 	if err := json.Unmarshal(data, &s); err != nil {
 		return fmt.Errorf("SVN decoding failure: %w", err)
@@ -74,4 +76,21 @@ func (o *SVN) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (o SVN) MarshalJSON() ([]byte, error) {
+	var s svnJSONRepr
+
+	switch t := o.val.(type) {
+	case TaggedSVN:
+		s.Cmp = "=="
+		s.Val = int64(t)
+	case TaggedMinSVN:
+		s.Cmp = ">="
+		s.Val = int64(t)
+	default:
+		return nil, fmt.Errorf("unknown SVN type: %T", t)
+	}
+
+	return json.Marshal(s)
 }

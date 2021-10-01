@@ -26,19 +26,19 @@ func (o Environment) Valid() error {
 
 	if o.Class != nil {
 		if err := o.Class.Valid(); err != nil {
-			return fmt.Errorf("environment validation failed: %w", err)
+			return fmt.Errorf("class validation failed: %w", err)
 		}
 	}
 
 	if o.Instance != nil {
 		if err := o.Instance.Valid(); err != nil {
-			return fmt.Errorf("environment validation failed: %w", err)
+			return fmt.Errorf("instance validation failed: %w", err)
 		}
 	}
 
 	if o.Group != nil {
 		if err := o.Group.Valid(); err != nil {
-			return fmt.Errorf("environment validation failed: %w", err)
+			return fmt.Errorf("group validation failed: %w", err)
 		}
 	}
 
@@ -70,4 +70,13 @@ func (o *Environment) FromJSON(data []byte) error {
 	}
 
 	return o.Valid()
+}
+
+// ToJSON serializes the target Environment to JSON (if the Environment is "valid")
+func (o Environment) ToJSON() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(&o)
 }

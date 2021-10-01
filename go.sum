@@ -308,8 +308,8 @@ github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff h1:r6I2eJL/z8dp5flsQI
 github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff/go.mod h1:+kxt8iuFiVvKRs2VQ1Ho7bbAScXAB/kHFFuP5Biw19I=
 github.com/veraison/go-cose v0.0.0-20201125131510-de93f6091ed4 h1:YCSAzEYRLKSUauy/lrUSFcJB/8vOZaIeH7eDNXqffX0=
 github.com/veraison/go-cose v0.0.0-20201125131510-de93f6091ed4/go.mod h1:sjLU/8dYHRJj3RWtKLJUbPLoByKdV7nnegaTBgQ+9XA=
-github.com/veraison/swid v0.0.1-beta.5 h1:9YiH5qNNNNFCjeifM42xizgXEAxvhVBh7B+dCwnek6o=
-github.com/veraison/swid v0.0.1-beta.5/go.mod h1:d5jt76uMNbTfQ+f2qU4Lt8RvWOTsv6PFgstIM1QdMH0=
+github.com/veraison/swid v0.0.1-beta.6 h1:ysDyCOPwGyjiBnhAM+/kgTEcc/PWieIbUQJOjnSTK48=
+github.com/veraison/swid v0.0.1-beta.6/go.mod h1:d5jt76uMNbTfQ+f2qU4Lt8RvWOTsv6PFgstIM1QdMH0=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

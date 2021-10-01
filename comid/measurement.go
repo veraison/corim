@@ -91,6 +91,36 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON serializes the target Mkey into the type'n'value JSON object
+// uuid, psa.refval-id
+func (o Mkey) MarshalJSON() ([]byte, error) {
+	var (
+		v   tnv
+		b   []byte
+		err error
+	)
+
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		uuidString := UUID(t).String()
+		b, err = json.Marshal(uuidString)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "uuid", Value: b}
+	case TaggedPSARefValID:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "psa.refval-id", Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for mkey", t)
+	}
+
+	return json.Marshal(v)
+}
+
 func (o Mkey) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.val)
 }
@@ -156,8 +186,28 @@ type Version struct {
 	Scheme  swid.VersionScheme `cbor:"1,keyasint" json:"scheme"`
 }
 
+func NewVersion() *Version {
+	return &Version{}
+}
+
+func (o *Version) SetVersion(v string) *Version {
+	if o != nil {
+		o.Version = v
+	}
+	return o
+}
+
+func (o *Version) SetScheme(v uint64) *Version {
+	if o != nil {
+		if o.Scheme.SetCode(v) != nil {
+			return nil
+		}
+	}
+	return o
+}
+
 func (o Version) Valid() error {
-	if o.Version != "" {
+	if o.Version == "" {
 		return fmt.Errorf("empty version")
 	}
 	return nil
@@ -213,6 +263,18 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 func NewUUIDMeasurement(uuid UUID) *Measurement {
 	m := &Measurement{}
 	return m.SetKeyUUID(uuid)
+}
+
+func (o *Measurement) SetVersion(ver string, scheme uint64) *Measurement {
+	if o != nil {
+		v := NewVersion().SetVersion(ver).SetScheme(scheme)
+		if v == nil {
+			return nil
+		}
+
+		o.Val.Ver = v
+	}
+	return o
 }
 
 // SetRawValueBytes sets the supplied raw-value and its mask in the

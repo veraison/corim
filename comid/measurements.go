@@ -3,7 +3,10 @@
 
 package comid
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Measurements is an array of Measurement
 type Measurements []Measurement
@@ -22,6 +25,10 @@ func (o *Measurements) AddMeasurement(m *Measurement) *Measurements {
 }
 
 func (o Measurements) Valid() error {
+	if len(o) == 0 {
+		return errors.New("no measurement entries")
+	}
+
 	for i, m := range o {
 		if err := m.Valid(); err != nil {
 			return fmt.Errorf("measurement at index %d: %w", i, err)
