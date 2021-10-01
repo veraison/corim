@@ -234,6 +234,10 @@ func (o Comid) Valid() error {
 
 // ToCBOR serializes the target Comid to CBOR
 func (o Comid) ToCBOR() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+
 	return em.Marshal(&o)
 }
 
@@ -248,6 +252,13 @@ func (o *Comid) FromJSON(data []byte) error {
 }
 
 // ToJSON serializes the target Comid to JSON
-func (o Comid) ToJSON() ([]byte, error) {
+func (o Comid) ToJSON(prettyPrint bool) ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+
+	if prettyPrint {
+		return json.MarshalIndent(&o, "", "  ")
+	}
 	return json.Marshal(&o)
 }
