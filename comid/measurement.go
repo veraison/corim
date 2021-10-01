@@ -125,6 +125,10 @@ func (o Mkey) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.val)
 }
 
+func (o *Mkey) UnmarshalCBOR(data []byte) error {
+	return dm.Unmarshal(data, &o.val)
+}
+
 // Mval stores a measurement-values-map with JSON and CBOR serializations.
 type Mval struct {
 	Ver          *Version  `cbor:"0,keyasint,omitempty" json:"version,omitempty"`
