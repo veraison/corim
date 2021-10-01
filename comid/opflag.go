@@ -24,6 +24,28 @@ func NewOpFlags() *OpFlags {
 	return new(OpFlags)
 }
 
+func (o OpFlags) Strings() []string {
+	var a []string
+
+	if o&OpFlagNotConfigured != 0 {
+		a = append(a, "notConfigured")
+	}
+
+	if o&OpFlagNotSecure != 0 {
+		a = append(a, "notSecure")
+	}
+
+	if o&OpFlagRecovery != 0 {
+		a = append(a, "recovery")
+	}
+
+	if o&OpFlagDebug != 0 {
+		a = append(a, "debug")
+	}
+
+	return a
+}
+
 func (o OpFlags) Valid() error {
 	// While any combination in the lower half-byte is acceptable, the most
 	// significant nibble must be all zeroes.
@@ -52,7 +74,7 @@ func (o OpFlags) IsSet(flag OpFlags) bool {
 // UnmarshalJSON provides a custom deserializer for the OpFlags type that uses an
 // array of identifiers rather than a bit set, e.g.:
 //
-//  "flags": [
+//  "op-flags": [
 //    "notSecure",
 //    "debug"
 //  ]
@@ -85,4 +107,8 @@ func (o *OpFlags) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (o OpFlags) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.Strings())
 }

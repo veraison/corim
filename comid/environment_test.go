@@ -26,7 +26,7 @@ func TestEnvironment_Valid_empty_class(t *testing.T) {
 
 	err := tv.Valid()
 
-	assert.EqualError(t, err, "environment validation failed: class must not be empty")
+	assert.EqualError(t, err, "class validation failed: class must not be empty")
 }
 
 func TestEnvironment_Valid_empty_instance(t *testing.T) {
@@ -36,7 +36,7 @@ func TestEnvironment_Valid_empty_instance(t *testing.T) {
 
 	err := tv.Valid()
 
-	assert.EqualError(t, err, "environment validation failed: invalid instance id")
+	assert.EqualError(t, err, "instance validation failed: invalid instance id")
 }
 
 func TestEnvironment_Valid_empty_group(t *testing.T) {
@@ -46,7 +46,7 @@ func TestEnvironment_Valid_empty_group(t *testing.T) {
 
 	err := tv.Valid()
 
-	assert.EqualError(t, err, "environment validation failed: invalid group id")
+	assert.EqualError(t, err, "group validation failed: invalid group id")
 }
 func TestEnvironment_Valid_ok_with_class(t *testing.T) {
 	tv := Environment{

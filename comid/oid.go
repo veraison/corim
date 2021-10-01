@@ -5,6 +5,7 @@ package comid
 
 import (
 	"encoding/asn1"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -132,4 +133,22 @@ func constructBERFromVal(val []byte) ([]byte, error) {
 	berOID = append(berOID, val...)
 
 	return berOID, nil
+}
+
+func (o *OID) UnmarshalJSON(data []byte) error {
+	var s string
+
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	if err := o.FromString(s); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o OID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.String())
 }

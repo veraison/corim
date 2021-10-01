@@ -41,6 +41,7 @@ func (o UUID) Valid() error {
 }
 
 // UnmarshalJSON deserializes the supplied string into the UUID target
+// The UUID string in expected to be in canonical 8-4-4-4-12 format
 func (o *UUID) UnmarshalJSON(data []byte) error {
 	var s string
 
@@ -56,4 +57,10 @@ func (o *UUID) UnmarshalJSON(data []byte) error {
 	*o = u
 
 	return nil
+}
+
+// MarshalJSON serialize the target UUID to a JSON string in canonical
+// 8-4-4-4-12 format
+func (o UUID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.String())
 }

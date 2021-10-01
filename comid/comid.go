@@ -246,3 +246,8 @@ func (o *Comid) FromCBOR(data []byte) error {
 func (o *Comid) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
+
+// ToJSON serializes the target Comid to JSON
+func (o Comid) ToJSON() ([]byte, error) {
+	return json.Marshal(&o)
+}

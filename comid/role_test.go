@@ -195,7 +195,7 @@ func TestRoles_UnmarshalJSON_fail(t *testing.T) {
 		},
 		{
 			json:        `["blabla"]`,
-			expectedErr: "unknown role 'blabla'",
+			expectedErr: `unknown role "blabla"`,
 		},
 		{
 			json:        `"tagCreator"`,

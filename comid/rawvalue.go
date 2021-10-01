@@ -67,3 +67,12 @@ func (o *RawValue) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+func (o RawValue) MarshalJSON() ([]byte, error) {
+	switch t := o.val.(type) {
+	case TaggedRawValueBytes:
+		return json.Marshal(t)
+	default:
+		return nil, fmt.Errorf("unknown type %T for $raw-value-type-choice", t)
+	}
+}

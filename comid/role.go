@@ -26,6 +26,20 @@ const (
 	RoleMaintainer
 )
 
+var (
+	roleToString = map[Role]string{
+		RoleTagCreator: "tagCreator",
+		RoleCreator:    "creator",
+		RoleMaintainer: "maintainer",
+	}
+
+	stringToRole = map[string]Role{
+		"tagCreator": RoleTagCreator,
+		"creator":    RoleCreator,
+		"maintainer": RoleMaintainer,
+	}
+)
+
 type Roles []Role
 
 func NewRoles() *Roles {
@@ -81,21 +95,27 @@ func (o *Roles) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("no roles found")
 	}
 
-	var r Role
-
 	for _, s := range a {
-		switch s {
-		case "tagCreator":
-			r = RoleTagCreator
-		case "creator":
-			r = RoleCreator
-		case "maintainer":
-			r = RoleMaintainer
-		default:
-			return fmt.Errorf("unknown role '%s'", s)
+		r, ok := stringToRole[s]
+		if !ok {
+			return fmt.Errorf("unknown role %q", s)
 		}
 		o = o.Add(r)
 	}
 
 	return nil
+}
+
+func (o Roles) MarshalJSON() ([]byte, error) {
+	roles := []string{}
+
+	for _, r := range o {
+		s, ok := roleToString[r]
+		if !ok {
+			return nil, fmt.Errorf("unknown role %d", r)
+		}
+		roles = append(roles, s)
+	}
+
+	return json.Marshal(roles)
 }

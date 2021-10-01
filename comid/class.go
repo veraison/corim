@@ -164,3 +164,12 @@ func (o *Class) FromJSON(data []byte) error {
 
 	return o.Valid()
 }
+
+// ToJSON serializes the target Class to JSON (if the Class is "valid")
+func (o Class) ToJSON() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(&o)
+}

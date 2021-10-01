@@ -42,6 +42,17 @@ func (o Rel) Valid() error {
 	return nil
 }
 
+func (o Rel) String() string {
+	switch o {
+	case RelReplaces:
+		return "replaces"
+	case RelSupplements:
+		return "supplements"
+	default:
+		return fmt.Sprintf("rel(%d)", o)
+	}
+}
+
 func (o Rel) ToCBOR() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -85,4 +96,8 @@ func (o *Rel) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (o Rel) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.String())
 }

@@ -14,9 +14,6 @@ type Instance struct {
 	val interface{}
 }
 
-// TaggedUEID is an alias to allow automatic tagging of a eat.UEID type
-type TaggedUEID eat.UEID
-
 // NewInstance instantiates an empty instance
 func NewInstance() *Instance {
 	return &Instance{}
@@ -120,10 +117,7 @@ func (o *Instance) UnmarshalCBOR(data []byte) error {
 //   }
 //
 func (o *Instance) UnmarshalJSON(data []byte) error {
-	v := struct {
-		Type  string      `json:"type"`
-		Value interface{} `json:"value"`
-	}{}
+	var v tnv
 
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -131,20 +125,47 @@ func (o *Instance) UnmarshalJSON(data []byte) error {
 
 	switch v.Type {
 	case "uuid":
-		var u UUID
-		if err := jsonDecodeUUID(v.Value, &u); err != nil {
+		var x UUID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.val = TaggedUUID(u)
+		o.val = TaggedUUID(x)
 	case "ueid":
-		ueid := eat.UEID{}
-		if err := jsonDecodeUEID(v.Value, &ueid); err != nil {
+		var x UEID
+		if err := x.UnmarshalJSON(v.Value); err != nil {
 			return err
 		}
-		o.val = TaggedUEID(ueid)
+		o.val = TaggedUEID(x)
 	default:
 		return fmt.Errorf("unknown type %s for instance", v.Type)
 	}
 
 	return nil
+}
+
+func (o Instance) MarshalJSON() ([]byte, error) {
+	var (
+		v   tnv
+		b   []byte
+		err error
+	)
+
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		b, err = UUID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "uuid", Value: b}
+	case TaggedUEID:
+		b, err = UEID(t).MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "ueid", Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for instance", t)
+	}
+
+	return json.Marshal(v)
 }

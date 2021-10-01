@@ -143,7 +143,7 @@ func TestClassID_UnmarshalJSON_badInput_missing_value(t *testing.T) {
 	var actual ClassID
 	err := actual.UnmarshalJSON([]byte(tv))
 
-	assert.EqualError(t, err, "ImplID must be string")
+	assert.EqualError(t, err, "bad ImplID: unexpected end of JSON input")
 	assert.Equal(t, ClassIDTypeUnknown, actual.Type())
 }
 
