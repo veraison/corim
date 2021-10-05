@@ -31,7 +31,7 @@ func NewComidValidateCmd() *cobra.Command {
 
 	Validate CoMIDs in files c1.cbor, c2.cbor and any cbor file in the comids/
 	directory.
-
+	
 	  cli comid validate --file=c1.cbor --file=c2.cbor --dir=comids
 	`,
 

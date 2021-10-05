@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var comidCmd = &cobra.Command{
-	Use:   "comid",
-	Short: "CoMID manipulation",
+var corimCmd = &cobra.Command{
+	Use:   "corim",
+	Short: "CoRIM manipulation",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
@@ -22,5 +22,5 @@ var comidCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(comidCmd)
+	rootCmd.AddCommand(corimCmd)
 }
