@@ -27,14 +27,16 @@ func NewComidCreateCmd() *cobra.Command {
 		Short: "create one or more CBOR-encoded CoMID(s) from the supplied JSON template(s)",
 		Long: `create one or more CBOR-encoded CoMID(s) from the supplied JSON template(s)
 
-	Create CoMIDs from templates t1.json and t2.json, plus any template found in the
-	templates/ directory.  Save them to the current working directory.
-
-	  cli comid create --tmpl-file=t1.json --tmpl-file=t2.json --tmpl-dir=templates
-
+	Create CoMIDs from templates t1.json and t2.json, plus any template found in
+	the templates/ directory.  Save them to the current working directory.
+	
+	  cli comid create --tmpl-file=t1.json \
+	                   --tmpl-file=t2.json \
+	                   --tmpl-dir=templates
+	  
 	Create one CoMID from template t3.json and save it to the comids/ directory.
 	Note that the output directory must exist.
-
+	
 	  cli comid create --tmpl-file=t3.json --output-dir=comids
 	`,
 
@@ -110,7 +112,7 @@ func templateToCBOR(tmplFile, outputDir string) (string, error) {
 	// we can use tag-id as the basename, since it is supposedly unique
 	cborFile = filepath.Join(outputDir, c.TagIdentity.TagID.String()+".cbor")
 
-	err = afero.WriteFile(fs, cborFile, cborData, 0400)
+	err = afero.WriteFile(fs, cborFile, cborData, 0644)
 	if err != nil {
 		return "", fmt.Errorf("error saving CBOR file %s: %w", cborFile, err)
 	}

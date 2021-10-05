@@ -31,7 +31,7 @@ func NewComidDisplayCmd() *cobra.Command {
 
 	Display CoMIDs in files c1.cbor, c2.cbor and any cbor file in the comids/
 	directory.
-
+	
 	  cli comid display --file=c1.cbor --file=c2.cbor --dir=comids
 	`,
 

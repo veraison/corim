@@ -50,7 +50,7 @@ func Test_ComidCreateCmd_template_with_invalid_json(t *testing.T) {
 	cmd := NewComidCreateCmd()
 
 	fs = afero.NewMemMapFs()
-	err = afero.WriteFile(fs, "invalid.json", []byte("..."), 0400)
+	err = afero.WriteFile(fs, "invalid.json", []byte("..."), 0644)
 	require.NoError(t, err)
 
 	args := []string{
@@ -68,7 +68,7 @@ func Test_ComidCreateCmd_template_with_invalid_comid(t *testing.T) {
 	cmd := NewComidCreateCmd()
 
 	fs = afero.NewMemMapFs()
-	err = afero.WriteFile(fs, "bad-comid.json", []byte("{}"), 0400)
+	err = afero.WriteFile(fs, "bad-comid.json", []byte("{}"), 0644)
 	require.NoError(t, err)
 
 	args := []string{
@@ -86,7 +86,7 @@ func Test_ComidCreateCmd_template_from_file_to_default_dir(t *testing.T) {
 	cmd := NewComidCreateCmd()
 
 	fs = afero.NewMemMapFs()
-	err = afero.WriteFile(fs, "ok.json", []byte(comid.PSARefValJSONTemplate), 0400)
+	err = afero.WriteFile(fs, "ok.json", []byte(comid.PSARefValJSONTemplate), 0644)
 	require.NoError(t, err)
 
 	args := []string{
@@ -110,7 +110,7 @@ func Test_ComidCreateCmd_template_from_dir_to_custom_dir(t *testing.T) {
 	cmd := NewComidCreateCmd()
 
 	fs = afero.NewMemMapFs()
-	err = afero.WriteFile(fs, "testdir/ok.json", []byte(comid.PSARefValJSONTemplate), 0400)
+	err = afero.WriteFile(fs, "testdir/ok.json", []byte(comid.PSARefValJSONTemplate), 0644)
 	require.NoError(t, err)
 
 	args := []string{
