@@ -9,34 +9,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/veraison/corim/comid"
-)
-
-var (
-	// note: embedded CoSWIDs are not validated {0: h'5C57E8F446CD421B91C908CF93E13CFC', 1: [505(h'deadbeef')]}
-	testCorimValid = comid.MustHexDecode(nil, "a200505c57e8f446cd421b91c908cf93e13cfc0181d901f944deadbeef")
-	// {0: h'5C57E8F446CD421B91C908CF93E13CFC'}
-	testCorimInvalid = comid.MustHexDecode(nil, "a100505c57e8f446cd421b91c908cf93e13cfc")
-	testMetaInvalid  = []byte("{}")
-	testMetaValid    = []byte(`{
-		"signer": {
-			"name": "ACME Ltd signing key",
-			"uri": "https://acme.example"
-		},
-		"validity": {
-			"not-before": "2021-12-31T00:00:00Z",
-			"not-after": "2025-12-31T00:00:00Z"
-		}
-	}`)
-	testECKey = []byte(`{
-		"kty": "EC",
-		"crv": "P-256",
-		"x": "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
-		"y": "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
-		"d": "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
-		"use": "enc",
-		"kid": "1"
-	  }`)
 )
 
 func Test_CorimSignCmd_unknown_argument(t *testing.T) {
