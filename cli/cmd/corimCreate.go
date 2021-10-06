@@ -73,7 +73,7 @@ func NewCorimCreateCmd() *cobra.Command {
 		},
 	}
 
-	corimCreateCorimFile = cmd.Flags().StringP("tmpl-file", "f", "", "a CoMID template file (in JSON format)")
+	corimCreateCorimFile = cmd.Flags().StringP("tmpl-file", "f", "", "a CoRIM template file (in JSON format)")
 
 	cmd.Flags().StringArrayVarP(
 		&corimCreateComidDirs, "comid-dir", "M", []string{}, "a directory containing CBOR-encoded CoMID files",

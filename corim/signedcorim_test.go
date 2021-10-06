@@ -4,22 +4,16 @@
 package corim
 
 import (
-	"crypto"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
-	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	cose "github.com/veraison/go-cose"
 )
 
 var (
-	testECKey = `{
+	testECKey = []byte(`{
 		"kty": "EC",
 		"crv": "P-256",
 		"x": "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
@@ -27,41 +21,8 @@ var (
 		"d": "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
 		"use": "enc",
 		"kid": "1"
-	  }`
+	  }`)
 )
-
-func signerFromJWK(t *testing.T, j string) *cose.Signer {
-	ks, err := jwk.ParseString(j)
-	require.Nil(t, err)
-
-	k, ok := ks.Get(0)
-	require.True(t, ok)
-
-	var key crypto.PrivateKey
-
-	err = k.Raw(&key)
-	require.Nil(t, err)
-
-	var crv elliptic.Curve
-	var alg *cose.Algorithm
-
-	switch v := key.(type) {
-	case *ecdsa.PrivateKey:
-		crv = v.Curve
-		if crv == elliptic.P256() {
-			alg = cose.ES256
-			break
-		}
-		require.True(t, false, "unknown elliptic curve %v", crv)
-	default:
-		require.True(t, false, "unknown private key type %v", reflect.TypeOf(key))
-	}
-
-	s, err := cose.NewSignerFromKey(alg, key)
-	require.Nil(t, err)
-
-	return s
-}
 
 func TestSignedCorim_FromCOSE_ok(t *testing.T) {
 	/*
@@ -293,7 +254,8 @@ func metaGood(t *testing.T) *Meta {
 }
 
 func TestSignedCorim_SignVerify_ok(t *testing.T) {
-	signer := signerFromJWK(t, testECKey)
+	signer, err := SignerFromJWK(testECKey)
+	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
 
@@ -315,7 +277,8 @@ func TestSignedCorim_SignVerify_ok(t *testing.T) {
 }
 
 func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
-	signer := signerFromJWK(t, testECKey)
+	signer, err := SignerFromJWK(testECKey)
+	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
 
@@ -342,7 +305,8 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 }
 
 func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
-	signer := signerFromJWK(t, testECKey)
+	signer, err := SignerFromJWK(testECKey)
+	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
 
@@ -351,7 +315,7 @@ func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
 
 	SignedCorimIn.UnsignedCorim = *emptyCorim
 
-	_, err := SignedCorimIn.Sign(signer)
+	_, err = SignedCorimIn.Sign(signer)
 	assert.EqualError(t, err, "failed validation of unsigned CoRIM: empty id")
 }
 
