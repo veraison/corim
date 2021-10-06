@@ -62,24 +62,6 @@ func Test_ComidDisplayCmd_file_with_invalid_cbor(t *testing.T) {
 	assert.EqualError(t, err, "1/1 display(s) failed")
 }
 
-func Test_ComidDisplayCmd_file_with_invalid_comid(t *testing.T) {
-	var err error
-
-	cmd := NewComidDisplayCmd()
-
-	fs = afero.NewMemMapFs()
-	err = afero.WriteFile(fs, "bad-comid.cbor", []byte{0xa0}, 0400)
-	require.NoError(t, err)
-
-	args := []string{
-		"--file=bad-comid.cbor",
-	}
-	cmd.SetArgs(args)
-
-	err = cmd.Execute()
-	assert.EqualError(t, err, "1/1 display(s) failed")
-}
-
 func Test_ComidDisplayCmd_file_with_valid_comid(t *testing.T) {
 	var err error
 

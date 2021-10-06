@@ -48,7 +48,7 @@ func NewCorimVerifyCmd() *cobra.Command {
 		},
 	}
 
-	corimVerifyCorimFile = cmd.Flags().StringP("corim-file", "f", "", "an signed CoRIM file (in CBOR format)")
+	corimVerifyCorimFile = cmd.Flags().StringP("corim-file", "f", "", "a signed CoRIM file (in CBOR format)")
 	corimVerifyKeyFile = cmd.Flags().StringP("key-file", "k", "", "verification key in JWK format")
 
 	return cmd

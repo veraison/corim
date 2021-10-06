@@ -107,8 +107,7 @@ func Example_encode() {
 		fmt.Printf("%x\n", cbor)
 	}
 
-	prettyPrint := false
-	json, err := comid.ToJSON(prettyPrint)
+	json, err := comid.ToJSON()
 	if err == nil {
 		fmt.Printf("%s\n", string(json))
 	}
@@ -164,8 +163,7 @@ func Example_encode_PSA() {
 		fmt.Printf("%x\n", cbor)
 	}
 
-	prettyPrint := false
-	json, err := comid.ToJSON(prettyPrint)
+	json, err := comid.ToJSON()
 	if err == nil {
 		fmt.Printf("%s\n", string(json))
 	}
@@ -197,8 +195,7 @@ func Example_encode_PSA_attestation_verification() {
 		fmt.Printf("%x\n", cbor)
 	}
 
-	prettyPrint := false
-	json, err := comid.ToJSON(prettyPrint)
+	json, err := comid.ToJSON()
 	if err == nil {
 		fmt.Printf("%s", string(json))
 	}
