@@ -4,6 +4,7 @@
 package corim
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -132,4 +133,9 @@ func (o Meta) ToCBOR() ([]byte, error) {
 // FromCBOR deserializes the supplied CBOR data into the target Meta
 func (o *Meta) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
+}
+
+// FromJSON deserializes the supplied JSON data into the target Meta
+func (o *Meta) FromJSON(data []byte) error {
+	return json.Unmarshal(data, o)
 }
