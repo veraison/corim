@@ -4,9 +4,13 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/afero"
+	"github.com/veraison/corim/comid"
+	"github.com/veraison/swid"
 )
 
 func filesList(files, dirs []string, ext string) []string {
@@ -32,4 +36,37 @@ func filesList(files, dirs []string, ext string) []string {
 	}
 
 	return l
+}
+
+type FromCBORLoader interface {
+	FromCBOR([]byte) error
+}
+
+func printJSONFromCBOR(fcl FromCBORLoader, cbor []byte, heading string) error {
+	var (
+		err error
+		j   []byte
+	)
+
+	if err = fcl.FromCBOR(cbor); err != nil {
+		return fmt.Errorf("CBOR decoding failed: %w", err)
+	}
+
+	indent := "  "
+	if j, err = json.MarshalIndent(fcl, "", indent); err != nil {
+		return fmt.Errorf("JSON encoding failed: %w", err)
+	}
+
+	fmt.Println(heading)
+	fmt.Println(string(j))
+
+	return nil
+}
+
+func printComid(cbor []byte, heading string) error {
+	return printJSONFromCBOR(&comid.Comid{}, cbor, heading)
+}
+
+func printCoswid(cbor []byte, heading string) error {
+	return printJSONFromCBOR(&swid.SoftwareIdentity{}, cbor, heading)
 }

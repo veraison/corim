@@ -139,3 +139,8 @@ func (o *Meta) FromCBOR(data []byte) error {
 func (o *Meta) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
+
+// ToJSON serializes the target Meta to JSON
+func (o Meta) ToJSON() ([]byte, error) {
+	return json.Marshal(&o)
+}

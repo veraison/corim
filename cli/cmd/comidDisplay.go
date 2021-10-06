@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/veraison/corim/comid"
 )
 
 var (
@@ -47,7 +46,7 @@ func NewComidDisplayCmd() *cobra.Command {
 
 			errs := 0
 			for _, file := range filesList {
-				if err := displayComid(file); err != nil {
+				if err := displayComidFile(file); err != nil {
 					fmt.Printf("failed displaying %q: %v", file, err)
 					errs++
 					continue
@@ -72,31 +71,18 @@ func NewComidDisplayCmd() *cobra.Command {
 	return cmd
 }
 
-func displayComid(file string) error {
+func displayComidFile(file string) error {
 	var (
 		data []byte
 		err  error
-		c    comid.Comid
 	)
 
 	if data, err = afero.ReadFile(fs, file); err != nil {
 		return fmt.Errorf("error loading CoMID from %s: %w", file, err)
 	}
 
-	if err = c.FromCBOR(data); err != nil {
-		return fmt.Errorf("error decoding CoMID from %s: %w", file, err)
-	}
-
-	prettyPrint := true
-	json, err := c.ToJSON(prettyPrint)
-	if err != nil {
-		return fmt.Errorf("error JSON encoding CoMID %s: %w", file, err)
-	}
-
-	fmt.Println("[ ", file, " ]")
-	fmt.Println(string(json))
-
-	return nil
+	// use file name as heading
+	return printComid(data, file)
 }
 
 func checkComidDisplayArgs() error {

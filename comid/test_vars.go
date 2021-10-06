@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"net"
+	"regexp"
 	"testing"
 
 	"github.com/google/uuid"
@@ -33,6 +34,11 @@ var (
 )
 
 func MustHexDecode(t *testing.T, s string) []byte {
+	// allow long hex string to be split over multiple lines (with soft or hard
+	// tab indentation)
+	m := regexp.MustCompile("[ \t\n]")
+	s = m.ReplaceAllString(s, "")
+
 	data, err := hex.DecodeString(s)
 	if t != nil {
 		require.Nil(t, err)
