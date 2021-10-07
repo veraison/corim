@@ -37,7 +37,7 @@ func Test_CorimExtractCmd_non_existent_corim_file(t *testing.T) {
 	cmd := NewCorimExtractCmd()
 
 	args := []string{
-		"--corim-file=nonexistent.cbor",
+		"--file=nonexistent.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -51,7 +51,7 @@ func Test_CorimExtractCmd_bad_signed_corim(t *testing.T) {
 	cmd := NewCorimExtractCmd()
 
 	args := []string{
-		"--corim-file=bad.txt",
+		"--file=bad.txt",
 	}
 	cmd.SetArgs(args)
 
@@ -67,7 +67,7 @@ func Test_CorimExtractCmd_invalid_signed_corim(t *testing.T) {
 	cmd := NewCorimExtractCmd()
 
 	args := []string{
-		"--corim-file=invalid.cbor",
+		"--file=invalid.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -83,7 +83,7 @@ func Test_CorimExtractCmd_ok_save_to_default_dir(t *testing.T) {
 	cmd := NewCorimExtractCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
+		"--file=ok.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -106,7 +106,7 @@ func Test_CorimExtractCmd_ok_save_to_non_default_dir(t *testing.T) {
 	cmd := NewCorimExtractCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
+		"--file=ok.cbor",
 		"--output-dir=my-dir/",
 	}
 	cmd.SetArgs(args)

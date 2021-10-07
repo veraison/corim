@@ -6,7 +6,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -30,16 +29,19 @@ func NewComidCreateCmd() *cobra.Command {
 	Create CoMIDs from templates t1.json and t2.json, plus any template found in
 	the templates/ directory.  Save them to the current working directory.
 	
-	  cli comid create --tmpl-file=t1.json \
-	                   --tmpl-file=t2.json \
-	                   --tmpl-dir=templates
+	  cli comid create --template=t1.json \
+	                   --template=t2.json \
+	                   --template-dir=templates
 	  
 	Create one CoMID from template t3.json and save it to the comids/ directory.
 	Note that the output directory must exist.
 	
-	  cli comid create --tmpl-file=t3.json --output-dir=comids
-	`,
+	  cli comid create --template=t3.json --output-dir=comids
 
+	Note: since the output file is deterministically generated from the template
+	file name, all the template file names (when from different directories)
+	MUST be different.
+	`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkComidCreateArgs(); err != nil {
 				return err
@@ -63,11 +65,11 @@ func NewComidCreateCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringArrayVarP(
-		&comidCreateFiles, "tmpl-file", "f", []string{}, "a CoMID template file (in JSON format)",
+		&comidCreateFiles, "template", "t", []string{}, "a CoMID template file (in JSON format)",
 	)
 
 	cmd.Flags().StringArrayVarP(
-		&comidCreateDirs, "tmpl-dir", "d", []string{}, "a directory containing CoMID template files",
+		&comidCreateDirs, "template-dir", "T", []string{}, "a directory containing CoMID template files",
 	)
 
 	cmd.Flags().StringVarP(
@@ -109,8 +111,7 @@ func templateToCBOR(tmplFile, outputDir string) (string, error) {
 		return "", fmt.Errorf("error encoding template %s to CBOR: %w", tmplFile, err)
 	}
 
-	// we can use tag-id as the basename, since it is supposedly unique
-	cborFile = filepath.Join(outputDir, c.TagIdentity.TagID.String()+".cbor")
+	cborFile = makeFileName(outputDir, tmplFile, ".cbor")
 
 	err = afero.WriteFile(fs, cborFile, cborData, 0644)
 	if err != nil {

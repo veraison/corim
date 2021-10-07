@@ -37,7 +37,7 @@ func Test_CorimDisplayCmd_non_existent_corim_file(t *testing.T) {
 	cmd := NewCorimDisplayCmd()
 
 	args := []string{
-		"--corim-file=nonexistent.cbor",
+		"--file=nonexistent.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -51,7 +51,7 @@ func Test_CorimDisplayCmd_bad_signed_corim(t *testing.T) {
 	cmd := NewCorimDisplayCmd()
 
 	args := []string{
-		"--corim-file=bad.txt",
+		"--file=bad.txt",
 	}
 	cmd.SetArgs(args)
 
@@ -67,7 +67,7 @@ func Test_CorimDisplayCmd_invalid_signed_corim(t *testing.T) {
 	cmd := NewCorimDisplayCmd()
 
 	args := []string{
-		"--corim-file=invalid.cbor",
+		"--file=invalid.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -83,7 +83,7 @@ func Test_CorimDisplayCmd_ok_top_level_view(t *testing.T) {
 	cmd := NewCorimDisplayCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
+		"--file=ok.cbor",
 	}
 	cmd.SetArgs(args)
 
@@ -99,7 +99,7 @@ func Test_CorimDisplayCmd_ok_nested_view(t *testing.T) {
 	cmd := NewCorimDisplayCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
+		"--file=ok.cbor",
 		"--show-tags",
 	}
 	cmd.SetArgs(args)

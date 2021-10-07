@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/afero"
 	"github.com/veraison/corim/comid"
@@ -69,4 +70,16 @@ func printComid(cbor []byte, heading string) error {
 
 func printCoswid(cbor []byte, heading string) error {
 	return printJSONFromCBOR(&swid.SoftwareIdentity{}, cbor, heading)
+}
+
+func makeFileName(dirName, baseName, ext string) string {
+	return filepath.Join(
+		dirName,
+		filepath.Base(
+			strings.TrimSuffix(
+				baseName,
+				filepath.Ext(baseName),
+			),
+		)+ext,
+	)
 }
