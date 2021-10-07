@@ -138,7 +138,6 @@ func TestRoles_ToCBOR_ok(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, tv.expected, actual)
-
 	}
 }
 

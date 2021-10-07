@@ -107,7 +107,7 @@ func Test_CorimCreateCmd_with_a_bad_comid(t *testing.T) {
 	fs = afero.NewMemMapFs()
 	err = afero.WriteFile(fs, "min-tmpl.json", minimalCorimTemplate, 0644)
 	require.NoError(t, err)
-	err = afero.WriteFile(fs, "bad-comid.cbor", BadCBOR, 0644)
+	err = afero.WriteFile(fs, "bad-comid.cbor", badCBOR, 0644)
 	require.NoError(t, err)
 
 	args := []string{
@@ -128,7 +128,7 @@ func Test_CorimCreateCmd_with_an_invalid_comid(t *testing.T) {
 	fs = afero.NewMemMapFs()
 	err = afero.WriteFile(fs, "min-tmpl.json", minimalCorimTemplate, 0644)
 	require.NoError(t, err)
-	err = afero.WriteFile(fs, "invalid-comid.cbor", InvalidComid, 0644)
+	err = afero.WriteFile(fs, "invalid-comid.cbor", invalidComid, 0644)
 	require.NoError(t, err)
 
 	args := []string{
@@ -149,7 +149,7 @@ func Test_CorimCreateCmd_with_a_bad_coswid(t *testing.T) {
 	fs = afero.NewMemMapFs()
 	err = afero.WriteFile(fs, "min-tmpl.json", minimalCorimTemplate, 0644)
 	require.NoError(t, err)
-	err = afero.WriteFile(fs, "bad-coswid.cbor", BadCBOR, 0644)
+	err = afero.WriteFile(fs, "bad-coswid.cbor", badCBOR, 0644)
 	require.NoError(t, err)
 
 	args := []string{
