@@ -15,6 +15,11 @@ var (
 	dm, dmError = initCBORDecMode()
 )
 
+var (
+	CoswidTag = []byte{0xd9, 0x01, 0xf9} // 505()
+	ComidTag  = []byte{0xd9, 0x01, 0xfa} // 506()
+)
+
 func corimTags() cbor.TagSet {
 	corimTagsMap := map[uint64]interface{}{
 		32: comid.TaggedURI(""),
