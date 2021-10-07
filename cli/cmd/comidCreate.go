@@ -57,7 +57,7 @@ func NewComidCreateCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				fmt.Printf("created %q from %q\n", cborFile, tmplFile)
+				fmt.Printf(">> created %q from %q\n", cborFile, tmplFile)
 			}
 
 			return nil
