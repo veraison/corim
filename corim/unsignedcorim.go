@@ -62,10 +62,7 @@ func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
 			return nil
 		}
 
-		// d9 01fa # tag(506)
-		comidTag := []byte{0xd9, 0x01, 0xfa}
-
-		taggedComid := append(comidTag, comidCBOR...)
+		taggedComid := append(ComidTag, comidCBOR...)
 
 		o.Tags = append(o.Tags, taggedComid)
 	}
@@ -86,10 +83,7 @@ func (o *UnsignedCorim) AddCoswid(c swid.SoftwareIdentity) *UnsignedCorim {
 			return nil
 		}
 
-		// d9 01f9 # tag(505)
-		coswidTag := []byte{0xd9, 0x01, 0xf9}
-
-		taggedCoswid := append(coswidTag, coswidCBOR...)
+		taggedCoswid := append(CoswidTag, coswidCBOR...)
 
 		o.Tags = append(o.Tags, taggedCoswid)
 	}

@@ -98,13 +98,8 @@ func display(signedCorimFile string, showTags bool) error {
 	if showTags {
 		fmt.Println("Tags:")
 		for i, e := range s.UnsignedCorim.Tags {
-			var (
-				coswidTag = []byte{0xd9, 0x01, 0xf9} // 505()
-				comidTag  = []byte{0xd9, 0x01, 0xfa} // 506()
-			)
-
 			// need at least 3 bytes for the tag and 1 for the smallest bstr
-			if len(e) < len(comidTag)+1 {
+			if len(e) < 3+1 {
 				fmt.Printf(">> skipping malformed tag at index %d\n", i)
 				continue
 			}
@@ -114,16 +109,16 @@ func display(signedCorimFile string, showTags bool) error {
 
 			hdr := fmt.Sprintf(">> [ %d ]", i)
 
-			if bytes.Equal(cborTag, comidTag) {
+			if bytes.Equal(cborTag, corim.ComidTag) {
 				if err = printComid(cborData, hdr); err != nil {
 					fmt.Printf(">> skipping malformed CoMID tag at index %d: %v\n", i, err)
 				}
-			} else if bytes.Equal(cborTag, coswidTag) {
+			} else if bytes.Equal(cborTag, corim.CoswidTag) {
 				if err = printCoswid(cborData, hdr); err != nil {
 					fmt.Printf(">> skipping malformed CoSWID tag at index %d: %v\n", i, err)
 				}
 			} else {
-				fmt.Printf("unmatched CBOR tag: %x\n", e[:2])
+				fmt.Printf(">> unmatched CBOR tag: %x\n", cborTag)
 			}
 		}
 	}
