@@ -19,9 +19,16 @@ var (
 	stringToRole = map[string]Role{
 		"manifestCreator": RoleManifestCreator,
 	}
+	roleToString = map[Role]string{
+		RoleManifestCreator: "manifestCreator",
+	}
 )
 
 type Roles []Role
+
+func NewRoles() *Roles {
+	return &Roles{}
+}
 
 // Add appends the supplied roles to Roles list.
 func (o *Roles) Add(roles ...Role) *Roles {
@@ -62,10 +69,6 @@ func (o *Roles) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(a) == 0 {
-		return fmt.Errorf("no roles found")
-	}
-
 	for _, s := range a {
 		r, ok := stringToRole[s]
 		if !ok {
@@ -75,4 +78,44 @@ func (o *Roles) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (o Roles) MarshalJSON() ([]byte, error) {
+	roles := []string{}
+
+	for _, r := range o {
+		s, ok := roleToString[r]
+		if !ok {
+			return nil, fmt.Errorf("unknown role %d", r)
+		}
+		roles = append(roles, s)
+	}
+
+	return json.Marshal(roles)
+}
+
+func (o Roles) ToJSON() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, fmt.Errorf("validation failed: %w", err)
+	}
+
+	data, err := o.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("encoding failed: %w", err)
+	}
+
+	return data, err
+}
+
+func (o *Roles) FromJSON(data []byte) error {
+	if err := o.UnmarshalJSON(data); err != nil {
+		return fmt.Errorf("decoding failed: %w", err)
+	}
+
+	err := o.Valid()
+	if err != nil {
+		return fmt.Errorf("validation failed: %w", err)
+	}
+
+	return err
 }

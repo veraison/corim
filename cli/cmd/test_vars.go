@@ -9,9 +9,9 @@ var (
 	minimalCorimTemplate = []byte(`{
 		"corim-id": "5c57e8f4-46cd-421b-91c9-08cf93e13cfc"
 	}`)
-	BadCBOR = comid.MustHexDecode(nil, "ffff")
+	badCBOR = comid.MustHexDecode(nil, "ffff")
 	// a "tag-id only" CoMID {1: {0: h'366D0A0A598845ED84882F2A544F6242'}}
-	InvalidComid = comid.MustHexDecode(nil,
+	invalidComid = comid.MustHexDecode(nil,
 		"a101a10050366d0a0a598845ed84882f2a544f6242",
 	)
 	// note: embedded CoSWIDs are not validated {0: h'5C57E8F446CD421B91C908CF93E13CFC', 1: [505(h'deadbeef')]}
