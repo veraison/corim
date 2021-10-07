@@ -36,17 +36,17 @@ func NewCorimCreateCmd() *cobra.Command {
 	output file is set, the (unsigned) CoRIM is saved to the current directory
 	with tag-id as basename and a .cbor extension.
 
-	  cli corim create --tmpl-file=t1.json --comid-dir=comid --coswid-dir=coswid
+	  cli corim create --template=t1.json --comid-dir=comid --coswid-dir=coswid
 	 
 	Create a CoRIM from template corim-template.json, adding CoMID stored in
 	comid1.cbor and the two CoSWIDs stored in coswid1.cbor and dir/coswid2.cbor.
 	The (unsigned) CoRIM is saved to corim.cbor.
 
-	  cli corim create --tmpl-file=corim-template.json \
-	                   --comid-file=comid1.cbor \
-	                   --coswid-file=coswid1.cbor \
-	                   --coswid-file=dir/coswid2.cbor \
-	                   --ouptut-file=corim.cbor
+	  cli corim create --template=corim-template.json \
+	                   --comid=comid1.cbor \
+	                   --coswid=coswid1.cbor \
+	                   --coswid=dir/coswid2.cbor \
+	                   --output=corim.cbor
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,14 +73,14 @@ func NewCorimCreateCmd() *cobra.Command {
 		},
 	}
 
-	corimCreateCorimFile = cmd.Flags().StringP("tmpl-file", "f", "", "a CoRIM template file (in JSON format)")
+	corimCreateCorimFile = cmd.Flags().StringP("template", "t", "", "a CoRIM template file (in JSON format)")
 
 	cmd.Flags().StringArrayVarP(
 		&corimCreateComidDirs, "comid-dir", "M", []string{}, "a directory containing CBOR-encoded CoMID files",
 	)
 
 	cmd.Flags().StringArrayVarP(
-		&corimCreateComidFiles, "comid-file", "m", []string{}, "a CBOR-encoded CoMID file",
+		&corimCreateComidFiles, "comid", "m", []string{}, "a CBOR-encoded CoMID file",
 	)
 
 	cmd.Flags().StringArrayVarP(
@@ -88,10 +88,10 @@ func NewCorimCreateCmd() *cobra.Command {
 	)
 
 	cmd.Flags().StringArrayVarP(
-		&corimCreateCoswidFiles, "coswid-file", "s", []string{}, "a CBOR-encoded CoSWID file",
+		&corimCreateCoswidFiles, "coswid", "s", []string{}, "a CBOR-encoded CoSWID file",
 	)
 
-	corimCreateOutputFile = cmd.Flags().StringP("output-file", "o", "", "name of the generated (unsigned) CoRIM file")
+	corimCreateOutputFile = cmd.Flags().StringP("output", "o", "", "name of the generated (unsigned) CoRIM file")
 
 	return cmd
 }
@@ -183,8 +183,7 @@ func corimTemplateToCBOR(tmplFile string, comidFiles, coswidFiles []string, outp
 	}
 
 	if outputFile == nil || *outputFile == "" {
-		// we can use tag-id as the basename, since it is supposedly unique
-		corimFile = c.ID.String() + ".cbor"
+		corimFile = makeFileName("", tmplFile, ".cbor")
 	} else {
 		corimFile = *outputFile
 	}

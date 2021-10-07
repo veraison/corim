@@ -29,12 +29,12 @@ func NewCorimDisplayCmd() *cobra.Command {
 
 	Display the contents of the signed CoRIM signed-corim.cbor 
 	
-	  cli corim display --corim-file signed-corim.cbor
+	  cli corim display --file signed-corim.cbor
 
 	Display the contents of the signed CoRIM yet-another-signed-corim.cbor and
 	also unpack any embedded CoRIM and CoSWID
 	
-	  cli corim display --corim-file yet-another-signed-corim.cbor --show-tags
+	  cli corim display --file yet-another-signed-corim.cbor --show-tags
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -50,7 +50,7 @@ func NewCorimDisplayCmd() *cobra.Command {
 		},
 	}
 
-	corimDisplayCorimFile = cmd.Flags().StringP("corim-file", "f", "", "a signed CoRIM file (in CBOR format)")
+	corimDisplayCorimFile = cmd.Flags().StringP("file", "f", "", "a signed CoRIM file (in CBOR format)")
 	corimDisplayShowTags = cmd.Flags().BoolP("show-tags", "v", false, "display embedded tags")
 
 	return cmd

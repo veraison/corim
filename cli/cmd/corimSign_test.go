@@ -25,8 +25,8 @@ func Test_CorimSignCmd_mandatory_args_missing_corim_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--key-file=ignored.jwk",
-		"--meta-file=ignored.json",
+		"--key=ignored.jwk",
+		"--meta=ignored.json",
 	}
 	cmd.SetArgs(args)
 
@@ -38,8 +38,8 @@ func Test_CorimSignCmd_mandatory_args_missing_meta_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ignored.cbor",
-		"--key-file=ignored.jwk",
+		"--file=ignored.cbor",
+		"--key=ignored.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -51,8 +51,8 @@ func Test_CorimSignCmd_mandatory_args_missing_key_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ignored.cbor",
-		"--meta-file=ignored.json",
+		"--file=ignored.cbor",
+		"--meta=ignored.json",
 	}
 	cmd.SetArgs(args)
 
@@ -64,9 +64,9 @@ func Test_CorimSignCmd_non_existent_unsigned_corim_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=nonexistent.cbor",
-		"--key-file=ignored.jwk",
-		"--meta-file=ignored.json",
+		"--file=nonexistent.cbor",
+		"--key=ignored.jwk",
+		"--meta=ignored.json",
 	}
 	cmd.SetArgs(args)
 
@@ -80,9 +80,9 @@ func Test_CorimSignCmd_bad_unsigned_corim(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=bad.txt",
-		"--key-file=ignored.jwk",
-		"--meta-file=ignored.json",
+		"--file=bad.txt",
+		"--key=ignored.jwk",
+		"--meta=ignored.json",
 	}
 	cmd.SetArgs(args)
 
@@ -98,9 +98,9 @@ func Test_CorimSignCmd_invalid_unsigned_corim(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=invalid.cbor",
-		"--key-file=ignored.jwk",
-		"--meta-file=ignored.json",
+		"--file=invalid.cbor",
+		"--key=ignored.jwk",
+		"--meta=ignored.json",
 	}
 	cmd.SetArgs(args)
 
@@ -116,9 +116,9 @@ func Test_CorimSignCmd_non_existent_meta_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ignored.jwk",
-		"--meta-file=nonexistent.json",
+		"--file=ok.cbor",
+		"--key=ignored.jwk",
+		"--meta=nonexistent.json",
 	}
 	cmd.SetArgs(args)
 
@@ -134,9 +134,9 @@ func Test_CorimSignCmd_bad_meta_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ignored.jwk",
-		"--meta-file=bad.json",
+		"--file=ok.cbor",
+		"--key=ignored.jwk",
+		"--meta=bad.json",
 	}
 	cmd.SetArgs(args)
 
@@ -154,9 +154,9 @@ func Test_CorimSignCmd_invalid_meta_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ignored.jwk",
-		"--meta-file=invalid.json",
+		"--file=ok.cbor",
+		"--key=ignored.jwk",
+		"--meta=invalid.json",
 	}
 	cmd.SetArgs(args)
 
@@ -174,9 +174,9 @@ func Test_CorimSignCmd_non_existent_key_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=nonexistent.jwk",
-		"--meta-file=ok.json",
+		"--file=ok.cbor",
+		"--key=nonexistent.jwk",
+		"--meta=ok.json",
 	}
 	cmd.SetArgs(args)
 
@@ -194,9 +194,9 @@ func Test_CorimSignCmd_invalid_key_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=invalid.jwk",
-		"--meta-file=ok.json",
+		"--file=ok.cbor",
+		"--key=invalid.jwk",
+		"--meta=ok.json",
 	}
 	cmd.SetArgs(args)
 
@@ -216,9 +216,9 @@ func Test_CorimSignCmd_ok_with_default_output_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ok.jwk",
-		"--meta-file=ok.json",
+		"--file=ok.cbor",
+		"--key=ok.jwk",
+		"--meta=ok.json",
 	}
 	cmd.SetArgs(args)
 
@@ -241,10 +241,10 @@ func Test_CorimSignCmd_ok_with_custom_output_file(t *testing.T) {
 	cmd := NewCorimSignCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ok.jwk",
-		"--meta-file=ok.json",
-		"--output-file=my-signed-corim.cbor",
+		"--file=ok.cbor",
+		"--key=ok.jwk",
+		"--meta=ok.json",
+		"--output=my-signed-corim.cbor",
 	}
 	cmd.SetArgs(args)
 

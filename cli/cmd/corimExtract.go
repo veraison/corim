@@ -30,13 +30,13 @@ func NewCorimExtractCmd() *cobra.Command {
 	Extract the contents of the signed CoRIM signed-corim.cbor to the current
 	directory
 	
-	  cli corim extract --corim-file signed-corim.cbor
+	  cli corim extract --file=signed-corim.cbor
 
 	Extract the contents of the signed CoRIM yet-another-signed-corim.cbor and
 	store them to directory my-dir.  Note that my-dir must exist.
 	
-	  cli corim extract --corim-file yet-another-signed-corim.cbor \
-	                    --output-dir my-dir
+	  cli corim extract --file=yet-another-signed-corim.cbor \
+	                    --output-dir=my-dir
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -52,7 +52,7 @@ func NewCorimExtractCmd() *cobra.Command {
 		},
 	}
 
-	corimExtractCorimFile = cmd.Flags().StringP("corim-file", "f", "", "a signed CoRIM file (in CBOR format)")
+	corimExtractCorimFile = cmd.Flags().StringP("file", "f", "", "a signed CoRIM file (in CBOR format)")
 	corimExtractOutputDir = cmd.Flags().StringP("output-dir", "o", ".", "folder to which CoSWIDs and CoMIDs are saved")
 
 	return cmd

@@ -25,7 +25,7 @@ func Test_CorimVerifyCmd_mandatory_args_missing_corim_file(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--key-file=ignored.jwk",
+		"--key=ignored.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -37,7 +37,7 @@ func Test_CorimVerifyCmd_mandatory_args_missing_key_file(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=ignored.jwk",
+		"--file=ignored.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -49,8 +49,8 @@ func Test_CorimVerifyCmd_non_existent_signed_corim_file(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=nonexistent.cbor",
-		"--key-file=ignored.jwk",
+		"--file=nonexistent.cbor",
+		"--key=ignored.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -64,8 +64,8 @@ func Test_CorimVerifyCmd_bad_signed_corim(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=bad.txt",
-		"--key-file=ignored.jwk",
+		"--file=bad.txt",
+		"--key=ignored.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -81,8 +81,8 @@ func Test_CorimVerifyCmd_non_existent_key_file(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=nonexistent.jwk",
+		"--file=ok.cbor",
+		"--key=nonexistent.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -98,8 +98,8 @@ func Test_CorimVerifyCmd_invalid_key_file(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=invalid.jwk",
+		"--file=ok.cbor",
+		"--key=invalid.jwk",
 	}
 	cmd.SetArgs(args)
 
@@ -117,8 +117,8 @@ func Test_CorimVerifyCmd_ok(t *testing.T) {
 	cmd := NewCorimVerifyCmd()
 
 	args := []string{
-		"--corim-file=ok.cbor",
-		"--key-file=ok.jwk",
+		"--file=ok.cbor",
+		"--key=ok.jwk",
 	}
 	cmd.SetArgs(args)
 

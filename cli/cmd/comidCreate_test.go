@@ -35,8 +35,8 @@ func Test_ComidCreateCmd_no_files_found(t *testing.T) {
 	cmd := NewComidCreateCmd()
 
 	args := []string{
-		"--tmpl-file=unknown",
-		"--tmpl-dir=unsure",
+		"--template=unknown",
+		"--template-dir=unsure",
 	}
 	cmd.SetArgs(args)
 
@@ -54,7 +54,7 @@ func Test_ComidCreateCmd_template_with_invalid_json(t *testing.T) {
 	require.NoError(t, err)
 
 	args := []string{
-		"--tmpl-file=invalid.json",
+		"--template=invalid.json",
 	}
 	cmd.SetArgs(args)
 
@@ -72,7 +72,7 @@ func Test_ComidCreateCmd_template_with_invalid_comid(t *testing.T) {
 	require.NoError(t, err)
 
 	args := []string{
-		"--tmpl-file=bad-comid.json",
+		"--template=bad-comid.json",
 	}
 	cmd.SetArgs(args)
 
@@ -90,15 +90,14 @@ func Test_ComidCreateCmd_template_from_file_to_default_dir(t *testing.T) {
 	require.NoError(t, err)
 
 	args := []string{
-		"--tmpl-file=ok.json",
+		"--template=ok.json",
 	}
 	cmd.SetArgs(args)
 
 	err = cmd.Execute()
 	assert.NoError(t, err)
 
-	// $tag-id ".cbor"
-	expectedFileName := "43bbe37f-2e61-4b33-aed3-53cff1428b16.cbor"
+	expectedFileName := "ok.cbor"
 
 	_, err = fs.Stat(expectedFileName)
 	assert.NoError(t, err)
@@ -114,7 +113,7 @@ func Test_ComidCreateCmd_template_from_dir_to_custom_dir(t *testing.T) {
 	require.NoError(t, err)
 
 	args := []string{
-		"--tmpl-dir=testdir",
+		"--template-dir=testdir",
 		"--output-dir=testdir",
 	}
 	cmd.SetArgs(args)
@@ -122,8 +121,7 @@ func Test_ComidCreateCmd_template_from_dir_to_custom_dir(t *testing.T) {
 	err = cmd.Execute()
 	assert.NoError(t, err)
 
-	// $tag-id ".cbor"
-	expectedFileName := "testdir/43bbe37f-2e61-4b33-aed3-53cff1428b16.cbor"
+	expectedFileName := "testdir/ok.cbor"
 
 	_, err = fs.Stat(expectedFileName)
 	assert.NoError(t, err)

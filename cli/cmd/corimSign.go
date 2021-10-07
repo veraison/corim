@@ -32,10 +32,10 @@ func NewCorimSignCmd() *cobra.Command {
 	file key.jwk and save the resulting COSE Sign1 to signed-corim.cbor.  Read
 	the relevant CorimMeta information from file meta.json.
 	
-	  cli corim sign --corim-file=unsigned-corim.cbor \
-	             --key-file key.jwk \
-				 --meta-file meta.json \
-				 --output-file signed-corim.cbor
+	  cli corim sign --file=unsigned-corim.cbor \
+	             --key=key.jwk \
+				 --meta=meta.json \
+				 --output=signed-corim.cbor
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -55,10 +55,10 @@ func NewCorimSignCmd() *cobra.Command {
 		},
 	}
 
-	corimSignCorimFile = cmd.Flags().StringP("corim-file", "f", "", "an unsigned CoRIM file (in CBOR format)")
-	corimSignMetaFile = cmd.Flags().StringP("meta-file", "m", "", "CoRIM Meta file (in JSON format)")
-	corimSignKeyFile = cmd.Flags().StringP("key-file", "k", "", "signing key in JWK format")
-	corimSignOutputFile = cmd.Flags().StringP("output-file", "o", "", "name of the generated COSE Sign1 file")
+	corimSignCorimFile = cmd.Flags().StringP("file", "f", "", "an unsigned CoRIM file (in CBOR format)")
+	corimSignMetaFile = cmd.Flags().StringP("meta", "m", "", "CoRIM Meta file (in JSON format)")
+	corimSignKeyFile = cmd.Flags().StringP("key", "k", "", "signing key in JWK format")
+	corimSignOutputFile = cmd.Flags().StringP("output", "o", "", "name of the generated COSE Sign1 file")
 
 	return cmd
 }

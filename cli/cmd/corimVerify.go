@@ -29,7 +29,7 @@ func NewCorimVerifyCmd() *cobra.Command {
 	Verify the signed CoRIM signed-corim.cbor using the key in JWK format from
 	file key.jwk
 	
-	  cli corim verify --corim-file=unverifyed-corim.cbor --key-file key.jwk
+	  cli corim verify --file=signed-corim.cbor --key=key.jwk
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -48,8 +48,8 @@ func NewCorimVerifyCmd() *cobra.Command {
 		},
 	}
 
-	corimVerifyCorimFile = cmd.Flags().StringP("corim-file", "f", "", "a signed CoRIM file (in CBOR format)")
-	corimVerifyKeyFile = cmd.Flags().StringP("key-file", "k", "", "verification key in JWK format")
+	corimVerifyCorimFile = cmd.Flags().StringP("file", "f", "", "a signed CoRIM file (in CBOR format)")
+	corimVerifyKeyFile = cmd.Flags().StringP("key", "k", "", "verification key in JWK format")
 
 	return cmd
 }
