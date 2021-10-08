@@ -2,22 +2,22 @@
 
 ## Installing and configuring
 
-To install the `cli` command, do:
+To install the `cocli` command, do:
 ```
-$ go install github.com/veraison/corim/cli
+$ go install github.com/veraison/corim/cocli
 ```
 
 To configure auto-completion, use the `completion` subcommand.  For example, if
 `bash` is your shell, you would do something like:
 ```
-$ cli completion bash > ~/.bash_completion.d/cli
+$ cocli completion bash > ~/.bash_completion.d/cocli
 $ . .bash_completion
 ```
 to get automatic command completion and suggestions using the TAB key.
 
 To get a list of the supported shells, do:
 ```
-$ cli completion --help
+$ cocli completion --help
 ```
 
 ## CoMIDs manipulation
@@ -30,7 +30,7 @@ Use the `comid create` subcommand to create a CBOR-encoded CoMID, passing its
 JSON representation<sup>[1](#templates-ex)</sup> via the `--template` switch (or
 equivalently its `-t` shorthand):
 ```
-$ cli comid create --template t1.json
+$ cocli comid create --template t1.json
 ```
 On success, you should see something like the following printed to stdout:
 ```
@@ -41,7 +41,7 @@ The CBOR-encoded CoMID file is stored in the current working directory with a
 name derived from its template.  If you want, you can specify a different
 target directory using the `--output-dir` command line switch (abbrev. `-o`)
 ```
-$ cli comid create --template t1.json --output-dir /tmp
+$ cocli comid create --template t1.json --output-dir /tmp
 >> created "/tmp/t1.cbor" from "t1.json"
 ```
 Note that the output directory, as well as all its parent directories, MUST
@@ -60,7 +60,7 @@ templates/
 Then, you can use the `--template-dir` (abbrev. `-T`), and let the tool load,
 validate, and CBOR-encode the templates one by one:
 ```
-$ cli comid create --template-dir templates
+$ cocli comid create --template-dir templates
 >> created "t1.cbor" from "templates/t1.json"
 >> created "t2.cbor" from "templates/t2.json"
 ...
@@ -70,7 +70,7 @@ $ cli comid create --template-dir templates
 You can specify both the `-T` and `-t` switches as many times as needed, and
 even combine them in one invocation:
 ```
-$ cli comid create -T comid-templates/ \
+$ cocli comid create -T comid-templates/ \
                    -T comid-templates-aux/ \
                    -t extra-comid.json \
                    -t yet-another-comid.json \
@@ -94,7 +94,7 @@ validation error will be printed alongside the corresponding file name.
 
 For example:
 ```
-$ cli comid display --file m1.cbor
+$ cocli comid display --file m1.cbor
 ```
 provided the `m1.cbor` file contains valid CoMID, would print something like:
 ```
@@ -126,7 +126,7 @@ comids.d/
 ```
 could be inspected in one go using:
 ```
-$ cli comid display --dir comids.d/
+$ cocli comid display --dir comids.d/
 ```
 which would output something like:
 ```
@@ -150,7 +150,7 @@ Error: 1/3 display(s) failed
 
 One of more files and directories can be supplied in the same invocation, e.g.:
 ```
-$ cli comid display -f m1.cbor \
+$ cocli comid display -f m1.cbor \
                     -f comids.d/m2.cbor \
                     -d /var/spool/comids \
                     -d yet-another-comid-folder/
@@ -169,7 +169,7 @@ passing its JSON representation<sup>[1](#templates-ex)</sup> via the
 `--template` switch (or equivalently its `-t` shorthand) together with the
 CBOR-encoded CoMIDs and/or CoSWIDs to be embedded.  For example:
 ```
-$ cli corim create --template c1.json --comid m1.cbor --coswid s1.cbor
+$ cocli corim create --template c1.json --comid m1.cbor --coswid s1.cbor
 ```
 On success, you should see something like the following printed to stdout:
 ```
@@ -180,7 +180,7 @@ The CBOR-encoded CoRIM file is stored in the current working directory with a
 name derived from its template.  If you want, you can specify a different
 file name using the `--output` command line switch (abbrev. `-o`):
 ```
-$ cli corim create -t c1.json -m m1.cbor -s s1.cbor -o my.cbor
+$ cocli corim create -t c1.json -m m1.cbor -s s1.cbor -o my.cbor
 >> created "my.cbor" from "c1.json"
 ```
 
@@ -189,12 +189,12 @@ CoMIDs and CoSWIDs can be either supplied as individual files, using the
 as "per-folder" blocks using the `--comid-dir` (abbrev. `-M`) and `--coswid-dir`
 (abbrev. `-S`) switch.  For example:
 ```
-$ cli corim create --template c1.json --comid-dir comids.d/
+$ cocli corim create --template c1.json --comid-dir comids.d/
 ```
 
 Creation will fail if *any* of the inputs is non conformant:
 ```
-$ cli corim create -t c1.json -M comids.d/
+$ cocli corim create -t c1.json -M comids.d/
 Error: error loading CoMID from comids.d/rubbish.cbor: EOF
 ```
 
@@ -209,12 +209,12 @@ the `--output` switch (abbrev. `-o`).  A CoRIM Meta<sup>[1](#templates-ex)</sup>
 template in JSON format must also be provided using the `--meta` switch (abbrev.
 `-m`).  For example, with the default output file:
 ```
-$ cli corim sign --file corim.cbor --key ec-p256.jwk --meta meta.json
+$ cocli corim sign --file corim.cbor --key ec-p256.jwk --meta meta.json
 >> "corim.cbor" signed and saved to "signed-corim.cbor"
 ```
 Or, the same but with a custom output file:
 ```
-$ cli corim sign --file corim.cbor \
+$ cocli corim sign --file corim.cbor \
                  --key ec-p256.jwk \
                  --meta meta.json \
                  --output /var/spool/signed-corim.cbor
@@ -228,14 +228,14 @@ supplied via the `--file` switch (abbrev. `-f`).  The signature is checked
 using the key supplied via the `--key` switch (abbrev. `-k`), which is expected
 to be in [JWK](https://www.rfc-editor.org/rfc/rfc7517) format.  For example:
 ```
-$ cli corim verify --file signed-corim.cbor --key ec-p256.jwk
+$ cocli corim verify --file signed-corim.cbor --key ec-p256.jwk
 >> "corim.cbor" verified
 ```
 
 Verification can fail either because the cryptographic processing fails or
 because the signed payload or protected headers are themselves invalid.  For example:
 ```
-$ cli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
+$ cocli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
 Error: error verifying signed-corim-bad-signature.cbor with key ec-p256.jwk: verification failed ecdsa.Verify
 ```
 
@@ -251,7 +251,7 @@ validation errors will be printed instead.
 The output has two logical sections: one for Meta and one for the (unsigned)
 CoRIM:
 ```
-$ cli corim display --file signed-corim.cbor
+$ cocli corim display --file signed-corim.cbor
 Meta:
 {
   "signer": {
@@ -275,7 +275,7 @@ will see is the base64 encoding of their CBOR serialisation.  If you want to
 peek at the tags' content, supply the `--show-tags` (abbrev. `-v`) switch, which
 will add a further Tags section with one entry per each expanded tag:
 ```
-$ cli corim display --file signed-corim.cbor --show-tags
+$ cocli corim display --file signed-corim.cbor --show-tags
 Meta:
 {
 [...]
@@ -318,7 +318,7 @@ well as any parent folder exists prior to issuing the command.
 
 On success, the found CoMIDs and CoSWIDs are saved in CBOR format:
 ```
-$ cli corim extract --file signed-corim.cbor --output-dir output.d/
+$ cocli corim extract --file signed-corim.cbor --output-dir output.d/
 $ tree output.d/
 output.d/
 ├── 000000-comid.cbor
