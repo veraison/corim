@@ -221,5 +221,23 @@ $ cli corim sign --file corim.cbor \
 >> "corim.cbor" signed and saved to "/var/spool/signed-corim.cbor"
 ```
 
+### Verify
+
+Use the `corim verify` subcommand to cryptographically verify the signed CoRIM
+supplied via the `--file` switch (abbrev. `-f`).  The signature is checked
+using the key supplied via the `--key` switch (abbrev. `-k`), which is expected
+to be in [JWK](https://www.rfc-editor.org/rfc/rfc7517) format.  For example:
+```
+$ cli corim verify --file signed-corim.cbor --key ec-p256.jwk
+>> "corim.cbor" verified
+```
+
+Verification can fail either because the cryptographic processing fails or
+because the signed payload or protected headers are themselves invalid.  For example:
+```
+$ cli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
+Error: error verifying signed-corim-bad-signature.cbor with key ec-p256.jwk: verification failed ecdsa.Verify
+```
+
 <a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
 templates can be found in the [data/templates](data/templates) folder.

@@ -42,7 +42,7 @@ func NewCorimVerifyCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%q verified\n", *corimVerifyCorimFile)
+			fmt.Printf(">> %q verified\n", *corimVerifyCorimFile)
 
 			return nil
 		},
