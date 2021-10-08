@@ -67,7 +67,7 @@ func NewCorimCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("created %q from %q\n", cborFile, *corimCreateCorimFile)
+			fmt.Printf(">> created %q from %q\n", cborFile, *corimCreateCorimFile)
 
 			return nil
 		},

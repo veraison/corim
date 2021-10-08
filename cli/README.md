@@ -1,5 +1,25 @@
 # Corim Command Line Interface
 
+## Installing and configuring
+
+To install the `cli` command, do:
+```
+$ go install github.com/veraison/corim/cli
+```
+
+To configure auto-completion, use the `completion` subcommand.  For example, if
+`bash` is your shell, you would do something like:
+```
+$ cli completion bash > ~/.bash_completion.d/cli
+$ . .bash_completion
+```
+to get automatic command completion and suggestions using the TAB key.
+
+To get a list of the supported shells, do:
+```
+$ cli completion --help
+```
+
 ## CoMIDs manipulation
 
 The `comid` subcommand allows you to create, display and validate CoMIDs.
@@ -61,7 +81,7 @@ $ cli comid create -T comid-templates/ \
 template file name, all the template files (when from different directories)
 MUST have different base names.
 
-<a name="comid-templates-ex">1</a>: A few examples of CoMID JSON templates,
+<a name="comid-templates-ex">1</a>: A few examples of CoMID JSON templates
 can be found in the [data/templates](data/templates) folder.
 
 ### Display
@@ -137,3 +157,48 @@ $ cli comid display -f m1.cbor \
                     -d /var/spool/comids \
                     -d yet-another-comid-folder/
 ```
+
+## CoRIMs manipulation
+
+The `corim` subcommand allows you to create, display, sign and verify CoRIMs.
+It also provides a means to extract the embedded CoSWIDs and CoMIDs and save
+them as separate files.
+
+### Create
+
+Use the `corim create` subcommand to create a CBOR-encoded, unsigned CoRIM,
+by passing its JSON representation<sup>[2](#corim-templates-ex)</sup> via the
+`--template` switch (or equivalently its `-t` shorthand) together with the
+CBOR-encoded CoMIDs and/or CoSWIDs to be embedded.  For example:
+```
+$ cli corim create --template c1.json --comid m1.cbor --coswid s1.cbor
+```
+On success, you should see something like the following printed to stdout:
+```
+>> created "c1.cbor" from "c1.json"
+```
+
+The CBOR-encoded CoRIM file is stored in the current working directory with a
+name derived from its template.  If you want, you can specify a different
+file name using the `--output` command line switch (abbrev. `-o`):
+```
+$ cli corim create -t c1.json -m m1.cbor -s s1.cbor -o my.cbor
+>> created "my.cbor" from "c1.json"
+```
+
+CoMIDs and CoSWIDs can be either supplied as individual files, using the
+`--comid` (abbrev. `-m`) and `--coswid` (abbrev. `-s`) switches respectively, or
+as "per-folder" blocks using the `--comid-dir` (abbrev. `-M`) and `--coswid-dir`
+(abbrev. `-S`) switch.  For example:
+```
+$ cli corim create --template c1.json --comid-dir comids.d/
+```
+
+Creation will fail if *any* of the inputs is non conformant:
+```
+$ cli corim create -t c1.json -M comids.d/
+Error: error loading CoMID from comids.d/rubbish.cbor: EOF
+
+<a name="corim-templates-ex">2</a>: A few examples of CoRIM and Meta JSON
+templates can be found in the [data/templates](data/templates) folder.
+
