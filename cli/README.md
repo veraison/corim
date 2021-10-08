@@ -306,6 +306,26 @@ Tags:
 }
 ```
 
+### Extract CoSWIDs and CoMIDs
+
+Use the `corim extract` subcommand to extract the embedded CoMIDs and CoSWIDs
+from a signed CoRIM.
+
+You must supply a signed CoRIM file using the `--file` switch (abbrev. `-f`) and
+an optional output folder (default is the current working directory) using the
+`--output-dir` switch (abbrev. `-o`).  Make sure that the output directory as
+well as any parent folder exists prior to issuing the command.
+
+On success, the found CoMIDs and CoSWIDs are saved in CBOR format:
+```
+$ cli corim extract --file signed-corim.cbor --output-dir output.d/
+$ tree output.d/
+output.d/
+├── 000000-comid.cbor
+├── 000001-comid.cbor
+└── 000002-coswid.cbor
+```
+
 
 
 <a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
