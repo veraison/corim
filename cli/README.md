@@ -27,8 +27,8 @@ The `comid` subcommand allows you to create, display and validate CoMIDs.
 ### Create
 
 Use the `comid create` subcommand to create a CBOR-encoded CoMID, passing its
-JSON representation<sup>[1](#comid-templates-ex)</sup> via the `--template`
-switch (or equivalently its `-t` shorthand):
+JSON representation<sup>[1](#templates-ex)</sup> via the `--template` switch (or
+equivalently its `-t` shorthand):
 ```
 $ cli comid create --template t1.json
 ```
@@ -81,8 +81,6 @@ $ cli comid create -T comid-templates/ \
 template file name, all the template files (when from different directories)
 MUST have different base names.
 
-<a name="comid-templates-ex">1</a>: A few examples of CoMID JSON templates
-can be found in the [data/templates](data/templates) folder.
 
 ### Display
 
@@ -166,8 +164,8 @@ them as separate files.
 
 ### Create
 
-Use the `corim create` subcommand to create a CBOR-encoded, unsigned CoRIM,
-by passing its JSON representation<sup>[2](#corim-templates-ex)</sup> via the
+Use the `corim create` subcommand to create a CBOR-encoded, unsigned CoRIM, by
+passing its JSON representation<sup>[1](#templates-ex)</sup> via the
 `--template` switch (or equivalently its `-t` shorthand) together with the
 CBOR-encoded CoMIDs and/or CoSWIDs to be embedded.  For example:
 ```
@@ -198,7 +196,30 @@ Creation will fail if *any* of the inputs is non conformant:
 ```
 $ cli corim create -t c1.json -M comids.d/
 Error: error loading CoMID from comids.d/rubbish.cbor: EOF
+```
 
-<a name="corim-templates-ex">2</a>: A few examples of CoRIM and Meta JSON
+### Sign
+
+Use the `corim sign` subcommand to cryptographically seal the unsigned CoRIM
+supplied via the `--file` switch (abbrev. `-f`).  The signature is produced
+using the key supplied via the `--key` switch (abbrev. `-k`), which is expected
+to be in [JWK](https://www.rfc-editor.org/rfc/rfc7517) format.  On success, the
+resulting COSE Sign1 payload is saved to file whose name can be controlled using
+the `--output` switch (abbrev. `-o`).  A CoRIM Meta<sup>[1](#templates-ex)</sup>
+template in JSON format must also be provided using the `--meta` switch (abbrev.
+`-m`).  For example, with the default output file:
+```
+$ cli corim sign --file corim.cbor --key ec-p256.jwk --meta meta.json
+>> "corim.cbor" signed and saved to "signed-corim.cbor"
+```
+Or, the same but with a custom output file:
+```
+$ cli corim sign --file corim.cbor \
+                 --key ec-p256.jwk \
+                 --meta meta.json \
+                 --output /var/spool/signed-corim.cbor
+>> "corim.cbor" signed and saved to "/var/spool/signed-corim.cbor"
+```
+
+<a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
 templates can be found in the [data/templates](data/templates) folder.
-

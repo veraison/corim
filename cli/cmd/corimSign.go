@@ -49,7 +49,7 @@ func NewCorimSignCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%q signed and saved to %q\n", *corimSignCorimFile, coseFile)
+			fmt.Printf(">> %q signed and saved to %q\n", *corimSignCorimFile, coseFile)
 
 			return nil
 		},
