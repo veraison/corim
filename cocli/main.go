@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/veraison/corim/cli/cmd"
+	"github.com/veraison/corim/cocli/cmd"
 )
 
 func main() {
