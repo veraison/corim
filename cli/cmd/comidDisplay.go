@@ -47,7 +47,7 @@ func NewComidDisplayCmd() *cobra.Command {
 			errs := 0
 			for _, file := range filesList {
 				if err := displayComidFile(file); err != nil {
-					fmt.Printf("failed displaying %q: %v", file, err)
+					fmt.Printf(">> failed displaying %q: %v\n", file, err)
 					errs++
 					continue
 				}
@@ -82,7 +82,7 @@ func displayComidFile(file string) error {
 	}
 
 	// use file name as heading
-	return printComid(data, file)
+	return printComid(data, ">> ["+file+"]")
 }
 
 func checkComidDisplayArgs() error {
