@@ -85,7 +85,7 @@ MUST have different base names.
 ### Display
 
 Use the `comid display` subcommand to print to stdout one or more CBOR-encoded
-CoMIDs in human readable JSON format.
+CoMIDs in human readable (JSON) format.
 
 You can supply individual files using the `--file` switch (abbrev. `-f`), or
 directories that may (or may not) contain CoMID files using the `--dir` switch
@@ -238,6 +238,75 @@ because the signed payload or protected headers are themselves invalid.  For exa
 $ cli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
 Error: error verifying signed-corim-bad-signature.cbor with key ec-p256.jwk: verification failed ecdsa.Verify
 ```
+
+### Display
+
+Use the `corim display` subcommand to print to stdout a signed CoRIM in human
+readable (JSON) format.
+
+You must supply the file you want to display using the `--file` switch (abbrev.
+`-f`).  Only a valid CoRIM will be displayed, and any occurring decoding or
+validation errors will be printed instead.
+
+The output has two logical sections: one for Meta and one for the (unsigned)
+CoRIM:
+```
+$ cli corim display --file signed-corim.cbor
+Meta:
+{
+  "signer": {
+    "name": "ACME Ltd signing key",
+    "uri": "https://acme.example/signing-key.pub"
+  },
+[...]
+}
+Corim:
+{
+  "corim-id": "5c57e8f4-46cd-421b-91c9-08cf93e13cfc",
+  "tags": [
+    "2QH...",
+[...]
+  ]
+}
+```
+
+By default, the embedded CoMID and CoSWID tags are not expanded, and what you
+will see is the base64 encoding of their CBOR serialisation.  If you want to
+peek at the tags' content, supply the `--show-tags` (abbrev. `-v`) switch, which
+will add a further Tags section with one entry per each expanded tag:
+```
+$ cli corim display --file signed-corim.cbor --show-tags
+Meta:
+{
+[...]
+}
+Corim:
+{
+[...]
+}
+Tags:
+>> [ 0 ]
+{
+  "tag-identity": {
+    "id": "366d0a0a-5988-45ed-8488-2f2a544f6242"
+  },
+[...]
+}
+>> [ 1 ]
+{
+  "tag-identity": {
+    "id": "43bbe37f-2e61-4b33-aed3-53cff1428b16"
+  },
+[...]
+}
+>> [ 2 ]
+{
+  "tag-id": "com.acme.rrd2013-ce-sp1-v4-1-5-0",
+[...]
+}
+```
+
+
 
 <a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
 templates can be found in the [data/templates](data/templates) folder.
