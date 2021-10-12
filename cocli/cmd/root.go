@@ -20,7 +20,7 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:           "cli",
+	Use:           "cocli",
 	Short:         "CoRIM & CoMID swiss-army knife",
 	Version:       "0.0.1",
 	SilenceUsage:  true,
