@@ -29,7 +29,7 @@ func NewCorimCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s) and/or CoSWID(s)",
-		Long: `create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s) and/or CoSWID(s)",
+		Long: `create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s) and/or CoSWID(s),
 
 	Create a CoRIM from template t1.json, adding CoMIDs found in the comid/
 	directory and CoSWIDs found in the coswid/ directory.  Since no explicit
