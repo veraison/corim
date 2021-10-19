@@ -24,7 +24,7 @@ func NewComidDisplayCmd() *cobra.Command {
 		Short: "display one or more CBOR-encoded CoMID(s) in human readable (JSON) format",
 		Long: `display one or more CBOR-encoded CoMID(s) in human readable (JSON) format
 
-	Display CoMIDs in file c.cbor.
+	Display CoMID in file c.cbor.
 
 	  cli comid display --file=c.cbor
 
