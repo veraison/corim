@@ -22,7 +22,7 @@ func NewComidDisplayCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "display",
 		Short: "display one or more CBOR-encoded CoMID(s) in human readable (JSON) format",
-		Long: `display one or more CBOR-encoded CoMID(s) in human readable (JSON) format,
+		Long: `display one or more CBOR-encoded CoMID(s) in human readable (JSON) format
 
 	Display CoMIDs in file c.cbor.
 
