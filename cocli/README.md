@@ -159,7 +159,7 @@ $ cocli comid display -f m1.cbor \
 ## CoRIMs manipulation
 
 The `corim` subcommand allows you to create, display, sign and verify CoRIMs.
-It also provides a means to extract the embedded CoSWIDs and CoMIDs and save
+It also provides a means to extract as-is the embedded CoSWIDs and CoMIDs and save
 them as separate files.
 
 ### Create
