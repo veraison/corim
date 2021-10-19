@@ -32,7 +32,7 @@ func NewCorimDisplayCmd() *cobra.Command {
 	  cli corim display --file signed-corim.cbor
 
 	Display the contents of the signed CoRIM yet-another-signed-corim.cbor and
-	also unpack any embedded CoRIM and CoSWID
+	also unpack any embedded CoMID and CoSWID
 	
 	  cli corim display --file yet-another-signed-corim.cbor --show-tags
 	`,
