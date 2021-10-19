@@ -23,7 +23,7 @@ func NewComidValidateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validate",
 		Short: "validate one or more CBOR-encoded CoMID(s)",
-		Long: `validate one or more CBOR-encoded CoMID(s)",
+		Long: `validate one or more CBOR-encoded CoMID(s)
 
 	Validate CoMIDs in file c.cbor.
 
