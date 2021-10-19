@@ -237,6 +237,10 @@ because the signed payload or protected headers are themselves invalid.  For exa
 ```
 $ cocli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
 ```
+will give
+```
+Error: error verifying signed-corim-bad-signature.cbor with key ec-p256.jwk: verification failed ecdsa.Verify
+```
 
 ### Display
 
