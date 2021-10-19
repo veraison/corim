@@ -236,7 +236,6 @@ Verification can fail either because the cryptographic processing fails or
 because the signed payload or protected headers are themselves invalid.  For example:
 ```
 $ cocli corim verify --file signed-corim-bad-signature.cbor --key ec-p256.jwk
-Error: error verifying signed-corim-bad-signature.cbor with key ec-p256.jwk: verification failed ecdsa.Verify
 ```
 
 ### Display
