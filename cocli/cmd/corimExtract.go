@@ -24,8 +24,8 @@ var corimExtractCmd = NewCorimExtractCmd()
 func NewCorimExtractCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "extract",
-		Short: "extract CoSWIDs and CoMIDs from a CoRIM and save them to disk",
-		Long: `extract CoSWIDs and CoMIDs from a CoRIM and save them to disk
+		Short: "extract, as-is, CoSWIDs and CoMIDs found in a CoRIM and save them to disk",
+		Long: `extract, as-is, CoSWIDs and CoMIDs found in a CoRIM and save them to disk
 
 	Extract the contents of the signed CoRIM signed-corim.cbor to the current
 	directory
