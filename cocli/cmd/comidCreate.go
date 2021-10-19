@@ -52,14 +52,20 @@ func NewComidCreateCmd() *cobra.Command {
 				return errors.New("no files found")
 			}
 
+			errs := 0
 			for _, tmplFile := range filesList {
 				cborFile, err := templateToCBOR(tmplFile, comidCreateOutputDir)
 				if err != nil {
-					return err
+					fmt.Printf(">> creation failed for %q: %v\n", cborFile, err)
+					errs++
+					continue
 				}
 				fmt.Printf(">> created %q from %q\n", cborFile, tmplFile)
 			}
 
+			if errs != 0 {
+				return fmt.Errorf("%d/%d creations(s) failed", errs, len(filesList))
+			}
 			return nil
 		},
 	}
