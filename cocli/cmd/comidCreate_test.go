@@ -59,7 +59,7 @@ func Test_ComidCreateCmd_template_with_invalid_json(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding template from invalid.json: invalid character '.' looking for beginning of value")
+	assert.EqualError(t, err, "1/1 creations(s) failed")
 }
 
 func Test_ComidCreateCmd_template_with_invalid_comid(t *testing.T) {
@@ -77,7 +77,7 @@ func Test_ComidCreateCmd_template_with_invalid_comid(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error validating template bad-comid.json: tag-identity validation failed: empty tag-id")
+	assert.EqualError(t, err, "1/1 creations(s) failed")
 }
 
 func Test_ComidCreateCmd_template_from_file_to_default_dir(t *testing.T) {
