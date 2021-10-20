@@ -192,9 +192,14 @@ as "per-folder" blocks using the `--comid-dir` (abbrev. `-M`) and `--coswid-dir`
 $ cocli corim create --template c1.json --comid-dir comids.d/
 ```
 
-Creation will fail if *any* of the inputs is non conformant:
+Creation will fail if *any* of the inputs is non conformant.  For example, if
+`comids.d` contains an invalid CoMID file `rubbish.cbor`, an attempt to create a
+CoRIM:
 ```
 $ cocli corim create -t c1.json -M comids.d/
+```
+will fail with:
+```
 Error: error loading CoMID from comids.d/rubbish.cbor: EOF
 ```
 
