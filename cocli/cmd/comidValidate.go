@@ -25,7 +25,7 @@ func NewComidValidateCmd() *cobra.Command {
 		Short: "validate one or more CBOR-encoded CoMID(s)",
 		Long: `validate one or more CBOR-encoded CoMID(s)
 
-	Validate CoMIDs in file c.cbor.
+	Validate CoMID in file c.cbor.
 
 	  cli comid validate --file=c.cbor
 
