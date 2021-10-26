@@ -2,7 +2,7 @@
 
 The [`corim/corim`](corim) and [`corim/comid`](comid) packages provide a golang API for low-level manipulation of [Concise Reference Integrity Manifest (CoRIM)](https://datatracker.ietf.org/doc/draft-birkholz-rats-corim/) and Concise Module Identifier (CoMID) tags respectively.
 
-The [`corim/cocli`](cocli) package builds on them (as well as the [`veraison/swid`](https://github.com/veraison/swid) package) to provide a command line interface for dealing with CoRIM and CoMID, which allows creating, signing, verifying, visualising, and more.
+The [`corim/cocli`](cocli) package builds on them (as well as the [`veraison/swid`](https://github.com/veraison/swid) package) to provide a command line interface for dealing with CoRIM and CoMID, which allows creating, signing, verifying, visualising, and more.  See [`cocli/README.md`](cocli/README.md) for further details.
 
 ## Resources
 
