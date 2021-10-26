@@ -338,3 +338,8 @@ output.d/
 
 <a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
 templates can be found in the [data/templates](data/templates) folder.
+
+
+## Visual Synopsis of the Available Commands
+
+![visual map](data/pics/cocli-map.png)
