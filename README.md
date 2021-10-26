@@ -1,14 +1,17 @@
-# corim
-Concise Reference Integrity Manifest (CoRIM) package provides a golang API for manipulating 
-CoRIM and Concise Module Identifier (CoMID) as per [Concise Reference Integrity Manifest](https://datatracker.ietf.org/doc/draft-birkholz-rats-corim/)
+# Concise Reference Integrity Manifest and Module Identifiers
 
-Specifically, the library supports following functions:
-* APIs to set and get individual fields within a CoMID
-* CBOR encoding/decoding to/from a CoMID
-* A user friendly interface to populate a CoMID using an equivalent JSON representation
-* A facility to add multiple CoMIDs and/or multiple CoSWIDs to an Unsigned CoRIM
-* CBOR encoding/decoding to/from an Unsigned CoRIM
-* A user friendly interface to populate an unsigned CoRIM using an equivalent JSON representation
-* Signing an unsigned CoRIM with a private key to obtain a signed CoRIM message
-* Verifying a signed CoRIM using a public key
-* Extracting an unsigned CoRIM and CoRIM Meta structures from a serialized signed CoRIM
+The [`corim/corim`](corim) and [`corim/comid`](comid) packages provide a golang API for low-level manipulation of [Concise Reference Integrity Manifest (CoRIM)](https://datatracker.ietf.org/doc/draft-birkholz-rats-corim/) and Concise Module Identifier (CoMID) tags respectively.
+
+The [`corim/cocli`](cocli) package builds on them (as well as the [swid](https://github.com/veraison/swid) package) to provide a command line interface for dealing with CoRIM and CoMID, which allows creating, signing, verifying, visualising, and more.
+
+## Resources
+
+* [Package documentation](https://pkg.go.dev/github.com/veraison/corim)
+
+## Developer tips
+
+Before requesting a PR (and routinely during the dev/test cycle), you are encouraged to run:
+```
+make presubmit
+```
+and check its output to make sure your code coverage figures are in line with the set target and that there are no newly introduced lint problems.
