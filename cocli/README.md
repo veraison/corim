@@ -11,7 +11,7 @@ To configure auto-completion, use the `completion` subcommand.  For example, if
 `bash` is your shell, you would do something like:
 ```
 $ cocli completion bash > ~/.bash_completion.d/cocli
-$ . .bash_completion
+$ . ~/.bash_completion
 ```
 to get automatic command completion and suggestions using the TAB key.
 
