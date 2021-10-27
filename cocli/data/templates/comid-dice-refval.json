@@ -1,0 +1,70 @@
+{
+  "tag-identity": {
+    "id": "1D5A8C7C-1C70-4C56-937E-3C5713AE5A83"
+  },
+  "triples": {
+    "reference-values": [
+      {
+        "environment": {
+          "class": {
+            "id": {
+              "type": "uuid",
+              "value": "DD6661F0-0928-4401-966B-589EA74E3272"
+            },
+            "model": "FMC",
+            "layer": 0,
+            "index": 0
+          }
+        },
+        "measurements": [
+          {
+            "value": {
+              "op-flags": [
+                "notSecure",
+                "debug"
+              ],
+              "digests": [
+                "sha-256:RKozavTLFKh5Qy5T3WVxx/qbzK+3X0iCWSYtbqOk2Rs="
+              ],
+              "svn": {
+                "cmp": "==",
+                "value": 10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "environment": {
+          "class": {
+            "id": {
+              "type": "uuid",
+              "value": "FFDA7CF3-2333-4A91-99A8-068626203ACA"
+            },
+            "model": "L1",
+            "layer": 1,
+            "index": 0
+          }
+        },
+        "measurements": [
+          {
+            "value": {
+              "op-flags": [
+                "notSecure",
+                "debug"
+              ],
+              "digests": [
+                "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=",
+                "sha-256:VgXOanU71cskR7hhl418y0an8zsD772wLJYg2o6awD0="
+              ],
+              "svn": {
+                "cmp": "==",
+                "value": 2
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
