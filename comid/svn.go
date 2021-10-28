@@ -8,21 +8,21 @@ import (
 	"fmt"
 )
 
-type TaggedSVN int64
-type TaggedMinSVN int64
+type TaggedSVN uint64
+type TaggedMinSVN uint64
 
 type SVN struct {
 	val interface{}
 }
 
-func (o *SVN) SetSVN(val int64) *SVN {
+func (o *SVN) SetSVN(val uint64) *SVN {
 	if o != nil {
 		o.val = TaggedSVN(val)
 	}
 	return o
 }
 
-func (o *SVN) SetMinSVN(val int64) *SVN {
+func (o *SVN) SetMinSVN(val uint64) *SVN {
 	if o != nil {
 		o.val = TaggedMinSVN(val)
 	}
@@ -51,14 +51,11 @@ func (o *SVN) UnmarshalCBOR(data []byte) error {
 	return fmt.Errorf("unknown SVN (CBOR: %x)", data)
 }
 
-type svnJSONRepr struct {
-	Cmp string `json:"cmp"`
-	Val int64  `json:"value"`
-}
+type svnJSONRepr tnv
 
 // Supported formats:
-// { "cmp": "==", "value": 123 } -> SVN
-// { "cmp": ">=", "value": 123 } -> MinSVN
+// { "type": "exact-value", "value": 123 } -> SVN
+// { "type": "min-value", "value": 123 } -> MinSVN
 func (o *SVN) UnmarshalJSON(data []byte) error {
 	var s svnJSONRepr
 
@@ -66,31 +63,45 @@ func (o *SVN) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("SVN decoding failure: %w", err)
 	}
 
-	switch s.Cmp {
-	case "==":
-		o.SetSVN(s.Val)
-	case ">=":
-		o.SetMinSVN(s.Val)
+	var x uint64
+	if err := json.Unmarshal(s.Value, &x); err != nil {
+		return fmt.Errorf(
+			"cannot unmarshal svn or min-svn of type uint64: %w",
+			err,
+		)
+	}
+
+	switch s.Type {
+	case "exact-value":
+		o.val = TaggedSVN(x)
+	case "min-value":
+		o.val = TaggedMinSVN(x)
 	default:
-		return fmt.Errorf("unknown comparison operator %s", s.Cmp)
+		return fmt.Errorf("unknown comparison operator %s", s.Type)
 	}
 
 	return nil
 }
 
 func (o SVN) MarshalJSON() ([]byte, error) {
-	var s svnJSONRepr
+	var (
+		v   svnJSONRepr
+		b   []byte
+		err error
+	)
 
+	b, err = json.Marshal(o.val)
+	if err != nil {
+		return nil, err
+	}
 	switch t := o.val.(type) {
 	case TaggedSVN:
-		s.Cmp = "=="
-		s.Val = int64(t)
+		v = svnJSONRepr{Type: "exact-value", Value: b}
 	case TaggedMinSVN:
-		s.Cmp = ">="
-		s.Val = int64(t)
+		v = svnJSONRepr{Type: "min-value", Value: b}
 	default:
 		return nil, fmt.Errorf("unknown SVN type: %T", t)
 	}
 
-	return json.Marshal(s)
+	return json.Marshal(v)
 }
