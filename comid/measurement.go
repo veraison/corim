@@ -396,7 +396,7 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 }
 
 func (o Measurement) Valid() error {
-	if o.Key.IsSet() {
+	if o.Key != nil && o.Key.IsSet() {
 		if err := o.Key.Valid(); err != nil {
 			return err
 		}
