@@ -66,7 +66,7 @@ func (o *SVN) UnmarshalJSON(data []byte) error {
 	var x uint64
 	if err := json.Unmarshal(s.Value, &x); err != nil {
 		return fmt.Errorf(
-			"cannot unmarshal svn or min-svn of type uint64: %w",
+			"cannot unmarshal svn or min-svn: %w",
 			err,
 		)
 	}
