@@ -27,7 +27,7 @@
                 "sha-256:RKozavTLFKh5Qy5T3WVxx/qbzK+3X0iCWSYtbqOk2Rs="
               ],
               "svn": {
-                "cmp": "==",
+                "type": "exact-value",
                 "value": 10
               }
             }
@@ -58,7 +58,7 @@
                 "sha-256:VgXOanU71cskR7hhl418y0an8zsD772wLJYg2o6awD0="
               ],
               "svn": {
-                "cmp": "==",
+                "type": "exact-value",
                 "value": 2
               }
             }

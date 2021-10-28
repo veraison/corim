@@ -293,7 +293,7 @@ func (o *Measurement) SetRawValueBytes(rawValue, rawValueMask []byte) *Measureme
 
 // SetSVN sets the supplied svn in the measurement-values-map of the target
 // measurement
-func (o *Measurement) SetSVN(svn int64) *Measurement {
+func (o *Measurement) SetSVN(svn uint64) *Measurement {
 	if o != nil {
 		s := SVN{}
 		if s.SetSVN(svn) == nil {
@@ -306,7 +306,7 @@ func (o *Measurement) SetSVN(svn int64) *Measurement {
 
 // SetMinSVN sets the supplied min-svn in the measurement-values-map of the
 // target measurement
-func (o *Measurement) SetMinSVN(svn int64) *Measurement {
+func (o *Measurement) SetMinSVN(svn uint64) *Measurement {
 	if o != nil {
 		s := SVN{}
 		if s.SetMinSVN(svn) == nil {
