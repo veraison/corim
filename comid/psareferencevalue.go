@@ -13,7 +13,6 @@ type PSARefValID struct {
 	Label    *string `cbor:"1,keyasint,omitempty" json:"label,omitempty"`
 	Version  *string `cbor:"4,keyasint,omitempty" json:"version,omitempty"`
 	SignerID []byte  `cbor:"5,keyasint" json:"signer-id"` // 32, 48 or 64
-	AlgID    *string `cbor:"6,keyasint,omitempty" json:"alg-id,omitempty"`
 }
 
 // Valid checks the validity (according to the spec) of the target PSARefValID
@@ -43,13 +42,6 @@ func NewPSARefValID(signerID []byte) *PSARefValID {
 	return &PSARefValID{
 		SignerID: signerID,
 	}
-}
-
-func (o *PSARefValID) SetAlgID(algID string) *PSARefValID {
-	if o != nil {
-		o.AlgID = &algID
-	}
-	return o
 }
 
 func (o *PSARefValID) SetLabel(label string) *PSARefValID {
