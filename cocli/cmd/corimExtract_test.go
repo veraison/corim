@@ -96,10 +96,7 @@ func Test_CorimExtractCmd_ok_save_to_default_dir(t *testing.T) {
 
 	_, err = fs.Stat("000000-comid.cbor")
 	assert.NoError(t, err)
-	_, err = fs.Stat("000001-comid.cbor")
-	assert.NoError(t, err)
-	_, err = fs.Stat("000002-coswid.cbor")
-	assert.NoError(t, err)
+
 }
 
 func Test_CorimExtractCmd_ok_save_to_non_default_dir(t *testing.T) {
@@ -119,9 +116,5 @@ func Test_CorimExtractCmd_ok_save_to_non_default_dir(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = fs.Stat("my-dir/000000-comid.cbor")
-	assert.NoError(t, err)
-	_, err = fs.Stat("my-dir/000001-comid.cbor")
-	assert.NoError(t, err)
-	_, err = fs.Stat("my-dir/000002-coswid.cbor")
 	assert.NoError(t, err)
 }

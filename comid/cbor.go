@@ -21,12 +21,13 @@ func comidTags() cbor.TagSet {
 		111: TaggedOID{},
 		// CoMID tags
 		550: TaggedUEID{},
-		551: TaggedImplID{},
+		//551: To Do see: https://github.com/veraison/corim/issues/32
 		552: TaggedSVN(0),
 		553: TaggedMinSVN(0),
 		560: TaggedRawValueBytes{},
 		// PSA profile tags
-		600: TaggedPSARefValID{},
+		600: TaggedImplID{},
+		601: TaggedPSARefValID{},
 	}
 
 	opts := cbor.TagOptions{
