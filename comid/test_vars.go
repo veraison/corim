@@ -23,14 +23,15 @@ var (
 		0x6e, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2d, 0x69, 0x64, 0x2d, 0x30,
 		0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31,
 	})
-	TestOID        = "2.5.2.8192"
-	TestRegID      = "https://acme.example"
-	TestMACaddr, _ = net.ParseMAC("02:00:5e:10:00:00:00:01")
-	TestIPaddr     = net.ParseIP("2001:db8::68")
-	TestUEIDString = "02deadbeefdead"
-	TestUEID       = eat.UEID(MustHexDecode(nil, TestUEIDString))
-	TestSignerID   = MustHexDecode(nil, "acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b")
-	TestTagID      = "urn:example:veraison"
+	TestOID               = "2.5.2.8192"
+	TestRegID             = "https://acme.example"
+	TestMACaddr, _        = net.ParseMAC("02:00:5e:10:00:00:00:01")
+	TestIPaddr            = net.ParseIP("2001:db8::68")
+	TestUEIDString        = "02deadbeefdead"
+	TestUEID              = eat.UEID(MustHexDecode(nil, TestUEIDString))
+	TestSignerID          = MustHexDecode(nil, "acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b")
+	TestTagID             = "urn:example:veraison"
+	TestMKey       uint64 = 700
 )
 
 func MustHexDecode(t *testing.T, s string) []byte {
