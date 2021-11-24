@@ -37,6 +37,11 @@ func (o Mkey) Valid() error {
 		return nil
 	case TaggedPSARefValID:
 		return PSARefValID(t).Valid()
+	case uint:
+		if o.val == nil {
+			return fmt.Errorf("empty uint Mkey")
+		}
+		return nil
 	default:
 		return fmt.Errorf("unknown measurement key type %T", t)
 	}
@@ -84,6 +89,15 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 			)
 		}
 		o.val = TaggedPSARefValID(x)
+	case "uint":
+		var x uint
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type uint: %w",
+				err,
+			)
+		}
+		o.val = x
 	default:
 		return fmt.Errorf("unknown type %s for $measured-element-type-choice", v.Type)
 	}
@@ -114,6 +128,13 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		v = tnv{Type: "psa.refval-id", Value: b}
+	case uint:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "uint", Value: b}
+
 	default:
 		return nil, fmt.Errorf("unknown type %T for mkey", t)
 	}
