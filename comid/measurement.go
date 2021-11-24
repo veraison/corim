@@ -12,6 +12,8 @@ import (
 	"github.com/veraison/swid"
 )
 
+const MaxUint64 = ^uint64(0)
+
 // Measurement stores a measurement-map with CBOR and JSON serializations.
 type Measurement struct {
 	Key *Mkey `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
@@ -19,7 +21,8 @@ type Measurement struct {
 }
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are UUID and PSA refval-id.
+// The supported types are UUID, PSA refval-id and unsigned integer
+// TO DO Add tagged OID: see https://github.com/veraison/corim/issues/35
 type Mkey struct {
 	val interface{}
 }
@@ -37,8 +40,13 @@ func (o Mkey) Valid() error {
 		return nil
 	case TaggedPSARefValID:
 		return PSARefValID(t).Valid()
+	case uint64:
+		if o.val == nil {
+			return fmt.Errorf("empty uint Mkey")
+		}
+		return nil
 	default:
-		return fmt.Errorf("unknown measurement key type %T", t)
+		return fmt.Errorf("unknown measurement key type: %T", t)
 	}
 }
 
@@ -48,6 +56,15 @@ func (o Mkey) GetPSARefValID() (PSARefValID, error) {
 		return PSARefValID(t), nil
 	default:
 		return PSARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
+	}
+}
+
+func (o Mkey) GetKeyUint() (uint64, error) {
+	switch t := o.val.(type) {
+	case uint64:
+		return t, nil
+	default:
+		return MaxUint64, fmt.Errorf("measurement-key type is: %T", t)
 	}
 }
 
@@ -84,6 +101,15 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 			)
 		}
 		o.val = TaggedPSARefValID(x)
+	case "uint":
+		var x uint64
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type uint: %w",
+				err,
+			)
+		}
+		o.val = x
 	default:
 		return fmt.Errorf("unknown type %s for $measured-element-type-choice", v.Type)
 	}
@@ -92,7 +118,7 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes the target Mkey into the type'n'value JSON object
-// uuid, psa.refval-id
+// Supported types are: uuid, psa.refval-id and unsigned integer
 func (o Mkey) MarshalJSON() ([]byte, error) {
 	var (
 		v   tnv
@@ -114,6 +140,13 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		v = tnv{Type: "psa.refval-id", Value: b}
+	case uint64:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "uint", Value: b}
+
 	default:
 		return nil, fmt.Errorf("unknown type %T for mkey", t)
 	}
@@ -122,6 +155,9 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 }
 
 func (o Mkey) MarshalCBOR() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
 	return em.Marshal(o.val)
 }
 
@@ -255,6 +291,17 @@ func (o *Measurement) SetKeyUUID(u UUID) *Measurement {
 	return o
 }
 
+// SetKeyUint sets the key of the target measurement-map to the supplied
+// unsigned integer
+func (o *Measurement) SetKeyUint(u uint64) *Measurement {
+	if o != nil {
+		o.Key = &Mkey{
+			val: u,
+		}
+	}
+	return o
+}
+
 // NewPSAMeasurement instantiates a new measurement-map with the key set to the
 // supplied PSA refval-id
 func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
@@ -267,6 +314,13 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 func NewUUIDMeasurement(uuid UUID) *Measurement {
 	m := &Measurement{}
 	return m.SetKeyUUID(uuid)
+}
+
+// NewUintMeasurement instantiates a new measurement-map with the key set to the
+// supplied Uint
+func NewUintMeasurement(mkey uint64) *Measurement {
+	m := &Measurement{}
+	return m.SetKeyUint(mkey)
 }
 
 func (o *Measurement) SetVersion(ver string, scheme uint64) *Measurement {
