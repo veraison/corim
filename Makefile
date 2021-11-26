@@ -44,6 +44,9 @@ presubmit:
 	@echo
 	$(MAKE) lint-extra
 
+.PHONY: licenses
+licenses: ; @./scripts/licenses.sh
+
 .PHONY: help
 help:
 	@echo "Available targets:"
@@ -53,3 +56,4 @@ help:
 	@echo "  * lint-extra: lint sources using default configuration and some extra checkers"
 	@echo "  * presubmit:  check you are ready to push your local branch to remote"
 	@echo "  * help:       print this menu"
+	@echo "  * licenses:   check licenses of dependent packages"
