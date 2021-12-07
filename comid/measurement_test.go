@@ -290,10 +290,9 @@ func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 
 	for _, tv := range tvs {
 
-		meas := NewUintMeasurement(tv.mkey)
-		require.NotNil(t, meas)
+		mkey := &Mkey{tv.mkey}
 
-		actual, err := meas.Key.MarshalJSON()
+		actual, err := mkey.MarshalJSON()
 		assert.Nil(t, err)
 
 		assert.JSONEq(t, tv.expected, string(actual))
