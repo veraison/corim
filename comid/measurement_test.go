@@ -134,7 +134,7 @@ func TestMkey_Valid_no_value(t *testing.T) {
 	assert.EqualError(t, err, expectedErr)
 }
 
-func TestMeasurement_MarshalCBOR_uint_mkey_ok(t *testing.T) {
+func TestMKey_MarshalCBOR_uint_ok(t *testing.T) {
 	tvs := []struct {
 		mkey     uint64
 		expected []byte
@@ -154,10 +154,8 @@ func TestMeasurement_MarshalCBOR_uint_mkey_ok(t *testing.T) {
 	}
 
 	for _, tv := range tvs {
-		meas := NewUintMeasurement(tv.mkey)
-		require.NotNil(t, meas)
-
-		actual, err := meas.Key.MarshalCBOR()
+		mkey := &Mkey{tv.mkey}
+		actual, err := mkey.MarshalCBOR()
 		assert.Nil(t, err)
 		assert.Equal(t, tv.expected, actual)
 		fmt.Printf("CBOR: %x\n", actual)
@@ -181,7 +179,8 @@ func TestMkey_MarshalCBOR_uint_not_ok(t *testing.T) {
 	for _, tv := range tvs {
 		mkey := &Mkey{tv.input}
 		_, err := mkey.MarshalCBOR()
-
+		assert.Nil(t, err)
+		err = mkey.Valid()
 		assert.EqualError(t, err, tv.expected)
 	}
 }
@@ -216,7 +215,7 @@ func TestMkey_UnmarshalCBOR_uint_ok(t *testing.T) {
 	}
 }
 
-func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
+func TestMkey_UnmarshalCBOR_not_ok(t *testing.T) {
 	tvs := []struct {
 		input    []byte
 		expected string
@@ -240,22 +239,48 @@ func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
 	}
 }
 
+func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
+	tvs := []struct {
+		input    []byte
+		expected string
+	}{
+		{
+			input:    []byte{0xd8, 0x25, 0x50, 0x31, 0xfb, 0x5a, 0xbf, 0x02, 0x3e, 0x49, 0x92, 0xaa, 0x4e, 0x95, 0xf9, 0xc1, 0x50, 0x3b, 0xfa},
+			expected: "measurement-key type is: comid.TaggedUUID",
+		},
+		{
+			input:    []byte{0xd8, 0x21, 0x50, 0x31, 0xfb, 0x5a, 0xFf, 0x12, 0xFF, 0xFF, 0x92, 0xaa, 0x4e, 0x95, 0xf9, 0xc1, 0x50, 0x3b, 0xfa},
+			expected: "measurement-key type is: cbor.Tag",
+		},
+	}
+
+	for _, tv := range tvs {
+		mKey := &Mkey{}
+
+		err := mKey.UnmarshalCBOR(tv.input)
+		assert.Nil(t, err)
+		_, err = mKey.GetKeyUint()
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, tv.expected)
+	}
+}
+
 func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 	tvs := []struct {
 		mkey     uint64
-		expected []byte
+		expected string
 	}{
 		{
 			mkey:     testMKeyUintMin,
-			expected: []byte(`{"type":"uint","value":0}`),
+			expected: `{"type":"uint","value":0}`,
 		},
 		{
 			mkey:     TestMKey,
-			expected: []byte(`{"type":"uint","value":700}`),
+			expected: `{"type":"uint","value":700}`,
 		},
 		{
 			mkey:     testMKeyUintMax,
-			expected: []byte(`{"type":"uint","value":18446744073709551615}`),
+			expected: `{"type":"uint","value":18446744073709551615}`,
 		},
 	}
 
@@ -266,8 +291,8 @@ func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 
 		actual, err := meas.Key.MarshalJSON()
 		assert.Nil(t, err)
-		assert.Equal(t, tv.expected, actual)
 
+		assert.JSONEq(t, tv.expected, string(actual))
 		fmt.Printf("JSON: %x\n", actual)
 	}
 }
