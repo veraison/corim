@@ -15,7 +15,6 @@ import (
 
 func TestMeasurement_NewUUIDMeasurement_good_uuid(t *testing.T) {
 	tv := NewUUIDMeasurement(TestUUID)
-
 	assert.NotNil(t, tv)
 }
 
@@ -39,7 +38,6 @@ func TestMeasurement_NewPSAMeasurement_empty(t *testing.T) {
 	emptyPSARefValID := PSARefValID{}
 
 	tv := NewPSAMeasurement(emptyPSARefValID)
-
 	assert.Nil(t, tv)
 }
 
@@ -264,7 +262,6 @@ func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
 		err := mKey.UnmarshalCBOR(tv.input)
 		assert.Nil(t, err)
 		_, err = mKey.GetKeyUint()
-		assert.NotNil(t, err)
 		assert.EqualError(t, err, tv.expected)
 	}
 }
@@ -355,7 +352,7 @@ func TestMkey_UnmarshalJSON_uint_ok(t *testing.T) {
 	}
 }
 
-func TestMkey_UnmarshalJSON_uint_notok(t *testing.T) {
+func TestMkey_UnmarshalJSON_notok(t *testing.T) {
 	tvs := []struct {
 		input    []byte
 		expected string
@@ -375,6 +372,31 @@ func TestMkey_UnmarshalJSON_uint_notok(t *testing.T) {
 
 		err := mKey.UnmarshalJSON(tv.input)
 
+		assert.EqualError(t, err, tv.expected)
+	}
+}
+
+func TestMkey_UnmarshalJSON_uint_notok(t *testing.T) {
+	tvs := []struct {
+		input    []byte
+		expected string
+	}{
+		{
+			input:    []byte(`{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}`),
+			expected: "measurement-key type is: comid.TaggedUUID",
+		},
+		{
+			input:    []byte(`{"type":"psa.refval-id","value":{"label": "BL","version": "2.1.0","signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="}}`),
+			expected: "measurement-key type is: comid.TaggedPSARefValID",
+		},
+	}
+
+	for _, tv := range tvs {
+		mKey := &Mkey{}
+
+		err := mKey.UnmarshalJSON(tv.input)
+		assert.Nil(t, err)
+		_, err = mKey.GetKeyUint()
 		assert.EqualError(t, err, tv.expected)
 	}
 }
