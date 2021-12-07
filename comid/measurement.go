@@ -155,9 +155,6 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 }
 
 func (o Mkey) MarshalCBOR() ([]byte, error) {
-	if err := o.Valid(); err != nil {
-		return nil, err
-	}
 	return em.Marshal(o.val)
 }
 
