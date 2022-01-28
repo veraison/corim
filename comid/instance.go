@@ -65,6 +65,15 @@ func (o Instance) GetUEID() (eat.UEID, error) {
 	}
 }
 
+func (o Instance) GetUUID() (string, error) {
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		return UUID(t).String(), nil
+	default:
+		return "", fmt.Errorf("instance-id type is: %T", t)
+	}
+}
+
 // String returns a printable string of the Instance value.  UUIDs use the
 // canonical 8-4-4-4-12 format, UEIDs are hex encoded.
 func (o Instance) String() string {
