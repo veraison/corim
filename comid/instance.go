@@ -65,12 +65,12 @@ func (o Instance) GetUEID() (eat.UEID, error) {
 	}
 }
 
-func (o Instance) GetUUID() (string, error) {
+func (o Instance) GetUUID() (UUID, error) {
 	switch t := o.val.(type) {
 	case TaggedUUID:
-		return UUID(t).String(), nil
+		return UUID(t), nil
 	default:
-		return "", fmt.Errorf("instance-id type is: %T", t)
+		return UUID{}, fmt.Errorf("instance-id type is: %T", t)
 	}
 }
 
