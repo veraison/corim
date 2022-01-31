@@ -5,14 +5,15 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInstance_GetUUID_OK(t *testing.T) {
 	inst := NewInstanceUUID(uuid.UUID(TestUUID))
-	assert.NotNil(t, inst)
+	require.NotNil(t, inst)
 	uuid, err := inst.GetUUID()
 	assert.Nil(t, err)
-	assert.Equal(t, uuid, TestUUID.String())
+	assert.Equal(t, uuid, TestUUID)
 }
 
 func TestInstance_GetUUID_NOK(t *testing.T) {
