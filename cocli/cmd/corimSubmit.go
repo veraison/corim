@@ -25,7 +25,7 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "submit",
 		Short: "submit a CBOR-encoded CoRIM payload",
-		Long: `submit a CBOR-encoded CoRIM payload with supplied api server and media type as inputs
+		Long: `submit a CBOR-encoded CoRIM payload with supplied media type to the given API Server
 
 	Submit a CBOR encoded CoRIM payload from unsigned-corim.cbor to Veraison provisioning server
 	"https://veraison.example/endorsement-provisioning/v1" using 
@@ -59,7 +59,7 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 
 	corimFile = cmd.Flags().StringP("corim-file", "f", "", "name of the CoRIM file in CBOR format")
 	apiServer = cmd.Flags().StringP("api-server", "s", "", "API server where to submit the corim file")
-	mediaType = cmd.Flags().StringP("media-type", "m", "", "media type of the file")
+	mediaType = cmd.Flags().StringP("media-type", "m", "", "media type of the CoRIM file")
 
 	return cmd
 }
@@ -69,7 +69,7 @@ func checkSubmitArgs() error {
 		return errors.New("no CoRIM input file supplied")
 	}
 	if apiServer == nil || *apiServer == "" {
-		return errors.New("no API server in the argument")
+		return errors.New("no API server supplied")
 	}
 	u, err := url.Parse(*apiServer)
 	if err != nil || !u.IsAbs() {

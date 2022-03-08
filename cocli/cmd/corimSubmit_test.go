@@ -51,7 +51,7 @@ func Test_CorimSubmitCmd_missing_server_url(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "no API server in the argument")
+	assert.EqualError(t, err, "no API server supplied")
 }
 
 func Test_CorimSubmitCmd_missing_media_type(t *testing.T) {
