@@ -159,7 +159,7 @@ $ cocli comid display -f m1.cbor \
 ## CoRIMs manipulation
 
 The `corim` subcommand allows you to create, display, sign, verify CoRIMs or submit
-a CoRIM to veraison.
+a CoRIM using the [Veraison provisioning API](https://github.com/veraison/docs/tree/main/api/endorsement-provisioning).
 It also provides a means to extract as-is the embedded CoSWIDs and CoMIDs and save
 them as separate files.
 
@@ -315,14 +315,17 @@ Tags:
 }
 ```
 ### Submit
-Use the `corim submit` subcommand to submit an unsigned CoRIM to veraison provisioning service.
-The CoRIM file containing the CoRIM data in a .cbor format is supplied via the 
+Use the `corim submit` subcommand to submit a CoRIM using the Veraison provisioning API.
+The CoRIM file containing the CoRIM data in CBOR format is supplied via the 
 `--corim-file` switch (abbrev. `-f`). The server URL where to send this 
-payload is supplied next via the `--api-server` switch (abbrev. `-s`).
+payload is supplied via the `--api-server` switch (abbrev. `-s`).
 Further it is required to supply the media type of the content via the 
 `--media-type` switch (abbrev. `-m`)
 ```
-$ cocli corim submit --corim-file unsigned-corim.cbor --api-server "https://veraison.example/endorsement-provisioning/v1" --media-type "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
+$ cocli corim submit \
+    --corim-file unsigned-corim.cbor \
+    --api-server "https://veraison.example/endorsement-provisioning/v1"
+    --media-type "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
 
 >> "corim.cbor" submit ok
 ```

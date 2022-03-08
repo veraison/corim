@@ -9,7 +9,6 @@ GOPKG += github.com/veraison/corim/comid
 GOPKG += github.com/veraison/corim/cocli/cmd
 MOCKGEN := $(shell go env GOPATH)/bin/mockgen
 INTERFACES := cocli/cmd/isubmitter.go
-
 MOCKPKG := mocks
 
 GOLINT ?= golangci-lint
@@ -27,7 +26,6 @@ lint lint-extra: _mocks; $(GOLINT) $(GOLINT_ARGS)
 
 ifeq ($(MAKECMDGOALS),test)
 GOTEST_ARGS ?= -v -race $(GOPKG)
-
 else
   ifeq ($(MAKECMDGOALS),test-cover)
   GOTEST_ARGS ?= -short -cover $(GOPKG)
@@ -44,7 +42,7 @@ endef
 
 $(foreach m,$(INTERFACES),$(eval $(call MOCK_template,$(m))))
 MOCK_FILES := $(foreach m,$(INTERFACES),$(join mock_,$(m)))
-
+CLEANFILES := $(MOCK_FILES)
 
 _mocks: $(MOCK_FILES)
 .PHONY: _mocks
@@ -54,6 +52,9 @@ test test-cover: _mocks; go test $(GOTEST_ARGS)
 
 realtest: _mocks; go test $(GOTEST_ARGS)
 .PHONY: realtest
+
+.PHONY: clean
+clean: ;$(RM) $(CLEANFILES)
 
 presubmit:
 	@echo
