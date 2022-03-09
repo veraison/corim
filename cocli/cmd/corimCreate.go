@@ -36,13 +36,13 @@ func NewCorimCreateCmd() *cobra.Command {
 	output file is set, the (unsigned) CoRIM is saved to the current directory
 	with tag-id as basename and a .cbor extension.
 
-	  cli corim create --template=t1.json --comid-dir=comid --coswid-dir=coswid
+	  cocli corim create --template=t1.json --comid-dir=comid --coswid-dir=coswid
 	 
 	Create a CoRIM from template corim-template.json, adding CoMID stored in
 	comid1.cbor and the two CoSWIDs stored in coswid1.cbor and dir/coswid2.cbor.
 	The (unsigned) CoRIM is saved to corim.cbor.
 
-	  cli corim create --template=corim-template.json \
+	  cocli corim create --template=corim-template.json \
 	                   --comid=comid1.cbor \
 	                   --coswid=coswid1.cbor \
 	                   --coswid=dir/coswid2.cbor \

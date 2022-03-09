@@ -29,12 +29,12 @@ func NewCorimDisplayCmd() *cobra.Command {
 
 	Display the contents of the signed CoRIM signed-corim.cbor 
 	
-	  cli corim display --file signed-corim.cbor
+	  cocli corim display --file signed-corim.cbor
 
 	Display the contents of the signed CoRIM yet-another-signed-corim.cbor and
 	also unpack any embedded CoMID and CoSWID
 	
-	  cli corim display --file yet-another-signed-corim.cbor --show-tags
+	  cocli corim display --file yet-another-signed-corim.cbor --show-tags
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {

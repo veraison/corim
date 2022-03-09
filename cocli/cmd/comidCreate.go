@@ -29,14 +29,14 @@ func NewComidCreateCmd() *cobra.Command {
 	Create CoMIDs from templates t1.json and t2.json, plus any template found in
 	the templates/ directory.  Save them to the current working directory.
 	
-	  cli comid create --template=t1.json \
-	                   --template=t2.json \
-	                   --template-dir=templates
+		cocli comid create --template=t1.json \
+	    			--template=t2.json \
+	    			--template-dir=templates
 	  
 	Create one CoMID from template t3.json and save it to the comids/ directory.
 	Note that the output directory must exist.
 	
-	  cli comid create --template=t3.json --output-dir=comids
+		cocli comid create --template=t3.json --output-dir=comids
 
 	Note: since the output file is deterministically generated from the template
 	file name, all the template file names (when from different directories)
