@@ -27,15 +27,15 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 		Short: "submit a CBOR-encoded CoRIM payload",
 		Long: `submit a CBOR-encoded CoRIM payload with supplied media type to the given API Server
 
-	Submit a CBOR encoded CoRIM payload from unsigned-corim.cbor to Veraison provisioning server
-	"https://veraison.example/endorsement-provisioning/v1" using 
-	"application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1" as the media type
+	To submit the CBOR-encoded CoRIM from file "unsigned-corim.cbor" with media type
+	"application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1" to the Veraison
+	provisioning API endpoint "https://veraison.example/endorsement-provisioning/v1", do:
 	
 
 	cocli corim submit \
-			--corim-file = unsigned-corim.cbor \
-			--api-server = "https://veraison.example/endorsement-provisioning/v1"
-			--media-type = "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
+			--corim-file=unsigned-corim.cbor \
+			--api-server="https://veraison.example/endorsement-provisioning/v1" \
+			--media-type="application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -97,11 +97,7 @@ func provisionData(data []byte, submitter ISubmitter, uri string, mediaType stri
 }
 
 func readCorimData(file string) ([]byte, error) {
-	data, err := afero.ReadFile(fs, file)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	return afero.ReadFile(fs, file)
 }
 
 func init() {

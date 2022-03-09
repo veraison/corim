@@ -112,11 +112,9 @@ func Test_CorimSubmitCmd_non_existent_corim_file(t *testing.T) {
 
 	err := cmd.Execute()
 	assert.EqualError(t, err, "corim payload read failed: open bad.cbor: file does not exist")
-
 }
 
 func Test_CorimSubmitCmd_submit_ok(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -141,7 +139,6 @@ func Test_CorimSubmitCmd_submit_ok(t *testing.T) {
 }
 
 func Test_CorimSubmitCmd_submit_not_ok(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

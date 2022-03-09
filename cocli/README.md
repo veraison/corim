@@ -315,6 +315,7 @@ Tags:
 }
 ```
 ### Submit
+
 Use the `corim submit` subcommand to submit a CoRIM using the Veraison provisioning API.
 The CoRIM file containing the CoRIM data in CBOR format is supplied via the 
 `--corim-file` switch (abbrev. `-f`). The server URL where to send this 
@@ -324,7 +325,7 @@ Further it is required to supply the media type of the content via the
 ```
 $ cocli corim submit \
     --corim-file unsigned-corim.cbor \
-    --api-server "https://veraison.example/endorsement-provisioning/v1"
+    --api-server "https://veraison.example/endorsement-provisioning/v1" \
     --media-type "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
 
 >> "corim.cbor" submit ok
