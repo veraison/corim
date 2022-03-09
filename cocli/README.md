@@ -316,11 +316,11 @@ Tags:
 ```
 ### Submit
 
-Use the `corim submit` subcommand to submit a CoRIM using the Veraison provisioning API.
+Use the `corim submit` subcommand to upload a CoRIM using the Veraison provisioning API.
 The CoRIM file containing the CoRIM data in CBOR format is supplied via the 
-`--corim-file` switch (abbrev. `-f`). The server URL where to send this 
+`--corim-file` switch (abbrev. `-f`). The server URL where to upload the CoRIM 
 payload is supplied via the `--api-server` switch (abbrev. `-s`).
-Further it is required to supply the media type of the content via the 
+Further, it is required to supply the media type of the content via the 
 `--media-type` switch (abbrev. `-m`)
 ```
 $ cocli corim submit \
