@@ -111,7 +111,7 @@ func Test_CorimSubmitCmd_non_existent_corim_file(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "corim payload read failed: open bad.cbor: file does not exist")
+	assert.EqualError(t, err, "read CoRIM payload failed: open bad.cbor: file does not exist")
 }
 
 func Test_CorimSubmitCmd_submit_ok(t *testing.T) {
@@ -161,5 +161,5 @@ func Test_CorimSubmitCmd_submit_not_ok(t *testing.T) {
 
 	ms.EXPECT().Run(testSignedCorimValid, "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1").Return(err)
 	err = cmd.Execute()
-	assert.EqualError(t, err, "corim submit failed reason: run failed: unexpected HTTP response code 404")
+	assert.EqualError(t, err, "submit CoRIM payload failed reason: run failed: unexpected HTTP response code 404")
 }

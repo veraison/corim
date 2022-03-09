@@ -14,9 +14,12 @@ import (
 )
 
 var (
-	corimFile      *string
-	apiServer      *string
-	mediaType      *string
+	corimFile *string
+	apiServer *string
+	mediaType *string
+)
+
+var (
 	submitter      ISubmitter = &provisioning.SubmitConfig{}
 	corimSubmitCmd            = NewCorimSubmitCmd(submitter)
 )
@@ -47,11 +50,11 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 			// Load the data from the CBOR File
 			data, err := readCorimData(*corimFile)
 			if err != nil {
-				return fmt.Errorf("corim payload read failed: %w", err)
+				return fmt.Errorf("read CoRIM payload failed: %w", err)
 			}
 
 			if err = provisionData(data, submitter, *apiServer, *mediaType); err != nil {
-				return fmt.Errorf("corim submit failed reason: %w", err)
+				return fmt.Errorf("submit CoRIM payload failed reason: %w", err)
 			}
 			return nil
 		},
