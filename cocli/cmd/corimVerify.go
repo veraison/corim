@@ -29,7 +29,7 @@ func NewCorimVerifyCmd() *cobra.Command {
 	Verify the signed CoRIM signed-corim.cbor using the key in JWK format from
 	file key.jwk
 	
-	  cli corim verify --file=signed-corim.cbor --key=key.jwk
+	  cocli corim verify --file=signed-corim.cbor --key=key.jwk
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {

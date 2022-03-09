@@ -32,10 +32,10 @@ func NewCorimSignCmd() *cobra.Command {
 	file key.jwk and save the resulting COSE Sign1 to signed-corim.cbor.  Read
 	the relevant CorimMeta information from file meta.json.
 	
-	  cli corim sign --file=unsigned-corim.cbor \
-	             --key=key.jwk \
-				 --meta=meta.json \
-				 --output=signed-corim.cbor
+	  cocli corim sign  --file=unsigned-corim.cbor \
+					--key=key.jwk \
+					--meta=meta.json \
+					--output=signed-corim.cbor
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {

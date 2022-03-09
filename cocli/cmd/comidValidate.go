@@ -27,12 +27,12 @@ func NewComidValidateCmd() *cobra.Command {
 
 	Validate CoMID in file c.cbor.
 
-	  cli comid validate --file=c.cbor
+	  cocli comid validate --file=c.cbor
 
 	Validate CoMIDs in files c1.cbor, c2.cbor and any cbor file in the comids/
 	directory.
 	
-	  cli comid validate --file=c1.cbor --file=c2.cbor --dir=comids
+	  cocli comid validate --file=c1.cbor --file=c2.cbor --dir=comids
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
