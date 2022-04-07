@@ -4,7 +4,7 @@
 
 To install the `cocli` command, do:
 ```
-$ go install github.com/veraison/corim/cocli
+$ go install github.com/veraison/corim/cocli@latest
 ```
 
 To configure auto-completion, use the `completion` subcommand.  For example, if
