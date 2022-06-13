@@ -15,6 +15,6 @@ require (
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v0.0.0-20201125131510-de93f6091ed4
 	github.com/veraison/swid v0.0.1-beta.6
-	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 )
