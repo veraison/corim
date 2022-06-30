@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/cots"
@@ -14,6 +15,10 @@ import (
 
 var (
 	cotsCreateLanguage          *string
+	cotsCreateTagID        	    *string
+	cotsCreateTagUUIDStr   	    *string
+	cotsCreateTagUUID           *bool
+	cotsCreateTagVersion        *uint
 	cotsCreateCtsEnvFile        *string
 	cotsCreateCtsPermClaimsFile *string
 	cotsCreateCtsExclClaimsFile *string
@@ -67,7 +72,7 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 			}
 
 			// checkCorimCreateArgs makes sure cotsCreateCtsCotsFile is not nil
-			cborFile, err := ctsTemplateToCBOR(*cotsCreateLanguage, *cotsCreateCtsEnvFile, *cotsCreateCtsPermClaimsFile, *cotsCreateCtsExclClaimsFile, cotsCreateCtsPurposes,
+			cborFile, err := ctsTemplateToCBOR(*cotsCreateLanguage, *cotsCreateTagID, *cotsCreateTagUUID, *cotsCreateTagUUIDStr, cotsCreateTagVersion, *cotsCreateCtsEnvFile, *cotsCreateCtsPermClaimsFile, *cotsCreateCtsExclClaimsFile, cotsCreateCtsPurposes,
 				tasFilesList, casFilesList, cotsCreateCtsOutputFile)
 			if err != nil {
 				return err
@@ -79,6 +84,10 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 	}
 
 	cotsCreateLanguage = cmd.Flags().StringP("language", "l", "", "language tag")
+	cotsCreateTagUUIDStr = cmd.Flags().StringP("uuid-str", "", "", "string representation of a UUID to use as tag ID (mutually exclusive from --uuid and --id)")
+	cotsCreateTagUUID = cmd.Flags().BoolP("uuid", "", false, "boolean indicating a random UUID value should be used as tag ID (mutually exclusive from --id and --uuid-str)")
+	cotsCreateTagID = cmd.Flags().StringP("id", "", "", "string value containing a tag ID value (mutually exclusive from --uuid and --uuid-str)")
+	cotsCreateTagVersion = cmd.Flags().UintP("tag-version", "", 0, "integer value indicating version of tag identity (ignored if neither --uuid nor --id are supplied)")
 	cotsCreateCtsEnvFile = cmd.Flags().StringP("environment", "e", "", "an environment template file (in JSON format)")
 	cotsCreateCtsPermClaimsFile = cmd.Flags().StringP("permclaims", "p", "", "a permitted claims template file (in JSON format)")
 	cotsCreateCtsExclClaimsFile = cmd.Flags().StringP("exclclaims", "x", "", "an excluded claims template file (in JSON format)")
@@ -106,9 +115,22 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 	return cmd
 }
 
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
+}
+
 func checkctsCreateCtsArgs() error {
 	if cotsCreateCtsEnvFile == nil || *cotsCreateCtsEnvFile == "" {
 		return errors.New("no environment template supplied")
+	}
+
+	if (*cotsCreateTagUUID != false && *cotsCreateTagID != "") || (*cotsCreateTagUUID != false && *cotsCreateTagUUIDStr != "") || (*cotsCreateTagUUIDStr != "" && *cotsCreateTagID != "") {
+		return errors.New("only one of --uuid, --uuid-str and --id can be used at the same time")
+	}
+
+	if *cotsCreateTagUUIDStr != "" && !IsValidUUID(*cotsCreateTagUUIDStr) {
+		return errors.New("--uuid-str does not contain a valid UUID")
 	}
 
 	if len(cotsCreateCtsTaFiles)+len(cotsCreateCtsTaDirs) == 0 {
@@ -118,7 +140,7 @@ func checkctsCreateCtsArgs() error {
 	return nil
 }
 
-func ctsTemplateToCBOR(language string, envFile string, permClaimsFile string, exclClaimsFile string, purposes, taFiles, caFiles []string, outputFile *string) (string, error) {
+func ctsTemplateToCBOR(language string, tagId string, genUuid bool, uuidStr string, version *uint, envFile string, permClaimsFile string, exclClaimsFile string, purposes, taFiles, caFiles []string, outputFile *string) (string, error) {
 	var (
 		envData        []byte
 		env            cots.EnvironmentGroups
@@ -145,6 +167,18 @@ func ctsTemplateToCBOR(language string, envFile string, permClaimsFile string, e
 
 	if language != "" {
 		cts.Language = &language
+	}
+
+	if tagId != "" {
+		cts.SetTagIdentity(tagId, version)
+	} else if genUuid != false {
+		u := uuid.New()
+		b, _ := u.MarshalBinary()
+		cts.SetTagIdentity(b, version)
+	} else if uuidStr != "" {
+		u, _ := uuid.Parse(uuidStr)
+		b, _ := u.MarshalBinary()
+		cts.SetTagIdentity(b, version)
 	}
 
 	if permClaimsFile != "" {

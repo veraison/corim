@@ -68,4 +68,35 @@ func Test_CotsCreateCtsCmd_env_not_found(t *testing.T) {
 	assert.EqualError(t, err, "error loading template from nonexistent.cbor: open nonexistent.cbor: no such file or directory")
 }
 
+func Test_CotsCreateCtsCmd_too_many_ids(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--uuid",
+		"--id=some_tag_identity",
+		"--environment=../data/cots/env/vendor.json",
+		"--tafile=../data/cots/shared_ta.der",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "only one of --uuid, --uuid-str and --id can be used at the same time")
+}
+
+func Test_CotsCreateCtsCmd_invalid_uuid(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--uuid-str=NotAUuid",
+		"--environment=../data/cots/env/vendor.json",
+		"--tafile=../data/cots/shared_ta.der",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "--uuid-str does not contain a valid UUID")
+}
+
 // TODO add more test cases

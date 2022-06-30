@@ -7,19 +7,37 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/veraison/corim/comid"
+	"github.com/veraison/swid"
 )
 
 type ConciseTaStore struct {
 	Language     *string            `cbor:"0,keyasint,omitempty" json:"language,omitempty"`
-	Environments EnvironmentGroups  `cbor:"1,keyasint" json:"environments"`
-	Purposes     []string           `cbor:"2,keyasint,omitempty" json:"purposes,omitempty"`
-	PermClaims   EatCWTClaims     	`cbor:"3,keyasint,omitempty" json:"permclaims,omitempty"`
-	ExclClaims   EatCWTClaims       	`cbor:"4,keyasint,omitempty" json:"exclclaims,omitempty"`
-	Keys         *TasAndCas         `cbor:"5,keyasint" json:"keys"`
+	TagIdentity  *comid.TagIdentity `cbor:"1,keyasint,omitempty" json:"tag-identity,omitempty"`
+	Environments EnvironmentGroups  `cbor:"2,keyasint" json:"environments"`
+	Purposes     []string           `cbor:"3,keyasint,omitempty" json:"purposes,omitempty"`
+	PermClaims   EatCWTClaims     	`cbor:"4,keyasint,omitempty" json:"permclaims,omitempty"`
+	ExclClaims   EatCWTClaims       `cbor:"5,keyasint,omitempty" json:"exclclaims,omitempty"`
+	Keys         *TasAndCas         `cbor:"6,keyasint" json:"keys"`
 }
 
 func NewConciseTaStore() *ConciseTaStore {
 	return &ConciseTaStore{}
+}
+
+func (o *ConciseTaStore) SetTagIdentity(tagID interface{}, tagIDVersion *uint) *ConciseTaStore {
+	if o != nil {
+		id := swid.NewTagID(tagID)
+		if id == nil {
+			return nil
+		}
+		o.TagIdentity = &comid.TagIdentity{}
+		o.TagIdentity.TagID = *id
+		if nil != tagIDVersion {
+			o.TagIdentity.TagVersion = *tagIDVersion
+		}
+	}
+	return o
 }
 
 func (o *ConciseTaStore) SetLanguage(language string) *ConciseTaStore {
