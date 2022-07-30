@@ -4,13 +4,13 @@
 package cmd
 
 import (
+	"crypto"
 	"errors"
 	"fmt"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/corim"
-	cose "github.com/veraison/go-cose"
 )
 
 var (
@@ -71,7 +71,7 @@ func verify(signedCorimFile, keyFile string) error {
 		signedCorimCBOR []byte
 		keyJWK          []byte
 		err             error
-		signer          *cose.Signer
+		pkey            crypto.PublicKey
 		s               corim.SignedCorim
 	)
 
@@ -87,11 +87,11 @@ func verify(signedCorimFile, keyFile string) error {
 		return fmt.Errorf("error loading verifying key from %s: %w", keyFile, err)
 	}
 
-	if signer, err = corim.SignerFromJWK(keyJWK); err != nil {
+	if pkey, err = corim.NewPublicKeyFromJWK(keyJWK); err != nil {
 		return fmt.Errorf("error loading verifying key from %s: %w", keyFile, err)
 	}
 
-	if err = s.Verify(signer.Verifier().PublicKey); err != nil {
+	if err = s.Verify(pkey); err != nil {
 		return fmt.Errorf("error verifying %s with key %s: %w", signedCorimFile, keyFile, err)
 	}
 

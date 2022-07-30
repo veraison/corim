@@ -60,7 +60,7 @@ func Test_CorimExtractCmd_bad_signed_corim(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoRIM from bad.txt: failed CBOR decoding for COSE-Sign1 signed CoRIM: unexpected EOF")
+	assert.EqualError(t, err, "error decoding signed CoRIM from bad.txt: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
 }
 
 func Test_CorimExtractCmd_invalid_signed_corim(t *testing.T) {
