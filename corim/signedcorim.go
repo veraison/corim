@@ -8,13 +8,15 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"strings"
 
 	cose "github.com/veraison/go-cose"
 )
 
 var (
-	ContentType    = "application/rim+cbor"
-	NoExternalData = []byte("")
+	ContentType          = "application/rim+cbor"
+	NoExternalData       = []byte("")
+	HeaderLabelCorimMeta = int64(8)
 )
 
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
@@ -25,12 +27,6 @@ type SignedCorim struct {
 	message       *cose.Sign1Message
 }
 
-var (
-	algID       = cose.GetCommonHeaderTagOrPanic("alg")
-	contentType = cose.GetCommonHeaderTagOrPanic("content type")
-	corimMeta   = 8
-)
-
 func (o *SignedCorim) processHdrs() error {
 	var hdr = o.message.Headers
 
@@ -38,7 +34,7 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory protected header")
 	}
 
-	v, ok := hdr.Protected[contentType]
+	v, ok := hdr.Protected[cose.HeaderLabelContentType]
 	if !ok {
 		return errors.New("missing mandatory content type")
 	}
@@ -51,7 +47,7 @@ func (o *SignedCorim) processHdrs() error {
 	// TODO(tho) Check with the CoRIM design team.
 	// See https://github.com/veraison/corim/issues/14
 
-	v, ok = hdr.Protected[corimMeta]
+	v, ok = hdr.Protected[HeaderLabelCorimMeta]
 	if !ok {
 		return errors.New("missing mandatory corim.meta")
 	}
@@ -102,7 +98,7 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
 // The target SignedCorim must have its UnsignedCorim field correctly
 // populated.
-func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
+func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	if signer == nil {
 		return nil, errors.New("nil signer")
 	}
@@ -124,21 +120,22 @@ func (o *SignedCorim) Sign(signer *cose.Signer) ([]byte, error) {
 		return nil, fmt.Errorf("failed CBOR encoding of CoRIM Meta: %w", err)
 	}
 
-	alg := signer.GetAlg()
-	if alg == nil {
+	alg := signer.Algorithm()
+
+	if strings.Contains(alg.String(), "unknown algorithm value") {
 		return nil, errors.New("signer has no algorithm")
 	}
 
-	o.message.Headers.Protected[algID] = alg.Value
-	o.message.Headers.Protected[contentType] = ContentType
-	o.message.Headers.Protected[corimMeta] = metaCBOR
+	o.message.Headers.Protected.SetAlgorithm(alg)
+	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
+	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
 
-	err = o.message.Sign(rand.Reader, NoExternalData, *signer)
+	err = o.message.Sign(rand.Reader, NoExternalData, signer)
 	if err != nil {
 		return nil, fmt.Errorf("COSE Sign1 signature failed: %w", err)
 	}
 
-	wrap, err := cose.Marshal(o.message)
+	wrap, err := o.message.MarshalCBOR()
 	if err != nil {
 		return nil, fmt.Errorf("signed-corim marshaling failed: %w", err)
 	}
@@ -153,14 +150,16 @@ func (o *SignedCorim) Verify(pk crypto.PublicKey) error {
 		return errors.New("no Sign1 message found")
 	}
 
-	alg, err := cose.GetAlg(o.message.Headers)
+	protected := o.message.Headers.Protected
+
+	alg, err := protected.Algorithm()
 	if err != nil {
 		return fmt.Errorf("unable to get verification algorithm: %w", err)
 	}
 
-	verifier := cose.Verifier{
-		Alg:       alg,
-		PublicKey: pk,
+	verifier, err := cose.NewVerifier(alg, pk)
+	if err != nil {
+		return fmt.Errorf("unable to instantiate verifier: %w", err)
 	}
 
 	err = o.message.Verify(NoExternalData, verifier)

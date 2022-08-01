@@ -11,9 +11,9 @@ import (
 func TestInstance_GetUUID_OK(t *testing.T) {
 	inst := NewInstanceUUID(uuid.UUID(TestUUID))
 	require.NotNil(t, inst)
-	uuid, err := inst.GetUUID()
+	u, err := inst.GetUUID()
 	assert.Nil(t, err)
-	assert.Equal(t, uuid, TestUUID)
+	assert.Equal(t, u, TestUUID)
 }
 
 func TestInstance_GetUUID_NOK(t *testing.T) {

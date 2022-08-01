@@ -12,40 +12,63 @@ import (
 	cose "github.com/veraison/go-cose"
 )
 
-func SignerFromJWK(j []byte) (*cose.Signer, error) {
+func getAlgAndKeyFromJWK(j string) (cose.Algorithm, crypto.Signer, error) {
+	const noAlg = cose.Algorithm(-65537)
 	var (
-		err  error
-		ks   jwk.Set
-		k    jwk.Key
-		ok   bool
-		pkey crypto.PrivateKey
-		crv  elliptic.Curve
-		alg  *cose.Algorithm
+		err error
+		ks  jwk.Set
+		k   jwk.Key
+		ok  bool
+		crv elliptic.Curve
+		alg cose.Algorithm
 	)
 
-	if ks, err = jwk.ParseString(string(j)); err != nil {
-		return nil, err
+	ks, err = jwk.ParseString(j)
+	if err != nil {
+		return noAlg, nil, err
 	}
 
-	if k, ok = ks.Get(0); !ok {
-		return nil, errors.New("no key found at slot 0")
+	k, ok = ks.Get(0)
+	if !ok {
+		return noAlg, nil, errors.New("key extraction failed")
 	}
 
-	if err = k.Raw(&pkey); err != nil {
-		return nil, err
+	var key crypto.Signer
+
+	err = k.Raw(&key)
+	if err != nil {
+		return noAlg, nil, err
 	}
 
-	switch v := pkey.(type) {
+	switch v := key.(type) {
 	case *ecdsa.PrivateKey:
 		crv = v.Curve
 		if crv == elliptic.P256() {
-			alg = cose.ES256
+			alg = cose.AlgorithmES256
 			break
 		}
-		return nil, fmt.Errorf("unknown elliptic curve %v", crv)
+		return noAlg, nil, fmt.Errorf("unknown elliptic curve %v", crv)
 	default:
-		return nil, fmt.Errorf("unknown private key type %v", reflect.TypeOf(pkey))
+		return noAlg, nil, fmt.Errorf("unknown private key type %v", reflect.TypeOf(key))
 	}
 
-	return cose.NewSignerFromKey(alg, pkey)
+	return alg, key, nil
+}
+
+func NewSignerFromJWK(j []byte) (cose.Signer, error) {
+	alg, key, err := getAlgAndKeyFromJWK(string(j))
+	if err != nil {
+		return nil, err
+	}
+
+	return cose.NewSigner(alg, key)
+}
+
+func NewPublicKeyFromJWK(j []byte) (crypto.PublicKey, error) {
+	_, key, err := getAlgAndKeyFromJWK(string(j))
+	if err != nil {
+		return nil, err
+	}
+
+	return key.Public(), nil
 }
