@@ -55,6 +55,30 @@ func TestMeasurement_NewPSAMeasurement_no_values(t *testing.T) {
 	assert.EqualError(t, err, "no measurement value set")
 }
 
+func TestMeasurement_NewCCAMeasurement_no_values(t *testing.T) {
+	ccaRefValID :=
+		NewCCARefValID(TestCCALabel)
+	require.NotNil(t, ccaRefValID)
+
+	tv := NewCCAMeasurement(*ccaRefValID)
+	assert.NotNil(t, tv)
+
+	err := tv.Valid()
+	assert.EqualError(t, err, "no measurement value set")
+}
+
+func TestMeasurement_NewCCAMeasurement_valid_meas(t *testing.T) {
+	ccaRefValID :=
+		NewCCARefValID(TestCCALabel)
+	require.NotNil(t, ccaRefValID)
+
+	tv := NewCCAMeasurement(*ccaRefValID).SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
+	assert.NotNil(t, tv)
+
+	err := tv.Valid()
+	assert.Nil(t, err)
+}
+
 func TestMeasurement_NewPSAMeasurement_one_value(t *testing.T) {
 	psaRefValID :=
 		NewPSARefValID(TestSignerID).
@@ -266,6 +290,47 @@ func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
 	}
 }
 
+func TestMKey_MarshalJSON_CCARefVal_ok(t *testing.T) {
+	refval := NewCCARefValID(TestCCALabel)
+	mkey := &Mkey{val: TaggedCCARefValID(*refval)}
+
+	expected := `{"type":"cca.refval-id","value":{"label": "cca-platform-config"}}`
+
+	actual, err := mkey.MarshalJSON()
+	assert.Nil(t, err)
+
+	assert.JSONEq(t, expected, string(actual))
+	fmt.Printf("JSON: %x\n", actual)
+}
+
+func TestMKey_UnMarshalJSON_CCARefVal_ok(t *testing.T) {
+	input := []byte(`{"type":"cca.refval-id","value":{"label": "cca-platform-config"}}`)
+	expected := TestCCALabel
+
+	mKey := &Mkey{}
+
+	err := mKey.UnmarshalJSON(input)
+	assert.Nil(t, err)
+	ccaref, err := mKey.GetCCARefValID()
+	actual := *ccaref.Label
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+
+}
+
+func TestMKey_UnMarshalJSON_CCARefVal_not_ok(t *testing.T) {
+	input := []byte(`{"type":"cca.refval-id","value":{"label": ""}}`)
+	expected := "cannot unmarshal $measured-element-type-choice of type CCARefValID: mandatory Label is empty"
+
+	mKey := &Mkey{}
+
+	err := mKey.UnmarshalJSON(input)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, expected, err.Error())
+
+}
 func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 	tvs := []struct {
 		mkey     uint64

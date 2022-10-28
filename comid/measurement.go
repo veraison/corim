@@ -21,7 +21,7 @@ type Measurement struct {
 }
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are UUID, PSA refval-id and unsigned integer
+// The supported types are UUID, PSA refval-id, CCA refval-id and unsigned integer
 // TO DO Add tagged OID: see https://github.com/veraison/corim/issues/35
 type Mkey struct {
 	val interface{}
@@ -40,6 +40,8 @@ func (o Mkey) Valid() error {
 		return nil
 	case TaggedPSARefValID:
 		return PSARefValID(t).Valid()
+	case TaggedCCARefValID:
+		return CCARefValID(t).Valid()
 	case uint64:
 		if o.val == nil {
 			return fmt.Errorf("empty uint Mkey")
@@ -50,12 +52,39 @@ func (o Mkey) Valid() error {
 	}
 }
 
+func (o Mkey) IsPSARefValID() bool {
+	switch o.val.(type) {
+	case TaggedPSARefValID:
+		return true
+	default:
+		return false
+	}
+}
+
+func (o Mkey) IsCCARefValID() bool {
+	switch o.val.(type) {
+	case TaggedCCARefValID:
+		return true
+	default:
+		return false
+	}
+}
+
 func (o Mkey) GetPSARefValID() (PSARefValID, error) {
 	switch t := o.val.(type) {
 	case TaggedPSARefValID:
 		return PSARefValID(t), nil
 	default:
 		return PSARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
+	}
+}
+
+func (o Mkey) GetCCARefValID() (CCARefValID, error) {
+	switch t := o.val.(type) {
+	case TaggedCCARefValID:
+		return CCARefValID(t), nil
+	default:
+		return CCARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
 	}
 }
 
@@ -101,6 +130,21 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 			)
 		}
 		o.val = TaggedPSARefValID(x)
+	case "cca.refval-id":
+		var x CCARefValID
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type CCARefValID: %w",
+				err,
+			)
+		}
+		if err := x.Valid(); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type CCARefValID: %w",
+				err,
+			)
+		}
+		o.val = TaggedCCARefValID(x)
 	case "uint":
 		var x uint64
 		if err := json.Unmarshal(v.Value, &x); err != nil {
@@ -140,6 +184,13 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		v = tnv{Type: "psa.refval-id", Value: b}
+	case TaggedCCARefValID:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "cca.refval-id", Value: b}
+
 	case uint64:
 		b, err = json.Marshal(t)
 		if err != nil {
@@ -269,6 +320,20 @@ func (o *Measurement) SetKeyPSARefValID(psaRefValID PSARefValID) *Measurement {
 	return o
 }
 
+// SetKeyCCARefValID sets the key of the target measurement-map to the supplied
+// CCA refval-id
+func (o *Measurement) SetKeyCCARefValID(ccaRefValID CCARefValID) *Measurement {
+	if o != nil {
+		if ccaRefValID.Valid() != nil {
+			return nil
+		}
+		o.Key = &Mkey{
+			val: TaggedCCARefValID(ccaRefValID),
+		}
+	}
+	return o
+}
+
 // SetKeyKeyUUID sets the key of the target measurement-map to the supplied
 // UUID
 func (o *Measurement) SetKeyUUID(u UUID) *Measurement {
@@ -306,6 +371,13 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 	return m.SetKeyPSARefValID(psaRefValID)
 }
 
+// NewCCAMeasurement instantiates a new measurement-map with the key set to the
+// supplied CCA refval-id
+func NewCCAMeasurement(ccaRefValID CCARefValID) *Measurement {
+	m := &Measurement{}
+	return m.SetKeyCCARefValID(ccaRefValID)
+}
+
 // NewUUIDMeasurement instantiates a new measurement-map with the key set to the
 // supplied UUID
 func NewUUIDMeasurement(uuid UUID) *Measurement {
@@ -337,7 +409,9 @@ func (o *Measurement) SetVersion(ver string, scheme uint64) *Measurement {
 func (o *Measurement) SetRawValueBytes(rawValue, rawValueMask []byte) *Measurement {
 	if o != nil {
 		o.Val.RawValue = NewRawValue().SetBytes(rawValue)
-		o.Val.RawValueMask = &rawValueMask
+		if len(rawValueMask) != 0 {
+			o.Val.RawValueMask = &rawValueMask
+		}
 	}
 	return o
 }

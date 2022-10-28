@@ -32,6 +32,7 @@ var (
 	TestSignerID          = MustHexDecode(nil, "acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b")
 	TestTagID             = "urn:example:veraison"
 	TestMKey       uint64 = 700
+	TestCCALabel          = "cca-platform-config"
 )
 
 func MustHexDecode(t *testing.T, s string) []byte {
@@ -188,6 +189,98 @@ var (
 				"verification-keys": [
 					{
 						"key": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6Vwqe7hy3O8Ypa+BUETLUjBNU3rEXVUyt9XHR7HJWLG7XTKQd9i1kVRXeBPDLFnfYru1/euxRnJM7H9UoFDLdA=="
+					}
+				]
+			}
+		]
+	}
+}
+`
+	CCARefValJSONTemplate = `{
+	"lang": "en-GB",
+	"tag-identity": {
+		"id": "43BBE37F-2E61-4B33-AED3-53CFF1428B16",
+		"version": 0
+	},
+	"entities": [
+		{
+			"name": "ACME Ltd.",
+			"regid": "https://acme.example",
+			"roles": [ "tagCreator", "creator", "maintainer" ]
+		}
+	],
+	"triples": {
+		"reference-values": [
+			{
+				"environment": {
+					"class": {
+						"id": {
+							"type": "psa.impl-id",
+							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+						},
+						"vendor": "ACME",
+						"model": "RoadRunner"
+					}
+				},
+				"measurements": [
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "BL",
+								"version": "2.1.0",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
+						},
+						"value": {
+							"digests": [
+								"sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
+							]
+						}
+					},
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "PRoT",
+								"version": "1.3.5",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
+						},
+						"value": {
+							"digests": [
+								"sha-256:AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8="
+							]
+						}
+					},
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "ARoT",
+								"version": "0.1.4",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
+						},
+						"value": {
+							"digests": [
+								"sha-256:o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg="
+							]
+						}
+					},
+					{
+						"key": {
+							"type": "cca.refval-id",
+							"value": {
+								"label": "cca-platform-config"
+							}
+						},
+						"value": {
+							"raw-value": {
+								"type": "bytes",
+								"value": "cmF3dmFsdWUKcmF3dmFsdWUK"
+							}
+						}
 					}
 				]
 			}
