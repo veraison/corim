@@ -72,7 +72,9 @@ func extractCCARefVal(rv ReferenceValue) error {
 			}
 		}
 		if m.Key.IsCCARefValID() {
-			extractCCARefValID(m.Key)
+			if err := extractCCARefValID(m.Key); err != nil {
+				return fmt.Errorf("extracting cca-refval-id: %w", err)
+			}
 			if err := extractRawValue(m.Val.RawValue); err != nil {
 				return fmt.Errorf("extracting raw vlue: %w", err)
 			}
