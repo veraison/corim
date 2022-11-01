@@ -34,7 +34,7 @@ func Example_cca_refval() {
 	// Label: ARoT
 	// Version: 0.1.4
 	// Digest: a3a5e715f0cc574a73c3f9bebb6bc24f32ffd5b67b387244c2c909da779a1478
-	// Label: cca-platform-config
+	// Label: a non-empty (unique) label
 	// Raw value: {72617776616c75650a72617776616c75650a}
 }
 

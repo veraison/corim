@@ -271,7 +271,7 @@ var (
 					{
 						"key": {
 							"type": "cca.platform-config-id",
-							"value": "cca-platform-config"
+							"value": "a non-empty (unique) label"
 						},
 						"value": {
 							"raw-value": {
