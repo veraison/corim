@@ -21,7 +21,7 @@ type Measurement struct {
 }
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are UUID, PSA refval-id, CCA refval-id and unsigned integer
+// The supported types are UUID, PSA refval-id, CCA platform-config-id and unsigned integer
 // TO DO Add tagged OID: see https://github.com/veraison/corim/issues/35
 type Mkey struct {
 	val interface{}
