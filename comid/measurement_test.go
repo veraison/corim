@@ -204,6 +204,7 @@ func TestMKey_UnmarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
 		err := mkey.UnmarshalCBOR(tv.input)
 		assert.Nil(t, err)
 		actual, err := mkey.GetCCAPlatformConfigID()
+		assert.Nil(t, err)
 		assert.Equal(t, tv.expected, actual)
 		fmt.Printf("CBOR: %x\n", actual)
 	}
