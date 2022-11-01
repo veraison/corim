@@ -271,9 +271,7 @@ var (
 					{
 						"key": {
 							"type": "cca.refval-id",
-							"value": {
-								"label": "cca-platform-config"
-							}
+							"value": "cca-platform-config"
 						},
 						"value": {
 							"raw-value": {

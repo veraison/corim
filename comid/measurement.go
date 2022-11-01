@@ -40,8 +40,10 @@ func (o Mkey) Valid() error {
 		return nil
 	case TaggedPSARefValID:
 		return PSARefValID(t).Valid()
-	case TaggedCCARefValID:
-		return CCARefValID(t).Valid()
+	case TaggedCCAPlatformConfigID:
+		if CCAPlatformConfigID(t).Empty() {
+			return fmt.Errorf("empty CCAPlatformConfigID")
+		}
 	case uint64:
 		if o.val == nil {
 			return fmt.Errorf("empty uint Mkey")
@@ -50,6 +52,7 @@ func (o Mkey) Valid() error {
 	default:
 		return fmt.Errorf("unknown measurement key type: %T", t)
 	}
+	return nil
 }
 
 func (o Mkey) IsPSARefValID() bool {
@@ -61,9 +64,9 @@ func (o Mkey) IsPSARefValID() bool {
 	}
 }
 
-func (o Mkey) IsCCARefValID() bool {
+func (o Mkey) IsCCAPlatformConfigID() bool {
 	switch o.val.(type) {
-	case TaggedCCARefValID:
+	case TaggedCCAPlatformConfigID:
 		return true
 	default:
 		return false
@@ -79,12 +82,12 @@ func (o Mkey) GetPSARefValID() (PSARefValID, error) {
 	}
 }
 
-func (o Mkey) GetCCARefValID() (CCARefValID, error) {
+func (o Mkey) GetCCAPlatformConfigID() (CCAPlatformConfigID, error) {
 	switch t := o.val.(type) {
-	case TaggedCCARefValID:
-		return CCARefValID(t), nil
+	case TaggedCCAPlatformConfigID:
+		return CCAPlatformConfigID(t), nil
 	default:
-		return CCARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
+		return CCAPlatformConfigID(""), fmt.Errorf("measurement-key type is: %T", t)
 	}
 }
 
@@ -131,20 +134,19 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 		}
 		o.val = TaggedPSARefValID(x)
 	case "cca.refval-id":
-		var x CCARefValID
+		var x CCAPlatformConfigID
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
-				"cannot unmarshal $measured-element-type-choice of type CCARefValID: %w",
+				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: %w",
 				err,
 			)
 		}
-		if err := x.Valid(); err != nil {
+		if x.Empty() {
 			return fmt.Errorf(
-				"cannot unmarshal $measured-element-type-choice of type CCARefValID: %w",
-				err,
+				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID",
 			)
 		}
-		o.val = TaggedCCARefValID(x)
+		o.val = TaggedCCAPlatformConfigID(x)
 	case "uint":
 		var x uint64
 		if err := json.Unmarshal(v.Value, &x); err != nil {
@@ -184,7 +186,7 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		v = tnv{Type: "psa.refval-id", Value: b}
-	case TaggedCCARefValID:
+	case TaggedCCAPlatformConfigID:
 		b, err = json.Marshal(t)
 		if err != nil {
 			return nil, err
@@ -320,15 +322,15 @@ func (o *Measurement) SetKeyPSARefValID(psaRefValID PSARefValID) *Measurement {
 	return o
 }
 
-// SetKeyCCARefValID sets the key of the target measurement-map to the supplied
+// SetKeyCCAPlatformConfigID sets the key of the target measurement-map to the supplied
 // CCA refval-id
-func (o *Measurement) SetKeyCCARefValID(ccaRefValID CCARefValID) *Measurement {
+func (o *Measurement) SetKeyCCAPlatformConfigID(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
 	if o != nil {
-		if ccaRefValID.Valid() != nil {
+		if ccaPlatformConfigID.Empty() {
 			return nil
 		}
 		o.Key = &Mkey{
-			val: TaggedCCARefValID(ccaRefValID),
+			val: TaggedCCAPlatformConfigID(ccaPlatformConfigID),
 		}
 	}
 	return o
@@ -373,9 +375,9 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 
 // NewCCAMeasurement instantiates a new measurement-map with the key set to the
 // supplied CCA refval-id
-func NewCCAMeasurement(ccaRefValID CCARefValID) *Measurement {
+func NewCCAMeasurement(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
 	m := &Measurement{}
-	return m.SetKeyCCARefValID(ccaRefValID)
+	return m.SetKeyCCAPlatformConfigID(ccaPlatformConfigID)
 }
 
 // NewUUIDMeasurement instantiates a new measurement-map with the key set to the

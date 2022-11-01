@@ -56,11 +56,9 @@ func TestMeasurement_NewPSAMeasurement_no_values(t *testing.T) {
 }
 
 func TestMeasurement_NewCCAMeasurement_no_values(t *testing.T) {
-	ccaRefValID :=
-		NewCCARefValID(TestCCALabel)
-	require.NotNil(t, ccaRefValID)
+	ccaplatID := CCAPlatformConfigID(TestCCALabel)
 
-	tv := NewCCAMeasurement(*ccaRefValID)
+	tv := NewCCAMeasurement(ccaplatID)
 	assert.NotNil(t, tv)
 
 	err := tv.Valid()
@@ -68,11 +66,9 @@ func TestMeasurement_NewCCAMeasurement_no_values(t *testing.T) {
 }
 
 func TestMeasurement_NewCCAMeasurement_valid_meas(t *testing.T) {
-	ccaRefValID :=
-		NewCCARefValID(TestCCALabel)
-	require.NotNil(t, ccaRefValID)
+	ccaplatID := CCAPlatformConfigID(TestCCALabel)
 
-	tv := NewCCAMeasurement(*ccaRefValID).SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
+	tv := NewCCAMeasurement(ccaplatID).SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
 	assert.NotNil(t, tv)
 
 	err := tv.Valid()
@@ -291,10 +287,10 @@ func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
 }
 
 func TestMKey_MarshalJSON_CCARefVal_ok(t *testing.T) {
-	refval := NewCCARefValID(TestCCALabel)
-	mkey := &Mkey{val: TaggedCCARefValID(*refval)}
+	refval := TestCCALabel
+	mkey := &Mkey{val: TaggedCCAPlatformConfigID(refval)}
 
-	expected := `{"type":"cca.refval-id","value":{"label": "cca-platform-config"}}`
+	expected := `{"type":"cca.refval-id","value":"cca-platform-config"}`
 
 	actual, err := mkey.MarshalJSON()
 	assert.Nil(t, err)
@@ -304,24 +300,22 @@ func TestMKey_MarshalJSON_CCARefVal_ok(t *testing.T) {
 }
 
 func TestMKey_UnMarshalJSON_CCARefVal_ok(t *testing.T) {
-	input := []byte(`{"type":"cca.refval-id","value":{"label": "cca-platform-config"}}`)
-	expected := TestCCALabel
+	input := []byte(`{"type":"cca.refval-id","value":"cca-platform-config"}`)
+	expected := CCAPlatformConfigID(TestCCALabel)
 
 	mKey := &Mkey{}
 
 	err := mKey.UnmarshalJSON(input)
 	assert.Nil(t, err)
-	ccaref, err := mKey.GetCCARefValID()
-	actual := *ccaref.Label
-
+	actual, err := mKey.GetCCAPlatformConfigID()
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 
 }
 
 func TestMKey_UnMarshalJSON_CCARefVal_not_ok(t *testing.T) {
-	input := []byte(`{"type":"cca.refval-id","value":{"label": ""}}`)
-	expected := "cannot unmarshal $measured-element-type-choice of type CCARefValID: mandatory Label is empty"
+	input := []byte(`{"type":"cca.refval-id","value":""}`)
+	expected := "cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID"
 
 	mKey := &Mkey{}
 

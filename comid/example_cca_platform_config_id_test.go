@@ -71,7 +71,7 @@ func extractCCARefVal(rv ReferenceValue) error {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 			}
 		}
-		if m.Key.IsCCARefValID() {
+		if m.Key.IsCCAPlatformConfigID() {
 			if err := extractCCARefValID(m.Key); err != nil {
 				return fmt.Errorf("extracting cca-refval-id: %w", err)
 			}
@@ -101,13 +101,10 @@ func extractCCARefValID(k *Mkey) error {
 		return fmt.Errorf("no measurement key")
 	}
 
-	id, err := k.GetCCARefValID()
+	id, err := k.GetCCAPlatformConfigID()
 	if err != nil {
-		return fmt.Errorf("getting CCA refval id: %w", err)
+		return fmt.Errorf("getting CCA platform config id: %w", err)
 	}
-
-	if id.Label != nil {
-		fmt.Printf("Label: %s\n", *id.Label)
-	}
+	fmt.Printf("Label: %s\n", id)
 	return nil
 }
