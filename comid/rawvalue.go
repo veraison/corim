@@ -27,6 +27,14 @@ func (o *RawValue) SetBytes(val []byte) *RawValue {
 	return o
 }
 
+func (o RawValue) GetBytes() ([]byte, error) {
+	if o.val == nil {
+		return nil, fmt.Errorf("raw value is not set")
+	}
+	t := o.val.(TaggedRawValueBytes)
+	return []byte(t), nil
+}
+
 func (o RawValue) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.val)
 }

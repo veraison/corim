@@ -35,7 +35,7 @@ func Example_cca_refval() {
 	// Version: 0.1.4
 	// Digest: a3a5e715f0cc574a73c3f9bebb6bc24f32ffd5b67b387244c2c909da779a1478
 	// Label: a non-empty (unique) label
-	// Raw value: {72617776616c75650a72617776616c75650a}
+	// Raw value: 72617776616c75650a72617776616c75650a
 }
 
 func extractCcaRefVals(c *Comid) error {
@@ -91,7 +91,11 @@ func extractRawValue(r *RawValue) error {
 		return fmt.Errorf("no raw value")
 	}
 
-	fmt.Printf("Raw value: %x\n", *r)
+	b, err := r.GetBytes()
+	if err != nil {
+		return fmt.Errorf("failed to extract raw value bytes")
+	}
+	fmt.Printf("Raw value: %x\n", b)
 
 	return nil
 }
