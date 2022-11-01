@@ -55,6 +55,26 @@ func TestMeasurement_NewPSAMeasurement_no_values(t *testing.T) {
 	assert.EqualError(t, err, "no measurement value set")
 }
 
+func TestMeasurement_NewCCAPlatCfgMeasurement_no_values(t *testing.T) {
+	ccaplatID := CCAPlatformConfigID(TestCCALabel)
+
+	tv := NewCCAPlatCfgMeasurement(ccaplatID)
+	assert.NotNil(t, tv)
+
+	err := tv.Valid()
+	assert.EqualError(t, err, "no measurement value set")
+}
+
+func TestMeasurement_NewCCAPlatCfgMeasurement_valid_meas(t *testing.T) {
+	ccaplatID := CCAPlatformConfigID(TestCCALabel)
+
+	tv := NewCCAPlatCfgMeasurement(ccaplatID).SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
+	assert.NotNil(t, tv)
+
+	err := tv.Valid()
+	assert.Nil(t, err)
+}
+
 func TestMeasurement_NewPSAMeasurement_one_value(t *testing.T) {
 	psaRefValID :=
 		NewPSARefValID(TestSignerID).
@@ -130,6 +150,64 @@ func TestMkey_Valid_no_value(t *testing.T) {
 	expectedErr := "unknown measurement key type: <nil>"
 	err := mkey.Valid()
 	assert.EqualError(t, err, expectedErr)
+}
+
+func TestMKey_MarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
+	tvs := []struct {
+		mkey     CCAPlatformConfigID
+		expected []byte
+	}{
+		{
+			mkey:     CCAPlatformConfigID(TestCCALabel),
+			expected: MustHexDecode(t, "d9025a736363612d706c6174666f726d2d636f6e666967"),
+		},
+		{
+			mkey:     CCAPlatformConfigID("mytestplatformfig"),
+			expected: MustHexDecode(t, "d9025a716d7974657374706c6174666f726d666967"),
+		},
+		{
+			mkey:     CCAPlatformConfigID("mytestlabel2"),
+			expected: MustHexDecode(t, "d9025a6c6d79746573746c6162656c32"),
+		},
+	}
+
+	for _, tv := range tvs {
+		mkey := &Mkey{TaggedCCAPlatformConfigID(tv.mkey)}
+		actual, err := mkey.MarshalCBOR()
+		assert.Nil(t, err)
+		assert.Equal(t, tv.expected, actual)
+		fmt.Printf("CBOR: %x\n", actual)
+	}
+}
+
+func TestMKey_UnmarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
+	tvs := []struct {
+		input    []byte
+		expected CCAPlatformConfigID
+	}{
+		{
+			input:    MustHexDecode(t, "d9025a736363612d706c6174666f726d2d636f6e666967"),
+			expected: CCAPlatformConfigID(TestCCALabel),
+		},
+		{
+			input:    MustHexDecode(t, "d9025a716d7974657374706c6174666f726d666967"),
+			expected: CCAPlatformConfigID("mytestplatformfig"),
+		},
+		{
+			input:    MustHexDecode(t, "d9025a6c6d79746573746c6162656c32"),
+			expected: CCAPlatformConfigID("mytestlabel2"),
+		},
+	}
+
+	for _, tv := range tvs {
+		mkey := &Mkey{}
+		err := mkey.UnmarshalCBOR(tv.input)
+		assert.Nil(t, err)
+		actual, err := mkey.GetCCAPlatformConfigID()
+		assert.Nil(t, err)
+		assert.Equal(t, tv.expected, actual)
+		fmt.Printf("CBOR: %x\n", actual)
+	}
 }
 
 func TestMKey_MarshalCBOR_uint_ok(t *testing.T) {
@@ -266,6 +344,45 @@ func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
 	}
 }
 
+func TestMKey_MarshalJSON_CCAPlatformConfigID_ok(t *testing.T) {
+	refval := TestCCALabel
+	mkey := &Mkey{val: TaggedCCAPlatformConfigID(refval)}
+
+	expected := `{"type":"cca.platform-config-id","value":"cca-platform-config"}`
+
+	actual, err := mkey.MarshalJSON()
+	assert.Nil(t, err)
+
+	assert.JSONEq(t, expected, string(actual))
+	fmt.Printf("JSON: %x\n", actual)
+}
+
+func TestMKey_UnMarshalJSON_CCAPlatformConfigID_ok(t *testing.T) {
+	input := []byte(`{"type":"cca.platform-config-id","value":"cca-platform-config"}`)
+	expected := CCAPlatformConfigID(TestCCALabel)
+
+	mKey := &Mkey{}
+
+	err := mKey.UnmarshalJSON(input)
+	assert.Nil(t, err)
+	actual, err := mKey.GetCCAPlatformConfigID()
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+
+}
+
+func TestMKey_UnMarshalJSON_CCAPlatformConfigID_not_ok(t *testing.T) {
+	input := []byte(`{"type":"cca.platform-config-id","value":""}`)
+	expected := "cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: empty label"
+
+	mKey := &Mkey{}
+
+	err := mKey.UnmarshalJSON(input)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, expected, err.Error())
+
+}
 func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 	tvs := []struct {
 		mkey     uint64
