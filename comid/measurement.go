@@ -56,21 +56,13 @@ func (o Mkey) Valid() error {
 }
 
 func (o Mkey) IsPSARefValID() bool {
-	switch o.val.(type) {
-	case TaggedPSARefValID:
-		return true
-	default:
-		return false
-	}
+	_, ok := o.val.(TaggedPSARefValID)
+	return ok
 }
 
 func (o Mkey) IsCCAPlatformConfigID() bool {
-	switch o.val.(type) {
-	case TaggedCCAPlatformConfigID:
-		return true
-	default:
-		return false
-	}
+	_, ok := o.val.(TaggedCCAPlatformConfigID)
+	return ok
 }
 
 func (o Mkey) GetPSARefValID() (PSARefValID, error) {
@@ -133,7 +125,7 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 			)
 		}
 		o.val = TaggedPSARefValID(x)
-	case "cca.refval-id":
+	case "cca.platform-config-id":
 		var x CCAPlatformConfigID
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
@@ -143,7 +135,7 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 		}
 		if x.Empty() {
 			return fmt.Errorf(
-				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID",
+				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: empty label",
 			)
 		}
 		o.val = TaggedCCAPlatformConfigID(x)
@@ -191,7 +183,7 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		v = tnv{Type: "cca.refval-id", Value: b}
+		v = tnv{Type: "cca.platform-config-id", Value: b}
 
 	case uint64:
 		b, err = json.Marshal(t)
@@ -323,7 +315,7 @@ func (o *Measurement) SetKeyPSARefValID(psaRefValID PSARefValID) *Measurement {
 }
 
 // SetKeyCCAPlatformConfigID sets the key of the target measurement-map to the supplied
-// CCA refval-id
+// CCA platform-config-id
 func (o *Measurement) SetKeyCCAPlatformConfigID(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
 	if o != nil {
 		if ccaPlatformConfigID.Empty() {
@@ -373,9 +365,9 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 	return m.SetKeyPSARefValID(psaRefValID)
 }
 
-// NewCCAMeasurement instantiates a new measurement-map with the key set to the
-// supplied CCA refval-id
-func NewCCAMeasurement(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
+// NewCCAPlatCfgMeasurement instantiates a new measurement-map with the key set to the
+// supplied CCA platform-config-id
+func NewCCAPlatCfgMeasurement(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
 	m := &Measurement{}
 	return m.SetKeyCCAPlatformConfigID(ccaPlatformConfigID)
 }

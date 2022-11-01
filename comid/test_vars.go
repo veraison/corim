@@ -270,7 +270,7 @@ var (
 					},
 					{
 						"key": {
-							"type": "cca.refval-id",
+							"type": "cca.platform-config-id",
 							"value": "cca-platform-config"
 						},
 						"value": {
