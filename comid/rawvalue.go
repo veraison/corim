@@ -27,6 +27,19 @@ func (o *RawValue) SetBytes(val []byte) *RawValue {
 	return o
 }
 
+func (o RawValue) GetBytes() ([]byte, error) {
+	if o.val == nil {
+		return nil, fmt.Errorf("raw value is not set")
+	}
+
+	switch t := o.val.(type) {
+	case TaggedRawValueBytes:
+		return []byte(t), nil
+	default:
+		return nil, fmt.Errorf("unknown type %T for $raw-value-type-choice", t)
+	}
+}
+
 func (o RawValue) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.val)
 }

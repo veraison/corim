@@ -55,7 +55,7 @@ func Test_CotsDisplayCmd_bad_unsigned_corim(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoTS from bad.txt: failed CBOR decoding for COSE-Sign1 signed CoRIM: unexpected EOF")
+	assert.EqualError(t, err, "error decoding signed CoTS from bad.txt: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
 }
 
 func Test_CotsDisplayCmd_invalid_unsigned_cots(t *testing.T) {
@@ -69,7 +69,7 @@ func Test_CotsDisplayCmd_invalid_unsigned_cots(t *testing.T) {
 	fs = afero.NewOsFs()
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoTS from ../data/cots/not.cbor: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: cannot unmarshal negative integer into Go value of type cbor.RawTag")
+	assert.EqualError(t, err, "error decoding signed CoTS from ../data/cots/not.cbor: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
 }
 
 func Test_CotsDisplayCmd_ok_top_level_view(t *testing.T) {
@@ -85,4 +85,3 @@ func Test_CotsDisplayCmd_ok_top_level_view(t *testing.T) {
 	err := cmd.Execute()
 	assert.NoError(t, err)
 }
-

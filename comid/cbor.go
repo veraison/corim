@@ -28,6 +28,7 @@ func comidTags() cbor.TagSet {
 		// PSA profile tags
 		600: TaggedImplID{},
 		601: TaggedPSARefValID{},
+		602: TaggedCCAPlatformConfigID(""),
 	}
 
 	opts := cbor.TagOptions{

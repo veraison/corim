@@ -21,7 +21,7 @@ type Measurement struct {
 }
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are UUID, PSA refval-id and unsigned integer
+// The supported types are UUID, PSA refval-id, CCA platform-config-id and unsigned integer
 // TO DO Add tagged OID: see https://github.com/veraison/corim/issues/35
 type Mkey struct {
 	val interface{}
@@ -40,6 +40,10 @@ func (o Mkey) Valid() error {
 		return nil
 	case TaggedPSARefValID:
 		return PSARefValID(t).Valid()
+	case TaggedCCAPlatformConfigID:
+		if CCAPlatformConfigID(t).Empty() {
+			return fmt.Errorf("empty CCAPlatformConfigID")
+		}
 	case uint64:
 		if o.val == nil {
 			return fmt.Errorf("empty uint Mkey")
@@ -48,6 +52,17 @@ func (o Mkey) Valid() error {
 	default:
 		return fmt.Errorf("unknown measurement key type: %T", t)
 	}
+	return nil
+}
+
+func (o Mkey) IsPSARefValID() bool {
+	_, ok := o.val.(TaggedPSARefValID)
+	return ok
+}
+
+func (o Mkey) IsCCAPlatformConfigID() bool {
+	_, ok := o.val.(TaggedCCAPlatformConfigID)
+	return ok
 }
 
 func (o Mkey) GetPSARefValID() (PSARefValID, error) {
@@ -56,6 +71,15 @@ func (o Mkey) GetPSARefValID() (PSARefValID, error) {
 		return PSARefValID(t), nil
 	default:
 		return PSARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
+	}
+}
+
+func (o Mkey) GetCCAPlatformConfigID() (CCAPlatformConfigID, error) {
+	switch t := o.val.(type) {
+	case TaggedCCAPlatformConfigID:
+		return CCAPlatformConfigID(t), nil
+	default:
+		return CCAPlatformConfigID(""), fmt.Errorf("measurement-key type is: %T", t)
 	}
 }
 
@@ -101,6 +125,20 @@ func (o *Mkey) UnmarshalJSON(data []byte) error {
 			)
 		}
 		o.val = TaggedPSARefValID(x)
+	case "cca.platform-config-id":
+		var x CCAPlatformConfigID
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: %w",
+				err,
+			)
+		}
+		if x.Empty() {
+			return fmt.Errorf(
+				"cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: empty label",
+			)
+		}
+		o.val = TaggedCCAPlatformConfigID(x)
 	case "uint":
 		var x uint64
 		if err := json.Unmarshal(v.Value, &x); err != nil {
@@ -140,6 +178,13 @@ func (o Mkey) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		v = tnv{Type: "psa.refval-id", Value: b}
+	case TaggedCCAPlatformConfigID:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = tnv{Type: "cca.platform-config-id", Value: b}
+
 	case uint64:
 		b, err = json.Marshal(t)
 		if err != nil {
@@ -269,6 +314,20 @@ func (o *Measurement) SetKeyPSARefValID(psaRefValID PSARefValID) *Measurement {
 	return o
 }
 
+// SetKeyCCAPlatformConfigID sets the key of the target measurement-map to the supplied
+// CCA platform-config-id
+func (o *Measurement) SetKeyCCAPlatformConfigID(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
+	if o != nil {
+		if ccaPlatformConfigID.Empty() {
+			return nil
+		}
+		o.Key = &Mkey{
+			val: TaggedCCAPlatformConfigID(ccaPlatformConfigID),
+		}
+	}
+	return o
+}
+
 // SetKeyKeyUUID sets the key of the target measurement-map to the supplied
 // UUID
 func (o *Measurement) SetKeyUUID(u UUID) *Measurement {
@@ -306,6 +365,13 @@ func NewPSAMeasurement(psaRefValID PSARefValID) *Measurement {
 	return m.SetKeyPSARefValID(psaRefValID)
 }
 
+// NewCCAPlatCfgMeasurement instantiates a new measurement-map with the key set to the
+// supplied CCA platform-config-id
+func NewCCAPlatCfgMeasurement(ccaPlatformConfigID CCAPlatformConfigID) *Measurement {
+	m := &Measurement{}
+	return m.SetKeyCCAPlatformConfigID(ccaPlatformConfigID)
+}
+
 // NewUUIDMeasurement instantiates a new measurement-map with the key set to the
 // supplied UUID
 func NewUUIDMeasurement(uuid UUID) *Measurement {
@@ -337,7 +403,9 @@ func (o *Measurement) SetVersion(ver string, scheme uint64) *Measurement {
 func (o *Measurement) SetRawValueBytes(rawValue, rawValueMask []byte) *Measurement {
 	if o != nil {
 		o.Val.RawValue = NewRawValue().SetBytes(rawValue)
-		o.Val.RawValueMask = &rawValueMask
+		if len(rawValueMask) != 0 {
+			o.Val.RawValueMask = &rawValueMask
+		}
 	}
 	return o
 }

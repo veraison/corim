@@ -65,7 +65,7 @@ func Test_CotsCreateCtsCmd_env_not_found(t *testing.T) {
 	cmd.SetArgs(args)
 	fs = afero.NewOsFs()
 	err := cmd.Execute()
-	assert.EqualError(t, err, "error loading template from nonexistent.cbor: open nonexistent.cbor: no such file or directory")
+	assert.EqualError(t, err, "no TA files found")
 }
 
 func Test_CotsCreateCtsCmd_too_many_ids(t *testing.T) {

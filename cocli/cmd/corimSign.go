@@ -89,7 +89,7 @@ func sign(unsignedCorimFile, keyFile, metaFile string, outputFile *string) (stri
 		signedCorimFile   string
 		c                 corim.UnsignedCorim
 		m                 corim.Meta
-		signer            *cose.Signer
+		signer            cose.Signer
 	)
 
 	if unsignedCorimCBOR, err = afero.ReadFile(fs, unsignedCorimFile); err != nil {
@@ -120,7 +120,7 @@ func sign(unsignedCorimFile, keyFile, metaFile string, outputFile *string) (stri
 		return "", fmt.Errorf("error loading signing key from %s: %w", keyFile, err)
 	}
 
-	if signer, err = corim.SignerFromJWK(keyJWK); err != nil {
+	if signer, err = corim.NewSignerFromJWK(keyJWK); err != nil {
 		return "", fmt.Errorf("error loading signing key from %s: %w", keyFile, err)
 	}
 

@@ -325,7 +325,7 @@ Further, it is required to supply the media type of the content via the
 ```
 $ cocli corim submit \
     --corim-file unsigned-corim.cbor \
-    --api-server "https://veraison.example/endorsement-provisioning/v1" \
+    --api-server "https://veraison.example/endorsement-provisioning/v1/submit" \
     --media-type "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
 
 >> "corim.cbor" submit ok

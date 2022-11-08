@@ -31,7 +31,7 @@ func TestSignedCorim_FromCOSE_ok(t *testing.T) {
 	       / protected h'a10126' / << {
 	         / alg / 1: -7, / ECDSA 256 /
 	         / content-type / 3: "application/rim+cbor",
-	         / issuer-key-id / 4: "meriadoc.brandybuck@buckland.example",
+	         / issuer-key-id / 4: 'meriadoc.brandybuck@buckland.example',
 	         / corim-meta / 8: h'a200a1006941434d45204c74642e01a101c11a5fad2056'
 	       } >>,
 	       / unprotected / {},
@@ -48,7 +48,7 @@ func TestSignedCorim_FromCOSE_ok(t *testing.T) {
 	tv := []byte{
 		0xd2, 0x84, 0x58, 0x59, 0xa4, 0x01, 0x26, 0x03, 0x74, 0x61, 0x70, 0x70,
 		0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x72, 0x69, 0x6d,
-		0x2b, 0x63, 0x62, 0x6f, 0x72, 0x04, 0x78, 0x24, 0x6d, 0x65, 0x72, 0x69,
+		0x2b, 0x63, 0x62, 0x6f, 0x72, 0x04, 0x58, 0x24, 0x6d, 0x65, 0x72, 0x69,
 		0x61, 0x64, 0x6f, 0x63, 0x2e, 0x62, 0x72, 0x61, 0x6e, 0x64, 0x79, 0x62,
 		0x75, 0x63, 0x6b, 0x40, 0x62, 0x75, 0x63, 0x6b, 0x6c, 0x61, 0x6e, 0x64,
 		0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x08, 0x57, 0xa2, 0x00,
@@ -62,7 +62,7 @@ func TestSignedCorim_FromCOSE_ok(t *testing.T) {
 		0x4d, 0x45, 0x20, 0x4c, 0x74, 0x64, 0x2e, 0x01, 0xd8, 0x20, 0x74, 0x68,
 		0x74, 0x74, 0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x61, 0x63, 0x6d, 0x65, 0x2e,
 		0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x02, 0x83, 0x00, 0x01, 0x02,
-		0x04, 0xa1, 0x00, 0x81, 0x82, 0xa1, 0x00, 0xa3, 0x00, 0xd9, 0x02, 0x27,
+		0x04, 0xa1, 0x00, 0x81, 0x82, 0xa1, 0x00, 0xa3, 0x00, 0xd9, 0x02, 0x58,
 		0x58, 0x20, 0x61, 0x63, 0x6d, 0x65, 0x2d, 0x69, 0x6d, 0x70, 0x6c, 0x65,
 		0x6d, 0x65, 0x6e, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2d, 0x69, 0x64,
 		0x2d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x01, 0x64,
@@ -107,8 +107,9 @@ func TestSignedCorim_FromCOSE_fail_no_tag(t *testing.T) {
 	var actual SignedCorim
 	err := actual.FromCOSE(tv)
 
-	assert.EqualError(t, err, "failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: wrong tag number 0")
+	assert.EqualError(t, err, "failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
 }
+
 func TestSignedCorim_FromCOSE_fail_corim_bad_cbor(t *testing.T) {
 	/*
 		18(
@@ -254,7 +255,7 @@ func metaGood(t *testing.T) *Meta {
 }
 
 func TestSignedCorim_SignVerify_ok(t *testing.T) {
-	signer, err := SignerFromJWK(testECKey)
+	signer, err := NewSignerFromJWK(testECKey)
 	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
@@ -272,12 +273,15 @@ func TestSignedCorim_SignVerify_ok(t *testing.T) {
 	err = SignedCorimOut.FromCOSE(cbor)
 	assert.Nil(t, err)
 
-	err = SignedCorimOut.Verify(signer.Verifier().PublicKey)
+	pk, err := NewPublicKeyFromJWK(testECKey)
+	require.NoError(t, err)
+
+	err = SignedCorimOut.Verify(pk)
 	assert.Nil(t, err)
 }
 
 func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
-	signer, err := SignerFromJWK(testECKey)
+	signer, err := NewSignerFromJWK(testECKey)
 	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
@@ -299,13 +303,16 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 	err = SignedCorimOut.FromCOSE(cbor)
 	assert.Nil(t, err)
 
+	pk, err := NewPublicKeyFromJWK(testECKey)
+	require.NoError(t, err)
+
 	// ... but the signature verification fails
-	err = SignedCorimOut.Verify(signer.Verifier().PublicKey)
-	assert.EqualError(t, err, "verification failed ecdsa.Verify")
+	err = SignedCorimOut.Verify(pk)
+	assert.EqualError(t, err, "verification error")
 }
 
 func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
-	signer, err := SignerFromJWK(testECKey)
+	signer, err := NewSignerFromJWK(testECKey)
 	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
