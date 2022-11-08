@@ -18,15 +18,19 @@ type MACaddr net.HardwareAddr
 
 // UnmarshalJSON deserialize a MAC address in textual form into the MACaddr
 // target, e.g.:
-//   "mac-addr": "00:00:5e:00:53:01"
+//
+//	"mac-addr": "00:00:5e:00:53:01"
+//
 // or
-//   "mac-addr": "02:00:5e:10:00:00:00:01"
+//
+//	"mac-addr": "02:00:5e:10:00:00:00:01"
 //
 // Supported formats are IEEE 802 MAC-48, EUI-48, EUI-64, e.g.:
-//   00:00:5e:00:53:01
-//   00-00-5e-00-53-01
-//   02:00:5e:10:00:00:00:01
-//   02-00-5e-10-00-00-00-01
+//
+//	00:00:5e:00:53:01
+//	00-00-5e-00-53-01
+//	02:00:5e:10:00:00:00:01
+//	02-00-5e-10-00-00-00-01
 func (o *MACaddr) UnmarshalJSON(data []byte) error {
 	var s string
 

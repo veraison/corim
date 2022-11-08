@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/veraison/corim/cots"
+
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/eat"
 	"github.com/veraison/swid"
@@ -65,6 +67,26 @@ func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
 		taggedComid := append(ComidTag, comidCBOR...)
 
 		o.Tags = append(o.Tags, taggedComid)
+	}
+	return o
+}
+
+// AddCots appends the CBOR encoded (and appropriately tagged) CoTS to the
+// tags array of the unsigned-corim-map
+func (o *UnsignedCorim) AddCots(c cots.ConciseTaStores) *UnsignedCorim {
+	if o != nil {
+		if c.Valid() != nil {
+			return nil
+		}
+
+		cotsCBOR, err := c.ToCBOR()
+		if err != nil {
+			return nil
+		}
+
+		taggedCots := append(cots.CotsTag, cotsCBOR...)
+
+		o.Tags = append(o.Tags, taggedCots)
 	}
 	return o
 }
