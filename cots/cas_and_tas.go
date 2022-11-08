@@ -17,15 +17,15 @@ const (
 )
 
 var (
-	roleToString = map[TaFormat]string{
+	formatToString = map[TaFormat]string{
 		TaFormatCertificate:          "cert",
 		TaFormatTrustAnchorInfo:      "ta",
 		TaFormatSubjectPublicKeyInfo: "spki",
 	}
 
-	stringToRole = map[string]TaFormat{
+	stringToFormat = map[string]TaFormat{
 		"cert": TaFormatCertificate,
-		"ta":  TaFormatTrustAnchorInfo,
+		"ta":   TaFormatTrustAnchorInfo,
 		"spki": TaFormatSubjectPublicKeyInfo,
 	}
 )
@@ -36,7 +36,7 @@ var (
 //}
 
 type TrustAnchor struct {
-	_            struct{}     `cbor:",toarray"`
+	_      struct{} `cbor:",toarray"`
 	Format TaFormat `json:"format"`
 	Data   []byte   `json:"data"`
 }

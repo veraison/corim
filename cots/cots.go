@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/swid"
 )
@@ -16,7 +17,7 @@ type ConciseTaStore struct {
 	TagIdentity  *comid.TagIdentity `cbor:"1,keyasint,omitempty" json:"tag-identity,omitempty"`
 	Environments EnvironmentGroups  `cbor:"2,keyasint" json:"environments"`
 	Purposes     []string           `cbor:"3,keyasint,omitempty" json:"purposes,omitempty"`
-	PermClaims   EatCWTClaims     	`cbor:"4,keyasint,omitempty" json:"permclaims,omitempty"`
+	PermClaims   EatCWTClaims       `cbor:"4,keyasint,omitempty" json:"permclaims,omitempty"`
 	ExclClaims   EatCWTClaims       `cbor:"5,keyasint,omitempty" json:"exclclaims,omitempty"`
 	Keys         *TasAndCas         `cbor:"6,keyasint" json:"keys"`
 }

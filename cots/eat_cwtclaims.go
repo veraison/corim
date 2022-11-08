@@ -2,6 +2,7 @@ package cots
 
 import (
 	"encoding/json"
+
 	"github.com/veraison/eat"
 )
 
@@ -9,13 +10,13 @@ type EatCWTClaim struct {
 	Nonce         *eat.Nonce         `cbor:"10,keyasint,omitempty" json:"nonce,omitempty"`
 	UEID          *eat.UEID          `cbor:"11,keyasint,omitempty" json:"ueid,omitempty"`
 	Origination   *eat.StringOrURI   `cbor:"12,keyasint,omitempty" json:"origination,omitempty"`
-	OemID         *[]byte        `cbor:"13,keyasint,omitempty" json:"oemid,omitempty"`
+	OemID         *[]byte            `cbor:"13,keyasint,omitempty" json:"oemid,omitempty"`
 	SecurityLevel *eat.SecurityLevel `cbor:"14,keyasint,omitempty" json:"security-level,omitempty"`
-	SecureBoot    *bool          `cbor:"15,keyasint,omitempty" json:"secure-boot,omitempty"`
+	SecureBoot    *bool              `cbor:"15,keyasint,omitempty" json:"secure-boot,omitempty"`
 	Debug         *eat.Debug         `cbor:"16,keyasint,omitempty" json:"debug-disable,omitempty"`
 	Location      *eat.Location      `cbor:"17,keyasint,omitempty" json:"location,omitempty"`
 	Profile       *eat.Profile       `cbor:"18,keyasint,omitempty" json:"eat-profile,omitempty"`
-	Uptime        *uint          `cbor:"19,keyasint,omitempty" json:"uptime,omitempty"`
+	Uptime        *uint              `cbor:"19,keyasint,omitempty" json:"uptime,omitempty"`
 	Submods       *eat.Submods       `cbor:"20,keyasint,omitempty" json:"submods,omitempty"`
 
 	eat.CWTClaims

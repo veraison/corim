@@ -74,10 +74,10 @@ func (o OpFlags) IsSet(flag OpFlags) bool {
 // UnmarshalJSON provides a custom deserializer for the OpFlags type that uses an
 // array of identifiers rather than a bit set, e.g.:
 //
-//  "op-flags": [
-//    "notSecure",
-//    "debug"
-//  ]
+//	"op-flags": [
+//	  "notSecure",
+//	  "debug"
+//	]
 func (o *OpFlags) UnmarshalJSON(data []byte) error {
 	var a []string
 

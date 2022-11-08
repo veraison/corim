@@ -7,8 +7,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/veraison/corim/cots"
 	"time"
+
+	"github.com/veraison/corim/cots"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/eat"

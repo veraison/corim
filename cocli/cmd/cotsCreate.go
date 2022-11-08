@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/cots"
@@ -95,7 +96,10 @@ func cotsTemplateToCBOR(ctsFiles []string, outputFile *string) (string, error) {
 			return "", fmt.Errorf("error loading CTS from %s: %w", ctsFile, err)
 		}
 
-		cts.FromCBOR(ctsData)
+		err = cts.FromCBOR(ctsData)
+		if err != nil {
+			return "", fmt.Errorf("failed to parse as CBOR from %s: %w", ctsFile, err)
+		}
 		tastores.AddConciseTaStores(cts)
 	}
 

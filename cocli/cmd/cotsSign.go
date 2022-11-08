@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/corim"
@@ -43,7 +44,7 @@ func NewCotsSignCmd() *cobra.Command {
 			}
 
 			// checkCotsSignArgs makes sure cotsSignCorimFile is not nil
-			coseFile, err := sign_cots(*cotsSignCotsFile, *cotsSignKeyFile,
+			coseFile, err := signCots(*cotsSignCotsFile, *cotsSignKeyFile,
 				*cotsSignMetaFile, cotsSignOutputFile)
 			if err != nil {
 				return err
@@ -78,7 +79,7 @@ func checkCotsSignArgs() error {
 	return nil
 }
 
-func sign_cots(unsignedCorimFile, keyFile, metaFile string, outputFile *string) (string, error) {
+func signCots(unsignedCorimFile, keyFile, metaFile string, outputFile *string) (string, error) {
 	var (
 		unsignedCorimCBOR []byte
 		signedCorimCBOR   []byte

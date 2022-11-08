@@ -6,17 +6,18 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
+
 	"github.com/google/uuid"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/cots"
-	"path/filepath"
 )
 
 var (
 	cotsCreateLanguage          *string
-	cotsCreateTagID        	    *string
-	cotsCreateTagUUIDStr   	    *string
+	cotsCreateTagID             *string
+	cotsCreateTagUUIDStr        *string
 	cotsCreateTagUUID           *bool
 	cotsCreateTagVersion        *uint
 	cotsCreateCtsEnvFile        *string
@@ -140,7 +141,7 @@ func checkctsCreateCtsArgs() error {
 	return nil
 }
 
-func ctsTemplateToCBOR(language string, tagId string, genUuid bool, uuidStr string, version *uint, envFile string, permClaimsFile string, exclClaimsFile string, purposes, taFiles, caFiles []string, outputFile *string) (string, error) {
+func ctsTemplateToCBOR(language string, tagID string, genUUID bool, uuidStr string, version *uint, envFile string, permClaimsFile string, exclClaimsFile string, purposes, taFiles, caFiles []string, outputFile *string) (string, error) {
 	var (
 		envData        []byte
 		env            cots.EnvironmentGroups
@@ -169,9 +170,9 @@ func ctsTemplateToCBOR(language string, tagId string, genUuid bool, uuidStr stri
 		cts.Language = &language
 	}
 
-	if tagId != "" {
-		cts.SetTagIdentity(tagId, version)
-	} else if genUuid != false {
+	if tagID != "" {
+		cts.SetTagIdentity(tagID, version)
+	} else if genUUID != false {
 		u := uuid.New()
 		b, _ := u.MarshalBinary()
 		cts.SetTagIdentity(b, version)

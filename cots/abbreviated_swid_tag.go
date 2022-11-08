@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+
 	"github.com/veraison/swid"
 )
 

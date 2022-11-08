@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/corim"
@@ -63,10 +64,10 @@ func checkCotsDisplayArgs() error {
 func cotsDisplay(signedCotsFile string, showTags bool) error {
 	var (
 		cotsData []byte
-		metaJSON        []byte
-		cotsJSON       []byte
+		metaJSON []byte
+		cotsJSON []byte
 		err      error
-		s      corim.SignedCorim
+		s        corim.SignedCorim
 	)
 
 	if cotsData, err = afero.ReadFile(fs, signedCotsFile); err != nil {

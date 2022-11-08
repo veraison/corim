@@ -161,4 +161,3 @@ func Test_CotsCreateCorimCmd_successful_cots_from_file(t *testing.T) {
 	e := os.Remove("corim.cbor")
 	assert.NoError(t, e)
 }
-

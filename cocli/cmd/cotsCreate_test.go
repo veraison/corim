@@ -77,7 +77,5 @@ func Test_CotsCreateCmd_template_with_invalid_cts(t *testing.T) {
 	fmt.Println(args)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error validating COTS: empty concise-ta-stores")
+	assert.EqualError(t, err, "failed to parse as CBOR from ../data/cots/not.cbor: cbor: cannot unmarshal negative integer into Go value of type cots.ConciseTaStore")
 }
-
-

@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/veraison/corim/cots"
 
@@ -15,10 +16,10 @@ import (
 )
 
 var (
-	cotsCorimCreateCorimFile   *string
-	cotsCorimCreateCotsFile    *string
-	cotsCorimCreateOutputFile  *string
-	cotsCorimCreateCotsFiles []string
+	cotsCorimCreateCorimFile  *string
+	cotsCorimCreateCotsFile   *string
+	cotsCorimCreateOutputFile *string
+	cotsCorimCreateCotsFiles  []string
 )
 
 var cotsCorimCreateCmd = NewCotsCorimCreateCmd()

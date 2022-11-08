@@ -6,6 +6,7 @@ package cots
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/veraison/corim/comid"
 )
 
@@ -14,7 +15,7 @@ import (
 type EnvironmentGroup struct {
 	Environment  *comid.Environment  `cbor:"1,keyasint,omitempty" json:"environment,omitempty"`
 	SwidTag      *AbbreviatedSwidTag `cbor:"2,keyasint,omitempty" json:"swidtag,omitempty"`
-	NamedTaStore *string              `cbor:"3,keyasint,omitempty" json:"namedtastore,omitempty"`
+	NamedTaStore *string             `cbor:"3,keyasint,omitempty" json:"namedtastore,omitempty"`
 }
 
 // NewEnvironmentGroup instantiates an empty EnvironmentGroup
@@ -57,7 +58,6 @@ func (o EnvironmentGroup) GetNamedTaStore() string {
 	}
 	return *o.NamedTaStore
 }
-
 
 // Valid checks the validity (according to the spec) of the target unsigned CoRIM
 func (o EnvironmentGroup) Valid() error {

@@ -6,8 +6,9 @@ package cots
 import (
 	"bytes"
 	//"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 	//"time"
 	//
 	//"github.com/stretchr/testify/assert"
@@ -141,6 +142,9 @@ func TestTasAndCas(t *testing.T) {
 	ct, _ := tas.ToCBOR()
 	assert.NotNil(t, ct)
 
+	assert.Equal(t, "cert", formatToString[tas.Format])
+	assert.Equal(t, tas.Format, stringToFormat["cert"])
+
 	tv := NewTasAndCas()
 	tv.AddTaCert(ta)
 
@@ -152,10 +156,12 @@ func TestTasAndCas(t *testing.T) {
 	assert.NotNil(t, c)
 
 	tv2 := NewTasAndCas()
-	tv2.FromJSON(j)
+	err := tv2.FromJSON(j)
+	assert.Nil(t, err)
 
 	tv3 := NewTasAndCas()
-	tv3.FromCBOR(c)
+	err = tv3.FromCBOR(c)
+	assert.Nil(t, err)
 
 	assert.Truef(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
 	assert.Truef(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA value")

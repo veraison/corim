@@ -4,9 +4,10 @@
 package cots
 
 import (
+	"testing"
+
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/swid"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -31,9 +32,10 @@ func TestNewEnvironmentGroup(t *testing.T) {
 	egZesty := NewEnvironmentGroup()
 	egZesty.SwidTag = &AbbreviatedSwidTag{}
 	egZesty.SwidTag.Entities = swid.Entities{}
-	e_zesty := swid.Entity{EntityName: "Zesty Hands, Inc."}
-	e_zesty.SetRoles(swid.RoleSoftwareCreator)
-	egZesty.SwidTag.Entities = append(egZesty.SwidTag.Entities, e_zesty)
+	eZesty := swid.Entity{EntityName: "Zesty Hands, Inc."}
+	err := eZesty.SetRoles(swid.RoleSoftwareCreator)
+	assert.Nil(t, err)
+	egZesty.SwidTag.Entities = append(egZesty.SwidTag.Entities, eZesty)
 	tvs2 := EnvironmentGroups{}
 	tvs2.AddEnvironmentGroup(*egZesty)
 	jEgZesty, _ := tvs2.ToJSON()
