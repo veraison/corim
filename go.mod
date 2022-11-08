@@ -3,6 +3,7 @@ module github.com/veraison/corim
 go 1.16
 
 require (
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.0
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
@@ -17,4 +18,5 @@ require (
 	github.com/veraison/swid v1.0.0 // indirect
 	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 )

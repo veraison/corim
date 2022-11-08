@@ -113,18 +113,17 @@ func (o *Instance) UnmarshalCBOR(data []byte) error {
 // UnmarshalJSON deserializes the supplied JSON type/value object into the Group
 // target.  The supported formats are UUID, e.g.:
 //
-//   {
-//     "type": "uuid",
-//     "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
-//   }
+//	{
+//	  "type": "uuid",
+//	  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
+//	}
 //
 // and UEID:
 //
-//   {
-//     "type": "ueid",
-//     "value": "Ad6tvu/erb7v3q2+796tvu8="
-//   }
-//
+//	{
+//	  "type": "ueid",
+//	  "value": "Ad6tvu/erb7v3q2+796tvu8="
+//	}
 func (o *Instance) UnmarshalJSON(data []byte) error {
 	var v tnv
 

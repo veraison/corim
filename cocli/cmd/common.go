@@ -19,7 +19,9 @@ func filesList(files, dirs []string, ext string) []string {
 
 	for _, file := range files {
 		if _, err := fs.Stat(file); err == nil {
-			l = append(l, file)
+			if filepath.Ext(file) == ext {
+				l = append(l, file)
+			}
 		}
 	}
 

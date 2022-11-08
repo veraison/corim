@@ -126,22 +126,25 @@ func (o *ClassID) UnmarshalCBOR(data []byte) error {
 // The class id object must have one of the following shapes:
 //
 // UUID:
-//   {
-//     "type": "uuid",
-//     "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
-//   }
+//
+//	{
+//	  "type": "uuid",
+//	  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
+//	}
 //
 // OID:
-//   {
-//     "type": "oid",
-//     "value": "2.16.840.1.113741.1.15.4.2"
-//   }
+//
+//	{
+//	  "type": "oid",
+//	  "value": "2.16.840.1.113741.1.15.4.2"
+//	}
 //
 // PSA Implementation ID:
-//   {
-//     "type": "psa.impl-id",
-//     "value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
-//   }
+//
+//	{
+//	  "type": "psa.impl-id",
+//	  "value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+//	}
 func (o *ClassID) UnmarshalJSON(data []byte) error {
 	var v tnv
 
