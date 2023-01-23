@@ -4,33 +4,25 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
-	"errors"
 	"fmt"
 	"reflect"
 
-	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/v2/jwk"
 	cose "github.com/veraison/go-cose"
 )
 
-func getAlgAndKeyFromJWK(j string) (cose.Algorithm, crypto.Signer, error) {
+func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, crypto.Signer, error) {
 	const noAlg = cose.Algorithm(-65537)
 	var (
 		err error
-		ks  jwk.Set
 		k   jwk.Key
-		ok  bool
 		crv elliptic.Curve
 		alg cose.Algorithm
 	)
 
-	ks, err = jwk.ParseString(j)
+	k, err = jwk.ParseKey(j)
 	if err != nil {
 		return noAlg, nil, err
-	}
-
-	k, ok = ks.Get(0)
-	if !ok {
-		return noAlg, nil, errors.New("key extraction failed")
 	}
 
 	var key crypto.Signer
@@ -56,7 +48,7 @@ func getAlgAndKeyFromJWK(j string) (cose.Algorithm, crypto.Signer, error) {
 }
 
 func NewSignerFromJWK(j []byte) (cose.Signer, error) {
-	alg, key, err := getAlgAndKeyFromJWK(string(j))
+	alg, key, err := getAlgAndKeyFromJWK(j)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +57,7 @@ func NewSignerFromJWK(j []byte) (cose.Signer, error) {
 }
 
 func NewPublicKeyFromJWK(j []byte) (crypto.PublicKey, error) {
-	_, key, err := getAlgAndKeyFromJWK(string(j))
+	_, key, err := getAlgAndKeyFromJWK(j)
 	if err != nil {
 		return nil, err
 	}

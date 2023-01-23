@@ -209,7 +209,7 @@ func Test_CorimSignCmd_invalid_key_file(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error loading signing key from invalid.jwk: failed to unmarshal JWK set: failed to parse sole key in key set: invalid key type from JSON ()")
+	assert.EqualError(t, err, "error loading signing key from invalid.jwk: invalid key type from JSON ()")
 }
 
 func Test_CorimSignCmd_ok_with_default_output_file(t *testing.T) {

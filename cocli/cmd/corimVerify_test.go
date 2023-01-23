@@ -110,7 +110,7 @@ func Test_CorimVerifyCmd_invalid_key_file(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error loading verifying key from invalid.jwk: failed to unmarshal JWK set: failed to parse sole key in key set: invalid key type from JSON ()")
+	assert.EqualError(t, err, "error loading verifying key from invalid.jwk: invalid key type from JSON ()")
 }
 
 func Test_CorimVerifyCmd_ok(t *testing.T) {
