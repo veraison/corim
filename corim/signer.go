@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/v2/jwk"
 	cose "github.com/veraison/go-cose"
 )
 
@@ -28,7 +28,7 @@ func getAlgAndKeyFromJWK(j string) (cose.Algorithm, crypto.Signer, error) {
 		return noAlg, nil, err
 	}
 
-	k, ok = ks.Get(0)
+	k, ok = ks.Key(0)
 	if !ok {
 		return noAlg, nil, errors.New("key extraction failed")
 	}
