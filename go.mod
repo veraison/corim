@@ -14,7 +14,7 @@ require (
 	github.com/veraison/apiclient v0.0.2
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.0.0-rc.1
-	github.com/veraison/swid v0.0.1-beta.6
+	github.com/veraison/swid v1.0.0 // indirect
 	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
