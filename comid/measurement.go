@@ -279,7 +279,7 @@ func (o *Version) SetVersion(v string) *Version {
 	return o
 }
 
-func (o *Version) SetScheme(v uint64) *Version {
+func (o *Version) SetScheme(v int64) *Version {
 	if o != nil {
 		if o.Scheme.SetCode(v) != nil {
 			return nil
@@ -386,7 +386,7 @@ func NewUintMeasurement(mkey uint64) *Measurement {
 	return m.SetKeyUint(mkey)
 }
 
-func (o *Measurement) SetVersion(ver string, scheme uint64) *Measurement {
+func (o *Measurement) SetVersion(ver string, scheme int64) *Measurement {
 	if o != nil {
 		v := NewVersion().SetVersion(ver).SetScheme(scheme)
 		if v == nil {
