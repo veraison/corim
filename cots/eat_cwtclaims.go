@@ -2,6 +2,7 @@ package cots
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/veraison/eat"
 )
@@ -30,31 +31,22 @@ type EatCWTClaim struct {
 	SoftwareVersionScheme *HardwareVersionType `cbor:"999,keyasint,omitempty" json:"swversion,omitempty"`
 }
 
-func (o EatCWTClaim) Valid() error {
-	//TODO validation
-	return nil
-}
-
-// ToCBOR serializes the target unsigned CoRIM to CBOR
+// ToCBOR serializes the target EatCWTClaim to CBOR
 func (o EatCWTClaim) ToCBOR() ([]byte, error) {
-	return em.Marshal(&o)
+	return em.Marshal(o)
 }
 
-// FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromCBOR deserializes a CBOR-encoded data into the target EatCWTClaim
 func (o *EatCWTClaim) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Comid to JSON
+// ToJSON serializes the target EatCWTClaim to JSON
 func (o EatCWTClaim) ToJSON() ([]byte, error) {
-	if err := o.Valid(); err != nil {
-		return nil, err
-	}
-
-	return json.Marshal(&o)
+	return json.Marshal(o)
 }
 
-// FromJSON deserializes a JSON-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromJSON deserializes a JSON-encoded data into the target EatCWTClaim
 func (o *EatCWTClaim) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
@@ -62,21 +54,24 @@ func (o *EatCWTClaim) FromJSON(data []byte) error {
 type EatCWTClaims []EatCWTClaim
 
 func (o EatCWTClaims) Valid() error {
-	//TODO validation
+	if len(o) == 0 {
+		return fmt.Errorf("empty EatCWTClaims")
+	}
+
 	return nil
 }
 
-// ToCBOR serializes the target unsigned CoRIM to CBOR
+// ToCBOR serializes the target EatCWTClsim to CBOR
 func (o EatCWTClaims) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromCBOR deserializes a CBOR-encoded data into the target EatCWTClaim
 func (o *EatCWTClaims) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Comid to JSON
+// ToJSON serializes the target EatCWTClaim to JSON
 func (o EatCWTClaims) ToJSON() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -85,7 +80,7 @@ func (o EatCWTClaims) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }
 
-// FromJSON deserializes a JSON-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromJSON deserializes a JSON-encoded data into the target EatCWTClaim
 func (o *EatCWTClaims) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }

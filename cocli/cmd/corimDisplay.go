@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/corim"
+	"github.com/veraison/corim/cots"
 )
 
 var (
@@ -32,7 +33,7 @@ func NewCorimDisplayCmd() *cobra.Command {
 	  cocli corim display --file signed-corim.cbor
 
 	Display the contents of the signed CoRIM yet-another-signed-corim.cbor and
-	also unpack any embedded CoMID and CoSWID
+	also unpack any embedded CoMID, CoSWID and CoTS
 	
 	  cocli corim display --file yet-another-signed-corim.cbor --show-tags
 	`,
@@ -116,6 +117,10 @@ func display(signedCorimFile string, showTags bool) error {
 			} else if bytes.Equal(cborTag, corim.CoswidTag) {
 				if err = printCoswid(cborData, hdr); err != nil {
 					fmt.Printf(">> skipping malformed CoSWID tag at index %d: %v\n", i, err)
+				}
+			} else if bytes.Equal(cborTag, cots.CotsTag) {
+				if err = printCots(cborData, hdr); err != nil {
+					fmt.Printf(">> skipping malformed CoTS tag at index %d: %v\n", i, err)
 				}
 			} else {
 				fmt.Printf(">> unmatched CBOR tag: %x\n", cborTag)

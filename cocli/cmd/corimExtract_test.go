@@ -118,3 +118,23 @@ func Test_CorimExtractCmd_ok_save_to_non_default_dir(t *testing.T) {
 	_, err = fs.Stat("my-dir/000000-comid.cbor")
 	assert.NoError(t, err)
 }
+
+func Test_CorimExtractCmd_with_cots_ok_save_to_default_dir(t *testing.T) {
+	cmd := NewCorimExtractCmd()
+
+	args := []string{
+		"--file=ok.cbor",
+	}
+	cmd.SetArgs(args)
+
+	fs = afero.NewMemMapFs()
+	err := afero.WriteFile(fs, "ok.cbor", testSignedCorimValidWithCots, 0644)
+	require.NoError(t, err)
+
+	err = cmd.Execute()
+	assert.NoError(t, err)
+
+	_, err = fs.Stat("000000-cots.cbor")
+	assert.NoError(t, err)
+
+}

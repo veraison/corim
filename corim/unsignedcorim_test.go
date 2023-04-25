@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/cots"
 	"github.com/veraison/swid"
 )
 
@@ -72,6 +73,26 @@ func TestUnsignedCorim_AddComid_and_marshal(t *testing.T) {
 	fmt.Printf("CBOR: %x", actual)
 
 	expected := testGoodUnsignedCorim
+
+	assert.Equal(t, expected, actual)
+}
+
+func TestUnsignedCorim_AddCots_and_marshal(t *testing.T) {
+	tv := NewUnsignedCorim().SetID("test corim id with CoTS")
+	require.NotNil(t, tv)
+
+	c := cots.ConciseTaStore{}
+
+	err := c.FromJSON([]byte(cots.ConciseTaStoreTemplateSingleOrg))
+	require.Nil(t, err)
+	assert.NotNil(t, tv.AddCots(c))
+
+	actual, err := tv.ToCBOR()
+	assert.Nil(t, err)
+
+	fmt.Printf("CBOR: %x", actual)
+
+	expected := comid.MustHexDecode(t, "a200777465737420636f72696d206964207769746820436f545301815899d901fba301a20050ab0f44b1bfdc4604ab4a30f80407ebcc01050281a101a100a10173576f7274686c657373205365612c20496e632e06a100818202585b3059301306072a8648ce3d020106082a8648ce3d03010703420004ad8a0c01da9eda0253dc2bc27227d9c7213df8df13e89cb9cdb7a8e4b62d9ce8a99a2d705c0f7f80db65c006d1091422b47fc611cbd46869733d9c483884d5fe")
 
 	assert.Equal(t, expected, actual)
 }

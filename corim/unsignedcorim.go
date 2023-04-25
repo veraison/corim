@@ -73,7 +73,7 @@ func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
 
 // AddCots appends the CBOR encoded (and appropriately tagged) CoTS to the
 // tags array of the unsigned-corim-map
-func (o *UnsignedCorim) AddCots(c cots.ConciseTaStores) *UnsignedCorim {
+func (o *UnsignedCorim) AddCots(c cots.ConciseTaStore) *UnsignedCorim {
 	if o != nil {
 		if c.Valid() != nil {
 			return nil
@@ -257,7 +257,7 @@ func (o *UnsignedCorim) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// Tag is either a CBOR-encoded CoMID or CoSWID
+// Tag is either a CBOR-encoded CoMID, CoSWID or CoTS
 type Tag []byte
 
 func (o Tag) Valid() error {

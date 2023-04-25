@@ -5,7 +5,7 @@ package cots
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/veraison/corim/comid"
 )
@@ -30,19 +30,11 @@ func (o *EnvironmentGroup) SetEnvironment(environment comid.Environment) *Enviro
 	return o
 }
 
-func (o EnvironmentGroup) GetEnvironment() comid.Environment {
-	return *o.Environment
-}
-
 func (o *EnvironmentGroup) SetAbbreviatedSwidTag(swidtag AbbreviatedSwidTag) *EnvironmentGroup {
 	if o != nil {
 		o.SwidTag = &swidtag
 	}
 	return o
-}
-
-func (o EnvironmentGroup) GetAbbreviatedSwidTag() AbbreviatedSwidTag {
-	return *o.SwidTag
 }
 
 func (o *EnvironmentGroup) SetNamedTaStore(namedtastore string) *EnvironmentGroup {
@@ -52,30 +44,34 @@ func (o *EnvironmentGroup) SetNamedTaStore(namedtastore string) *EnvironmentGrou
 	return o
 }
 
-func (o EnvironmentGroup) GetNamedTaStore() string {
-	if o.NamedTaStore == nil {
-		return ""
-	}
-	return *o.NamedTaStore
-}
-
-// Valid checks the validity (according to the spec) of the target unsigned CoRIM
+// Valid checks the validity of the target EnvironmentGroup
 func (o EnvironmentGroup) Valid() error {
-	//TODO validation
+	if o.Environment != nil {
+		if err := o.Environment.Valid(); err != nil {
+			return fmt.Errorf("environment group validation failed: %w", err)
+		}
+	}
+
+	if o.SwidTag != nil {
+		if err := o.SwidTag.Valid(); err != nil {
+			return fmt.Errorf("abbreviated swid tag validation failed: %w", err)
+		}
+	}
+
 	return nil
 }
 
-// ToCBOR serializes the target unsigned CoRIM to CBOR
+// ToCBOR serializes the target EnvironmentGroup to CBOR
 func (o EnvironmentGroup) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromCBOR deserializes a CBOR-encoded data into the target EnvironmentGroup
 func (o *EnvironmentGroup) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Comid to JSON
+// ToJSON serializes the target EnvironmentGroup to JSON
 func (o EnvironmentGroup) ToJSON() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -84,7 +80,7 @@ func (o EnvironmentGroup) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }
 
-// FromJSON deserializes a JSON-encoded unsigned CoRIM into the target EnvironmentGroup
+// FromJSON deserializes a JSON-encoded data into the target EnvironmentGroup
 func (o *EnvironmentGroup) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
@@ -102,19 +98,22 @@ func (o *EnvironmentGroups) AddEnvironmentGroup(e EnvironmentGroup) *Environment
 	return o
 }
 
+// An empty list signifies all contexts SHOULD be considered as applicable
 func (o EnvironmentGroups) Valid() error {
-	if len(o) == 0 {
-		return errors.New("empty EnvironmentGroups")
+	for i, e := range o {
+		if err := e.Valid(); err != nil {
+			return fmt.Errorf("bad environment group at index %d: %w", i, err)
+		}
 	}
 	return nil
 }
 
-// FromJSON deserializes a JSON-encoded CoMID into the target Comid
+// FromJSON deserializes a JSON-encoded data into the target EnvironmentGroup
 func (o *EnvironmentGroups) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Comid to JSON
+// ToJSON serializes the target EnvironmentGroup to JSON
 func (o EnvironmentGroups) ToJSON() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err

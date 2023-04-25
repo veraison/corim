@@ -43,7 +43,7 @@ func Test_CorimCreateCmd_no_files_found(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CoMID or CoSWID files found")
+	assert.EqualError(t, err, "no CoMID, CoSWID or CoTS files found")
 }
 
 func Test_CorimCreateCmd_no_tag_files(t *testing.T) {
@@ -51,12 +51,12 @@ func Test_CorimCreateCmd_no_tag_files(t *testing.T) {
 
 	args := []string{
 		"--template=unknown.json",
-		// no --co{m,sw}id-{dir,}
+		// no --co{m,sw}id,{cots}-{dir,}
 	}
 	cmd.SetArgs(args)
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CoMID or CoSWID files or folders supplied")
+	assert.EqualError(t, err, "no CoMID, CoSWID or CoTS files or folders supplied")
 }
 
 func Test_CorimCreateCmd_template_not_found(t *testing.T) {
@@ -162,7 +162,49 @@ func Test_CorimCreateCmd_with_a_bad_coswid(t *testing.T) {
 	assert.EqualError(t, err, `error loading CoSWID from bad-coswid.cbor: cbor: unexpected "break" code`)
 }
 
-func Test_CorimCreateCmd_successful_comid_and_coswid_from_file(t *testing.T) {
+func Test_CorimCreateCmd_with_an_invalid_cots(t *testing.T) {
+	var err error
+
+	cmd := NewCorimCreateCmd()
+
+	fs = afero.NewMemMapFs()
+	err = afero.WriteFile(fs, "min-tmpl.json", minimalCorimTemplate, 0644)
+	require.NoError(t, err)
+	err = afero.WriteFile(fs, "invalid-cots.cbor", invalidCots, 0644)
+	require.NoError(t, err)
+
+	args := []string{
+		"--template=min-tmpl.json",
+		"--cots=invalid-cots.cbor",
+	}
+	cmd.SetArgs(args)
+
+	err = cmd.Execute()
+	assert.EqualError(t, err, `error adding CoTS from invalid-cots.cbor`)
+}
+
+func Test_CorimCreateCmd_with_a_bad_cots(t *testing.T) {
+	var err error
+
+	cmd := NewCorimCreateCmd()
+
+	fs = afero.NewMemMapFs()
+	err = afero.WriteFile(fs, "min-tmpl.json", minimalCorimTemplate, 0644)
+	require.NoError(t, err)
+	err = afero.WriteFile(fs, "bad-cots.cbor", badCBOR, 0644)
+	require.NoError(t, err)
+
+	args := []string{
+		"--template=min-tmpl.json",
+		"--cots=bad-cots.cbor",
+	}
+	cmd.SetArgs(args)
+
+	err = cmd.Execute()
+	assert.EqualError(t, err, `error loading CoTS from bad-cots.cbor: cbor: unexpected "break" code`)
+}
+
+func Test_CorimCreateCmd_successful_comid_coswid_and_cots_from_file(t *testing.T) {
 	var err error
 
 	cmd := NewCorimCreateCmd()
@@ -174,11 +216,14 @@ func Test_CorimCreateCmd_successful_comid_and_coswid_from_file(t *testing.T) {
 	require.NoError(t, err)
 	err = afero.WriteFile(fs, "comid.cbor", testComid, 0644)
 	require.NoError(t, err)
+	err = afero.WriteFile(fs, "cots.cbor", testCots, 0644)
+	require.NoError(t, err)
 
 	args := []string{
 		"--template=min-tmpl.json",
 		"--coswid=coswid.cbor",
 		"--comid=comid.cbor",
+		"--cots=cots.cbor",
 		"--output=corim.cbor",
 	}
 	cmd.SetArgs(args)
@@ -190,7 +235,7 @@ func Test_CorimCreateCmd_successful_comid_and_coswid_from_file(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_CorimCreateCmd_successful_comid_and_coswid_from_dir(t *testing.T) {
+func Test_CorimCreateCmd_successful_comid_coswid_and_cots_from_dir(t *testing.T) {
 	var err error
 
 	cmd := NewCorimCreateCmd()
@@ -202,11 +247,14 @@ func Test_CorimCreateCmd_successful_comid_and_coswid_from_dir(t *testing.T) {
 	require.NoError(t, err)
 	err = afero.WriteFile(fs, "comid/1.cbor", testComid, 0644)
 	require.NoError(t, err)
+	err = afero.WriteFile(fs, "cots/1.cbor", testCots, 0644)
+	require.NoError(t, err)
 
 	args := []string{
 		"--template=min-tmpl.json",
 		"--coswid-dir=coswid",
 		"--comid-dir=comid",
+		"--cots-dir=cots",
 	}
 	cmd.SetArgs(args)
 
