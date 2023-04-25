@@ -118,10 +118,6 @@ func cotsDisplay(signedCotsFile string, showTags bool) error {
 	return nil
 }
 
-func printCots(cbor []byte, heading string) error {
-	return printJSONFromCBOR(&cots.ConciseTaStores{}, cbor, heading)
-}
-
 func init() {
 	cotsCmd.AddCommand(cotsDisplayCmd)
 }

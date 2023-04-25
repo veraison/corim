@@ -5,15 +5,9 @@ package cots
 
 import (
 	"bytes"
-	//"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	//"time"
-	//
-	//"github.com/stretchr/testify/assert"
-	//"github.com/stretchr/testify/require"
-	//"github.com/veraison/corim/comid"
 )
 
 var (
@@ -135,54 +129,99 @@ var (
 	}
 )
 
-func TestTasAndCas(t *testing.T) {
-	tas := NewTrustAnchor()
-	tas.Data = ta
-	tas.Format = TaFormatCertificate
-	ct, _ := tas.ToCBOR()
-	assert.NotNil(t, ct)
+func TestTrustAnchor_JSON_Roundtrip(t *testing.T) {
+	tvs := NewTrustAnchor()
+	tvs.SetData(ta)
+	tvs.SetFormat(TaFormatCertificate)
 
-	assert.Equal(t, "cert", formatToString[tas.Format])
-	assert.Equal(t, tas.Format, stringToFormat["cert"])
+	assert.Equal(t, "cert", formatToString[tvs.Format])
+	assert.Equal(t, tvs.Format, stringToFormat["cert"])
 
-	tv := NewTasAndCas()
-	tv.AddTaCert(ta)
-
-	assert.Nil(t, tv.Valid())
-
-	c, _ := tv.ToCBOR()
-	j, _ := tv.ToJSON()
+	j, _ := tvs.ToJSON()
 	assert.NotNil(t, j)
-	assert.NotNil(t, c)
+	t.Logf("JSON: '%s'", string(j))
 
-	tv2 := NewTasAndCas()
+	tv2 := NewTrustAnchor()
 	err := tv2.FromJSON(j)
 	assert.Nil(t, err)
 
-	tv3 := NewTasAndCas()
-	err = tv3.FromCBOR(c)
-	assert.Nil(t, err)
+	assert.True(t, len(tv2.Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Data), "Compare TA value")
+	assert.True(t, TaFormatCertificate == tv2.Format, "Compare TA format")
 
-	assert.Truef(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
-	assert.Truef(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA value")
 }
 
-func TestEmptyTasAndCas(t *testing.T) {
+func TestTrustAnchor_CBOR_Roundtrip(t *testing.T) {
+	tvs := NewTrustAnchor()
+	tvs.SetData(ta)
+	tvs.SetFormat(TaFormatCertificate)
+
+	assert.Equal(t, "cert", formatToString[tvs.Format])
+	assert.Equal(t, tvs.Format, stringToFormat["cert"])
+
+	c, _ := tvs.ToCBOR()
+	assert.NotNil(t, c)
+	t.Logf("CBOR: '%s'", string(c))
+
+	tv2 := NewTrustAnchor()
+	err := tv2.FromCBOR(c)
+	assert.Nil(t, err)
+
+	assert.True(t, len(tv2.Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Data), "Compare TA value")
+	assert.True(t, TaFormatCertificate == tv2.Format, "Compare TA format")
+
+}
+func TestTasAndCas_Empty(t *testing.T) {
 	tv := NewTasAndCas()
 
 	assert.NotNil(t, tv.Valid())
 }
 
-func TestEmptyTas(t *testing.T) {
+func TestTasAndCas_empty_tas(t *testing.T) {
 	tv := NewTasAndCas()
 	tv.AddCaCert(ca)
 
 	assert.NotNil(t, tv.Valid())
 }
 
-func TestEmptyCas(t *testing.T) {
+func TestTasAndCas_empty_cas(t *testing.T) {
 	tv := NewTasAndCas()
 	tv.AddTaCert(ta)
 
 	assert.Nil(t, tv.Valid())
+}
+
+func TestTasAndCas_JSON_full_Roundtrip(t *testing.T) {
+	tv := NewTasAndCas()
+	tv.AddTaCert(ta)
+	tv.AddCaCert(ca)
+	assert.Nil(t, tv.Valid())
+
+	j, _ := tv.ToJSON()
+	assert.NotNil(t, j)
+
+	tv2 := NewTasAndCas()
+	err := tv2.FromJSON(j)
+	assert.Nil(t, err)
+
+	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
+	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
+	assert.True(t, len(tv2.Cas[0]) == len(ca) && 0 == bytes.Compare(ca, tv2.Cas[0]), "Compare CA")
+}
+
+func TestTasAndCas_CBOR_full_Roundtrip(t *testing.T) {
+	tv := NewTasAndCas()
+	tv.AddTaCert(ta)
+	tv.AddCaCert(ca)
+	assert.Nil(t, tv.Valid())
+
+	c, _ := tv.ToCBOR()
+	assert.NotNil(t, c)
+
+	tv2 := NewTasAndCas()
+	err := tv2.FromCBOR(c)
+	assert.Nil(t, err)
+
+	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
+	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
+	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
 }

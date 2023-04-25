@@ -4,17 +4,14 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"os"
 	"testing"
 
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_CotsCreateCmd_unknown_argument(t *testing.T) {
-	cmd := NewCotsCreateCmd()
+func Test_CotsCreateCtsCmd_unknown_argument(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
 	args := []string{"--unknown-argument=val"}
 	cmd.SetArgs(args)
@@ -23,17 +20,17 @@ func Test_CotsCreateCmd_unknown_argument(t *testing.T) {
 	assert.EqualError(t, err, "unknown flag: --unknown-argument")
 }
 
-func Test_CotsCreateCmd_no_templates(t *testing.T) {
-	cmd := NewCotsCreateCmd()
+func Test_CotsCreateCtsCmd_no_templates(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
 	// no args
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CTS files or folders supplied")
+	assert.EqualError(t, err, "no environment template supplied")
 }
 
-func Test_CotsCreateCmd_no_files_found(t *testing.T) {
-	cmd := NewCotsCreateCmd()
+func Test_CotsCreateCtsCmd_no_files_found(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
 	args := []string{
 		"--output=output.cbor",
@@ -41,41 +38,109 @@ func Test_CotsCreateCmd_no_files_found(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CTS files or folders supplied")
+	assert.EqualError(t, err, "no environment template supplied")
 }
 
-func Test_CotsCreateCmd_cts_not_found(t *testing.T) {
-	cmd := NewCotsCreateCmd()
+func Test_CotsCreateCtsCmd_env_not_found_no_tas(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
 	args := []string{
 		"--output=output.cbor",
-		"--ctsfile=nonexistent.cbor",
+		"--environment=nonexistent.json",
 	}
 	cmd.SetArgs(args)
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CTS files found")
+	assert.EqualError(t, err, "no TA files or folders supplied")
 }
 
-func Test_CotsCreateCmd_template_with_invalid_cts(t *testing.T) {
-	var err error
+func Test_CotsCreateCtsCmd_too_many_ids(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
+	args := []string{
+		"--output=output.cbor",
+		"--uuid",
+		"--id=some_tag_identity",
+		"--environment=../data/cots/env/vendor.json",
+		"--tafile=../data/cots/shared_ta.ta",
 	}
-	fmt.Println(path)
-
-	cmd := NewCotsCreateCmd()
-
+	cmd.SetArgs(args)
 	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "only one of --uuid, --uuid-str and --id can be used at the same time")
+}
+
+func Test_CotsCreateCtsCmd_invalid_uuid(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
 
 	args := []string{
-		"--ctsfile=../data/cots/not.cbor",
+		"--output=output.cbor",
+		"--uuid-str=NotAUuid",
+		"--environment=../data/cots/env/vendor.json",
+		"--tafile=../data/cots/shared_ta.ta",
 	}
 	cmd.SetArgs(args)
-	fmt.Println(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "--uuid-str does not contain a valid UUID")
+}
 
-	err = cmd.Execute()
-	assert.EqualError(t, err, "failed to parse as CBOR from ../data/cots/not.cbor: cbor: cannot unmarshal negative integer into Go value of type cots.ConciseTaStore")
+func Test_CotsCreateCtsCmd_loading_env_template_fail(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--environment=nonexistent.json",
+		"--tafile=../data/cots/shared_ta.ta",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "error loading template from nonexistent.json: open nonexistent.json: no such file or directory")
+}
+
+func Test_CotsCreateCtsCmd_loading_permclaims_template_fail(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--environment=../data/cots/env/vendor.json",
+		"--permclaims=nonexistent.json",
+		"--tafile=../data/cots/shared_ta.ta",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "error loading template from nonexistent.json: open nonexistent.json: no such file or directory")
+}
+
+func Test_CotsCreateCtsCmd_loading_exclclaims_template_fail(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--environment=../data/cots/env/vendor.json",
+		"--exclclaims=nonexistent.json",
+		"--tafile=../data/cots/shared_ta.ta",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.EqualError(t, err, "error loading template from nonexistent.json: open nonexistent.json: no such file or directory")
+}
+
+func Test_CotsCreateCtsCmd_ok(t *testing.T) {
+	cmd := NewCotsCreateCtsCmd()
+
+	args := []string{
+		"--output=output.cbor",
+		"--environment=../data/cots/env/vendor.json",
+		"--exclclaims=../data/cots/claims/exclclaim.json",
+		"--permclaims=../data/cots/claims/permclaim.json",
+		"--tafile=../data/cots/shared_ta.ta",
+	}
+	cmd.SetArgs(args)
+	fs = afero.NewOsFs()
+	err := cmd.Execute()
+	assert.Nil(t, err)
 }

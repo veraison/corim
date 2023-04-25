@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 
 	"github.com/veraison/swid"
 )
@@ -126,14 +127,14 @@ type AbbreviatedSwidTag struct {
 	// user selections at install time, an installation might not include every
 	// artifact that could be created or executed on the endpoint when the
 	// software component is installed or run.
-	Payloads *swid.Payloads `cbor:"6,keyasint,omitempty" json:"payload,omitempty" xml:"Payload,omitempty"`
+	Payload *swid.Payload `cbor:"6,keyasint,omitempty" json:"payload,omitempty" xml:"Payload,omitempty"`
 
 	// This item can be used to record the results of a software discovery
 	// process used to identify untagged software on an endpoint or to represent
 	// indicators for why software is believed to be installed on the endpoint.
 	// In either case, a CoSWID tag can be created by the tool performing an
 	// analysis of the software components installed on the endpoint.
-	Evidences *swid.Evidences `cbor:"3,keyasint,omitempty" json:"evidence,omitempty" xml:"Evidence,omitempty"`
+	Evidence *swid.Evidence `cbor:"3,keyasint,omitempty" json:"evidence,omitempty" xml:"Evidence,omitempty"`
 }
 
 // NewTag instantiates a new SWID tag with the supplied tag identifier and
@@ -142,7 +143,7 @@ func NewTag(tagID interface{}, softwareName, softwareVersion string) (*Abbreviat
 	t := AbbreviatedSwidTag{
 		XMLName: xml.Name{
 			Space: "http://standards.iso.org/iso/19770/-2/2015/schema.xsd",
-			Local: "SoftwareIdentity",
+			Local: "AbbreviatedSwidTag",
 		},
 		SoftwareName:    softwareName,
 		SoftwareVersion: softwareVersion,
@@ -155,36 +156,43 @@ func NewTag(tagID interface{}, softwareName, softwareVersion string) (*Abbreviat
 	return &t, nil
 }
 
-// ToXML serializes the receiver SoftwareIdentity to SWID
+func (t AbbreviatedSwidTag) Valid() error {
+	if len(t.Entities) == 0 || t.Entities == nil {
+		return fmt.Errorf("no entities present, must have at least 1 entity")
+	}
+	return nil
+}
+
+// ToXML serializes the receiver AbbreviatedSwidTag to SWID
 func (t AbbreviatedSwidTag) ToXML() ([]byte, error) {
 	return xml.Marshal(t)
 }
 
-// ToJSON serializes the receiver SoftwareIdentity to CoSWID using the JSON
+// ToJSON serializes the receiver AbbreviatedSwidTag to CoSWID using the JSON
 // formatter
 func (t AbbreviatedSwidTag) ToJSON() ([]byte, error) {
 	return json.Marshal(t)
 }
 
-// ToCBOR serializes the receiver SoftwareIdentity to CoSWID
+// ToCBOR serializes the receiver AbbreviatedSwidTag to CoSWID
 func (t AbbreviatedSwidTag) ToCBOR() ([]byte, error) {
 	return em.Marshal(t)
 }
 
-// FromXML deserializes the supplied XML encoded SWID into the receiver
-// SoftwareIdentity
+// FromXML deserializes the supplied XML encoded CoSWID into the receiver
+// AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) FromXML(data []byte) error {
 	return xml.Unmarshal(data, t)
 }
 
 // FromJSON deserializes the supplied JSON encoded CoSWID into the receiver
-// SoftwareIdentity
+// AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) FromJSON(data []byte) error {
 	return json.Unmarshal(data, t)
 }
 
 // FromCBOR deserializes the supplied CBOR encoded CoSWID into the receiver
-// SoftwareIdentity
+// AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, t)
 }
@@ -200,14 +208,14 @@ func (t *AbbreviatedSwidTag) setTagID(v interface{}) error {
 	return nil
 }
 
-// AddEntity adds the supplied Entity to the receiver SoftwareIdentity
+// AddEntity adds the supplied Entity to the receiver AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) AddEntity(e swid.Entity) error {
 	t.Entities = append(t.Entities, e)
 
 	return nil
 }
 
-// AddLink adds the supplied Link to the receiver SoftwareIdentity
+// AddLink adds the supplied Link to the receiver AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) AddLink(l swid.Link) error {
 	if t.Links == nil {
 		t.Links = new(swid.Links)
@@ -219,35 +227,13 @@ func (t *AbbreviatedSwidTag) AddLink(l swid.Link) error {
 }
 
 // AddSoftwareMeta adds the supplied SoftwareMeta to the receiver
-// SoftwareIdentity
+// AbbreviatedSwidTag
 func (t *AbbreviatedSwidTag) AddSoftwareMeta(m swid.SoftwareMeta) error {
 	if t.SoftwareMetas == nil {
 		t.SoftwareMetas = new(swid.SoftwareMetas)
 	}
 
 	*t.SoftwareMetas = append(*t.SoftwareMetas, m)
-
-	return nil
-}
-
-// AddPayload adds the supplied Payload to the receiver SoftwareIdentity
-func (t *AbbreviatedSwidTag) AddPayload(p swid.Payload) error {
-	if t.Payloads == nil {
-		t.Payloads = new(swid.Payloads)
-	}
-
-	*t.Payloads = append(*t.Payloads, p)
-
-	return nil
-}
-
-// AddEvidence adds the supplied Evidence to the receiver SoftwareIdentity
-func (t *AbbreviatedSwidTag) AddEvidence(e swid.Evidence) error {
-	if t.Evidences == nil {
-		t.Evidences = new(swid.Evidences)
-	}
-
-	*t.Evidences = append(*t.Evidences, e)
 
 	return nil
 }

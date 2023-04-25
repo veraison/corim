@@ -4,118 +4,52 @@
 package cots
 
 import (
-	"os"
 	"testing"
 
-	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/veraison/corim/comid"
 )
 
-func TestNewConciseTaStore(t *testing.T) {
-	// TODO add expected values or remove test cases
-	sharedTa, _ := os.ReadFile("../cocli/data/cots/shared_ta.der")
-	sharedCa, _ := os.ReadFile("../cocli/data/cots/shared_ca.der")
-	snobTa, _ := os.ReadFile("../cocli/data/cots/Snobbish Apparel_ta.der")
-	zestyTa, _ := os.ReadFile("../cocli/data/cots/Zesty Hands_ta.der")
+func TestConciseTaStore_Valid_no_environment_groups(t *testing.T) {
+	cots := ConciseTaStore{}
+	assert.EqualError(t, cots.Valid(), "environmentGroups must be present")
+}
 
-	egDice := NewEnvironmentGroup()
-	egDice.SetNamedTaStore("DICE Trust Anchors")
+func TestConciseTaStore_Valid_invalid_environment_groups(t *testing.T) {
+	cots := ConciseTaStore{}
+	cots.Environments = EnvironmentGroups{
+		EnvironmentGroup{
+			Environment: &comid.Environment{},
+		},
+	}
 
-	cotsDice := ConciseTaStore{}
-	cotsDice.Keys = NewTasAndCas()
-	cotsDice.Keys.AddTaCert(sharedTa)
-	cotsDice.Keys.AddTaCert(snobTa)
-	cotsDice.Keys.AddTaCert(zestyTa)
-	cotsDice.Environments = *NewEnvironmentGroups()
-	cotsDice.Environments.AddEnvironmentGroup(*egDice)
+	assert.EqualError(t, cots.Valid(), "invalid environmentGroups: bad environment group at index 0: environment group validation failed: environment must not be empty")
 
-	cotsDiceCbor, _ := cotsDice.ToCBOR()
-	assert.NotNil(t, cotsDiceCbor)
-	cotsDiceJSON, _ := cotsDice.ToJSON()
-	assert.NotNil(t, cotsDiceJSON)
+}
 
-	egShared := NewEnvironmentGroup()
-	egShared.Environment = &comid.Environment{}
-	egShared.Environment.Class = comid.NewClassOID("1.2.3.4.5")
+func TestConciseTaStore_Valid_empty_keys(t *testing.T) {
+	cots := ConciseTaStore{}
+	cots.Environments = EnvironmentGroups{}
+	cots.Keys = &TasAndCas{}
 
-	cotsShared := ConciseTaStore{}
-	cotsShared.Keys = NewTasAndCas()
-	cotsShared.Keys.AddTaCert(sharedTa)
-	cotsShared.Keys.AddCaCert(sharedCa)
-	cotsShared.Environments = make([]EnvironmentGroup, 1)
-	cotsShared.Environments[0] = *egShared
+	assert.EqualError(t, cots.Valid(), "empty Keys")
+}
 
-	cotsSharedCbor, _ := cotsShared.ToCBOR()
-	assert.NotNil(t, cotsSharedCbor)
+func TestConciseTaStore_Valid_invalid_tag_identity(t *testing.T) {
+	cots := ConciseTaStore{}
+	cots.Environments = EnvironmentGroups{}
+	cots.Keys = NewTasAndCas().AddTaCert(ta)
+	cots.TagIdentity = &comid.TagIdentity{}
 
-	egZesty := NewEnvironmentGroup()
-	egZesty.SwidTag = &AbbreviatedSwidTag{}
-	egZesty.SwidTag.Entities = swid.Entities{}
-	eZesty := swid.Entity{EntityName: "Zesty Hands, Inc."}
-	err := eZesty.SetRoles(swid.RoleSoftwareCreator)
-	assert.Nil(t, err)
-	egZesty.SwidTag.Entities = append(egZesty.SwidTag.Entities, eZesty)
+	assert.EqualError(t, cots.Valid(), "invalid TagIdentity: empty tag-id")
+}
 
-	cotsZesty := ConciseTaStore{}
-	cotsZesty.Keys = NewTasAndCas()
-	cotsZesty.Keys.AddTaCert(zestyTa)
-	cotsZesty.Environments = make([]EnvironmentGroup, 1)
-	cotsZesty.Environments[0] = *egZesty
+func TestConciseTaStores_Valid_empty_stores(t *testing.T) {
+	cotsList := ConciseTaStores{}
+	assert.EqualError(t, cotsList.Valid(), "empty concise-ta-stores")
+}
 
-	cotsZestyCbor, _ := cotsZesty.ToCBOR()
-	assert.NotNil(t, cotsZestyCbor)
-
-	cotsZestyPermClaim := ConciseTaStore{}
-	cotsZestyPermClaim.Keys = NewTasAndCas()
-	cotsZestyPermClaim.Keys.AddTaCert(zestyTa)
-	cotsZestyPermClaim.Environments = make([]EnvironmentGroup, 1)
-	cotsZestyPermClaim.Environments[0] = *egZesty
-
-	permName := "Bitter Paper"
-	permClaims1 := EatCWTClaim{SoftwareNameLabel: &permName}
-	cotsZestyPermClaim.PermClaims = append(cotsZestyPermClaim.PermClaims, permClaims1)
-
-	cotsZestyPermClaimCbor, _ := cotsZestyPermClaim.ToCBOR()
-	assert.NotNil(t, cotsZestyPermClaimCbor)
-
-	egSnob := NewEnvironmentGroup()
-	egSnob.SwidTag = &AbbreviatedSwidTag{}
-	egSnob.SwidTag.Entities = swid.Entities{}
-	eSnob := swid.Entity{EntityName: "Snobbish Apparel, Inc."}
-	err = eSnob.SetRoles(swid.RoleSoftwareCreator)
-	assert.Nil(t, err)
-	egSnob.SwidTag.Entities = append(egSnob.SwidTag.Entities, eSnob)
-
-	cotsSnobExclClaim := ConciseTaStore{}
-	cotsSnobExclClaim.Keys = NewTasAndCas()
-	cotsSnobExclClaim.Keys.AddTaCert(snobTa)
-	cotsSnobExclClaim.Environments = make([]EnvironmentGroup, 1)
-	cotsSnobExclClaim.Environments[0] = *egSnob
-
-	exclName := "Legal Lawyer"
-	exclClaims1 := EatCWTClaim{SoftwareNameLabel: &exclName}
-	cotsSnobExclClaim.ExclClaims = append(cotsSnobExclClaim.ExclClaims, exclClaims1)
-
-	cotsSnobExclClaimCbor, _ := cotsSnobExclClaim.ToCBOR()
-	assert.NotNil(t, cotsSnobExclClaimCbor)
-
-	cts := NewConciseTaStores()
-	cts.AddConciseTaStores(cotsDice)
-	cts.AddConciseTaStores(cotsShared)
-	cts.AddConciseTaStores(cotsZesty)
-	cts.AddConciseTaStores(cotsZestyPermClaim)
-	cts.AddConciseTaStores(cotsSnobExclClaim)
-
-	ctsCbor2, _ := cts.ToCBOR()
-	assert.NotNil(t, ctsCbor2)
-
-	ctsCbor3 := append(CotsTag, ctsCbor2...)
-	assert.NotNil(t, ctsCbor3)
-
-	var roundtrip ConciseTaStores
-	errrt := roundtrip.FromCBOR(ctsCbor3)
-	assert.Nil(t, errrt)
-	assert.Nil(t, roundtrip.Valid())
+func TestConciseTaStores_Valid_bad_cots(t *testing.T) {
+	cotsList := ConciseTaStores{*NewConciseTaStore().AddPurpose("cots")}
+	assert.EqualError(t, cotsList.Valid(), "bad ConciseTaStore group at index 0: environmentGroups must be present")
 }

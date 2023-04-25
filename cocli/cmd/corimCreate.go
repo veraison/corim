@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
+	"github.com/veraison/corim/cots"
 	"github.com/veraison/swid"
 )
 
@@ -20,6 +21,8 @@ var (
 	corimCreateCoswidDirs  []string
 	corimCreateComidFiles  []string
 	corimCreateComidDirs   []string
+	corimCreateCotsFiles   []string
+	corimCreateCotsDirs    []string
 	corimCreateOutputFile  *string
 )
 
@@ -28,24 +31,26 @@ var corimCreateCmd = NewCorimCreateCmd()
 func NewCorimCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s) and/or CoSWID(s)",
-		Long: `create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s) and/or CoSWID(s),
+		Short: "create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s), CoSWID(s) and/or CoTS",
+		Long: `create a CBOR-encoded CoRIM from the supplied JSON template, CoMID(s), CoSWID(s) and/or CoTS,
 
 	Create a CoRIM from template t1.json, adding CoMIDs found in the comid/
-	directory and CoSWIDs found in the coswid/ directory.  Since no explicit
+	directory, CoSWIDs found in the coswid/ directory and CoTS found in the cots/ directory.  Since no explicit
 	output file is set, the (unsigned) CoRIM is saved to the current directory
 	with tag-id as basename and a .cbor extension.
 
-	  cocli corim create --template=t1.json --comid-dir=comid --coswid-dir=coswid
+	  cocli corim create --template=t1.json --comid-dir=comid --coswid-dir=coswid --cots-dir=cots
 	 
 	Create a CoRIM from template corim-template.json, adding CoMID stored in
-	comid1.cbor and the two CoSWIDs stored in coswid1.cbor and dir/coswid2.cbor.
+	comid1.cbor and the two CoSWIDs stored in coswid1.cbor and dir/coswid2.cbor
+	and a CoTS stored in cots1.cbor.
 	The (unsigned) CoRIM is saved to corim.cbor.
 
 	  cocli corim create --template=corim-template.json \
 	                   --comid=comid1.cbor \
 	                   --coswid=coswid1.cbor \
 	                   --coswid=dir/coswid2.cbor \
+					   --cots=cots1.cbor
 	                   --output=corim.cbor
 	`,
 
@@ -56,14 +61,15 @@ func NewCorimCreateCmd() *cobra.Command {
 
 			comidFilesList := filesList(corimCreateComidFiles, corimCreateComidDirs, ".cbor")
 			coswidFilesList := filesList(corimCreateCoswidFiles, corimCreateCoswidDirs, ".cbor")
+			cotsFilesList := filesList(corimCreateCotsFiles, corimCreateCotsDirs, ".cbor")
 
-			if len(comidFilesList)+len(coswidFilesList) == 0 {
-				return errors.New("no CoMID or CoSWID files found")
+			if len(comidFilesList)+len(coswidFilesList)+len(cotsFilesList) == 0 {
+				return errors.New("no CoMID, CoSWID or CoTS files found")
 			}
 
 			// checkCorimCreateArgs makes sure corimCreateCorimFile is not nil
 			cborFile, err := corimTemplateToCBOR(*corimCreateCorimFile,
-				comidFilesList, coswidFilesList, corimCreateOutputFile)
+				comidFilesList, coswidFilesList, cotsFilesList, corimCreateOutputFile)
 			if err != nil {
 				return err
 			}
@@ -91,6 +97,14 @@ func NewCorimCreateCmd() *cobra.Command {
 		&corimCreateCoswidFiles, "coswid", "s", []string{}, "a CBOR-encoded CoSWID file",
 	)
 
+	cmd.Flags().StringArrayVarP(
+		&corimCreateCotsDirs, "cots-dir", "C", []string{}, "a directory containing CBOR-encoded CoTS files",
+	)
+
+	cmd.Flags().StringArrayVarP(
+		&corimCreateCotsFiles, "cots", "c", []string{}, "a CBOR-encoded CoTS file",
+	)
+
 	corimCreateOutputFile = cmd.Flags().StringP("output", "o", "", "name of the generated (unsigned) CoRIM file")
 
 	return cmd
@@ -102,14 +116,15 @@ func checkCorimCreateArgs() error {
 	}
 
 	if len(corimCreateComidDirs)+len(corimCreateComidFiles)+
-		len(corimCreateCoswidDirs)+len(corimCreateCoswidFiles) == 0 {
-		return errors.New("no CoMID or CoSWID files or folders supplied")
+		len(corimCreateCoswidDirs)+len(corimCreateCoswidFiles)+
+		len(corimCreateCotsDirs)+len(corimCreateCotsFiles) == 0 {
+		return errors.New("no CoMID, CoSWID or CoTS files or folders supplied")
 	}
 
 	return nil
 }
 
-func corimTemplateToCBOR(tmplFile string, comidFiles, coswidFiles []string, outputFile *string) (string, error) {
+func corimTemplateToCBOR(tmplFile string, comidFiles, coswidFiles, cotsFiles []string, outputFile *string) (string, error) {
 	var (
 		tmplData, corimCBOR []byte
 		c                   corim.UnsignedCorim
@@ -169,6 +184,28 @@ func corimTemplateToCBOR(tmplFile string, comidFiles, coswidFiles []string, outp
 
 		if c.AddCoswid(s) == nil {
 			return "", fmt.Errorf("error adding CoSWID from %s", coswidFile)
+		}
+	}
+
+	// append CoTS(s)
+	for _, cotsFile := range cotsFiles {
+		var (
+			cotsCBOR []byte
+			t        cots.ConciseTaStore
+		)
+
+		cotsCBOR, err = afero.ReadFile(fs, cotsFile)
+		if err != nil {
+			return "", fmt.Errorf("error loading CoTS from %s: %w", cotsFile, err)
+		}
+
+		err = t.FromCBOR(cotsCBOR)
+		if err != nil {
+			return "", fmt.Errorf("error loading CoTS from %s: %w", cotsFile, err)
+		}
+
+		if c.AddCots(t) == nil {
+			return "", fmt.Errorf("error adding CoTS from %s", cotsFile)
 		}
 	}
 

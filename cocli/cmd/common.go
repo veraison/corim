@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/cots"
 	"github.com/veraison/swid"
 )
 
@@ -72,6 +73,10 @@ func printComid(cbor []byte, heading string) error {
 
 func printCoswid(cbor []byte, heading string) error {
 	return printJSONFromCBOR(&swid.SoftwareIdentity{}, cbor, heading)
+}
+
+func printCots(cbor []byte, heading string) error {
+	return printJSONFromCBOR(&cots.ConciseTaStore{}, cbor, heading)
 }
 
 func makeFileName(dirName, baseName, ext string) string {

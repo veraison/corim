@@ -48,22 +48,11 @@ func (o *ConciseTaStore) SetLanguage(language string) *ConciseTaStore {
 	return o
 }
 
-func (o ConciseTaStore) GetLanguage() string {
-	if o.Language == nil {
-		return ""
-	}
-	return *o.Language
-}
-
 func (o *ConciseTaStore) AddEnvironmentGroup(eg EnvironmentGroup) *ConciseTaStore {
 	if o != nil {
 		o.Environments = append(o.Environments, eg)
 	}
 	return o
-}
-
-func (o ConciseTaStore) GetEnvironments() []EnvironmentGroup {
-	return o.Environments
 }
 
 func (o *ConciseTaStore) AddPurpose(purpose string) *ConciseTaStore {
@@ -73,10 +62,6 @@ func (o *ConciseTaStore) AddPurpose(purpose string) *ConciseTaStore {
 	return o
 }
 
-func (o ConciseTaStore) GetPurposes() []string {
-	return o.Purposes
-}
-
 func (o *ConciseTaStore) AddPermClaims(permclaim EatCWTClaim) *ConciseTaStore {
 	if o != nil {
 		o.PermClaims = append(o.PermClaims, permclaim)
@@ -84,23 +69,11 @@ func (o *ConciseTaStore) AddPermClaims(permclaim EatCWTClaim) *ConciseTaStore {
 	return o
 }
 
-func (o ConciseTaStore) GetPermClaims() EatCWTClaims {
-	return o.PermClaims
-}
-
 func (o *ConciseTaStore) AddExclClaims(exclclaim EatCWTClaim) *ConciseTaStore {
 	if o != nil {
 		o.ExclClaims = append(o.ExclClaims, exclclaim)
 	}
 	return o
-}
-
-func (o ConciseTaStore) GetExclClaims() EatCWTClaims {
-	return o.ExclClaims
-}
-
-func (o ConciseTaStore) GetKeys() TasAndCas {
-	return *o.Keys
 }
 
 func (o *ConciseTaStore) SetKeys(keys TasAndCas) *ConciseTaStore {
@@ -119,26 +92,41 @@ func (o ConciseTaStore) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes a CBOR-encoded CoMID into the target Comid
+// FromCBOR deserializes a CBOR-encoded CoTS into the target ConciseTaStore
 func (o *ConciseTaStore) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
 // Valid iterates over the range of individual entities to check for validity
 func (o ConciseTaStore) Valid() error {
-	if nil == o.Keys || len(o.Keys.Tas) == 0 {
+	if o.Environments == nil {
+		return fmt.Errorf("environmentGroups must be present")
+	}
+	if len(o.Environments) != 0 {
+		if err := o.Environments.Valid(); err != nil {
+			return fmt.Errorf("invalid environmentGroups: %w", err)
+		}
+	}
+
+	if o.TagIdentity != nil {
+		if err := o.TagIdentity.Valid(); err != nil {
+			return fmt.Errorf("invalid TagIdentity: %w", err)
+		}
+	}
+
+	if o.Keys == nil || len(o.Keys.Tas) == 0 {
 		return fmt.Errorf("empty Keys")
 	}
 
 	return nil
 }
 
-// FromJSON deserializes the supplied JSON data into the target Meta
+// FromJSON deserializes a JSON-encoded CoTS into the target ConciseTaStore
 func (o *ConciseTaStore) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Meta to JSON
+// FromJSON deserializes a JSON-encoded CoTS into the target ConsiseTaStore
 func (o ConciseTaStore) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }
@@ -160,6 +148,7 @@ func (o *ConciseTaStores) AddConciseTaStores(cts ConciseTaStore) *ConciseTaStore
 	return o
 }
 
+// ToCBOR serializes the target ConciseTaStores to CBOR
 func (o ConciseTaStores) ToCBOR() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -168,17 +157,17 @@ func (o ConciseTaStores) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes a CBOR-encoded ConciseTaStores into the target ConciseTaStores
+// FromCBOR deserializes a CBOR-encoded CoTS into the target ConsiseTaStores
 func (o *ConciseTaStores) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// FromJSON deserializes the supplied JSON data into the target deserializes a
+// FromJSON deserializes a JSON-encoded CoTS into the target ConsiseTaStores
 func (o *ConciseTaStores) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target deserializes a  to JSON
+// ToJSON serializes the target ConsiseTaStore to JSON
 func (o ConciseTaStores) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }
@@ -186,6 +175,12 @@ func (o ConciseTaStores) ToJSON() ([]byte, error) {
 func (o ConciseTaStores) Valid() error {
 	if len(o) == 0 {
 		return errors.New("empty concise-ta-stores")
+	}
+
+	for i, c := range o {
+		if err := c.Valid(); err != nil {
+			return fmt.Errorf("bad ConciseTaStore group at index %d: %w", i, err)
+		}
 	}
 	return nil
 }

@@ -30,11 +30,6 @@ var (
 	}
 )
 
-//type TrustAnchor struct {
-//	Format TaFormat `cbor:"0,keyasint" json:"format"`
-//	Data   []byte   `cbor:"1,keyasint,omitempty" json:"data,omitempty"`
-//}
-
 type TrustAnchor struct {
 	_      struct{} `cbor:",toarray"`
 	Format TaFormat `json:"format"`
@@ -52,10 +47,6 @@ func (o *TrustAnchor) SetFormat(format TaFormat) *TrustAnchor {
 	return o
 }
 
-func (o TrustAnchor) GetFormat() TaFormat {
-	return o.Format
-}
-
 func (o *TrustAnchor) SetData(data []byte) *TrustAnchor {
 	if o != nil {
 		o.Data = data
@@ -63,26 +54,22 @@ func (o *TrustAnchor) SetData(data []byte) *TrustAnchor {
 	return o
 }
 
-func (o TrustAnchor) GetData() []byte {
-	return o.Data
-}
-
-// ToCBOR serializes the target Meta to CBOR
+// ToCBOR serializes the target TrustAnchor to CBOR
 func (o TrustAnchor) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes the supplied CBOR data into the target Meta
+// FromCBOR deserializes the supplied CBOR data into the target TrustAnchor
 func (o *TrustAnchor) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// FromJSON deserializes the supplied JSON data into the target Meta
+// FromJSON deserializes the supplied JSON data into the target TrustAnchor
 func (o *TrustAnchor) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Meta to JSON
+// ToJSON serializes the target TrustAnchor to JSON
 func (o TrustAnchor) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }
@@ -103,10 +90,6 @@ func (o *TasAndCas) AddCaCert(cert []byte) *TasAndCas {
 	return o
 }
 
-func (o TasAndCas) GetCaCerts() [][]byte {
-	return o.Cas
-}
-
 func (o *TasAndCas) AddTaCert(cert []byte) *TasAndCas {
 	if o != nil {
 		ta := TrustAnchor{}
@@ -117,11 +100,7 @@ func (o *TasAndCas) AddTaCert(cert []byte) *TasAndCas {
 	return o
 }
 
-func (o TasAndCas) GetTas() []TrustAnchor {
-	return o.Tas
-}
-
-// Valid checks for validity of the fields within Meta
+// Valid checks for validity of the fields within TasAndCas
 func (o TasAndCas) Valid() error {
 	if len(o.Tas) == 0 {
 		return fmt.Errorf("empty TasAndCas")
@@ -130,22 +109,22 @@ func (o TasAndCas) Valid() error {
 	return nil
 }
 
-// ToCBOR serializes the target Meta to CBOR
+// ToCBOR serializes the target TasAndCas to CBOR
 func (o TasAndCas) ToCBOR() ([]byte, error) {
 	return em.Marshal(&o)
 }
 
-// FromCBOR deserializes the supplied CBOR data into the target Meta
+// FromCBOR deserializes the supplied CBOR data into the target TasAndCas
 func (o *TasAndCas) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// FromJSON deserializes the supplied JSON data into the target Meta
+// FromJSON deserializes the supplied JSON data into the target TasAndCas
 func (o *TasAndCas) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target Meta to JSON
+// ToJSON serializes the target TasAndCas to JSON
 func (o TasAndCas) ToJSON() ([]byte, error) {
 	return json.Marshal(&o)
 }

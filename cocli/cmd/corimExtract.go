@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/veraison/corim/corim"
+	"github.com/veraison/corim/cots"
 )
 
 var (
@@ -24,8 +25,8 @@ var corimExtractCmd = NewCorimExtractCmd()
 func NewCorimExtractCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "extract",
-		Short: "extract, as-is, CoSWIDs and CoMIDs found in a CoRIM and save them to disk",
-		Long: `extract, as-is, CoSWIDs and CoMIDs found in a CoRIM and save them to disk
+		Short: "extract, as-is, CoSWIDs CoMIDs, CoTS found in a CoRIM and save them to disk",
+		Long: `extract, as-is, CoSWIDs and CoMIDs, CoTS found in a CoRIM and save them to disk
 
 	Extract the contents of the signed CoRIM signed-corim.cbor to the current
 	directory
@@ -53,7 +54,7 @@ func NewCorimExtractCmd() *cobra.Command {
 	}
 
 	corimExtractCorimFile = cmd.Flags().StringP("file", "f", "", "a signed CoRIM file (in CBOR format)")
-	corimExtractOutputDir = cmd.Flags().StringP("output-dir", "o", ".", "folder to which CoSWIDs and CoMIDs are saved")
+	corimExtractOutputDir = cmd.Flags().StringP("output-dir", "o", ".", "folder to which CoSWIDs, CoMIDs, CoTSs are saved")
 
 	return cmd
 }
@@ -112,6 +113,12 @@ func extract(signedCorimFile string, outputDir *string) error {
 
 			if err = afero.WriteFile(fs, outputFile, cborData, 0644); err != nil {
 				fmt.Printf(">> error saving CoSWID tag at index %d: %v\n", i, err)
+			}
+		} else if bytes.Equal(cborTag, cots.CotsTag) {
+			outputFile = filepath.Join(baseDir, fmt.Sprintf("%06d-cots.cbor", i))
+
+			if err = afero.WriteFile(fs, outputFile, cborData, 0644); err != nil {
+				fmt.Printf(">> error saving CoTS tag at index %d: %v\n", i, err)
 			}
 		} else {
 			fmt.Printf(">> unmatched CBOR tag: %x\n", cborTag)
