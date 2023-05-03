@@ -156,11 +156,117 @@ $ cocli comid display -f m1.cbor \
                     -d yet-another-comid-folder/
 ```
 
+## CoTSs manipulation
+
+The `cots` subcommand allows you to create, display and validate CoTSs.
+
+### Create
+
+Use the `cots create` subcommand to create a CBOR-encoded CoTS. The `environment` switch takes in a JSON template specifiying the environments that are valid for the keys specified and the `tas` switch takes in a directory of trust anchors files:
+```
+$ cocli cots create --environment c1.json --tas tas_dir
+```
+On success, you should see something like the following printed to stdout:
+```
+>> created "c1.cbor"
+```
+
+The CBOR-encoded CoTS file is stored in the current working directory with a
+name derived from its environment template.  If you want, you can specify a different
+target directory and file name using the `--output` command line switch (abbrev. `-o`)
+```
+$ cocli cots create --environment c1.json --tas tas_dir --output /tmp/myCots.cbor
+>> created "/tmp/myCots.cbor"
+```
+Note that the output directory, as well as all its parent directories, MUST pre-exist.
+
+### Display
+
+Use the `cots display` subcommand to print to stdout one or more CBOR-encoded
+CoTSs in human readable (JSON) format.
+
+You can supply individual files using the `--file` switch (abbrev. `-f`), or
+directories that may (or may not) contain CoTS files using the `--dir` switch
+(abbrev. `-d`).  Only valid CoTSs will be displayed, and any decoding or
+validation error will be printed alongside the corresponding file name.
+
+For example:
+```
+$ cocli cots display --file c1.cbor
+```
+provided the `c1.cbor` file contains valid CoTS, would print something like:
+```
+>> [c1.cbor]
+{
+  "tag-identity": {
+    "id": "ab0f44b1-bfdc-4604-ab4a-30f80407ebcc",
+    "version": 5
+  },
+  "environments": [
+    {
+      "environment": {
+        "class": {
+          "vendor": "Worthless Sea, Inc."
+        }
+      }
+    }
+  ],
+  "keys": {
+    "tas": [
+      {
+        "format": 2,
+        "data": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErYoMAdqe2gJT3CvCcifZxyE9+N8T6Jy5zbeo5LYtnOipmi1wXA9/gNtlwAbRCRQitH/GEcvUaGlzPZxIOITV/g=="
+      }
+    ]
+  }
+}
+```
+While a `cots` folder with the following contents:
+```
+$ tree cots/
+cots/
+├── rubbish.cbor
+├── valid-cots-1.cbor
+├── valid-cots-2.cbor
+```
+could be inspected in one go using:
+```
+$ cocli cots display --dir cots/
+```
+which would output something like:
+```
+>> failed displaying "cots/rubbish.cbor": CBOR decoding failed: EOF
+>> [cots/valid-cots-1.cbor]
+{
+  "tag-identity": {
+    "id": "43bbe37f-2e61-4b33-aed3-53cff1428b16"
+  },
+[...]
+}
+>> [cots/valid-cots-2.cbor]
+{
+  "tag-identity": {
+    "id": "ab0f44b1-bfdc-4604-ab4a-30f80407ebcc"
+  },
+[...]
+}
+Error: 1/3 display(s) failed
+```
+
+One of more files and directories can be supplied in the same invocation, e.g.:
+```
+$ cocli cots display -f c1.cbor \
+                    -f cots/c2.cbor \
+                    -d /var/spool/cots \
+                    -d yet-another-cots-folder/
+```
+
+
 ## CoRIMs manipulation
 
 The `corim` subcommand allows you to create, display, sign, verify CoRIMs or submit
 a CoRIM using the [Veraison provisioning API](https://github.com/veraison/docs/tree/main/api/endorsement-provisioning).
-It also provides a means to extract as-is the embedded CoSWIDs and CoMIDs and save
+It also provides a means to extract as-is the embedded CoSWIDs, CoMIDs and CoTSs and save
 them as separate files.
 
 ### Create
@@ -168,9 +274,9 @@ them as separate files.
 Use the `corim create` subcommand to create a CBOR-encoded, unsigned CoRIM, by
 passing its JSON representation<sup>[1](#templates-ex)</sup> via the
 `--template` switch (or equivalently its `-t` shorthand) together with the
-CBOR-encoded CoMIDs and/or CoSWIDs to be embedded.  For example:
+CBOR-encoded CoMIDs, CoSWIDs and/or CoTS to be embedded.  For example:
 ```
-$ cocli corim create --template c1.json --comid m1.cbor --coswid s1.cbor
+$ cocli corim create --template c1.json --comid m1.cbor --coswid s1.cbor --cots c1.cbor
 ```
 On success, you should see something like the following printed to stdout:
 ```
@@ -181,14 +287,14 @@ The CBOR-encoded CoRIM file is stored in the current working directory with a
 name derived from its template.  If you want, you can specify a different
 file name using the `--output` command line switch (abbrev. `-o`):
 ```
-$ cocli corim create -t c1.json -m m1.cbor -s s1.cbor -o my.cbor
->> created "my.cbor" from "c1.json"
+$ cocli corim create -t r1.json -m m1.cbor -s s1.cbor -c c1.cbor -o my.cbor
+>> created "my.cbor" from "r1.json"
 ```
 
-CoMIDs and CoSWIDs can be either supplied as individual files, using the
-`--comid` (abbrev. `-m`) and `--coswid` (abbrev. `-s`) switches respectively, or
-as "per-folder" blocks using the `--comid-dir` (abbrev. `-M`) and `--coswid-dir`
-(abbrev. `-S`) switch.  For example:
+CoMIDs, CoSWIDs and CoTSs can be either supplied as individual files, using the
+`--comid` (abbrev. `-m`), `--coswid` (abbrev. `-s`) and `--cots` (abbrev. `-c`) switches respectively, or
+as "per-folder" blocks using the `--comid-dir` (abbrev. `-M`), `--coswid-dir` and `--cots-dir`
+(abbrev. `-C`) switch.  For example:
 ```
 $ cocli corim create --template c1.json --comid-dir comids.d/
 ```
@@ -279,7 +385,7 @@ Corim:
 }
 ```
 
-By default, the embedded CoMID and CoSWID tags are not expanded, and what you
+By default, the embedded CoMID, CoSWID and CoTS tags are not expanded, and what you
 will see is the base64 encoding of their CBOR serialisation.  If you want to
 peek at the tags' content, supply the `--show-tags` (abbrev. `-v`) switch, which
 will add a further Tags section with one entry per each expanded tag:
@@ -331,9 +437,9 @@ $ cocli corim submit \
 >> "corim.cbor" submit ok
 ```
 
-### Extract CoSWIDs and CoMIDs
+### Extract CoSWIDs, CoMIDs and CoTSs
 
-Use the `corim extract` subcommand to extract the embedded CoMIDs and CoSWIDs
+Use the `corim extract` subcommand to extract the embedded CoMIDs, CoSWIDs and CoTSs
 from a signed CoRIM.
 
 You must supply a signed CoRIM file using the `--file` switch (abbrev. `-f`) and
@@ -341,22 +447,142 @@ an optional output folder (default is the current working directory) using the
 `--output-dir` switch (abbrev. `-o`).  Make sure that the output directory as
 well as any parent folder exists prior to issuing the command.
 
-On success, the found CoMIDs and CoSWIDs are saved in CBOR format:
+On success, the found CoMIDs, CoSWIDs, CoTS are saved in CBOR format:
 ```
 $ cocli corim extract --file signed-corim.cbor --output-dir output.d/
 $ tree output.d/
 output.d/
 ├── 000000-comid.cbor
 ├── 000001-comid.cbor
-└── 000002-coswid.cbor
+├── 000002-coswid.cbor
+└── 000003-cots.cbor
 ```
 
 
 
-<a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, and Meta JSON
+<a name="templates-ex">1</a>: A few examples of CoMID, CoRIM, CoTS, and Meta JSON
 templates can be found in the [data/templates](data/templates) folder.
 
 
 ## Visual Synopsis of the Available Commands
 
-![visual map](data/pics/cocli-map.png)
+```mermaid
+graph LR
+    OEM[(OEM/ODM \n DB)]
+    JSONTmplCoMID[["JSON \n template \n (CoMID)"]]
+
+    JSONTmplCoSWID[["JSON \n template \n (CoSWID)"]]
+    style JSONTmplCoSWID fill:#71797E
+    click JSONTmplCoSWID "https://github.com/veraison/corim/issues/81"
+
+    JSONTmplCoRIM[["JSON \n template \n (CoRIM)"]]
+    JSONTmplMeta[["JSON \n template \n (Meta)"]]
+    key((key))
+
+    %% Cots nodes
+    environments[["Environments"]]
+    tas(("Trust \n anchors"))
+    cas(("CA \n certificates"))
+    permClaims[["Permanant claims"]]
+    exclClaims[["Excluded claims"]]
+
+    cliComidCreate($ cocli comid create)
+    cliComidDisplay($ cocli comid display)
+    style cliComidCreate fill:#00758f
+    style cliComidDisplay fill:#00758f
+
+    cliCotsCreate($ cocli cots create)
+    cliCotsDisplay($ cocli cots display)
+    style cliCotsCreate fill:#00758f
+    style cliCotsDisplay fill:#00758f
+
+    cliCoswidCreate($ cocli coswid create)
+    cliCoswidDisplay($ cocli coswid display)
+    style cliCoswidCreate fill:#71797E
+    style cliCoswidDisplay fill:#71797E
+
+
+    cliCorimCreate($ cocli corim create)
+    cliCorimSign($ cocli corim sign)
+    cliCorimVerify($ cocli corim verify)
+    cliCorimExtract($ cocli corim extract)
+    cliCorimDisplay($ cocli corim display)
+    cliCorimSubmit($ cocli corim submit)
+    style cliCorimCreate fill:#00758f
+    style cliCorimSign fill:#00758f
+    style cliCorimVerify fill:#00758f
+    style cliCorimExtract fill:#00758f
+    style cliCorimDisplay fill:#00758f
+    style cliCorimSubmit fill:#00758f
+
+    provisioningEndpoint{{Veraison \n Provisioning \n Service}}
+
+    CBORComid1((CBOR <br /> CoMID))
+    CBORSwid1((CBOR <br /> SWID))
+    CBORCots1((CBOR <br /> CoTS))
+
+    CBORComid2((CBOR <br /> CoMID))
+    CBORSwid2((CBOR <br /> SWID))
+    CBORCots2((CBOR <br /> CoTS))
+
+    CBORCorim((CBOR CoRIM))
+    CoseSign1((COSE Sign1 CoRIM))
+    signBool((T/F))
+
+    OEM --> JSONTmplCoMID
+    OEM --> JSONTmplCoSWID
+
+    %% Cots items provisioning
+    OEM --> environments
+    OEM --> tas
+    OEM --> cas
+    OEM --> permClaims
+    OEM --> exclClaims
+
+    OEM --> JSONTmplCoRIM
+    OEM --> JSONTmplMeta
+    OEM --> key
+
+    %% Cots individual items
+    environments --> cliCotsCreate
+    tas --> cliCotsCreate
+    cas --> cliCotsCreate
+    permClaims --> cliCotsCreate
+    exclClaims --> cliCotsCreate
+
+
+    JSONTmplCoMID --> cliComidCreate
+    JSONTmplCoSWID --> cliCoswidCreate
+    JSONTmplCoRIM --> cliCorimCreate
+    JSONTmplMeta --> cliCorimSign
+    key --> cliCorimSign
+    key --> cliCorimVerify
+
+    cliComidCreate --> CBORComid1
+    cliCotsCreate --> CBORCots1
+    cliCoswidCreate --> CBORSwid1
+    
+    cliCorimCreate --> CBORCorim
+    cliCorimSign --> CoseSign1
+    cliCorimVerify --> signBool
+    cliCorimSubmit -- to--> provisioningEndpoint
+
+    CBORComid1 --> cliComidDisplay
+    CBORComid1 --> cliCorimCreate
+
+    CBORCots1 --> cliCorimCreate
+    CBORCots1  --> cliCotsDisplay
+
+    CBORSwid1 --> cliCoswidDisplay
+    CBORSwid1 --> cliCorimCreate
+
+    CBORCorim --> cliCorimSubmit
+    CBORCorim --> cliCorimSign
+    CoseSign1 --> cliCorimExtract
+    CoseSign1 --> cliCorimVerify
+    CoseSign1 --> cliCorimDisplay
+
+    cliCorimExtract --> CBORComid2
+    cliCorimExtract --> CBORSwid2
+    cliCorimExtract --> CBORCots2
+```

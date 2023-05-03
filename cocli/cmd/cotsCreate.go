@@ -110,7 +110,7 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 		&cotsCreateCtsCaFiles, "cafile", "", []string{}, "a DER-encoded certificate file",
 	)
 
-	cotsCreateCtsOutputFile = cmd.Flags().StringP("output", "o", "", "name of the generated (unsigned) CoTS file")
+	cotsCreateCtsOutputFile = cmd.Flags().StringP("output", "o", "", "name of the generated CoTS file")
 
 	return cmd
 }
