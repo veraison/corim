@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/spf13/afero"
@@ -21,67 +22,80 @@ func Test_CotsDisplayCmd_unknown_argument(t *testing.T) {
 	assert.EqualError(t, err, "unknown flag: --unknown-argument")
 }
 
-func Test_CotsDisplayCmd_mandatory_args_missing_cots_file(t *testing.T) {
+func Test_CotsDisplayCmd_no_files(t *testing.T) {
 	cmd := NewCotsDisplayCmd()
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "no CoTS supplied")
+	assert.EqualError(t, err, "no files supplied")
 }
 
-func Test_CotsDisplayCmd_non_existent_cots_file(t *testing.T) {
+func Test_CotsDisplayCmd_no_files_found(t *testing.T) {
 	cmd := NewCotsDisplayCmd()
 
 	args := []string{
-		"--file=nonexistent.cbor",
+		"--file=unknown",
+		"--dir=unsure",
 	}
 	cmd.SetArgs(args)
-
-	fs = afero.NewMemMapFs()
 
 	err := cmd.Execute()
-	assert.EqualError(t, err, "error loading signed CoTS from nonexistent.cbor: open nonexistent.cbor: file does not exist")
+	assert.EqualError(t, err, "no files found")
 }
 
-func Test_CotsDisplayCmd_bad_unsigned_corim(t *testing.T) {
+func Test_CotsDisplayCmd_file_with_invalid_cbor(t *testing.T) {
+	var err error
+
 	cmd := NewCotsDisplayCmd()
 
-	args := []string{
-		"--file=bad.txt",
-	}
-	cmd.SetArgs(args)
-
 	fs = afero.NewMemMapFs()
-	err := afero.WriteFile(fs, "bad.txt", []byte("hello!"), 0644)
+	err = afero.WriteFile(fs, "invalid.cbor", []byte{0xff, 0xff}, 0400)
 	require.NoError(t, err)
 
+	args := []string{
+		"--file=invalid.cbor",
+	}
+	cmd.SetArgs(args)
+
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoTS from bad.txt: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
+	assert.EqualError(t, err, "1/1 display(s) failed")
 }
 
-func Test_CotsDisplayCmd_invalid_unsigned_cots(t *testing.T) {
+func Test_CotsDisplayCmd_file_with_valid_cots(t *testing.T) {
+	var err error
+
 	cmd := NewCotsDisplayCmd()
 
+	fs = afero.NewMemMapFs()
+	err = afero.WriteFile(fs, "ok.cbor", testCots, 0400)
+	require.NoError(t, err)
+
 	args := []string{
-		"--file=../data/cots/not.cbor",
+		"--file=ok.cbor",
 	}
 	cmd.SetArgs(args)
 
-	fs = afero.NewOsFs()
+	fmt.Printf("%x\n", testCots)
 
-	err := cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoTS from ../data/cots/not.cbor: failed CBOR decoding for COSE-Sign1 signed CoRIM: cbor: invalid COSE_Sign1_Tagged object")
+	err = cmd.Execute()
+	assert.NoError(t, err)
 }
 
-func Test_CotsDisplayCmd_ok_top_level_view(t *testing.T) {
+func Test_CotsDisplayCmd_file_with_valid_cots_from_dir(t *testing.T) {
+	var err error
+
 	cmd := NewCotsDisplayCmd()
 
+	fs = afero.NewMemMapFs()
+	err = afero.WriteFile(fs, "testdir/ok.cbor", testCots, 0400)
+	require.NoError(t, err)
+
 	args := []string{
-		"--file=../data/cots/signed.cbor",
+		"--dir=testdir",
 	}
 	cmd.SetArgs(args)
 
-	fs = afero.NewOsFs()
+	fmt.Printf("%x\n", testCots)
 
-	err := cmd.Execute()
+	err = cmd.Execute()
 	assert.NoError(t, err)
 }
