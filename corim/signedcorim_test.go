@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	testECKey = []byte(`{
+	testES256Key = []byte(`{
 		"kty": "EC",
 		"crv": "P-256",
 		"x": "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
@@ -21,6 +21,82 @@ var (
 		"d": "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
 		"use": "enc",
 		"kid": "1"
+	  }`)
+
+	testES384Key = []byte(`{
+		"kty": "EC",
+		"d": "XiZ_ZEDMw3Hr9BjNc_4qbNxMG6VpkFHTN3KcdT1UlOc51pFwS1t6Yg_aFYJTGMBf",
+		"use": "sig",
+		"crv": "P-384",
+		"x": "Ay-c_vlONI_FNQn4PNHXwEswuoxOTqOEHNIQbSKv5OnC_KBLwAbg5uBQRHCRmFnu",
+		"y": "mJpRrG-ex0R08heh1qm-osCH7SSTKC1Bjx1SrFpUQZCiYQXdPLIokC0DGRAMYq41",
+		"alg": "ES384"
+	  }`)
+
+	testES512Key = []byte(`{
+		"use": "sig",
+		"kty": "EC",
+		"kid": "Xt7n2MSHsgErmf1Uq-UZV451DhzlSPVuH75Rj9adAZ0",
+		"crv": "P-521",
+		"alg": "ES512",
+		"x": "AVBBp8Mckn-HYsdx5bMSkFRxGhKH2M7ked49PqK2PzG2A5QEBPc813AHUO3MHoe-_JQjEm-r-E52sNln-zn6OFJL",
+		"y": "AcsVxiDaIJpr3MToPmDqSjWnCkg765Rum3DWuFNaTmvietwrY6OYdoW995m4SkWv4GYI0mdchuXoThvPn0CXcDb9",
+		"d": "AeSLG30MsuX6wzm-AYpBbTooVPt3GvU_Fl9LesAFZrtJ4HJhPL3QhMLmiDbB3Am0j_IpIR3P9dTJTNpt6B_YSVda"
+	  }`)
+
+	testEdDSAKey = []byte(`{
+		"use": "sig",
+		"kty": "OKP",
+		"kid": "RBx2781Ag7Sd1vmuVbxpe0LzWT94pmB3GPtNx6m_gsQ",
+		"crv": "Ed25519",
+		"alg": "EdDSA",
+		"x": "JL3cmVCzN3m3afnctG2agbjb6nrZWFl48A8Feknkpx0",
+		"d": "m8LDAfKvGWAZTXWC21tzHeSYLqVSP4YpzI-Z7fL3NEY"
+	  }`)
+
+	testPS256Key = []byte(`{
+		"use": "sig",
+		"kty": "RSA",
+		"kid": "jYGw-iPMi7AxzdJPMHYh_gb9YI-BQGAVAvf6hgZndzw",
+		"alg": "PS256",
+		"n": "r8tDvmXtJjtGOgX34bxDGT3-v2AtfVkP4vhdOl5Wau-XFyaPNpob5u3DtNsYUnHREQFnrPbIp02IeassUqSi6FlT9SZsYX8M5xkfpCuLb6FD5Loqz4ZMhzqtMNoKjUt2_9tdyW-iMfMm-EWLfVRfiXnfXq__o122LZ93-zmR4kEusCp7rUa12-E48pv4Wu5CwKntz08DjP-WB-yR8ZT1_F4IacqK6Uhhdh56TLONoUytyQkJTYi0lvohzVVtuRp7jXDpG9TBMBsyAJ0yj6FvpA-Bs1mkMNUlUr-p6xbSIAsOrv4FBtLXDKtApurRQmnNAtm4LTE4RsuQxI2FSKlOnQ",
+		"e": "AQAB",
+		"d": "bx6bObUQDISXRYIUSDpKZ6BKcQoIdx1e72dy9rw-_-VmqhmTmT4cuQI-HQoI-8Q6FPfAYxKzjx1xUQckQzESULB2Y5XgGFjI_SNiXtGvl-ZmFiSffwIzSZ-Lbj_FP78d_2jYhcXszooWbgT3wUceBLZmvWGew9MunvQYUVL4pfzktRn7zX0u9ks8GYxNfnwbeB8e8x7ZGrGpPSy5MNJkTHuPpu6XGXR8fJFEEFZZdsyJYd-Ii5Nma2uXyVZfBeRYmqlRIvok5jcNGmFm9wM291v7fieuJycSV71iFQnZfoF48uiNt3mGsdzPNfulCSKjMdR03jk-v1YyyQP34wu8uQ",
+		"p": "ww7iRrQKk37YmQP_4xVtdAtOj5-bBWkM6wid2VNDss3u3GbivCqchqY2fQFgw9wKVYN0T7hS8wgErKPgE7ALTImwrK66TdTLZ_ljLScoYcrHRdAnTiqSbK3iyUnCs15ptSzOSXJHUXeVbynK7K9wo6TALz8c7-y05Gc_XpvM4I8",
+		"q": "5reZTbuRXJ3O2sIG4vBvmn0UujZ9WbnvzQ36c92vxIqsWZ1MJzzc-9FKv9iG3zHS8tLLLYT4V6InIovJ6ZNgit0HieFyWfGNfc-3rt13OZwcFLhAu5nizZzkh24Mx0lquXoRxQwgc43Fg0Lk64C-xhgWAhW6OeNIxwp3zxpLHBM",
+		"dp": "MfOK0M5kcvcl4rGagv3GxNPsb21RFqabT0kqmy_ug0inZbvXTpae9QB1rbd_n0inQNTkIVIzs9cW01s4E_KeQiB0pRQt06at3FeKJVMEzV5Pf7pZhnPygXBaRm_kM2j3KxVpUne4ec1k8E3EkK4w60dSjAbekzaL8H3cRY8ifVM",
+		"dq": "oe6PDP3vIqAoRWYVS0cSLc5ItAH2rPlSFAwRky0vZrUmDqfWgVu4ho349vnUf-cKdh_5NvOzEl7fNOIET4p_IjfMSLwRdIuTkZAvDe6m9apaEzjXRlTV2RabV2qoUV94JsJEopbGWBRTYrOa1KhCPes91yzEzkh2Fi2Etblwqj0",
+		"qi": "tWSsmBzj2NZ71Phe6wOUSKvdvLFyASRgnF-YZN1VKsyXER-SPujBiSjHC5f0TCcNKg4Y1GZxRjfVin2_ZO_qmlOij3xc6GsxVdXXvyzKg1wamf-Fut0I2K6dGLalJuCY0rp_Q1BGLv-LET2wArEkMgYWtsQLRuZXCktMi9XPsiU"
+	  }`)
+
+	testPS384Key = []byte(`{
+		"use": "sig",
+		"kty": "RSA",
+		"kid": "-Q8rUDoeh60B1OorMT6v80KxBTy0SzqeAab2Isi09Ko",
+		"alg": "PS384",
+		"n": "6aeDsQF3WjbJEBq00Oxne7m9CNXGUn4ANI4DsjYDDfZnewNiZDhnO14g-VvrnF5MoP725Ho9b2VSQZ5Ke0Bp8mtvIXohsCtzodNe7_dcU9ycD-PdLBRZalvloLKt_o8-rVdWEpiJtg8CO4VZHu2ReOX-mzecr4W8RxBiQGRaP6t1XAUwj3bQnkHYcQ9VtD3-RxRS9vr1xDUv-v8HrmlUtrlBTAABIzDUS8YXP5h2hjGfd8qaY1c-4TvKAdNuasTCWUjJjVhj_-6pA0bmxM0F2jEdZo-1yA0vZE0V6hBeayMCTOw08wPdOVC07dupZMFYBiRdH1jL_eGwBaCTp2QIEw",
+		"e": "AQAB",
+		"d": "6FTnP8Rjd1LujpLfpLbNF1vTOcvHjhM4BQoJZtUKKIIQ12LAHUNwcrngM9NQ7oVd0OB1gy6BlBi9t_27td6Q-roVIMaeZNxv-EODLT1bkw_UJoC_VatOVdHW_PluxaaN_jLPpWID3QIDiEfKHFTBx-N6TcD4jhd-5XLHH5wpmQ_wE6G55PJmq0jONCntK5c4D21CAePzT2FL3oJ4OmpsZqChWAmYm1Lv2OFzSQpaI0HjE6Cchlkx_8ENKhEJrfxkLCNA1yPUfkXGOkpF6GFVpjTSVYjnwyYJKeC5D5KDb6Ln_n56OFejksuzCcKJCkDEKsS7UZmxw02DbYgjjCcsgQ",
+		"p": "9ygG1oK4M9_ZJyMdAoDQFIkc4ISekZAm1_y8PW-NR0_l-bZkP2SUtRXBiT0qEtg1ltkVSCLRRtd940HLuOu7ZKOoF0DRvzFlkyrKyqwCwjGSBhqiSdC9PW9YGjYabIRzJaXBvp_F4v6u3KV1aIJDx9hrlAEJcUtzW1EHYB_GWuE",
+		"q": "8gPO5_MpV2J6WVXVmFfYJ6TJvPLkM0oHfticCH3wkj3E6NgCygOkWe8SuFEWb2FJJ8AwBXCLp-j7gN2oU-TylqFd_Of2oQb4YjTJAwvub-kJuN8Y434C1DAEdSEqNGyvMAxMKE-q89DtzDmDKd5v5gI9Ci4DCQdl27q0ddks1XM",
+		"dp": "17zyqxATpgRBUu5Nhj_WYfaFZF2e5ETGA0azMZVL5vGRNvXEb6lmPOMuupLPRP_BV1lKQFtT_dhgJJzsLRBn1KMeOJ31-EQv-9Qgi-S1y7jlU7qv6mrwpM2qQ8byLcM3l6cmhTSF0WyqSiOLZpw-ehUpYlm9Wk2X9h-2pmtWA0E",
+		"dq": "GsirHGZ_28jtS3fBZNPL-080eHHVKYv22mX0lsgBWN33LeHCJUNT7BQWWUm4FumIZBrT9bYn7pRNSUy-tVIwOtVvBm9Rjy6rTIsU9_5ZDA-ZYNln8r1eaMdLpv7doeGpXcLupsNyYvtrZd-zkW2pqqXyxW6kLVqhPjkigaxgVts",
+		"qi": "jH5q55Ez6f3yQE3-PEf3a6i7C1PgHfAy6E3sXONoyztbCMm6hSj_agBUj2bt_Q9XeddQf66OmBa2zPGGJqp0lclSDwuJB82iZspHjsAQuUQaBWE2eOfJlJkU4L34ibahQT2DgRxuosvv9gCSIXMOh7fZ2hp71XExrQTuA2BIC_s"
+	  }`)
+
+	testPS512Key = []byte(`{
+		"use": "sig",
+		"kty": "RSA",
+		"kid": "umrdA9anNl7Qewgx-QWa7iBeVBHJ_i50NXdAiLLoU80",
+		"alg": "PS512",
+		"n": "yAdpoRbB0CPVjBFoVr4k4bEvrtpxLYDiqtGBwWxSEBlXxSLfABIgQXpR2Dkhda9Wsk-kBOEXS-8MUs8Slq0f6g0oaG1X_3IbZOcI_QzKDcIiQnoJH5herrY8S0eLkcUWvmAHuQoJ7G6JIiMePuM6eLNagwJzSIr6qq4y7-3ua1ZEieJXUkhsHEL3_ZsIWEIZ1tkI6nrfZnqRc1OMXqxRgeZTI5nqF99UptxUwGoTKGQB-yiH9kVGyYqjgvOQFCVLOyUMbdN76BAKGduQ56vjfNqqRNtZm_E1S7dhyu9F86C5p97BswRcFjkCb499bDEvYofJHY7npBnmJMRBhF1krw",
+		"e": "AQAB",
+		"d": "Qd5XBUnmJrE2J_qvfij9Iijjx9N9A3v2qEN3VAdkepKt2WfjQTW203kBLI-bmhJUHUGmhEjPEB021KoFuAJoiP0uOj0PhjnAFZkS16l3e9Jaz8M57-KQAz5VWoDD0AuzspsSz_cjT20S0V_5HMJcxdRh0NRkvBWv97aHZYTXRxa6SAZnyElAE2IqkLkKFRyK63V8TXJNFUc9DRzDtKgDszpZ7QflMqqb0nh02VImrcZdyRQtHEyCyCZvUURzL44qMayYWVmlDNwjXsS37iZLP0kValfe6sjNrS8JCq52ccyD_PBGTDv6aDDatrUdg64aEcNFvKzbRdQKxlMY9U8G2Q",
+		"p": "_ohOSzzBHPycHTtZUOXR4b-DVfDtdLLxtiPBQUdcWvu_TL9HFkjRdx3Y-YaW6WRFAirF6dDz1VixhQFgnwlbRkYW2U8VB1wlYmVPOnJvDWO7aWVfJ8_QZjfhdfnQya_ATYu-X8o71yo0eP6GLRGNs6a_1L13o_2P8Dtg0FOKVws",
+		"q": "yS6ooWwNOuEKLZUmLLc-euxaVxEOabKwRWoxTzbSaIeTR0MfhTDWWBVjWqKp6wDtN-3gFTnC56oUwddsktTxKvpQHj49CHCGPPUpOFROJoqRrjnxi4cd35oPkbbcoujMacSCLygKpNRZb7eqnVe8pW5aFIXUYqN5hjA1MxlEH20",
+		"dp": "5xAKM1bV4GCZwBeufzgCjjLzIUNz7Oq9bqGKwJ3tg1LiWOOTvvEf5kicPfkman1yAAOgYyAjGlxH2vxjIDy4NVVPTLrz1hiaf3aEtARKOBd_fLBf755CC2lTLWw5U75Ojpb7na3TIQLZW7WDTMqQnrQTlSbiw2ZeErF0s-oCvf0",
+		"dq": "NJQlLkr3CjRWXKNmXrllcurikW67vZQdzYZ7bKB_TSJhs3YvfrfMzSiJ1t48WlbbqIpazjFSZwlkc2TB034jqX_SAJVzjgkajEPmifo-koQUntw17KlbfVzeRM7tywXcpqfc_kYQwhNdbH0r8gNEIlg84rA3WbAvyoo-3SP1UeE",
+		"qi": "pCqnuy1DLWTyNXW3pihPkhIXHPMBWBR6kjXGoQ_QG8ig_ukWEs5CVxMXBNid8zOEklzMOCIShK03n8o5U60tAjOztzB_cSoNsKSLLuO2lRQKIOTjfI4I4QY9eY3lvfXCSt40DH6YPXX3fOgy6b52WDNdOdu1BK6AQ5JYgMdLttw"
 	  }`)
 )
 
@@ -255,33 +331,43 @@ func metaGood(t *testing.T) *Meta {
 }
 
 func TestSignedCorim_SignVerify_ok(t *testing.T) {
-	signer, err := NewSignerFromJWK(testECKey)
-	require.NoError(t, err)
+	for _, key := range [][]byte{
+		testES256Key,
+		testES384Key,
+		testES512Key,
+		testEdDSAKey,
+		testPS256Key,
+		testPS384Key,
+		testPS512Key,
+	} {
+		signer, err := NewSignerFromJWK(key)
+		require.NoError(t, err)
 
-	var SignedCorimIn SignedCorim
+		var SignedCorimIn SignedCorim
 
-	SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorim)
-	SignedCorimIn.Meta = *metaGood(t)
+		SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorim)
+		SignedCorimIn.Meta = *metaGood(t)
 
-	cbor, err := SignedCorimIn.Sign(signer)
-	assert.Nil(t, err)
+		cbor, err := SignedCorimIn.Sign(signer)
+		assert.Nil(t, err)
 
-	var SignedCorimOut SignedCorim
+		var SignedCorimOut SignedCorim
 
-	fmt.Printf("signed-corim: %x\n", cbor)
+		fmt.Printf("signed-corim: %x\n", cbor)
 
-	err = SignedCorimOut.FromCOSE(cbor)
-	assert.Nil(t, err)
+		err = SignedCorimOut.FromCOSE(cbor)
+		assert.Nil(t, err)
 
-	pk, err := NewPublicKeyFromJWK(testECKey)
-	require.NoError(t, err)
+		pk, err := NewPublicKeyFromJWK(key)
+		require.NoError(t, err)
 
-	err = SignedCorimOut.Verify(pk)
-	assert.Nil(t, err)
+		err = SignedCorimOut.Verify(pk)
+		assert.Nil(t, err)
+	}
 }
 
 func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
-	signer, err := NewSignerFromJWK(testECKey)
+	signer, err := NewSignerFromJWK(testES256Key)
 	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
@@ -303,7 +389,7 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 	err = SignedCorimOut.FromCOSE(cbor)
 	assert.Nil(t, err)
 
-	pk, err := NewPublicKeyFromJWK(testECKey)
+	pk, err := NewPublicKeyFromJWK(testES256Key)
 	require.NoError(t, err)
 
 	// ... but the signature verification fails
@@ -312,7 +398,7 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 }
 
 func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
-	signer, err := NewSignerFromJWK(testECKey)
+	signer, err := NewSignerFromJWK(testES256Key)
 	require.NoError(t, err)
 
 	var SignedCorimIn SignedCorim
