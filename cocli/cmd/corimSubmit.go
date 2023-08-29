@@ -16,8 +16,8 @@ import (
 
 var (
 	corimFile *string
-	apiServer *string
 	mediaType *string
+	apiServer string
 )
 
 var (
@@ -54,7 +54,7 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 				return fmt.Errorf("read CoRIM payload failed: %w", err)
 			}
 
-			if err = provisionData(data, submitter, *apiServer, *mediaType); err != nil {
+			if err = provisionData(data, submitter, apiServer, *mediaType); err != nil {
 				return fmt.Errorf("submit CoRIM payload failed reason: %w", err)
 			}
 			return nil
@@ -62,9 +62,9 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 	}
 
 	corimFile = cmd.Flags().StringP("corim-file", "f", "", "name of the CoRIM file in CBOR format")
-	apiServer = cmd.Flags().StringP("api-server", "s", "", "API server where to submit the corim file")
 	mediaType = cmd.Flags().StringP("media-type", "m", "", "media type of the CoRIM file")
 
+	cmd.Flags().StringP("api-server", "s", "", "API server where to submit the corim file")
 	cmd.Flags().VarP(&authMethod, "auth", "a",
 		`authentication method, must be one of "none"/"passthrough", "basic", "oauth2"`)
 	cmd.Flags().StringP("client-id", "C", "", "OAuth2 client ID")
@@ -73,7 +73,9 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 	cmd.Flags().StringP("username", "U", "", "service username")
 	cmd.Flags().StringP("password", "P", "", "service password")
 
-	err := viper.BindPFlag("auth", cmd.Flags().Lookup("auth"))
+	err := viper.BindPFlag("api_server", cmd.Flags().Lookup("api-server"))
+	cobra.CheckErr(err)
+	err = viper.BindPFlag("auth", cmd.Flags().Lookup("auth"))
 	cobra.CheckErr(err)
 	err = viper.BindPFlag("client_id", cmd.Flags().Lookup("client-id"))
 	cobra.CheckErr(err)
@@ -93,10 +95,12 @@ func checkSubmitArgs() error {
 	if corimFile == nil || *corimFile == "" {
 		return errors.New("no CoRIM input file supplied")
 	}
-	if apiServer == nil || *apiServer == "" {
+
+	apiServer = viper.GetString("api_server")
+	if apiServer == "" {
 		return errors.New("no API server supplied")
 	}
-	u, err := url.Parse(*apiServer)
+	u, err := url.Parse(apiServer)
 	if err != nil || !u.IsAbs() {
 		return fmt.Errorf("malformed API server URL")
 	}
