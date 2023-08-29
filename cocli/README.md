@@ -423,10 +423,10 @@ Tags:
 ### Submit
 
 Use the `corim submit` subcommand to upload a CoRIM using the Veraison provisioning API.
-The CoRIM file containing the CoRIM data in CBOR format is supplied via the 
-`--corim-file` switch (abbrev. `-f`). The server URL where to upload the CoRIM 
+The CoRIM file containing the CoRIM data in CBOR format is supplied via the
+`--corim-file` switch (abbrev. `-f`). The server URL where to upload the CoRIM
 payload is supplied via the `--api-server` switch (abbrev. `-s`).
-Further, it is required to supply the media type of the content via the 
+Further, it is required to supply the media type of the content via the
 `--media-type` switch (abbrev. `-m`)
 ```
 $ cocli corim submit \
@@ -436,6 +436,16 @@ $ cocli corim submit \
 
 >> "corim.cbor" submit ok
 ```
+
+#### Remote Service Authentication
+
+The above will work if the remote service does not authenticate
+endorsement-provisioning API calls. If the service does authenticate, then
+cocli must be configured appropriately. This can be done using a `config.yaml`
+file located in the current working directory, or in the standard config
+path (usually `~/.config/cocli/config.yaml` on XDG-compliant systems). Please
+see `./data/config/example-config.yaml` file for details of the configuration
+that needs to be provided.
 
 ### Extract CoSWIDs, CoMIDs and CoTSs
 
@@ -561,7 +571,7 @@ graph LR
     cliComidCreate --> CBORComid1
     cliCotsCreate --> CBORCots1
     cliCoswidCreate --> CBORSwid1
-    
+
     cliCorimCreate --> CBORCorim
     cliCorimSign --> CoseSign1
     cliCorimVerify --> signBool

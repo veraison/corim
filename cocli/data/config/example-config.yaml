@@ -1,0 +1,21 @@
+# This file contains example configuration for connecting to Veraison services.
+# This configuration is only necessary for the `cocli corim submit` sub-command,
+# as that is the only instance where remote service configuration is used. You
+# do not need this configuration for creating or manipulating corims/corim and
+# related objects locally.
+
+# Authentication method used by the remote service.
+auth: none  # may also be "basic" or "oauth2"
+
+# Credentials for the remote service.
+username: example_user  # used only if auth is "basic" or "oauth2"
+password: Passw0rd!  # used only if auth is "basic" or "oauth2"; this can also
+                     # be specfied on the command line using --password, or by
+                     # setting COCLI_PASSWORD environment variable
+
+# OAuth2 cofiguration for the authorisation server associated with the remote
+# service.
+client_id: veraison-client  # used only if auth is "oauth2"
+client_secret: YifmabB4cVSPPtFLAmHfq7wKaEHQn10Z  # used only if auth is "oauth2"
+token_url: http://localhost:11111/realms/veraison/protocol/openid-connect/token  # used only if auth is "oauth2"
+
