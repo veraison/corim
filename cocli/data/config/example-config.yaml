@@ -4,6 +4,9 @@
 # do not need this configuration for creating or manipulating corims/corim and
 # related objects locally.
 
+# API Server submit endpoint URL.
+api_server: https://veraison.example/endorsement-provisioning/v1/submit
+
 # Authentication method used by the remote service.
 auth: none  # may also be "basic" or "oauth2"
 
