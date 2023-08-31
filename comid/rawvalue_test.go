@@ -32,3 +32,14 @@ func TestRawValue_Get_Bytes_nok(t *testing.T) {
 	_, err = rv.GetBytes()
 	assert.EqualError(t, err, expectedErr)
 }
+
+func TestRawValue_Marshal_UnMarshal_ok(t *testing.T) {
+	tv := RawValue{}
+	rv := tv.SetBytes([]byte{0x01, 0x02, 0x03})
+	bytes, err := rv.MarshalJSON()
+	assert.NoError(t, err)
+	sv := RawValue{}
+	err = sv.UnmarshalJSON(bytes)
+	assert.NoError(t, err)
+	assert.Equal(t, *rv, sv)
+}
