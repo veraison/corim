@@ -110,7 +110,7 @@ func TestDigests_MarshalJSON(t *testing.T) {
 		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
 	require.NotNil(t, d)
 
-	expected := `[ "sha-256-32:5Ftyqw==", "sha-256-64:5Fty9cDAtXI=" ]`
+	expected := `[ "sha-256-32;5Ftyqw==", "sha-256-64;5Fty9cDAtXI=" ]`
 
 	actual, err := json.Marshal(d)
 

@@ -184,10 +184,9 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 				Environment: comid.Environment{
 					Instance: comid.NewInstanceUUID(uuid.UUID(comid.TestUUID)),
 				},
-				VerifKeys: *comid.NewVerifKeys().
-					AddVerifKey(
-						comid.NewVerifKey().
-							SetKey("FGHIjkisldnASDxvWY..."),
+				VerifKeys: *comid.NewCryptoKeys().
+					Add(
+						comid.MustNewPKIXBase64Key(comid.TestECPubKey),
 					),
 			},
 		)
