@@ -24,7 +24,14 @@ func comidTags() cbor.TagSet {
 		//551: To Do see: https://github.com/veraison/corim/issues/32
 		552: TaggedSVN(0),
 		553: TaggedMinSVN(0),
+		554: TaggedPKIXBase64Key(""),
+		555: TaggedPKIXBase64Cert(""),
+		556: TaggedPKIXBase64CertPath(""),
+		557: TaggedThumbprint{},
+		558: TaggedCOSEKey{},
+		559: TaggedCertThumbprint{},
 		560: TaggedRawValueBytes{},
+		561: TaggedCertPathThumbprint{},
 		// PSA profile tags
 		600: TaggedImplID{},
 		601: TaggedPSARefValID{},

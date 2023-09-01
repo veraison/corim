@@ -1,4 +1,4 @@
-// Copyright 2021 Contributors to the Veraison project.
+// Copyright 2021-2023 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -10,26 +10,27 @@ import (
 )
 
 func TestDevIdentityKey_Valid_empty(t *testing.T) {
+	invalidKey := CryptoKey{TaggedPKIXBase64Key("")}
 
 	tvs := []struct {
 		env      Environment
-		verifkey VerifKeys
+		verifkey CryptoKeys
 		testerr  string
 	}{
 		{
 			env:      Environment{},
-			verifkey: VerifKeys{},
+			verifkey: CryptoKeys{},
 			testerr:  "environment validation failed: environment must not be empty",
 		},
 		{
 			env:      Environment{Instance: NewInstanceUEID(TestUEID)},
-			verifkey: VerifKeys{},
-			testerr:  "verification keys validation failed: no verification key to validate",
+			verifkey: CryptoKeys{},
+			testerr:  "verification keys validation failed: no keys to validate",
 		},
 		{
 			env:      Environment{Instance: NewInstanceUEID(TestUEID)},
-			verifkey: VerifKeys{{Key: ""}},
-			testerr:  "verification keys validation failed: invalid verification key at index 0: verification key not set",
+			verifkey: CryptoKeys{&invalidKey},
+			testerr:  "verification keys validation failed: invalid key at index 0: key value not set",
 		},
 	}
 	for _, tv := range tvs {
