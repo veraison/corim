@@ -6,7 +6,7 @@ package corim
 import (
 	"fmt"
 
-	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/v2/comid"
 )
 
 // Entity stores an entity-map capable of CBOR and JSON serializations.
