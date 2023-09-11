@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/v2/comid"
 )
 
 // EnvironmentGroup is the top-level representation of the unsigned-corim-map with

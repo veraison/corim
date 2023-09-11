@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/v2/comid"
 	"github.com/veraison/swid"
 )
 

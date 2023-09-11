@@ -11,8 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/veraison/corim/comid"
-	"github.com/veraison/corim/cots"
+	"github.com/veraison/corim/v2/comid"
+	"github.com/veraison/corim/v2/cots"
 	"github.com/veraison/swid"
 )
 

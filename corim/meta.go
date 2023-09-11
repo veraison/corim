@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/v2/comid"
 )
 
 type Signer struct {
