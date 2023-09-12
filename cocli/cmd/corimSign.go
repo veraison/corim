@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/veraison/corim/v2/corim"
+	"github.com/veraison/corim/corim"
 	cose "github.com/veraison/go-cose"
 )
 

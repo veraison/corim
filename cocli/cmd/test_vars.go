@@ -3,7 +3,7 @@
 
 package cmd
 
-import "github.com/veraison/corim/v2/comid"
+import "github.com/veraison/corim/comid"
 
 var (
 	minimalCorimTemplate = []byte(`{

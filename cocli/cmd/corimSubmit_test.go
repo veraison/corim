@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	mock_deps "github.com/veraison/corim/v2/cocli/cmd/mocks"
+	mock_deps "github.com/veraison/corim/cocli/cmd/mocks"
 )
 
 func Test_CorimSubmitCmd_bad_server_url(t *testing.T) {

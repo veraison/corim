@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/veraison/corim/v2/comid"
+	"github.com/veraison/corim/comid"
 )
 
 func TestEntity_Valid_uninitialized(t *testing.T) {
