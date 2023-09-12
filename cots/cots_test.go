@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/veraison/corim/v2/comid"
+	"github.com/veraison/corim/comid"
 )
 
 func TestConciseTaStore_Valid_no_environment_groups(t *testing.T) {

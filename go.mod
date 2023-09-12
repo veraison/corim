@@ -1,4 +1,4 @@
-module github.com/veraison/corim/v2
+module github.com/veraison/corim
 
 go 1.18
 
