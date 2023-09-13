@@ -46,7 +46,7 @@ func TestEnvironment_Valid_empty_group(t *testing.T) {
 
 	err := tv.Valid()
 
-	assert.EqualError(t, err, "group validation failed: invalid group id")
+	assert.EqualError(t, err, "group validation failed: no value set")
 }
 func TestEnvironment_Valid_ok_with_class(t *testing.T) {
 	tv := Environment{
@@ -78,7 +78,7 @@ func TestEnvironment_ToCBOR_class_only(t *testing.T) {
 func TestEnvironment_ToCBOR_class_and_instance(t *testing.T) {
 	tv := Environment{
 		Class:    NewClassUUID(TestUUID),
-		Instance: NewInstanceUEID(TestUEID),
+		Instance: MustNewUEIDInstance(TestUEID),
 	}
 	require.NotNil(t, tv.Class)
 	require.NotNil(t, tv.Instance)
@@ -96,7 +96,7 @@ func TestEnvironment_ToCBOR_class_and_instance(t *testing.T) {
 
 func TestEnvironment_ToCBOR_instance_only(t *testing.T) {
 	tv := Environment{
-		Instance: NewInstanceUEID(TestUEID),
+		Instance: MustNewUEIDInstance(TestUEID),
 	}
 	require.NotNil(t, tv.Instance)
 
@@ -113,7 +113,7 @@ func TestEnvironment_ToCBOR_instance_only(t *testing.T) {
 
 func TestEnvironment_ToCBOR_group_only(t *testing.T) {
 	tv := Environment{
-		Group: NewGroupUUID(TestUUID),
+		Group: MustNewUUIDGroup(TestUUID),
 	}
 	require.NotNil(t, tv.Group)
 
@@ -180,7 +180,7 @@ func TestEnvironment_FromCBOR_class_and_instance(t *testing.T) {
 	assert.NotNil(t, actual.Class)
 	assert.Equal(t, TestUUIDString, actual.Class.ClassID.String())
 	assert.NotNil(t, actual.Instance)
-	assert.Equal(t, TestUEIDString, actual.Instance.String())
+	assert.Equal(t, []byte(TestUEID), actual.Instance.Bytes())
 	assert.Nil(t, actual.Group)
 }
 
@@ -196,4 +196,26 @@ func TestEnvironment_FromCBOR_group_only(t *testing.T) {
 	assert.Nil(t, actual.Instance)
 	assert.NotNil(t, actual.Group)
 	assert.Equal(t, TestUUIDString, actual.Group.String())
+}
+
+func TestEnviroment_JSON(t *testing.T) {
+	testEnv := Environment{
+		Class: NewClassUUID(TestUUID),
+	}
+
+	out, err := testEnv.ToJSON()
+	require.NoError(t, err)
+	assert.Equal(t, `{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}}`, string(out))
+
+	var outEnv Environment
+
+	err = outEnv.FromJSON(out)
+	require.NoError(t, err)
+	assert.Equal(t, testEnv, outEnv)
+
+	_, err = Environment{}.ToJSON()
+	assert.EqualError(t, err, "environment must not be empty")
+
+	err = outEnv.FromJSON([]byte(`{"class": 7}`))
+	assert.EqualError(t, err, "json: cannot unmarshal number into Go struct field Environment.class of type comid.Class")
 }

@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"crypto"
 	"fmt"
 	"testing"
 
@@ -14,86 +15,86 @@ import (
 )
 
 func TestMeasurement_NewUUIDMeasurement_good_uuid(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID)
-	assert.NotNil(t, tv)
+	_, err := NewUUIDMeasurement(TestUUID)
+	assert.NoError(t, err)
 }
 
 func TestMeasurement_NewUUIDMeasurement_empty_uuid(t *testing.T) {
 	emptyUUID := UUID{}
 
-	tv := NewUUIDMeasurement(emptyUUID)
+	_, err := NewUUIDMeasurement(emptyUUID)
 
-	assert.Nil(t, tv)
+	assert.EqualError(t, err,
+		"invalid key: expecting RFC4122 UUID, got Reserved instead")
 }
 
 func TestMeasurement_NewUIntMeasurement(t *testing.T) {
 	var TestUint uint64 = 35
 
-	tv := NewUintMeasurement(TestUint)
+	_, err := NewUintMeasurement(TestUint)
 
-	assert.NotNil(t, tv)
+	assert.NoError(t, err)
 }
 
 func TestMeasurement_NewPSAMeasurement_empty(t *testing.T) {
 	emptyPSARefValID := PSARefValID{}
 
-	tv := NewPSAMeasurement(emptyPSARefValID)
-	assert.Nil(t, tv)
+	_, err := NewPSAMeasurement(emptyPSARefValID)
+
+	assert.EqualError(t, err, "invalid key: invalid psa.refval-id: missing mandatory signer ID")
 }
 
 func TestMeasurement_NewPSAMeasurement_no_values(t *testing.T) {
-	psaRefValID :=
-		NewPSARefValID(TestSignerID).
-			SetLabel("PRoT").
-			SetVersion("1.2.3")
+	psaRefValID, err := NewPSARefValID(TestSignerID)
+	require.NoError(t, err)
+	psaRefValID.SetLabel("PRoT")
+	psaRefValID.SetVersion("1.2.3")
 	require.NotNil(t, psaRefValID)
 
-	tv := NewPSAMeasurement(*psaRefValID)
-	assert.NotNil(t, tv)
+	tv, err := NewPSAMeasurement(*psaRefValID)
+	assert.NoError(t, err)
 
-	err := tv.Valid()
+	err = tv.Valid()
 	assert.EqualError(t, err, "no measurement value set")
 }
 
 func TestMeasurement_NewCCAPlatCfgMeasurement_no_values(t *testing.T) {
 	ccaplatID := CCAPlatformConfigID(TestCCALabel)
 
-	tv := NewCCAPlatCfgMeasurement(ccaplatID)
-	assert.NotNil(t, tv)
+	tv, err := NewCCAPlatCfgMeasurement(ccaplatID)
+	assert.NoError(t, err)
 
-	err := tv.Valid()
+	err = tv.Valid()
 	assert.EqualError(t, err, "no measurement value set")
 }
 
 func TestMeasurement_NewCCAPlatCfgMeasurement_valid_meas(t *testing.T) {
 	ccaplatID := CCAPlatformConfigID(TestCCALabel)
 
-	tv := NewCCAPlatCfgMeasurement(ccaplatID).SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
-	assert.NotNil(t, tv)
+	tv, err := NewCCAPlatCfgMeasurement(ccaplatID)
+	assert.NoError(t, err)
 
-	err := tv.Valid()
-	assert.Nil(t, err)
+	tv.SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{})
+
+	err = tv.Valid()
+	assert.NoError(t, err)
 }
 
 func TestMeasurement_NewPSAMeasurement_one_value(t *testing.T) {
-	psaRefValID :=
-		NewPSARefValID(TestSignerID).
-			SetLabel("PRoT").
-			SetVersion("1.2.3")
-	require.NotNil(t, psaRefValID)
+	tv, err := NewPSAMeasurement(MustCreatePSARefValID(TestSignerID, "PRoT", "1.2.3"))
+	require.NoError(t, err)
 
-	tv := NewPSAMeasurement(*psaRefValID).SetIPaddr(TestIPaddr)
-	assert.NotNil(t, tv)
+	tv.SetIPaddr(TestIPaddr)
 
-	err := tv.Valid()
+	err = tv.Valid()
 	assert.Nil(t, err)
 }
 
 func TestMeasurement_NewUUIDMeasurement_no_values(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID)
-	require.NotNil(t, tv)
+	tv, err := NewUUIDMeasurement(TestUUID)
+	require.NoError(t, err)
 
-	err := tv.Valid()
+	err = tv.Valid()
 	assert.EqualError(t, err, "no measurement value set")
 }
 
@@ -101,26 +102,27 @@ func TestMeasurement_NewUUIDMeasurement_some_value(t *testing.T) {
 	var vs swid.VersionScheme
 	require.NoError(t, vs.SetCode(swid.VersionSchemeSemVer))
 
-	tv := NewUUIDMeasurement(TestUUID).
-		SetMinSVN(2).
+	tv, err := NewUUIDMeasurement(TestUUID)
+	require.NoError(t, err)
+
+	tv.SetMinSVN(2).
 		SetFlagsTrue(FlagIsDebug).
 		SetVersion("1.2.3", swid.VersionSchemeSemVer)
-	require.NotNil(t, tv)
 
-	err := tv.Valid()
+	err = tv.Valid()
 	assert.Nil(t, err)
 }
 
 func TestMeasurement_NewUUIDMeasurement_bad_digest(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID)
-	require.NotNil(t, tv)
+	tv, err := NewUUIDMeasurement(TestUUID)
+	require.NoError(t, err)
 
 	assert.Nil(t, tv.AddDigest(swid.Sha256, []byte{0xff}))
 }
 
 func TestMeasurement_NewUUIDMeasurement_bad_ueid(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID)
-	require.NotNil(t, tv)
+	tv, err := NewUUIDMeasurement(TestUUID)
+	require.NoError(t, err)
 
 	badUEID := eat.UEID{
 		0xFF, // Invalid
@@ -131,8 +133,8 @@ func TestMeasurement_NewUUIDMeasurement_bad_ueid(t *testing.T) {
 }
 
 func TestMeasurement_NewUUIDMeasurement_bad_uuid(t *testing.T) {
-	tv := NewUUIDMeasurement(TestUUID)
-	require.NotNil(t, tv)
+	tv, err := NewUUIDMeasurement(TestUUID)
+	require.NoError(t, err)
 
 	nonRFC4122UUID, err := ParseUUID("f47ac10b-58cc-4372-c567-0e02b2c3d479")
 	require.Nil(t, err)
@@ -147,7 +149,7 @@ var (
 
 func TestMkey_Valid_no_value(t *testing.T) {
 	mkey := &Mkey{}
-	expectedErr := "unknown measurement key type: <nil>"
+	expectedErr := "Mkey value not set"
 	err := mkey.Valid()
 	assert.EqualError(t, err, expectedErr)
 }
@@ -183,19 +185,19 @@ func TestMKey_MarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
 func TestMKey_UnmarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
 	tvs := []struct {
 		input    []byte
-		expected CCAPlatformConfigID
+		expected TaggedCCAPlatformConfigID
 	}{
 		{
 			input:    MustHexDecode(t, "d9025a736363612d706c6174666f726d2d636f6e666967"),
-			expected: CCAPlatformConfigID(TestCCALabel),
+			expected: TaggedCCAPlatformConfigID(TestCCALabel),
 		},
 		{
 			input:    MustHexDecode(t, "d9025a716d7974657374706c6174666f726d666967"),
-			expected: CCAPlatformConfigID("mytestplatformfig"),
+			expected: TaggedCCAPlatformConfigID("mytestplatformfig"),
 		},
 		{
 			input:    MustHexDecode(t, "d9025a6c6d79746573746c6162656c32"),
-			expected: CCAPlatformConfigID("mytestlabel2"),
+			expected: TaggedCCAPlatformConfigID("mytestlabel2"),
 		},
 	}
 
@@ -203,9 +205,9 @@ func TestMKey_UnmarshalCBOR_CCAPlatformConfigID_ok(t *testing.T) {
 		mkey := &Mkey{}
 		err := mkey.UnmarshalCBOR(tv.input)
 		assert.Nil(t, err)
-		actual, err := mkey.GetCCAPlatformConfigID()
-		assert.Nil(t, err)
-		assert.Equal(t, tv.expected, actual)
+		actual, ok := mkey.Value.(*TaggedCCAPlatformConfigID)
+		assert.True(t, ok)
+		assert.Equal(t, tv.expected, *actual)
 		fmt.Printf("CBOR: %x\n", actual)
 	}
 }
@@ -230,34 +232,11 @@ func TestMKey_MarshalCBOR_uint_ok(t *testing.T) {
 	}
 
 	for _, tv := range tvs {
-		mkey := &Mkey{tv.mkey}
+		mkey := &Mkey{UintMkey(tv.mkey)}
 		actual, err := mkey.MarshalCBOR()
 		assert.Nil(t, err)
 		assert.Equal(t, tv.expected, actual)
 		fmt.Printf("CBOR: %x\n", actual)
-	}
-}
-func TestMkey_MarshalCBOR_uint_not_ok(t *testing.T) {
-	tvs := []struct {
-		input    interface{}
-		expected string
-	}{
-		{
-			input:    123.456,
-			expected: "unknown measurement key type: float64",
-		},
-		{
-			input:    "sample",
-			expected: "unknown measurement key type: string",
-		},
-	}
-
-	for _, tv := range tvs {
-		mkey := &Mkey{tv.input}
-		_, err := mkey.MarshalCBOR()
-		assert.Nil(t, err)
-		err = mkey.Valid()
-		assert.EqualError(t, err, tv.expected)
 	}
 }
 
@@ -284,10 +263,10 @@ func TestMkey_UnmarshalCBOR_uint_ok(t *testing.T) {
 		mKey := &Mkey{}
 
 		err := mKey.UnmarshalCBOR(tv.mkey)
-		assert.Nil(t, err)
-		actual, err := mKey.GetKeyUint()
-		assert.Nil(t, err)
-		assert.Equal(t, tv.expected, actual)
+		require.NoError(t, err)
+		actual, ok := mKey.Value.(*UintMkey)
+		require.True(t, ok)
+		assert.Equal(t, tv.expected, uint64(*actual))
 	}
 }
 
@@ -315,38 +294,9 @@ func TestMkey_UnmarshalCBOR_not_ok(t *testing.T) {
 	}
 }
 
-func TestMkey_UnmarshalCBOR_uint_not_ok(t *testing.T) {
-	tvs := []struct {
-		input    []byte
-		expected string
-	}{
-		{
-			input: []byte{0xd8, 0x25, 0x50, 0x31, 0xfb, 0x5a, 0xbf, 0x02,
-				0x3e, 0x49, 0x92, 0xaa, 0x4e, 0x95, 0xf9, 0xc1,
-				0x50, 0x3b, 0xfa},
-			expected: "measurement-key type is: comid.TaggedUUID",
-		},
-		{
-			input: []byte{0xd8, 0x21, 0x50, 0x31, 0xfb, 0x5a, 0xff, 0x12,
-				0xFF, 0xFF, 0x92, 0xaa, 0x4e, 0x95, 0xf9, 0xc1,
-				0x50, 0x3b, 0xfa},
-			expected: "measurement-key type is: cbor.Tag",
-		},
-	}
-
-	for _, tv := range tvs {
-		mKey := &Mkey{}
-
-		err := mKey.UnmarshalCBOR(tv.input)
-		assert.Nil(t, err)
-		_, err = mKey.GetKeyUint()
-		assert.EqualError(t, err, tv.expected)
-	}
-}
-
 func TestMKey_MarshalJSON_CCAPlatformConfigID_ok(t *testing.T) {
 	refval := TestCCALabel
-	mkey := &Mkey{val: TaggedCCAPlatformConfigID(refval)}
+	mkey := &Mkey{Value: TaggedCCAPlatformConfigID(refval)}
 
 	expected := `{"type":"cca.platform-config-id","value":"cca-platform-config"}`
 
@@ -359,30 +309,29 @@ func TestMKey_MarshalJSON_CCAPlatformConfigID_ok(t *testing.T) {
 
 func TestMKey_UnMarshalJSON_CCAPlatformConfigID_ok(t *testing.T) {
 	input := []byte(`{"type":"cca.platform-config-id","value":"cca-platform-config"}`)
-	expected := CCAPlatformConfigID(TestCCALabel)
+	expected := TaggedCCAPlatformConfigID(TestCCALabel)
 
 	mKey := &Mkey{}
 
 	err := mKey.UnmarshalJSON(input)
 	assert.Nil(t, err)
-	actual, err := mKey.GetCCAPlatformConfigID()
-	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
+	actual, ok := mKey.Value.(*TaggedCCAPlatformConfigID)
+	assert.True(t, ok)
+	assert.Equal(t, expected, *actual)
 
 }
 
 func TestMKey_UnMarshalJSON_CCAPlatformConfigID_not_ok(t *testing.T) {
 	input := []byte(`{"type":"cca.platform-config-id","value":""}`)
-	expected := "cannot unmarshal $measured-element-type-choice of type CCAPlatformConfigID: empty label"
+	expected := "invalid cca.platform-config-id: empty value"
 
 	mKey := &Mkey{}
 
 	err := mKey.UnmarshalJSON(input)
 
-	assert.NotNil(t, err)
-	assert.Equal(t, expected, err.Error())
-
+	assert.EqualError(t, err, expected)
 }
+
 func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 	tvs := []struct {
 		mkey     uint64
@@ -404,38 +353,13 @@ func TestMkey_MarshalJSON_uint_ok(t *testing.T) {
 
 	for _, tv := range tvs {
 
-		mkey := &Mkey{tv.mkey}
+		mkey := &Mkey{UintMkey(tv.mkey)}
 
 		actual, err := mkey.MarshalJSON()
 		assert.Nil(t, err)
 
 		assert.JSONEq(t, tv.expected, string(actual))
 		fmt.Printf("JSON: %x\n", actual)
-	}
-}
-
-func TestMkey_MarshalJSON_uint_not_ok(t *testing.T) {
-	tvs := []struct {
-		input    interface{}
-		expected string
-	}{
-		{
-			input:    123.456,
-			expected: "unknown type float64 for mkey",
-		},
-		{
-			input:    "sample",
-			expected: "unknown type string for mkey",
-		},
-	}
-
-	for _, tv := range tvs {
-
-		mkey := &Mkey{tv.input}
-
-		_, err := mkey.MarshalJSON()
-
-		assert.EqualError(t, err, tv.expected)
 	}
 }
 
@@ -463,9 +387,9 @@ func TestMkey_UnmarshalJSON_uint_ok(t *testing.T) {
 
 		err := mKey.UnmarshalJSON(tv.input)
 		assert.Nil(t, err)
-		actual, err := mKey.GetKeyUint()
-		assert.Nil(t, err)
-		assert.Equal(t, tv.expected, actual)
+		actual, ok := mKey.Value.(*UintMkey)
+		assert.True(t, ok)
+		assert.Equal(t, tv.expected, uint64(*actual))
 	}
 }
 
@@ -476,11 +400,11 @@ func TestMkey_UnmarshalJSON_notok(t *testing.T) {
 	}{
 		{
 			input:    []byte(`{"type":"uint","value":"abcdefg"}`),
-			expected: "cannot unmarshal $measured-element-type-choice of type uint: json: cannot unmarshal string into Go value of type uint64",
+			expected: `invalid uint: json: cannot unmarshal string into Go value of type uint64`,
 		},
 		{
 			input:    []byte(`{"type":"uint","value":123.456}`),
-			expected: "cannot unmarshal $measured-element-type-choice of type uint: json: cannot unmarshal number 123.456 into Go value of type uint64",
+			expected: "invalid uint: json: cannot unmarshal number 123.456 into Go value of type uint64",
 		},
 	}
 
@@ -493,27 +417,102 @@ func TestMkey_UnmarshalJSON_notok(t *testing.T) {
 	}
 }
 
-func TestMkey_UnmarshalJSON_uint_notok(t *testing.T) {
+func TestNewUintMkey(t *testing.T) {
+	testVal := UintMkey(7)
+
 	tvs := []struct {
-		input    []byte
-		expected string
+		input    any
+		expected UintMkey
+		err      string
 	}{
 		{
-			input:    []byte(`{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}`),
-			expected: "measurement-key type is: comid.TaggedUUID",
+			input:    testVal,
+			expected: testVal,
 		},
 		{
-			input:    []byte(`{"type":"psa.refval-id","value":{"label": "BL","version": "2.1.0","signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="}}`),
-			expected: "measurement-key type is: comid.TaggedPSARefValID",
+			input:    &testVal,
+			expected: testVal,
+		},
+		{
+			input:    uint(7),
+			expected: testVal,
+		},
+		{
+			input:    uint64(7),
+			expected: testVal,
+		},
+		{
+			input:    "7",
+			expected: testVal,
+		},
+		{
+			input: true,
+			err:   "unexpected type for UintMkey: bool",
 		},
 	}
 
 	for _, tv := range tvs {
-		mKey := &Mkey{}
-
-		err := mKey.UnmarshalJSON(tv.input)
-		assert.Nil(t, err)
-		_, err = mKey.GetKeyUint()
-		assert.EqualError(t, err, tv.expected)
+		out, err := NewUintMkey(tv.input)
+		if tv.err != "" {
+			assert.Nil(t, out)
+			assert.EqualError(t, err, tv.err)
+		} else {
+			assert.Equal(t, tv.expected, *out)
+		}
 	}
+}
+
+func TestNewMkeyOID(t *testing.T) {
+	var expectedOID OID
+	require.NoError(t, expectedOID.FromString(TestOID))
+	expected := TaggedOID(expectedOID)
+
+	out, err := NewMkeyOID(TestOID)
+	require.NoError(t, err)
+	assert.Equal(t, &expected, out.Value)
+}
+
+type testMkey [4]byte
+
+func newTestMkey(val any) (*Mkey, error) {
+	return &Mkey{&testMkey{0x74, 0x64, 0x73, 0x74}}, nil
+}
+
+func (o testMkey) PublicKey() (crypto.PublicKey, error) {
+	return crypto.PublicKey(o[:]), nil
+}
+
+func (o testMkey) Type() string {
+	return "test-mkey"
+}
+
+func (o testMkey) String() string {
+	return "test"
+}
+
+func (o testMkey) Valid() error {
+	return nil
+}
+
+type badMkey struct {
+	testMkey
+}
+
+func (o badMkey) Type() string {
+	return "uuid"
+}
+
+func newBadMkey(val any) (*Mkey, error) {
+	return &Mkey{&badMkey{testMkey{0x74, 0x64, 0x73, 0x74}}}, nil
+}
+
+func TestRegisterMkeyType(t *testing.T) {
+	err := RegisterMkeyType(32, newTestMkey)
+	assert.EqualError(t, err, "tag 32 is already registered")
+
+	err = RegisterMkeyType(99996, newBadMkey)
+	assert.EqualError(t, err, `mesurement key type with name "uuid" already exists`)
+
+	err = RegisterMkeyType(99996, newTestMkey)
+	assert.NoError(t, err)
 }

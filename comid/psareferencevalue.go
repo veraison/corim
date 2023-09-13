@@ -4,8 +4,11 @@
 package comid
 
 import (
+	"encoding/json"
 	"fmt"
 )
+
+var PSARefValIDType = "psa.refval-id"
 
 // PSARefValID stores a PSA refval-id with CBOR and JSON serializations
 // (See https://datatracker.ietf.org/doc/html/draft-xyz-rats-psa-endorsements)
@@ -30,18 +33,56 @@ func (o PSARefValID) Valid() error {
 	return nil
 }
 
-type TaggedPSARefValID PSARefValID
+func CreatePSARefValID(signerID []byte, label, version string) (*PSARefValID, error) {
+	ret, err := NewPSARefValID(signerID)
+	if err != nil {
+		return nil, err
+	}
 
-func NewPSARefValID(signerID []byte) *PSARefValID {
-	switch len(signerID) {
-	case 32, 48, 64:
+	ret.SetLabel(label)
+	ret.SetVersion(version)
+
+	return ret, nil
+}
+
+func MustCreatePSARefValID(signerID []byte, label, version string) *PSARefValID {
+	ret, err := CreatePSARefValID(signerID, label, version)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+func NewPSARefValID(val any) (*PSARefValID, error) {
+	var ret PSARefValID
+
+	if val == nil {
+		return &ret, nil
+	}
+
+	switch t := val.(type) {
+	case PSARefValID:
+		ret = t
+	case *PSARefValID:
+		ret = *t
+	case string:
+		if err := json.Unmarshal([]byte(t), &ret); err != nil {
+			return nil, err
+		}
+	case []byte:
+		switch len(t) {
+		case 32, 48, 64:
+			ret.SignerID = t
+		default:
+			return nil, fmt.Errorf("invalid PSA RefVal ID length: %d", len(t))
+		}
 	default:
-		return nil
+		return nil, fmt.Errorf("unexpected type for PSA RefVal ID: %T", t)
 	}
 
-	return &PSARefValID{
-		SignerID: signerID,
-	}
+	return &ret, nil
 }
 
 func (o *PSARefValID) SetLabel(label string) *PSARefValID {
@@ -56,4 +97,47 @@ func (o *PSARefValID) SetVersion(version string) *PSARefValID {
 		o.Version = &version
 	}
 	return o
+}
+
+type TaggedPSARefValID PSARefValID
+
+func NewTaggedPSARefValID(val any) (*TaggedPSARefValID, error) {
+	var ret TaggedPSARefValID
+
+	switch t := val.(type) {
+	case TaggedPSARefValID:
+		ret = t
+	case *TaggedPSARefValID:
+		ret = *t
+	default:
+		refvalID, err := NewPSARefValID(val)
+		if err != nil {
+			return nil, err
+		}
+		ret = TaggedPSARefValID(*refvalID)
+
+	}
+
+	return &ret, nil
+}
+
+func (o TaggedPSARefValID) Valid() error {
+	return PSARefValID(o).Valid()
+}
+
+func (o TaggedPSARefValID) String() string {
+	ret, err := json.Marshal(o)
+	if err != nil {
+		return ""
+	}
+
+	return string(ret)
+}
+
+func (o TaggedPSARefValID) Type() string {
+	return PSARefValIDType
+}
+
+func (o TaggedPSARefValID) IsZero() bool {
+	return len(o.SignerID) == 0
 }

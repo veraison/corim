@@ -163,3 +163,20 @@ func TestRel_ToCBOR_fail_unset(t *testing.T) {
 
 	assert.EqualError(t, err, "rel is unset")
 }
+
+func Test_RegisterRel(t *testing.T) {
+	err := RegisterRel(1, "augments")
+	assert.EqualError(t, err, "rel with value 1 already exists")
+
+	err = RegisterRel(3, "replaces")
+	assert.EqualError(t, err, `rel with name "replaces" already exists`)
+
+	err = RegisterRel(3, "augments")
+	assert.NoError(t, err)
+
+	rel := Rel(3)
+
+	out, err := rel.MarshalJSON()
+	require.NoError(t, err)
+	assert.Equal(t, `"augments"`, string(out))
+}

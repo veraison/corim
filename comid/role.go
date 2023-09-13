@@ -40,6 +40,35 @@ var (
 	}
 )
 
+// String returns the string representation of the Role.
+func (o Role) String() string {
+	text, ok := roleToString[o]
+	if ok {
+		return text
+	}
+
+	return fmt.Sprintf("Role(%d)", o)
+}
+
+// RegisterRole creates a new Role association between the provided value and
+// name. An error is returned if either clashes with any of the existing roles.
+func RegisterRole(val int64, name string) error {
+	role := Role(val)
+
+	if _, ok := roleToString[role]; ok {
+		return fmt.Errorf("role with value %d already exists", val)
+	}
+
+	if _, ok := stringToRole[name]; ok {
+		return fmt.Errorf("role with name %q already exists", name)
+	}
+
+	roleToString[role] = name
+	stringToRole[name] = role
+
+	return nil
+}
+
 type Roles []Role
 
 func NewRoles() *Roles {

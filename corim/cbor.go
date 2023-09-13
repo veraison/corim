@@ -4,6 +4,7 @@
 package corim
 
 import (
+	"fmt"
 	"reflect"
 
 	cbor "github.com/fxamacker/cbor/v2"
@@ -18,13 +19,13 @@ var (
 var (
 	CoswidTag = []byte{0xd9, 0x01, 0xf9} // 505()
 	ComidTag  = []byte{0xd9, 0x01, 0xfa} // 506()
+
+	corimTagsMap = map[uint64]interface{}{
+		32: comid.TaggedURI(""),
+	}
 )
 
 func corimTags() cbor.TagSet {
-	corimTagsMap := map[uint64]interface{}{
-		32: comid.TaggedURI(""),
-	}
-
 	opts := cbor.TagOptions{
 		EncTag: cbor.EncTagRequired,
 		DecTag: cbor.DecTagRequired,
@@ -55,6 +56,28 @@ func initCBORDecMode() (dm cbor.DecMode, err error) {
 		TimeTag:     cbor.DecTagRequired,
 	}
 	return decOpt.DecModeWithTags(corimTags())
+}
+
+func registerCORIMTag(tag uint64, t interface{}) error {
+	if _, exists := corimTagsMap[tag]; exists {
+		return fmt.Errorf("tag %d is already registered", tag)
+	}
+
+	corimTagsMap[tag] = t
+
+	var err error
+
+	em, err = initCBOREncMode()
+	if err != nil {
+		return err
+	}
+
+	dm, err = initCBORDecMode()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func init() {

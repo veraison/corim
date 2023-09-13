@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"crypto"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -149,7 +150,7 @@ func Test_CryptoKey_NewCOSEKey(t *testing.T) {
 }
 
 func Test_CryptoKey_NewThumbprint(t *testing.T) {
-	type newKeyFunc func(swid.HashEntry) (*CryptoKey, error)
+	type newKeyFunc func(any) (*CryptoKey, error)
 
 	for _, newFunc := range []newKeyFunc{
 		NewThumbprint,
@@ -177,7 +178,7 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 		assert.Contains(t, err.Error(), "length mismatch for hash algorithm")
 	}
 
-	type mustNewKeyFunc func(swid.HashEntry) *CryptoKey
+	type mustNewKeyFunc func(any) *CryptoKey
 
 	for _, mustNewFunc := range []mustNewKeyFunc{
 		MustNewThumbprint,
@@ -271,7 +272,7 @@ func Test_CryptoKey_UnmarshalJSON_negative(t *testing.T) {
 		},
 		{
 			Val:    `{"value":"deadbeef"}`,
-			ErrMsg: "key type not set",
+			ErrMsg: "type not set",
 		},
 		{
 			Val:    `{"type": "cose-key", "value":";;;"}`,
@@ -371,22 +372,22 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 		{
 			Type:   COSEKeyType,
 			In:     7,
-			ErrMsg: "value must be a []byte; found int",
+			ErrMsg: "value must be a []byte or a string; found int",
 		},
 		{
 			Type:   ThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   CertThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   CertPathThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   "random-key",
@@ -398,4 +399,56 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 		_, err := NewCryptoKey(tv.In, tv.Type)
 		assert.ErrorContains(t, err, tv.ErrMsg)
 	}
+}
+
+type testCryptoKey [4]byte
+
+func newTestCryptoKey(val any) (*CryptoKey, error) {
+	return &CryptoKey{&testCryptoKey{0x74, 0x64, 0x73, 0x74}}, nil
+}
+
+func (o testCryptoKey) PublicKey() (crypto.PublicKey, error) {
+	return crypto.PublicKey(o[:]), nil
+}
+
+func (o testCryptoKey) Type() string {
+	return "test-crypto-key"
+}
+
+func (o testCryptoKey) String() string {
+	return "test"
+}
+
+func (o testCryptoKey) Valid() error {
+	return nil
+}
+
+func Test_RegisterCryptoKey(t *testing.T) {
+	err := RegisterCryptoKeyType(99998, newTestCryptoKey)
+	require.NoError(t, err)
+
+	key, err := newTestCryptoKey(nil)
+	require.NoError(t, err)
+
+	data, err := json.Marshal(key)
+	require.NoError(t, err)
+	assert.Equal(t, string(data), `{"type":"test-crypto-key","value":"test"}`)
+
+	var out CryptoKey
+	err = json.Unmarshal(data, &out)
+	require.NoError(t, err)
+	assert.EqualValues(t, key, &out)
+
+	data, err = em.Marshal(key)
+	require.NoError(t, err)
+	assert.Equal(t, data, []byte{
+		0xda, 0x0, 0x1, 0x86, 0x9e, // tag 99998
+		0x44,                   // bstr(4)
+		0x74, 0x64, 0x73, 0x74, // "test"
+	})
+
+	var out2 CryptoKey
+	err = dm.Unmarshal(data, &out2)
+	require.NoError(t, err)
+	assert.Equal(t, key, &out2)
 }

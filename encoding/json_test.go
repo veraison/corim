@@ -119,3 +119,34 @@ func Test_skipValue(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "other", token)
 }
+
+func TestTypeAndValue_UnmarshalJSON(t *testing.T) {
+	for _, tv := range []struct {
+		Input    string
+		Expected TypeAndValue
+		Err      string
+	}{
+		{
+			Input:    `{"type": "test", "value": "test"}`,
+			Expected: TypeAndValue{Type: "test", Value: []byte(`"test"`)},
+		},
+		{
+			Input: `{"type": "test"}`,
+			Err:   "no value provided for test",
+		},
+		{
+			Input: `{"value": "test"}`,
+			Err:   "type not set",
+		},
+	} {
+		var out TypeAndValue
+		err := out.UnmarshalJSON([]byte(tv.Input))
+
+		if tv.Err != "" {
+			assert.EqualError(t, err, tv.Err)
+		} else {
+			assert.NoError(t, err)
+			assert.Equal(t, tv.Expected, out)
+		}
+	}
+}

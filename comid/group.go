@@ -5,66 +5,51 @@ package comid
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 )
 
 // Group stores a group identity.  The supported format is UUID.
 type Group struct {
-	val interface{}
+	Value IGroupValue
 }
 
 // NewGroup instantiates an empty group
-func NewGroup() *Group {
-	return &Group{}
-}
-
-// SetUUID sets the identity of the target group to the supplied UUID
-func (o *Group) SetUUID(val UUID) *Group {
-	if o != nil {
-		o.val = TaggedUUID(val)
+func NewGroup(val any, typ string) (*Group, error) {
+	factory, ok := groupValueRegister[typ]
+	if !ok {
+		return nil, fmt.Errorf("unknown group type: %s", typ)
 	}
-	return o
-}
 
-// NewGroupUUID instantiates a new group with the supplied UUID identity
-func NewGroupUUID(val UUID) *Group {
-	return NewGroup().SetUUID(val)
+	return factory(val)
 }
 
 // Valid checks for the validity of given group
 func (o Group) Valid() error {
-	if o.String() == "" {
-		return fmt.Errorf("invalid group id")
+	if o.Value == nil {
+		return errors.New("no value set")
 	}
-	return nil
+
+	return o.Value.Valid()
 }
 
 // String returns a printable string of the Group value.  UUIDs use the
 // canonical 8-4-4-4-12 format, UEIDs are hex encoded.
 func (o Group) String() string {
-	switch t := o.val.(type) {
-	case TaggedUUID:
-		return UUID(t).String()
-	default:
-		return ""
-	}
+	return o.Value.String()
 }
 
 // MarshalCBOR serializes the target group to CBOR
 func (o Group) MarshalCBOR() ([]byte, error) {
-	return em.Marshal(o.val)
+	return em.Marshal(o.Value)
 }
 
 // UnmarshalCBOR deserializes the supplied CBOR into the target group
 func (o *Group) UnmarshalCBOR(data []byte) error {
-	var uuid TaggedUUID
-
-	if dm.Unmarshal(data, &uuid) == nil {
-		o.val = uuid
-		return nil
-	}
-
-	return fmt.Errorf("unknown group type (CBOR: %x)", data)
+	return dm.Unmarshal(data, &o.Value)
 }
 
 // UnmarshalJSON deserializes the supplied JSON type/value object into the Group
@@ -75,43 +60,97 @@ func (o *Group) UnmarshalCBOR(data []byte) error {
 //	  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
 //	}
 func (o *Group) UnmarshalJSON(data []byte) error {
-	var v tnv
+	var tnv encoding.TypeAndValue
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, &tnv); err != nil {
+		return fmt.Errorf("group decoding failure: %w", err)
+	}
+
+	decoded, err := NewGroup(nil, tnv.Type)
+	if err != nil {
 		return err
 	}
 
-	switch v.Type {
-	case "uuid":
-		var x UUID
-		if err := x.UnmarshalJSON(v.Value); err != nil {
-			return err
-		}
-		o.val = TaggedUUID(x)
-	default:
-		return fmt.Errorf("unknown type %s for group", v.Type)
+	if err := json.Unmarshal(tnv.Value, &decoded.Value); err != nil {
+		return fmt.Errorf(
+			"cannot unmarshal group: %w",
+			err,
+		)
 	}
+
+	if err := decoded.Value.Valid(); err != nil {
+		return fmt.Errorf("invalid %s: %w", tnv.Type, err)
+	}
+
+	o.Value = decoded.Value
 
 	return nil
 }
 
 func (o Group) MarshalJSON() ([]byte, error) {
-	var (
-		v   tnv
-		b   []byte
-		err error
-	)
+	return extensions.TypeChoiceValueMarshalJSON(o.Value)
+}
 
-	switch t := o.val.(type) {
-	case TaggedUUID:
-		b, err = UUID(t).MarshalJSON()
-		if err != nil {
-			return nil, err
-		}
-		v = tnv{Type: "ueid", Value: b}
-	default:
-		return nil, fmt.Errorf("unknown type %T for group", t)
+type IGroupValue interface {
+	extensions.ITypeChoiceValue
+}
+
+func NewUUIDGroup(val any) (*Group, error) {
+	if val == nil {
+		return &Group{&TaggedUUID{}}, nil
 	}
 
-	return json.Marshal(v)
+	u, err := NewTaggedUUID(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Group{u}, nil
+}
+
+func MustNewUUIDGroup(val any) *Group {
+	ret, err := NewUUIDGroup(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// IGroupFactory defines the signature for the factory functions that may be
+// registred using RegisterGroupType to provide a new implementation of the
+// corresponding type choice. The factory function should create a new *Group
+// with the underlying value created based on the provided input. The range of
+// valid inputs is up to the specific type choice implementation, however it
+// _must_ accept nil as one of the inputs, and return the Zero value for
+// implemented type.
+// See also https://go.dev/ref/spec#The_zero_value
+type IGroupFactory func(any) (*Group, error)
+
+var groupValueRegister = map[string]IGroupFactory{
+	UUIDType: NewUUIDGroup,
+}
+
+// RegisterGroupType registers a new IGroupValue implementation
+// (created by the provided IGroupFactory) under the specified type name
+// and CBOR tag.
+func RegisterGroupType(tag uint64, factory IGroupFactory) error {
+
+	nilVal, err := factory(nil)
+	if err != nil {
+		return err
+	}
+
+	typ := nilVal.Value.Type()
+	if _, exists := groupValueRegister[typ]; exists {
+		return fmt.Errorf("Group type with name %q already exists", typ)
+	}
+
+	if err := registerCOMIDTag(tag, nilVal.Value); err != nil {
+		return err
+	}
+
+	groupValueRegister[typ] = factory
+
+	return nil
 }

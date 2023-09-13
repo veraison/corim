@@ -120,7 +120,7 @@ func (o *Comid) AddEntity(name string, regID *string, roles ...Role) *Comid {
 		}
 
 		e := Entity{
-			EntityName: name,
+			EntityName: MustNewStringEntityName(name),
 			RegID:      uri,
 			Roles:      rs,
 		}

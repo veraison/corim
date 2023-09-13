@@ -317,3 +317,35 @@ func skipValue(decoder *json.Decoder) error {
 	}
 	return nil
 }
+
+// TypeAndValue stores a JSON object with two attributes: a string "type"
+// and a generic "value" (string) defined by type.  This type is used in
+// a few places to implement the choice types that CBOR handles using tags.
+type TypeAndValue struct {
+	Type  string          `json:"type"`
+	Value json.RawMessage `json:"value"`
+}
+
+func (o *TypeAndValue) UnmarshalJSON(data []byte) error {
+	var temp struct {
+		Type  string          `json:"type"`
+		Value json.RawMessage `json:"value"`
+	}
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	if temp.Type == "" {
+		return errors.New("type not set")
+	}
+
+	if len(temp.Value) == 0 {
+		return fmt.Errorf("no value provided for %s", temp.Type)
+	}
+
+	o.Type = temp.Type
+	o.Value = temp.Value
+
+	return nil
+}

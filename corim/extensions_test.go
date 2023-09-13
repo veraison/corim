@@ -17,7 +17,7 @@ type TestExtensions struct {
 }
 
 func (o TestExtensions) ConstrainEntity(ent *Entity) error {
-	if ent.EntityName != "Futurama" {
+	if ent.EntityName.String() != "Futurama" {
 		return errors.New(`EntityName must be "Futurama"`) // nolint:golint
 	}
 
@@ -78,7 +78,7 @@ func TestEntityExtensions_CBOR(t *testing.T) {
 	err := cbor.Unmarshal(data, &ent)
 	assert.NoError(t, err)
 
-	assert.Equal(t, ent.EntityName, "acme")
+	assert.Equal(t, ent.EntityName.String(), "acme")
 
 	address, err := ent.Get("address")
 	require.NoError(t, err)
