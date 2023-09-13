@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"fmt"
 	"reflect"
 
 	cbor "github.com/fxamacker/cbor/v2"
@@ -12,16 +13,14 @@ import (
 var (
 	em, emError = initCBOREncMode()
 	dm, dmError = initCBORDecMode()
-)
 
-func comidTags() cbor.TagSet {
-	comidTagsMap := map[uint64]interface{}{
+	comidTagsMap = map[uint64]interface{}{
 		32:  TaggedURI(""),
 		37:  TaggedUUID{},
 		111: TaggedOID{},
 		// CoMID tags
 		550: TaggedUEID{},
-		//551: To Do see: https://github.com/veraison/corim/issues/32
+		551: TaggedInt(0),
 		552: TaggedSVN(0),
 		553: TaggedMinSVN(0),
 		554: TaggedPKIXBase64Key(""),
@@ -37,7 +36,9 @@ func comidTags() cbor.TagSet {
 		601: TaggedPSARefValID{},
 		602: TaggedCCAPlatformConfigID(""),
 	}
+)
 
+func comidTags() cbor.TagSet {
 	opts := cbor.TagOptions{
 		EncTag: cbor.EncTagRequired,
 		DecTag: cbor.DecTagRequired,
@@ -67,6 +68,28 @@ func initCBORDecMode() (dm cbor.DecMode, err error) {
 		IndefLength: cbor.IndefLengthForbidden,
 	}
 	return decOpt.DecModeWithTags(comidTags())
+}
+
+func registerCOMIDTag(tag uint64, t interface{}) error {
+	if _, exists := comidTagsMap[tag]; exists {
+		return fmt.Errorf("tag %d is already registered", tag)
+	}
+
+	comidTagsMap[tag] = t
+
+	var err error
+
+	em, err = initCBOREncMode()
+	if err != nil {
+		return err
+	}
+
+	dm, err = initCBORDecMode()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func init() {

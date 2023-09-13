@@ -210,3 +210,25 @@ func TestRoles_UnmarshalJSON_fail(t *testing.T) {
 		assert.EqualError(t, err, tv.expectedErr)
 	}
 }
+
+func Test_Role_String(t *testing.T) {
+	assert.Equal(t, "maintainer", RoleMaintainer.String())
+	assert.Equal(t, "Role(9999)", Role(9999).String())
+}
+
+func Test_RegisterRole(t *testing.T) {
+	err := RegisterRole(1, "owner")
+	assert.EqualError(t, err, "role with value 1 already exists")
+
+	err = RegisterRole(3, "maintainer")
+	assert.EqualError(t, err, `role with name "maintainer" already exists`)
+
+	err = RegisterRole(3, "owner")
+	assert.NoError(t, err)
+
+	roles := NewRoles().Add(Role(3))
+
+	out, err := roles.MarshalJSON()
+	require.NoError(t, err)
+	assert.Equal(t, `["owner"]`, string(out))
+}

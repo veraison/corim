@@ -13,10 +13,9 @@ func Test_ReferenceValue(t *testing.T) {
 	err := rv.Valid()
 	assert.EqualError(t, err, "environment validation failed: environment must not be empty")
 
-	rv.Environment.Instance = NewInstance()
 	id, err := uuid.NewUUID()
 	require.NoError(t, err)
-	rv.Environment.Instance.SetUUID(id)
+	rv.Environment.Instance = MustNewUUIDInstance(id)
 	err = rv.Valid()
 	assert.EqualError(t, err, "measurements validation failed: no measurement entries")
 }

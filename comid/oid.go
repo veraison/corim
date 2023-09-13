@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+const OIDType = "oid"
+
 // BER-encoded absolute OID
 type OID []byte
 
@@ -150,5 +152,80 @@ func (o *OID) UnmarshalJSON(data []byte) error {
 }
 
 func (o OID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.String())
+}
+
+type TaggedOID OID
+
+func NewTaggedOID(val any) (*TaggedOID, error) {
+	ret := TaggedOID{}
+
+	if val == nil {
+		return &ret, nil
+	}
+
+	switch t := val.(type) {
+	case string:
+		var berOID OID
+		if err := berOID.FromString(t); err != nil {
+			return nil, err
+		}
+
+		ret = TaggedOID(berOID)
+	case []byte:
+		ret = make([]byte, len(t))
+		copy(ret, t)
+	case TaggedOID:
+		ret = make([]byte, len(t))
+		copy(ret, t)
+	case OID:
+		ret = make([]byte, len(t))
+		copy(ret, t)
+	case *TaggedOID:
+		ret = make([]byte, len(*t))
+		copy(ret, (*t))
+	case *OID:
+		ret = make([]byte, len(*t))
+		copy(ret, (*t))
+	}
+
+	return &ret, nil
+}
+
+func (o TaggedOID) Type() string {
+	return OIDType
+}
+
+func (o TaggedOID) String() string {
+	return OID(o).String()
+}
+
+func (o TaggedOID) Valid() error {
+	return nil
+}
+
+func (o TaggedOID) Bytes() []byte {
+	return o
+}
+
+func (o *TaggedOID) FromString(s string) error {
+	return (*OID)(o).FromString(s)
+}
+
+func (o *TaggedOID) UnmarshalJSON(data []byte) error {
+	var s string
+
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	if err := o.FromString(s); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o TaggedOID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(o.String())
 }

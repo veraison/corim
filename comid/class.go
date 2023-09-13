@@ -23,39 +23,33 @@ type Class struct {
 // NewClassUUID instantiates a new Class object with the specified UUID as
 // identifier
 func NewClassUUID(uuid UUID) *Class {
-	c := Class{
-		ClassID: &ClassID{},
-	}
-
-	if c.ClassID.SetUUID(uuid) == nil {
+	classID, err := NewUUIDClassID(uuid)
+	if err != nil {
 		return nil
 	}
-	return &c
+
+	return &Class{ClassID: classID}
 }
 
 // NewClassImplID instantiates a new Class object that identifies the specified PSA
 // Implementation ID
 func NewClassImplID(implID ImplID) *Class {
-	c := Class{
-		ClassID: &ClassID{},
-	}
-
-	if c.ClassID.SetImplID(implID) == nil {
+	classID, err := NewImplIDClassID(implID)
+	if err != nil {
 		return nil
 	}
-	return &c
+
+	return &Class{ClassID: classID}
 }
 
 // NewClassOID instantiates a new Class object that identifies the OID
 func NewClassOID(oid string) *Class {
-	c := Class{
-		ClassID: &ClassID{},
-	}
-
-	if c.ClassID.SetOID(oid) == nil {
+	classID, err := NewOIDClassID(oid)
+	if err != nil {
 		return nil
 	}
-	return &c
+
+	return &Class{ClassID: classID}
 }
 
 // SetVendor sets the vendor metadata to the supplied string
@@ -131,7 +125,7 @@ func (o *Class) SetIndex(index uint64) *Class {
 // Valid checks the non-empty<> constraint on the map
 func (o Class) Valid() error {
 	// check non-empty<{ ... }>
-	if (o.ClassID == nil || o.ClassID.Unset()) &&
+	if (o.ClassID == nil || !o.ClassID.IsSet()) &&
 		o.Vendor == nil && o.Model == nil && o.Layer == nil && o.Index == nil {
 		return fmt.Errorf("class must not be empty")
 	}

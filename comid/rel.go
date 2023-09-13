@@ -18,6 +18,37 @@ const (
 	RelUnset = ^Rel(0)
 )
 
+var (
+	relToString = map[Rel]string{
+		RelReplaces:    "replaces",
+		RelSupplements: "supplements",
+	}
+
+	stringToRel = map[string]Rel{
+		"replaces":    RelReplaces,
+		"supplements": RelSupplements,
+	}
+)
+
+// RegisterRel creates a new Rel association between the provided value and
+// name. An error is returned if either clashes with any of the existing roles.
+func RegisterRel(val int64, name string) error {
+	rel := Rel(val)
+
+	if _, ok := relToString[rel]; ok {
+		return fmt.Errorf("rel with value %d already exists", val)
+	}
+
+	if _, ok := stringToRel[name]; ok {
+		return fmt.Errorf("rel with name %q already exists", name)
+	}
+
+	relToString[rel] = name
+	stringToRel[name] = rel
+
+	return nil
+}
+
 func NewRel() *Rel {
 	r := RelUnset
 	return &r
@@ -43,14 +74,12 @@ func (o Rel) Valid() error {
 }
 
 func (o Rel) String() string {
-	switch o {
-	case RelReplaces:
-		return "replaces"
-	case RelSupplements:
-		return "supplements"
-	default:
-		return fmt.Sprintf("rel(%d)", o)
+	ret, ok := relToString[o]
+	if ok {
+		return ret
 	}
+
+	return fmt.Sprintf("rel(%d)", o)
 }
 
 func (o Rel) ToCBOR() ([]byte, error) {

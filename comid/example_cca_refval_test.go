@@ -66,21 +66,23 @@ func extractCCARefVal(rv ReferenceValue) error {
 		if !m.Key.IsSet() {
 			return fmt.Errorf("mKey not set at index %d", i)
 		}
-		if m.Key.IsPSARefValID() {
+
+		switch t := m.Key.Value.(type) {
+		case *TaggedPSARefValID:
 			if err := extractSwMeasurement(m); err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 			}
-		}
-		if m.Key.IsCCAPlatformConfigID() {
+		case *TaggedCCAPlatformConfigID:
 			if err := extractCCARefValID(m.Key); err != nil {
 				return fmt.Errorf("extracting cca-refval-id: %w", err)
 			}
 			if err := extractRawValue(m.Val.RawValue); err != nil {
 				return fmt.Errorf("extracting raw vlue: %w", err)
 			}
-
-			return nil
+		default:
+			return fmt.Errorf("unexpected  Mkey type: %T", t)
 		}
+
 	}
 
 	return nil
@@ -105,9 +107,9 @@ func extractCCARefValID(k *Mkey) error {
 		return fmt.Errorf("no measurement key")
 	}
 
-	id, err := k.GetCCAPlatformConfigID()
-	if err != nil {
-		return fmt.Errorf("getting CCA platform config id: %w", err)
+	id, ok := k.Value.(*TaggedCCAPlatformConfigID)
+	if !ok {
+		return fmt.Errorf("expected CCA platform config id, found: %T", k.Value)
 	}
 	fmt.Printf("Label: %s\n", id)
 	return nil

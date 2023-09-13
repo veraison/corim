@@ -70,12 +70,7 @@ func extractInstanceID(i *Instance) error {
 		return fmt.Errorf("no instance")
 	}
 
-	instID, err := i.GetUEID()
-	if err != nil {
-		return fmt.Errorf("extracting implemenetation-id: %w", err)
-	}
-
-	fmt.Printf("InstanceID: %x\n", instID)
+	fmt.Printf("InstanceID: %x\n", i.Bytes())
 
 	return nil
 }

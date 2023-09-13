@@ -23,16 +23,17 @@ func TestAttestVerifKey_Valid_empty(t *testing.T) {
 			testerr:  "environment validation failed: environment must not be empty",
 		},
 		{
-			env:      Environment{Instance: NewInstanceUEID(TestUEID)},
+			env:      Environment{Instance: MustNewUEIDInstance(TestUEID)},
 			verifkey: CryptoKeys{},
 			testerr:  "verification keys validation failed: no keys to validate",
 		},
 		{
-			env:      Environment{Instance: NewInstanceUEID(TestUEID)},
+			env:      Environment{Instance: MustNewUEIDInstance(TestUEID)},
 			verifkey: CryptoKeys{&invalidKey},
 			testerr:  "verification keys validation failed: invalid key at index 0: key value not set",
 		},
 	}
+
 	for _, tv := range tvs {
 		av := AttestVerifKey{Environment: tv.env, VerifKeys: tv.verifkey}
 		err := av.Valid()

@@ -111,9 +111,10 @@ func extractPSARefValID(k *Mkey) error {
 		return fmt.Errorf("no measurement key")
 	}
 
-	id, err := k.GetPSARefValID()
-	if err != nil {
-		return fmt.Errorf("getting PSA refval id: %w", err)
+	id, ok := k.Value.(*TaggedPSARefValID)
+
+	if !ok {
+		return fmt.Errorf("expected PSA refval id, found: %T", k.Value)
 	}
 
 	fmt.Printf("SignerID: %x\n", id.SignerID)
@@ -142,12 +143,11 @@ func extractImplementationID(c *Class) error {
 		return fmt.Errorf("no class-id")
 	}
 
-	implID, err := classID.GetImplID()
-	if err != nil {
-		return fmt.Errorf("extracting implemenetation-id: %w", err)
+	if classID.Type() != ImplIDType {
+		return fmt.Errorf("class id is not a psa.impl-id")
 	}
 
-	fmt.Printf("ImplementationID: %x\n", implID)
+	fmt.Printf("ImplementationID: %x\n", classID.Bytes())
 
 	return nil
 }
