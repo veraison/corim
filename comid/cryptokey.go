@@ -58,50 +58,12 @@ type CryptoKey struct {
 // specified crypto key type. For PKIX types, k must be a string. For COSE_Key,
 // k must be a []byte. For thumbprint types, k must be a swid.HashEntry.
 func NewCryptoKey(k any, typ string) (*CryptoKey, error) {
-	switch typ {
-	case PKIXBase64KeyType:
-		v, ok := k.(string)
-		if !ok {
-			return nil, fmt.Errorf("value must be a string; found %T", k)
-		}
-		return NewPKIXBase64Key(v)
-	case PKIXBase64CertType:
-		v, ok := k.(string)
-		if !ok {
-			return nil, fmt.Errorf("value must be a string; found %T", k)
-		}
-		return NewPKIXBase64Cert(v)
-	case PKIXBase64CertPathType:
-		v, ok := k.(string)
-		if !ok {
-			return nil, fmt.Errorf("value must be a string; found %T", k)
-		}
-		return NewPKIXBase64CertPath(v)
-	case COSEKeyType:
-		v, ok := k.([]byte)
-		if !ok {
-			return nil, fmt.Errorf("value must be a []byte; found %T", k)
-		}
-		return NewCOSEKey(v)
-	case ThumbprintType, CertThumbprintType, CertPathThumbprintType:
-		v, ok := k.(swid.HashEntry)
-		if !ok {
-			return nil, fmt.Errorf("value must be a swid.HashEntry; found %T", k)
-		}
-		switch typ {
-		case ThumbprintType:
-			return NewThumbprint(v)
-		case CertThumbprintType:
-			return NewCertThumbprint(v)
-		case CertPathThumbprintType:
-			return NewCertPathThumbprint(v)
-		default:
-			// Should never here because of the the outer case clause
-			panic(fmt.Sprintf("unexpected thumbprint type: %s", typ))
-		}
-	default:
+	factory, ok := cryptoKeyValueRegister[typ]
+	if !ok {
 		return nil, fmt.Errorf("unexpected CryptoKey type: %s", typ)
 	}
+
+	return factory(k)
 }
 
 // MustNewCryptoKey is the same as NewCryptoKey, but does not return an error,
@@ -140,26 +102,8 @@ func (o CryptoKey) MarshalJSON() ([]byte, error) {
 		Type  string `json:"type"`
 		Value string `json:"value"`
 	}{
+		Type:  o.Value.Type(),
 		Value: o.Value.String(),
-	}
-
-	switch o.Value.(type) {
-	case TaggedPKIXBase64Key:
-		value.Type = PKIXBase64KeyType
-	case TaggedPKIXBase64Cert:
-		value.Type = PKIXBase64CertType
-	case TaggedPKIXBase64CertPath:
-		value.Type = PKIXBase64CertPathType
-	case TaggedCOSEKey:
-		value.Type = COSEKeyType
-	case TaggedThumbprint:
-		value.Type = ThumbprintType
-	case TaggedCertThumbprint:
-		value.Type = CertThumbprintType
-	case TaggedCertPathThumbprint:
-		value.Type = CertPathThumbprintType
-	default:
-		return nil, fmt.Errorf("unexpected ICryptoKeyValue type: %T", o.Value)
 	}
 
 	return json.Marshal(value)
@@ -181,35 +125,17 @@ func (o *CryptoKey) UnmarshalJSON(b []byte) error {
 		return errors.New("key type not set")
 	}
 
-	switch value.Type {
-	case PKIXBase64KeyType:
-		o.Value = TaggedPKIXBase64Key(value.Value)
-	case PKIXBase64CertType:
-		o.Value = TaggedPKIXBase64Cert(value.Value)
-	case PKIXBase64CertPathType:
-		o.Value = TaggedPKIXBase64CertPath(value.Value)
-	case COSEKeyType:
-		data, err := base64.StdEncoding.DecodeString(value.Value)
-		if err != nil {
-			return fmt.Errorf("base64 decode error: %w", err)
-		}
-		o.Value = TaggedCOSEKey(data)
-	case ThumbprintType, CertThumbprintType, CertPathThumbprintType:
-		he, err := swid.ParseHashEntry(value.Value)
-		if err != nil {
-			return fmt.Errorf("swid.HashEntry decode error: %w", err)
-		}
-		switch value.Type {
-		case ThumbprintType:
-			o.Value = TaggedThumbprint{digest{he}}
-		case CertThumbprintType:
-			o.Value = TaggedCertThumbprint{digest{he}}
-		case CertPathThumbprintType:
-			o.Value = TaggedCertPathThumbprint{digest{he}}
-		}
-	default:
+	factory, ok := cryptoKeyValueRegister[value.Type]
+	if !ok {
 		return fmt.Errorf("unexpected ICryptoKeyValue type: %q", value.Type)
 	}
+
+	k, err := factory(value.Value)
+	if err != nil {
+		return err
+	}
+
+	o.Value = k.Value
 
 	return o.Valid()
 }
@@ -238,13 +164,20 @@ type ICryptoKeyValue interface {
 	// ICryptoKeyValue's underlying value. This returns an error if the
 	// ICryptoKeyValue is one of the thumbprint types.
 	PublicKey() (crypto.PublicKey, error)
+	// Type returns the type name of this ICryptoKeyValue implementation.
+	Type() string
 }
 
 // TaggedPKIXBase64Key is a PEM-encoded SubjectPublicKeyInfo. See
 // https://www.rfc-editor.org/rfc/rfc7468#section-13
 type TaggedPKIXBase64Key string
 
-func NewPKIXBase64Key(s string) (*CryptoKey, error) {
+func NewPKIXBase64Key(k any) (*CryptoKey, error) {
+	s, ok := k.(string)
+	if !ok {
+		return nil, fmt.Errorf("value must be a string; found %T", k)
+	}
+
 	key := TaggedPKIXBase64Key(s)
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -252,8 +185,8 @@ func NewPKIXBase64Key(s string) (*CryptoKey, error) {
 	return &CryptoKey{key}, nil
 }
 
-func MustNewPKIXBase64Key(s string) *CryptoKey {
-	key, err := NewPKIXBase64Key(s)
+func MustNewPKIXBase64Key(k any) *CryptoKey {
+	key, err := NewPKIXBase64Key(k)
 	if err != nil {
 		panic(err)
 	}
@@ -267,6 +200,10 @@ func (o TaggedPKIXBase64Key) String() string {
 func (o TaggedPKIXBase64Key) Valid() error {
 	_, err := o.PublicKey()
 	return err
+}
+
+func (o TaggedPKIXBase64Key) Type() string {
+	return PKIXBase64KeyType
 }
 
 func (o TaggedPKIXBase64Key) PublicKey() (crypto.PublicKey, error) {
@@ -302,7 +239,12 @@ func (o TaggedPKIXBase64Key) PublicKey() (crypto.PublicKey, error) {
 // certificate. See https://www.rfc-editor.org/rfc/rfc7468#section-5
 type TaggedPKIXBase64Cert string
 
-func NewPKIXBase64Cert(s string) (*CryptoKey, error) {
+func NewPKIXBase64Cert(k any) (*CryptoKey, error) {
+	s, ok := k.(string)
+	if !ok {
+		return nil, fmt.Errorf("value must be a string; found %T", k)
+	}
+
 	cert := TaggedPKIXBase64Cert(s)
 	if err := cert.Valid(); err != nil {
 		return nil, err
@@ -310,8 +252,8 @@ func NewPKIXBase64Cert(s string) (*CryptoKey, error) {
 	return &CryptoKey{cert}, nil
 }
 
-func MustNewPKIXBase64Cert(s string) *CryptoKey {
-	cert, err := NewPKIXBase64Cert(s)
+func MustNewPKIXBase64Cert(k any) *CryptoKey {
+	cert, err := NewPKIXBase64Cert(k)
 	if err != nil {
 		panic(err)
 	}
@@ -325,6 +267,10 @@ func (o TaggedPKIXBase64Cert) String() string {
 func (o TaggedPKIXBase64Cert) Valid() error {
 	_, err := o.cert()
 	return err
+}
+
+func (o TaggedPKIXBase64Cert) Type() string {
+	return PKIXBase64CertType
 }
 
 func (o TaggedPKIXBase64Cert) PublicKey() (crypto.PublicKey, error) {
@@ -375,7 +321,11 @@ func (o TaggedPKIXBase64Cert) cert() (*x509.Certificate, error) {
 // directly certifies the one preceding.
 type TaggedPKIXBase64CertPath string
 
-func NewPKIXBase64CertPath(s string) (*CryptoKey, error) {
+func NewPKIXBase64CertPath(k any) (*CryptoKey, error) {
+	s, ok := k.(string)
+	if !ok {
+		return nil, fmt.Errorf("value must be a string; found %T", k)
+	}
 	cert := TaggedPKIXBase64CertPath(s)
 
 	if err := cert.Valid(); err != nil {
@@ -385,8 +335,8 @@ func NewPKIXBase64CertPath(s string) (*CryptoKey, error) {
 	return &CryptoKey{cert}, nil
 }
 
-func MustNewPKIXBase64CertPath(s string) *CryptoKey {
-	cert, err := NewPKIXBase64CertPath(s)
+func MustNewPKIXBase64CertPath(k any) *CryptoKey {
+	cert, err := NewPKIXBase64CertPath(k)
 
 	if err != nil {
 		panic(err)
@@ -402,6 +352,10 @@ func (o TaggedPKIXBase64CertPath) String() string {
 func (o TaggedPKIXBase64CertPath) Valid() error {
 	_, err := o.certPath()
 	return err
+}
+
+func (o TaggedPKIXBase64CertPath) Type() string {
+	return PKIXBase64CertPathType
 }
 
 func (o TaggedPKIXBase64CertPath) PublicKey() (crypto.PublicKey, error) {
@@ -468,7 +422,22 @@ func (o TaggedPKIXBase64CertPath) certPath() ([]*x509.Certificate, error) {
 // https://www.rfc-editor.org/rfc/rfc9052#section-7
 type TaggedCOSEKey []byte
 
-func NewCOSEKey(b []byte) (*CryptoKey, error) {
+func NewCOSEKey(k any) (*CryptoKey, error) {
+	var b []byte
+	var err error
+
+	switch t := k.(type) {
+	case []byte:
+		b = t
+	case string:
+		b, err = base64.StdEncoding.DecodeString(t)
+		if err != nil {
+			return nil, fmt.Errorf("base64 decode error: %w", err)
+		}
+	default:
+		return nil, fmt.Errorf("value must be a []byte or a string; found %T", k)
+	}
+
 	key := TaggedCOSEKey(b)
 
 	if err := key.Valid(); err != nil {
@@ -478,8 +447,8 @@ func NewCOSEKey(b []byte) (*CryptoKey, error) {
 	return &CryptoKey{key}, nil
 }
 
-func MustNewCOSEKey(b []byte) *CryptoKey {
-	key, err := NewCOSEKey(b)
+func MustNewCOSEKey(k any) *CryptoKey {
+	key, err := NewCOSEKey(k)
 
 	if err != nil {
 		panic(err)
@@ -507,6 +476,10 @@ func (o TaggedCOSEKey) Valid() error {
 		_, err = o.coseKey()
 	}
 	return err
+}
+
+func (o TaggedCOSEKey) Type() string {
+	return COSEKeyType
 }
 
 func (o TaggedCOSEKey) PublicKey() (crypto.PublicKey, error) {
@@ -608,7 +581,22 @@ type TaggedThumbprint struct {
 	digest
 }
 
-func NewThumbprint(he swid.HashEntry) (*CryptoKey, error) {
+func NewThumbprint(k any) (*CryptoKey, error) {
+	var he swid.HashEntry
+	var err error
+
+	switch t := k.(type) {
+	case string:
+		he, err = swid.ParseHashEntry(t)
+		if err != nil {
+			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+		}
+	case swid.HashEntry:
+		he = t
+	default:
+		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+	}
+
 	key := &CryptoKey{TaggedThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
@@ -618,8 +606,8 @@ func NewThumbprint(he swid.HashEntry) (*CryptoKey, error) {
 	return key, nil
 }
 
-func MustNewThumbprint(he swid.HashEntry) *CryptoKey {
-	key, err := NewThumbprint(he)
+func MustNewThumbprint(k any) *CryptoKey {
+	key, err := NewThumbprint(k)
 
 	if err != nil {
 		panic(err)
@@ -628,13 +616,32 @@ func MustNewThumbprint(he swid.HashEntry) *CryptoKey {
 	return key
 }
 
+func (o TaggedThumbprint) Type() string {
+	return ThumbprintType
+}
+
 // TaggedCertThumbprint represents a digest of a certificate. The digest value
 // may be used to find the certificate if contained in a lookup table.
 type TaggedCertThumbprint struct {
 	digest
 }
 
-func NewCertThumbprint(he swid.HashEntry) (*CryptoKey, error) {
+func NewCertThumbprint(k any) (*CryptoKey, error) {
+	var he swid.HashEntry
+	var err error
+
+	switch t := k.(type) {
+	case string:
+		he, err = swid.ParseHashEntry(t)
+		if err != nil {
+			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+		}
+	case swid.HashEntry:
+		he = t
+	default:
+		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+	}
+
 	key := &CryptoKey{TaggedCertThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
@@ -644,14 +651,18 @@ func NewCertThumbprint(he swid.HashEntry) (*CryptoKey, error) {
 	return key, nil
 }
 
-func MustNewCertThumbprint(he swid.HashEntry) *CryptoKey {
-	key, err := NewCertThumbprint(he)
+func MustNewCertThumbprint(k any) *CryptoKey {
+	key, err := NewCertThumbprint(k)
 
 	if err != nil {
 		panic(err)
 	}
 
 	return key
+}
+
+func (o TaggedCertThumbprint) Type() string {
+	return CertThumbprintType
 }
 
 // TaggedCertPathThumbprint represents a digest of a certification path. The
@@ -661,7 +672,22 @@ type TaggedCertPathThumbprint struct {
 	digest
 }
 
-func NewCertPathThumbprint(he swid.HashEntry) (*CryptoKey, error) {
+func NewCertPathThumbprint(k any) (*CryptoKey, error) {
+	var he swid.HashEntry
+	var err error
+
+	switch t := k.(type) {
+	case string:
+		he, err = swid.ParseHashEntry(t)
+		if err != nil {
+			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+		}
+	case swid.HashEntry:
+		he = t
+	default:
+		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+	}
+
 	key := &CryptoKey{TaggedCertPathThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
@@ -671,12 +697,54 @@ func NewCertPathThumbprint(he swid.HashEntry) (*CryptoKey, error) {
 	return key, nil
 }
 
-func MustNewCertPathThumbprint(he swid.HashEntry) *CryptoKey {
-	key, err := NewCertPathThumbprint(he)
+func MustNewCertPathThumbprint(k any) *CryptoKey {
+	key, err := NewCertPathThumbprint(k)
 
 	if err != nil {
 		panic(err)
 	}
 
 	return key
+}
+
+func (o TaggedCertPathThumbprint) Type() string {
+	return CertPathThumbprintType
+}
+
+// ICryptoKeyFactory creates a *CryptoKey from the specified any value. When
+// passed nil as input, this must return the equivaluent nil-value for the
+// associated ICryptoKeyValue implementation.
+type ICryptoKeyFactory func(any) (*CryptoKey, error)
+
+var cryptoKeyValueRegister = map[string]ICryptoKeyFactory{
+	// types defined by the core spec
+	PKIXBase64KeyType:      NewPKIXBase64Key,
+	PKIXBase64CertType:     NewPKIXBase64Cert,
+	PKIXBase64CertPathType: NewPKIXBase64CertPath,
+	COSEKeyType:            NewCOSEKey,
+	ThumbprintType:         NewThumbprint,
+	CertThumbprintType:     NewCertThumbprint,
+	CertPathThumbprintType: NewCertPathThumbprint,
+}
+
+// RegisterCryptoKeyType registeres a new ICryptoKeyValue implementation
+// (created by the provided ICryptoKeyFactory) under the specified type name
+// and CBOR tag.
+func RegisterCryptoKeyType(typ string, tag uint64, factory ICryptoKeyFactory) error {
+	if _, exists := cryptoKeyValueRegister[typ]; exists {
+		return fmt.Errorf("crypto key type with name %q already exists", typ)
+	}
+
+	nilVal, err := factory(nil)
+	if err != nil {
+		return err
+	}
+
+	if err := registerCOMIDTag(tag, nilVal); err != nil {
+		return err
+	}
+
+	cryptoKeyValueRegister[typ] = factory
+
+	return nil
 }

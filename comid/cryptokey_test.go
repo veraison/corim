@@ -149,7 +149,7 @@ func Test_CryptoKey_NewCOSEKey(t *testing.T) {
 }
 
 func Test_CryptoKey_NewThumbprint(t *testing.T) {
-	type newKeyFunc func(swid.HashEntry) (*CryptoKey, error)
+	type newKeyFunc func(any) (*CryptoKey, error)
 
 	for _, newFunc := range []newKeyFunc{
 		NewThumbprint,
@@ -177,7 +177,7 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 		assert.Contains(t, err.Error(), "length mismatch for hash algorithm")
 	}
 
-	type mustNewKeyFunc func(swid.HashEntry) *CryptoKey
+	type mustNewKeyFunc func(any) *CryptoKey
 
 	for _, mustNewFunc := range []mustNewKeyFunc{
 		MustNewThumbprint,
@@ -371,22 +371,22 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 		{
 			Type:   COSEKeyType,
 			In:     7,
-			ErrMsg: "value must be a []byte; found int",
+			ErrMsg: "value must be a []byte or a string; found int",
 		},
 		{
 			Type:   ThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   CertThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   CertPathThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry; found int",
+			ErrMsg: "value must be a swid.HashEntry or a string; found int",
 		},
 		{
 			Type:   "random-key",
