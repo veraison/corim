@@ -186,7 +186,7 @@ func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *Un
 			o.Entities = new(Entities)
 		}
 
-		if o.Entities.AddEntity(*e) == nil {
+		if o.Entities.AddEntity(e) == nil {
 			return nil
 		}
 	}

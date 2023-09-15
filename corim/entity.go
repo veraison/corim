@@ -21,7 +21,7 @@ func NewEntity() *Entity {
 }
 
 // SetEntityName is used to set the EntityName field of Entity using supplied name
-func (o *Entity) SetEntityName(name string) *Entity {
+func (o *Entity) SetEntityName(name string) IEntity {
 	if o != nil {
 		if name == "" {
 			return nil
@@ -32,7 +32,7 @@ func (o *Entity) SetEntityName(name string) *Entity {
 }
 
 // SetRegID is used to set the RegID field of Entity using supplied uri
-func (o *Entity) SetRegID(uri string) *Entity {
+func (o *Entity) SetRegID(uri string) IEntity {
 	if o != nil {
 		if uri == "" {
 			return nil
@@ -49,7 +49,7 @@ func (o *Entity) SetRegID(uri string) *Entity {
 }
 
 // SetRoles appends the supplied roles to the target entity.
-func (o *Entity) SetRoles(roles ...Role) *Entity {
+func (o *Entity) SetRoles(roles ...Role) IEntity {
 	if o != nil {
 		if o.Roles.Add(roles...) == nil {
 			return nil
@@ -75,8 +75,22 @@ func (o Entity) Valid() error {
 	return nil
 }
 
+func (o *Entity) FromCBOR(data []byte) error {
+	if err := o.Valid(); err != nil {
+		return err
+	}
+	return dm.Unmarshal(data, o)
+}
+
+func (o *Entity) ToCBOR() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+	return em.Marshal(o)
+}
+
 // Entities is an array of entity-map's
-type Entities []Entity
+type Entities []IEntity
 
 // NewEntities instantiates an empty entity-map array
 func NewEntities() *Entities {
@@ -84,7 +98,7 @@ func NewEntities() *Entities {
 }
 
 // AddEntity adds the supplied entity-map to the target Entities
-func (o *Entities) AddEntity(e Entity) *Entities {
+func (o *Entities) AddEntity(e IEntity) *Entities {
 	if o != nil {
 		*o = append(*o, e)
 	}

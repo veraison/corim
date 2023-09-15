@@ -263,7 +263,7 @@ func TestUnsignedCorim_AddEntity_full(t *testing.T) {
 
 	expected := UnsignedCorim{
 		Entities: &Entities{
-			Entity{
+			&Entity{
 				EntityName: name,
 				Roles:      Roles{role},
 				RegID:      &taggedRegID,

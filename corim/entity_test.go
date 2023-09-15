@@ -4,11 +4,11 @@
 package corim
 
 import (
-	"testing"
-
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
+	"testing"
 )
 
 func TestEntity_Valid_uninitialized(t *testing.T) {
@@ -76,7 +76,7 @@ func TestEntities_Valid_ok(t *testing.T) {
 		SetRoles(RoleManifestCreator)
 	require.NotNil(t, e)
 
-	es := NewEntities().AddEntity(*e)
+	es := NewEntities().AddEntity(e)
 	require.NotNil(t, es)
 
 	err := es.Valid()
@@ -86,9 +86,41 @@ func TestEntities_Valid_ok(t *testing.T) {
 func TestEntities_Valid_empty(t *testing.T) {
 	e := Entity{}
 
-	es := NewEntities().AddEntity(e)
+	es := NewEntities().AddEntity(&e)
 	require.NotNil(t, es)
 
 	err := es.Valid()
 	assert.EqualError(t, err, "entity at index 0: invalid entity: empty entity-name")
+}
+
+func TestEntities_Valid1_ok(t *testing.T) {
+	e := NewEntity().
+		SetEntityName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+
+	err := e.Valid()
+	assert.Nil(t, err)
+	data, err := e.ToCBOR()
+	assert.Nil(t, err)
+	fmt.Printf("Encoded CBOR Payload= %x", data)
+	assert.NotNil(t, data)
+}
+
+func TestEntities_Valid2_ok(t *testing.T) {
+	//ext := &EntityExtension{"myname", 0x20}
+	e := NewEntity().
+		SetEntityName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+	//e.SetEntityExtension(ext)
+
+	err := e.Valid()
+	assert.Nil(t, err)
+	data, err := e.ToCBOR()
+	assert.Nil(t, err)
+	fmt.Printf("Encoded CBOR Payload= %x", data)
+	assert.NotNil(t, data)
 }
