@@ -4,16 +4,21 @@
 package corim
 
 import (
+	"errors"
 	"fmt"
-
 	"github.com/veraison/corim/comid"
 )
+
+type IExtension interface {
+	Valid() error
+}
 
 // Entity stores an entity-map capable of CBOR and JSON serializations.
 type Entity struct {
 	EntityName string           `cbor:"0,keyasint" json:"name"`
 	RegID      *comid.TaggedURI `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
 	Roles      Roles            `cbor:"2,keyasint" json:"roles"`
+	Extension  IExtension       `cbor:"3,keyasint" json:"extensions"`
 }
 
 func NewEntity() *Entity {
@@ -58,6 +63,45 @@ func (o *Entity) SetRoles(roles ...Role) *Entity {
 	return o
 }
 
+// SetExtension adds the profile specific extension.
+func (o *Entity) SetExtension(extension IExtension) *Entity {
+	if o != nil {
+		o.Extension = extension
+	}
+	return o
+}
+
+// GetExtension gets the profile specific extension.
+func (o *Entity) GetExtension() (IExtension, error) {
+	if o != nil {
+		return o.Extension, nil
+	}
+	return nil, errors.New("no Entity present")
+}
+
+func (o *Entity) FromCBOR(data []byte) error {
+	if o != nil {
+		err := dm.Unmarshal(data, o)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (o *Entity) ToCBOR() ([]byte, error) {
+	if o != nil {
+		data, err := em.Marshal(o)
+		if err != nil {
+			return nil, err
+		} else {
+			return data, nil
+		}
+	} else {
+		return nil, fmt.Errorf("no entity to serialize")
+	}
+}
+
 // Valid checks for validity of the fields within each Entity
 func (o Entity) Valid() error {
 	if o.EntityName == "" {
@@ -70,6 +114,13 @@ func (o Entity) Valid() error {
 
 	if err := o.Roles.Valid(); err != nil {
 		return fmt.Errorf("invalid entity: %w", err)
+	}
+
+	// Check for user supplied Extensions
+	if o.Extension != nil {
+		if err := o.Extension.Valid(); err != nil {
+			return fmt.Errorf("invalid entity extensions: %w", err)
+		}
 	}
 
 	return nil
