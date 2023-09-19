@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/encoding"
 )
 
 // Entity stores an entity-map capable of CBOR and JSON serializations.
@@ -14,10 +15,20 @@ type Entity struct {
 	EntityName string           `cbor:"0,keyasint" json:"name"`
 	RegID      *comid.TaggedURI `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
 	Roles      Roles            `cbor:"2,keyasint" json:"roles"`
+
+	Extensions
 }
 
 func NewEntity() *Entity {
 	return &Entity{}
+}
+
+func (o *Entity) RegisterExtensions(exts IExtensionsValue) {
+	o.Extensions.IExtensionsValue = exts
+}
+
+func (o *Entity) GetExtensions() IExtensionsValue {
+	return o.Extensions.IExtensionsValue
 }
 
 // SetEntityName is used to set the EntityName field of Entity using supplied name
@@ -72,7 +83,15 @@ func (o Entity) Valid() error {
 		return fmt.Errorf("invalid entity: %w", err)
 	}
 
-	return nil
+	return o.Extensions.ValidEntity(&o)
+}
+
+func (o *Entity) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+func (o *Entity) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
 }
 
 // Entities is an array of entity-map's
