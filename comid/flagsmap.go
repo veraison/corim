@@ -3,6 +3,11 @@
 
 package comid
 
+import (
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
+)
+
 var True = true
 var False = false
 
@@ -52,6 +57,8 @@ type FlagsMap struct {
 	// IsTcb indicates whether the measured environment is a trusted
 	// computing base.
 	IsTcb *bool `cbor:"8,keyasint,omitempty" json:"is-tcb,omitempty"`
+
+	Extensions
 }
 
 func NewFlagsMap() *FlagsMap {
@@ -65,7 +72,7 @@ func (o *FlagsMap) AnySet() bool {
 		return true
 	}
 
-	return false
+	return o.Extensions.anySet()
 }
 
 func (o *FlagsMap) SetTrue(flags ...Flag) {
@@ -90,6 +97,7 @@ func (o *FlagsMap) SetTrue(flags ...Flag) {
 		case FlagIsTcb:
 			o.IsTcb = &True
 		default:
+			o.Extensions.setTrue(flag)
 		}
 	}
 }
@@ -116,6 +124,7 @@ func (o *FlagsMap) SetFalse(flags ...Flag) {
 		case FlagIsTcb:
 			o.IsTcb = &False
 		default:
+			o.Extensions.setFalse(flag)
 		}
 	}
 }
@@ -142,6 +151,7 @@ func (o *FlagsMap) Clear(flags ...Flag) {
 		case FlagIsTcb:
 			o.IsTcb = nil
 		default:
+			o.Extensions.clear(flag)
 		}
 	}
 }
@@ -167,11 +177,41 @@ func (o *FlagsMap) Get(flag Flag) *bool {
 	case FlagIsTcb:
 		return o.IsTcb
 	default:
-		return nil
+		return o.Extensions.get(flag)
 	}
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *FlagsMap) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *FlagsMap) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *FlagsMap) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *FlagsMap) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
+}
+
+// UnmarshalJSON deserializes from JSON
+func (o *FlagsMap) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *FlagsMap) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
 }
 
 // Valid returns an error if the FlagsMap is invalid.
 func (o FlagsMap) Valid() error {
-	return nil
+	return o.Extensions.validFlagsMap(&o)
 }

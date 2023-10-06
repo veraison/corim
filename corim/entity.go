@@ -7,6 +7,8 @@ import (
 	"fmt"
 
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 )
 
 // Entity stores an entity-map capable of CBOR and JSON serializations.
@@ -14,10 +16,22 @@ type Entity struct {
 	EntityName string           `cbor:"0,keyasint" json:"name"`
 	RegID      *comid.TaggedURI `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
 	Roles      Roles            `cbor:"2,keyasint" json:"roles"`
+
+	Extensions
 }
 
 func NewEntity() *Entity {
 	return &Entity{}
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Entity) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *Entity) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
 }
 
 // SetEntityName is used to set the EntityName field of Entity using supplied name
@@ -72,7 +86,27 @@ func (o Entity) Valid() error {
 		return fmt.Errorf("invalid entity: %w", err)
 	}
 
-	return nil
+	return o.Extensions.validEntity(&o)
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *Entity) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *Entity) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
+}
+
+// UnmarshalJSON deserializes from JSON
+func (o *Entity) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *Entity) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
 }
 
 // Entities is an array of entity-map's

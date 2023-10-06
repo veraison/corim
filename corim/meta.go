@@ -10,15 +10,29 @@ import (
 	"time"
 
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 )
 
 type Signer struct {
 	Name string           `cbor:"0,keyasint" json:"name"`
 	URI  *comid.TaggedURI `cbor:"1,keyasint,omitempty" json:"uri,omitempty"`
+
+	Extensions
 }
 
 func NewSigner() *Signer {
 	return &Signer{}
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Signer) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns previously registered extension
+func (o *Signer) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
 }
 
 // SetName sets the target Signer's name to the supplied value
@@ -61,7 +75,27 @@ func (o Signer) Valid() error {
 		}
 	}
 
-	return nil
+	return o.Extensions.validSigner(&o)
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *Signer) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *Signer) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
+}
+
+// UnmarshalJSON deserializes from JSON
+func (o *Signer) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *Signer) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
 }
 
 // Meta stores a corim-meta-map with JSON and CBOR serializations.  It carries

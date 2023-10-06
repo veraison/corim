@@ -3,7 +3,12 @@
 
 package comid
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
+)
 
 type TaggedURI string
 
@@ -16,8 +21,21 @@ type Entity struct {
 	EntityName string     `cbor:"0,keyasint" json:"name"`
 	RegID      *TaggedURI `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
 	Roles      Roles      `cbor:"2,keyasint" json:"roles"`
+
+	Extensions
 }
 
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Entity) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *Entity) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
+}
+
+// SetEntityName is used to set the EntityName field of Entity using supplied name
 func (o *Entity) SetEntityName(name string) *Entity {
 	if o != nil {
 		if name == "" {
@@ -28,6 +46,7 @@ func (o *Entity) SetEntityName(name string) *Entity {
 	return o
 }
 
+// SetRegID is used to set the RegID field of Entity using supplied uri
 func (o *Entity) SetRegID(uri string) *Entity {
 	if o != nil {
 		if uri == "" {
@@ -39,6 +58,7 @@ func (o *Entity) SetRegID(uri string) *Entity {
 	return o
 }
 
+// SetRoles appends the supplied roles to the target entity.
 func (o *Entity) SetRoles(roles ...Role) *Entity {
 	if o != nil {
 		o.Roles.Add(roles...)
@@ -46,6 +66,7 @@ func (o *Entity) SetRoles(roles ...Role) *Entity {
 	return o
 }
 
+// Valid checks for validity of the fields within each Entity
 func (o Entity) Valid() error {
 	if o.EntityName == "" {
 		return fmt.Errorf("invalid entity: empty entity-name")
@@ -59,7 +80,27 @@ func (o Entity) Valid() error {
 		return fmt.Errorf("invalid entity: %w", err)
 	}
 
-	return nil
+	return o.Extensions.validEntity(&o)
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *Entity) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *Entity) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
+}
+
+// UnmarshalJSON deserializes from JSON
+func (o *Entity) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *Entity) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
 }
 
 // Entities is an array of entity-map's
@@ -78,6 +119,7 @@ func (o *Entities) AddEntity(e Entity) *Entities {
 	return o
 }
 
+// Valid iterates over the range of individual entities to check for validity
 func (o Entities) Valid() error {
 	for i, m := range o {
 		if err := m.Valid(); err != nil {

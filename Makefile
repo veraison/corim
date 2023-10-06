@@ -8,6 +8,8 @@ GOPKG := github.com/veraison/corim/corim
 GOPKG += github.com/veraison/corim/comid
 GOPKG += github.com/veraison/corim/cots
 GOPKG += github.com/veraison/corim/cocli/cmd
+GOPKG += github.com/veraison/corim/encoding
+GOPKG += github.com/veraison/corim/extensions
 
 MOCKGEN := $(shell go env GOPATH)/bin/mockgen
 INTERFACES := cocli/cmd/isubmitter.go

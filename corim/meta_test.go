@@ -183,3 +183,15 @@ func TestMeta_FromCBOR_full(t *testing.T) {
 	assert.Equal(t, notBefore.Unix(), actual.Validity.NotBefore.Unix())
 	assert.Equal(t, notAfter.Unix(), actual.Validity.NotAfter.Unix())
 }
+
+func Test_Signer_Valid(t *testing.T) {
+	var signer Signer
+
+	assert.EqualError(t, signer.Valid(), "empty name")
+
+	signer.Name = "test-signer"
+	uri := comid.TaggedURI("@@@")
+	signer.URI = &uri
+
+	assert.EqualError(t, signer.Valid(), `invalid URI: "@@@" is not an absolute URI`)
+}

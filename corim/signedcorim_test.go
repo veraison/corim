@@ -246,7 +246,7 @@ func TestSignedCorim_FromCOSE_fail_invalid_corim(t *testing.T) {
 	var actual SignedCorim
 	err := actual.FromCOSE(tv)
 
-	assert.EqualError(t, err, "failed validation of unsigned CoRIM: tags validation failed: no tags")
+	assert.EqualError(t, err, `failed CBOR decoding of unsigned CoRIM: missing mandatory field "Tags" (1)`)
 }
 
 func TestSignedCorim_FromCOSE_fail_no_content_type(t *testing.T) {

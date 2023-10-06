@@ -247,6 +247,16 @@ func (o *Mval) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
+// UnmarshalJSON deserializes from JSON
+func (o *Mval) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *Mval) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
+}
+
 func (o Mval) Valid() error {
 	if o.Ver == nil &&
 		o.SVN == nil &&
@@ -284,7 +294,7 @@ func (o Mval) Valid() error {
 
 	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
 
-	return o.Extensions.ValidMval(&o)
+	return o.Extensions.validMval(&o)
 }
 
 // Version stores a version-map with JSON and CBOR serializations.

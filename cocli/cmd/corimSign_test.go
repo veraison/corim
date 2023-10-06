@@ -91,7 +91,7 @@ func Test_CorimSignCmd_bad_unsigned_corim(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding unsigned CoRIM from bad.txt: unexpected EOF")
+	assert.EqualError(t, err, "error decoding unsigned CoRIM from bad.txt: expected map (CBOR Major Type 5), found Major Type 3")
 }
 
 func Test_CorimSignCmd_invalid_unsigned_corim(t *testing.T) {
@@ -109,7 +109,7 @@ func Test_CorimSignCmd_invalid_unsigned_corim(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error validating CoRIM: tags validation failed: no tags")
+	assert.EqualError(t, err, `error decoding unsigned CoRIM from invalid.cbor: missing mandatory field "Tags" (1)`)
 }
 
 func Test_CorimSignCmd_non_existent_meta_file(t *testing.T) {
