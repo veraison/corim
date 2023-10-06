@@ -3,13 +3,50 @@
 
 package comid
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
+)
 
 type Triples struct {
 	ReferenceValues *[]ReferenceValue `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
 	EndorsedValues  *[]EndorsedValue  `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
 	AttestVerifKeys *[]AttestVerifKey `cbor:"2,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
 	DevIdentityKeys *[]DevIdentityKey `cbor:"3,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+
+	Extensions
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Triples) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *Triples) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *Triples) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *Triples) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
+}
+
+// UnmarshalJSON deserializes from JSON
+func (o *Triples) UnmarshalJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
+}
+
+// MarshalJSON serializes to JSON
+func (o *Triples) MarshalJSON() ([]byte, error) {
+	return encoding.SerializeStructToJSON(o)
 }
 
 // Valid checks that the Triples is valid as per the specification
@@ -52,7 +89,7 @@ func (o Triples) Valid() error {
 		}
 	}
 
-	return nil
+	return o.Extensions.validTriples(&o)
 }
 
 func (o *Triples) AddReferenceValue(val ReferenceValue) *Triples {

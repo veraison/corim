@@ -299,3 +299,11 @@ func TestUnsignedCorim_AddEntity_non_nil_empty_URI(t *testing.T) {
 
 	assert.Nil(t, tv)
 }
+
+func TestUnsignedCorim_FromJSON(t *testing.T) {
+	data := []byte(`{"corim-id": "5c57e8f4-46cd-421b-91c9-08cf93e13cfc"}`)
+
+	err := NewUnsignedCorim().FromJSON(data)
+
+	assert.NoError(t, err)
+}

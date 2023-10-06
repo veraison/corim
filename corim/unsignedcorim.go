@@ -4,12 +4,13 @@
 package corim
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/veraison/corim/cots"
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/eat"
@@ -19,17 +20,37 @@ import (
 // UnsignedCorim is the top-level representation of the unsigned-corim-map with
 // CBOR and JSON serialization.
 type UnsignedCorim struct {
-	ID            swid.TagID     `cbor:"0,keyasint" json:"corim-id"`
-	Tags          []Tag          `cbor:"1,keyasint" json:"tags"`
+	ID swid.TagID `cbor:"0,keyasint" json:"corim-id"`
+	// note: even though tags are mandatory for CoRIM, we allow omitting
+	// them in our JSON templates for cocli (the min template just has
+	// corim-id). Since we're never writing JSON (so far), this normally
+	// wouldn't matter, however the custom serialization code we use to
+	// handle embedded structs relies on the omitempty entry to determine
+	// if a fieled is optional, so we use it during unmarshaling as well as
+	// marshaling. Hence omitempty is present for the json tag, but not
+	// cbor.
+	Tags          []Tag          `cbor:"1,keyasint" json:"tags,omitempty"`
 	DependentRims *[]Locator     `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
 	Profiles      *[]eat.Profile `cbor:"3,keyasint,omitempty" json:"profiles,omitempty"`
 	RimValidity   *Validity      `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
 	Entities      *Entities      `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
+
+	Extensions
 }
 
 // NewUnsignedCorim instantiates an empty UnsignedCorim
 func NewUnsignedCorim() *UnsignedCorim {
 	return &UnsignedCorim{}
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *UnsignedCorim) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *UnsignedCorim) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
 }
 
 // SetID sets the corim-id in the unsigned-corim-map to the supplied value.  The
@@ -239,22 +260,22 @@ func (o UnsignedCorim) Valid() error {
 		}
 	}
 
-	return nil
+	return o.Extensions.validCorim(&o)
 }
 
 // ToCBOR serializes the target unsigned CoRIM to CBOR
-func (o UnsignedCorim) ToCBOR() ([]byte, error) {
-	return em.Marshal(&o)
+func (o *UnsignedCorim) ToCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
 }
 
 // FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target UnsignedCorim
 func (o *UnsignedCorim) FromCBOR(data []byte) error {
-	return dm.Unmarshal(data, o)
+	return encoding.PopulateStructFromCBOR(dm, data, o)
 }
 
 // FromJSON deserializes a JSON-encoded unsigned CoRIM into the target UnsignedCorim
 func (o *UnsignedCorim) FromJSON(data []byte) error {
-	return json.Unmarshal(data, o)
+	return encoding.PopulateStructFromJSON(data, o)
 }
 
 // Tag is either a CBOR-encoded CoMID, CoSWID or CoTS

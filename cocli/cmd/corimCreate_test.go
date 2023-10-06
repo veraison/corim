@@ -117,7 +117,7 @@ func Test_CorimCreateCmd_with_a_bad_comid(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, `error loading CoMID from bad-comid.cbor: cbor: unexpected "break" code`)
+	assert.EqualError(t, err, `error loading CoMID from bad-comid.cbor: expected map (CBOR Major Type 5), found Major Type 7`)
 }
 
 func Test_CorimCreateCmd_with_an_invalid_comid(t *testing.T) {
@@ -138,7 +138,7 @@ func Test_CorimCreateCmd_with_an_invalid_comid(t *testing.T) {
 	cmd.SetArgs(args)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, `error adding CoMID from invalid-comid.cbor (check its validity using the "comid validate" sub-command)`)
+	assert.EqualError(t, err, `error loading CoMID from invalid-comid.cbor: missing mandatory field "Triples" (4)`)
 }
 
 func Test_CorimCreateCmd_with_a_bad_coswid(t *testing.T) {

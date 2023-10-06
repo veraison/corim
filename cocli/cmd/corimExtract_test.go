@@ -76,7 +76,7 @@ func Test_CorimExtractCmd_invalid_signed_corim(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error decoding signed CoRIM from invalid.cbor: failed validation of unsigned CoRIM: empty id")
+	assert.EqualError(t, err, `error decoding signed CoRIM from invalid.cbor: failed CBOR decoding of unsigned CoRIM: unexpected EOF`)
 }
 
 func Test_CorimExtractCmd_ok_save_to_default_dir(t *testing.T) {

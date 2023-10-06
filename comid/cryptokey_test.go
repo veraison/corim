@@ -119,7 +119,7 @@ func Test_CryptoKey_NewCOSEKey(t *testing.T) {
 	assert.EqualError(t, err, "empty COSE_Key bytes")
 
 	_, err = NewCOSEKey([]byte("DEADBEEF"))
-	assert.Contains(t, err.Error(), "cbor: cannot unmarshal")
+	assert.Contains(t, err.Error(), "cbor: 3 bytes of extraneous data starting at index 5")
 
 	badKey := []byte{ // taken from go-cose unit tests
 		0xa2,       // map(2)

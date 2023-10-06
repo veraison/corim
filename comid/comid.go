@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 	"github.com/veraison/swid"
 )
 
@@ -19,11 +21,23 @@ type Comid struct {
 	Entities    *Entities   `cbor:"2,keyasint,omitempty" json:"entities,omitempty"`
 	LinkedTags  *LinkedTags `cbor:"3,keyasint,omitempty" json:"linked-tags,omitempty"`
 	Triples     Triples     `cbor:"4,keyasint" json:"triples"`
+
+	Extensions
 }
 
 // NewComid instantiates an empty Comid
 func NewComid() *Comid {
 	return &Comid{}
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Comid) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *Comid) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
 }
 
 // SetLanguage sets the language used in the target Comid to the supplied
@@ -229,7 +243,7 @@ func (o Comid) Valid() error {
 		return fmt.Errorf("triples validation failed: %w", err)
 	}
 
-	return nil
+	return o.Extensions.validComid(&o)
 }
 
 // ToCBOR serializes the target Comid to CBOR
@@ -238,17 +252,17 @@ func (o Comid) ToCBOR() ([]byte, error) {
 		return nil, err
 	}
 
-	return em.Marshal(&o)
+	return encoding.SerializeStructToCBOR(em, &o)
 }
 
 // FromCBOR deserializes a CBOR-encoded CoMID into the target Comid
 func (o *Comid) FromCBOR(data []byte) error {
-	return dm.Unmarshal(data, o)
+	return encoding.PopulateStructFromCBOR(dm, data, o)
 }
 
 // FromJSON deserializes a JSON-encoded CoMID into the target Comid
 func (o *Comid) FromJSON(data []byte) error {
-	return json.Unmarshal(data, o)
+	return encoding.PopulateStructFromJSON(data, o)
 }
 
 // ToJSON serializes the target Comid to JSON
@@ -257,7 +271,7 @@ func (o Comid) ToJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(&o)
+	return encoding.SerializeStructToJSON(&o)
 }
 
 func (o Comid) ToJSONPretty(indent string) ([]byte, error) {

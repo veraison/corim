@@ -103,7 +103,7 @@ func TestMeasurement_NewUUIDMeasurement_some_value(t *testing.T) {
 
 	tv := NewUUIDMeasurement(TestUUID).
 		SetMinSVN(2).
-		SetOpFlags(OpFlagDebug).
+		SetFlagsTrue(FlagIsDebug).
 		SetVersion("1.2.3", swid.VersionSchemeSemVer)
 	require.NotNil(t, tv)
 
