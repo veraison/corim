@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/veraison/corim/encoding"
+	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
 	"github.com/veraison/swid"
 )
@@ -16,8 +18,9 @@ const MaxUint64 = ^uint64(0)
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.
 type Measurement struct {
-	Key *Mkey `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
-	Val Mval  `cbor:"1,keyasint" json:"value"`
+	Key          *Mkey      `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
+	Val          Mval       `cbor:"1,keyasint" json:"value"`
+	AuthorizedBy *CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
 }
 
 // Mkey stores a $measured-element-type-choice.
@@ -212,7 +215,7 @@ type Mval struct {
 	Ver          *Version  `cbor:"0,keyasint,omitempty" json:"version,omitempty"`
 	SVN          *SVN      `cbor:"1,keyasint,omitempty" json:"svn,omitempty"`
 	Digests      *Digests  `cbor:"2,keyasint,omitempty" json:"digests,omitempty"`
-	OpFlags      *OpFlags  `cbor:"3,keyasint,omitempty" json:"op-flags,omitempty"`
+	Flags        *FlagsMap `cbor:"3,keyasint,omitempty" json:"flags,omitempty"`
 	RawValue     *RawValue `cbor:"4,keyasint,omitempty" json:"raw-value,omitempty"`
 	RawValueMask *[]byte   `cbor:"5,keyasint,omitempty" json:"raw-value-mask,omitempty"`
 	MACAddr      *MACaddr  `cbor:"6,keyasint,omitempty" json:"mac-addr,omitempty"`
@@ -220,13 +223,35 @@ type Mval struct {
 	SerialNumber *string   `cbor:"8,keyasint,omitempty" json:"serial-number,omitempty"`
 	UEID         *eat.UEID `cbor:"9,keyasint,omitempty" json:"ueid,omitempty"`
 	UUID         *UUID     `cbor:"10,keyasint,omitempty" json:"uuid,omitempty"`
+
+	Extensions
+}
+
+// RegisterExtensions registers a struct as a collections of extensions
+func (o *Mval) RegisterExtensions(exts extensions.IExtensionsValue) {
+	o.Extensions.Register(exts)
+}
+
+// GetExtensions returns pervisouosly registered extension
+func (o *Mval) GetExtensions() extensions.IExtensionsValue {
+	return o.Extensions.IExtensionsValue
+}
+
+// UnmarshalCBOR deserializes from CBOR
+func (o *Mval) UnmarshalCBOR(data []byte) error {
+	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// MarshalCBOR serializes to CBOR
+func (o *Mval) MarshalCBOR() ([]byte, error) {
+	return encoding.SerializeStructToCBOR(em, o)
 }
 
 func (o Mval) Valid() error {
 	if o.Ver == nil &&
 		o.SVN == nil &&
 		o.Digests == nil &&
-		o.OpFlags == nil &&
+		o.Flags == nil &&
 		o.RawValue == nil &&
 		o.RawValueMask == nil &&
 		o.MACAddr == nil &&
@@ -249,8 +274,8 @@ func (o Mval) Valid() error {
 		}
 	}
 
-	if o.OpFlags != nil {
-		if err := o.OpFlags.Valid(); err != nil {
+	if o.Flags != nil {
+		if err := o.Flags.Valid(); err != nil {
 			return err
 		}
 	}
@@ -259,7 +284,7 @@ func (o Mval) Valid() error {
 
 	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
 
-	return nil
+	return o.Extensions.ValidMval(&o)
 }
 
 // Version stores a version-map with JSON and CBOR serializations.
@@ -450,16 +475,51 @@ func (o *Measurement) AddDigest(algID uint64, digest []byte) *Measurement {
 		}
 		o.Val.Digests = ds
 	}
+
 	return o
 }
 
-// SetOpFlags sets the supplied operational flags in the measurement-values-map
-// of the target measurement
-func (o *Measurement) SetOpFlags(flags ...OpFlags) *Measurement {
+// SetFlagsTrue sets the supplied operational flags to true in the
+// measurement-values-map of the target measurement
+func (o *Measurement) SetFlagsTrue(flags ...Flag) *Measurement {
 	if o != nil {
-		o.Val.OpFlags = NewOpFlags()
-		o.Val.OpFlags.SetOpFlags(flags...)
+		if o.Val.Flags == nil {
+			o.Val.Flags = NewFlagsMap()
+		}
+		o.Val.Flags.SetTrue(flags...)
 	}
+
+	return o
+}
+
+// SetFlagsFalse sets the supplied operational flags to true in the
+// measurement-values-map of the target measurement
+func (o *Measurement) SetFlagsFalse(flags ...Flag) *Measurement {
+	if o != nil {
+		if o.Val.Flags == nil {
+			o.Val.Flags = NewFlagsMap()
+		}
+		o.Val.Flags.SetFalse(flags...)
+	}
+
+	return o
+}
+
+// ClearFlags clears the supplied operational flags in the
+// measurement-values-map of the target measurement
+func (o *Measurement) ClearFlags(flags ...Flag) *Measurement {
+	if o != nil {
+		if o.Val.Flags == nil {
+			return o
+		}
+
+		o.Val.Flags.Clear(flags...)
+
+		if !o.Val.Flags.AnySet() {
+			o.Val.Flags = nil
+		}
+	}
+
 	return o
 }
 
