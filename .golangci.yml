@@ -22,9 +22,9 @@ linters-settings:
       - octalLiteral
       - paramTypeCombine
       - whyNoLint
-      - wrapperFunc    
+      - wrapperFunc
   gofmt:
-    simplify: false    
+    simplify: false
   goimports:
   golint:
     min-confidence: 0
@@ -40,24 +40,20 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - goconst
     - gocyclo
     - gofmt
     - goimports
-    - golint
     - gosec
     - govet
     - ineffassign
-    - maligned
     - misspell
+    - revive
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unused
-    - varcheck
 
 
 issues:
@@ -72,7 +68,7 @@ issues:
         - goconst
         - dupl
         - gomnd
-        - lll        
+        - lll
     - path: doc\.go
       linters:
         - goimports

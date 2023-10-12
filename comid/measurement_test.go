@@ -141,8 +141,8 @@ func TestMeasurement_NewUUIDMeasurement_bad_uuid(t *testing.T) {
 }
 
 var (
-	testMKeyUintMin uint64 = 0
-	testMKeyUintMax uint64 = ^uint64(0)
+	testMKeyUintMin uint64
+	testMKeyUintMax = ^uint64(0)
 )
 
 func TestMkey_Valid_no_value(t *testing.T) {
