@@ -201,7 +201,7 @@ func MustHexDecode(t *testing.T, s string) []byte {
 }
 
 func b64TestImplID() string {
-	var implID []byte = TestImplID[:]
+	var implID = TestImplID[:]
 
 	return base64.StdEncoding.EncodeToString(implID)
 }
