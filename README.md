@@ -19,3 +19,16 @@ Before requesting a PR (and routinely during the dev/test cycle), you are encour
 make presubmit
 ```
 and check its output to make sure your code coverage figures are in line with the set target and that there are no newly introduced lint problems.
+
+## Extending CoRIM/CoMID
+
+The CoRIM specification provides a mechanism for adding extensions to the base
+CoRIM schema. The `corim` and `comid` structs which can be extended, embed an
+`Extensions` object  that allows registering a wrapper structure defining
+extension fields. For field types that can be extended, i.e. `type choice`,
+extensions can be implemented by calling an appropriate registration function
+and giving it a new type or a value (for enums).
+
+Please see [extensions documentation](extensions/README.md) for details.
+
+
