@@ -438,4 +438,72 @@ var (
 	}
 }
 `
+	CCARealmRefValJSONTemplate = `{
+	"lang": "en-GB",
+	"tag-identity": {
+		"id": "99019224-57AA-44BC-BEF8-D36BDD6BD035",
+		"version": 0
+	},
+	"entities": [
+		{
+			"name": "Workload Client Ltd.",
+			"regid": "https://workloadclient.example",
+			"roles": [ "tagCreator", "creator", "maintainer" ]
+		}
+	],
+	"triples": {
+		"reference-values": [
+			{
+				"environment": {
+					"class": {
+						"id": {
+							"type": "uuid",
+							"value": "CD1F0E55-26F9-460D-B9D8-F7FDE171787C"
+						},
+						"vendor": "Workload Client Ltd"
+					}
+				},
+				"measurements": [
+					{
+						"value": {
+							"digests": [
+								"sha-384;QoS1aUymwNLPR4mguVrIAlyBjeUjBDZL580pgbLS7caFsyInfsJYGZYkE9jJssH1"
+							]
+						}
+					},
+					{
+						"value": {
+							"digests": [
+								"sha-384;IQe752H8pS2VE2oTVNt6TdV7Gya+DT2nHZ6yOYazS6YVq/ZRTPNeWp6lWgMtBop4"
+							]
+						}
+					},
+					{
+						"value": {
+							"digests": [
+
+								"sha-384;QQe752H8pS2VE2oTVNt6TdV7Gya+DT2nHZ6yOYazS6YVq/ZRTPNeWp6lWgMtBop4"
+							]
+						}
+					},
+					{
+						"value": {
+							"digests": [
+								"sha-384;JQe752H8pS2VE2oTVNt6TdV7Gya+DT2nHZ6yOYazS6YVq/ZRTPNeWp6lWgMtBop4"
+							]
+						}
+					},
+					{
+						"value": {
+							"digests": [
+								"sha-384;MQe752H8pS2VE2oTVNt6TdV7Gya+DT2nHZ6yOYazS6YVq/ZRTPNeWp6lWgMtBop4"
+							]
+						}
+					}
+				]
+			}
+		]
+	}
+}
+`
 )
