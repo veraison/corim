@@ -76,6 +76,16 @@ func (o ClassID) GetImplID() (ImplID, error) {
 	}
 }
 
+func (o ClassID) GetUUID() (UUID, error) {
+	switch t := o.val.(type) {
+	case TaggedUUID:
+		return UUID(t), nil
+	default:
+		return UUID{}, fmt.Errorf("class-id type is: %T", t)
+	}
+
+}
+
 // SetOID sets the value of the targed ClassID to the supplied OID.
 // The OID is a string in dotted-decimal notation
 func (o *ClassID) SetOID(s string) *ClassID {
