@@ -61,7 +61,7 @@ func Test_CotsCreateCtsCmd_too_many_ids(t *testing.T) {
 		"--output=output.cbor",
 		"--uuid",
 		"--id=some_tag_identity",
-		"--environment=../data/cots/env/vendor.json",
+		"--environment=../data/cots/templates/env/vendor.json",
 		"--tafile=../data/cots/shared_ta.ta",
 	}
 	cmd.SetArgs(args)
@@ -76,7 +76,7 @@ func Test_CotsCreateCtsCmd_invalid_uuid(t *testing.T) {
 	args := []string{
 		"--output=output.cbor",
 		"--uuid-str=NotAUuid",
-		"--environment=../data/cots/env/vendor.json",
+		"--environment=../data/cots/templates/env/vendor.json",
 		"--tafile=../data/cots/shared_ta.ta",
 	}
 	cmd.SetArgs(args)
@@ -104,7 +104,7 @@ func Test_CotsCreateCtsCmd_loading_permclaims_template_fail(t *testing.T) {
 
 	args := []string{
 		"--output=output.cbor",
-		"--environment=../data/cots/env/vendor.json",
+		"--environment=../data/cots/templates/env/vendor.json",
 		"--permclaims=nonexistent.json",
 		"--tafile=../data/cots/shared_ta.ta",
 	}
@@ -119,7 +119,7 @@ func Test_CotsCreateCtsCmd_loading_exclclaims_template_fail(t *testing.T) {
 
 	args := []string{
 		"--output=output.cbor",
-		"--environment=../data/cots/env/vendor.json",
+		"--environment=../data/cots/templates/env/vendor.json",
 		"--exclclaims=nonexistent.json",
 		"--tafile=../data/cots/shared_ta.ta",
 	}
@@ -134,9 +134,9 @@ func Test_CotsCreateCtsCmd_ok(t *testing.T) {
 
 	args := []string{
 		"--output=output.cbor",
-		"--environment=../data/cots/env/vendor.json",
-		"--exclclaims=../data/cots/claims/exclclaim.json",
-		"--permclaims=../data/cots/claims/permclaim.json",
+		"--environment=../data/cots/templates/env/vendor.json",
+		"--exclclaims=../data/cots/templates/claims/exclclaim.json",
+		"--permclaims=../data/cots/templates/claims/permclaim.json",
 		"--tafile=../data/cots/shared_ta.ta",
 	}
 	cmd.SetArgs(args)
