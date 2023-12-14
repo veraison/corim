@@ -516,3 +516,18 @@ func TestRegisterMkeyType(t *testing.T) {
 	err = RegisterMkeyType(99996, newTestMkey)
 	assert.NoError(t, err)
 }
+
+func TestMkey_UnmarshalJSON_regression_issue_100(t *testing.T) {
+	u := `31fb5abf-023e-4992-aa4e-95f9c1503bfa`
+
+	tv := []byte(fmt.Sprintf(`{ "type": "uuid", "value": %q }`, u))
+
+	expected, err := NewMkeyUUID(u)
+	require.NoError(t, err)
+
+	actual := &Mkey{}
+	err = actual.UnmarshalJSON(tv)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+}
