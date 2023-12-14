@@ -70,6 +70,10 @@ type TaggedUUID UUID
 func NewTaggedUUID(val any) (*TaggedUUID, error) {
 	var ret TaggedUUID
 
+	if val == nil {
+		return &ret, nil
+	}
+
 	switch t := val.(type) {
 	case string:
 		u, err := ParseUUID(t)
