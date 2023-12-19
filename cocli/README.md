@@ -20,8 +20,7 @@ To get a list of the supported shells, do:
 $ cocli completion --help
 ```
 # CoRIM Handling
-A CoRIM consists of either one or more CoMID and/or CoSWID and/or CoTS. The below
-picture and instructions provides a step by step approach to handle CoRIMs.
+This document provides step-by-step instructions for how to use the `cocli` tool to manipulate CoRIMs, CoMIDs and CoTS.
 
 ``` mermaid
 flowchart TD

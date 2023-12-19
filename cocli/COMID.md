@@ -120,7 +120,7 @@ which would output something like:
 Error: 1/3 display(s) failed
 ```
 
-One of more files and directories can be supplied in the same invocation, e.g.:
+One or more files and directories can be supplied in the same invocation, e.g.:
 ```
 $ cocli comid display -f m1.cbor \
                     -f comids.d/m2.cbor \
