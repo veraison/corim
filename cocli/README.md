@@ -34,7 +34,7 @@ flowchart TD
     subgraph COMIDCMD["<b>COMID COMMANDS</b> \n cocli comid create \n cocli comid display"]
     end
     end
-    CORIM ---> CORIMCMD
+    CORIM ----> CORIMCMD
     subgraph CORIM["<b>CoRIM</b>"]
       subgraph CoMID["\n"]
         CM1["CoMID-1"]
