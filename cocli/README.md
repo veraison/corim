@@ -24,44 +24,46 @@ This document provides step-by-step instructions for how to use the `cocli` tool
 
 ``` mermaid
 flowchart TD
+    subgraph COCLI["<b>COCLI COMMANDS</b>"]
+    style COCLI fill:#ffffff, stroke:#333,stroke-width:4px
+    subgraph CORIMCMD["<b>CORIM COMMANDS</b> \n
+        cocli corim create \n cocli corim display \n cocli corim sign \n cocli corim verify\n cocli corim extract\n cocli corim submit"]
+    end
+    subgraph COTSCMD["<b>COTS COMMANDS</b> \n cocli cots create \n cocli cots display"]
+    end
+    subgraph COMIDCMD["<b>COMID COMMANDS</b> \n cocli comid create \n cocli comid display"]
+    end
+    end
+    CORIM ---> CORIMCMD
     subgraph CORIM["<b>CoRIM</b>"]
       subgraph CoMID["\n"]
         CM1["CoMID-1"]
         CM2["CoMID-2"]
 
         CM3["CoMID-N"]
-        CM4["<b>COMID COMMANDS</b> \n cocli comid create \n cocli comid display"]
         CM1  -.- CM2
         CM2  -.- CM3
-        CM3  -.- CM4
+        CM3  ---> COMIDCMD
     end
     subgraph CoMID["Blank1"]
         CSW1["CoSWID-1"]
         CSW2["CoSWID-2"]
         CSW3["CoSWID-N"]
-
         CSW1  -.- CSW2
         CSW2  -.- CSW3
    
     end
 
     subgraph CoMID["Blank3"]
-        CS1["CoTS-1"]
-        CS2["CoTS-2"]
-       
         CS3["CoTS-N"]
-        CS4["<b>COTS COMMANDS</b> \n cocli cots create \n cocli cots display"]
+        CS2["CoTS-2"]
+        CS1["CoTS-1"]
+  
         CS1  -.- CS2
-
         CS2  -.- CS3
-        CS3 -.- CS4
+        CS3 ---> COTSCMD
     end
 end
-CORIM ---> CMD
-subgraph CMD["<b>CORIM COMMANDS</b> \n
- 1.cocli corim create \n 2.cocli corim display \n 3.cocli corim sign \n4.cocli corim verify\n5.cocli corim extract\n 6.cocli corim submit"]
-end
-
 ```
 
 ## CoMIDs manipulation
