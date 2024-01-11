@@ -22,50 +22,49 @@ $ cocli completion --help
 # CoRIM Handling
 This document provides step-by-step instructions for how to use the `cocli` tool to manipulate CoRIMs, CoMIDs and CoTS.
 
-``` mermaid
+```mermaid 
 flowchart TD
-    subgraph COCLI["<b>COCLI COMMANDS</b>"]
+  subgraph COCLI["<b>COCLI COMMANDS</b>"]
     style COCLI fill:#ffffff, stroke:#333,stroke-width:4px
     subgraph CORIMCMD["<b>CORIM COMMANDS</b> \n
         cocli corim create \n cocli corim display \n cocli corim sign \n cocli corim verify\n cocli corim extract\n cocli corim submit"]
     end
-    subgraph COTSCMD["<b>COTS COMMANDS</b> \n cocli cots create \n cocli cots display"]
-    end
     subgraph COMIDCMD["<b>COMID COMMANDS</b> \n cocli comid create \n cocli comid display"]
     end
+
+    subgraph COTSCMD["<b>COTS COMMANDS</b> \n cocli cots create \n cocli cots display"]
     end
-
-    CORIM ----> CORIMCMD
-
-    subgraph CORIM["<b>CoRIM</b>"]
-      subgraph CoMID["\n"]
-        CM1["CoMID-1"]
-        CM2["CoMID-2"]
-
+  end
+ CORIM ---> CORIMCMD
+subgraph CORIM["<b>CoRIM</b>"]
+      subgraph CoMID["COMIDs\n"]
         CM3["CoMID-N"]
+        CM2["CoMID-2"]
+        CM1["CoMID-1"]
         CM1  -.- CM2
         CM2  -.- CM3
-        CM3  ---> COMIDCMD
-    end
-    subgraph CoMID["Blank1"]
+        CM3 ---> COMIDCMD
+     end
+     
+    subgraph CoSWID["CoSWID\n"]
         CSW1["CoSWID-1"]
         CSW2["CoSWID-2"]
         CSW3["CoSWID-N"]
         CSW1  -.- CSW2
-        CSW2  -.- CSW3
-   
+        CSW2 -.- CSW3
     end
 
-    subgraph CoMID["Blank3"]
+    subgraph CoTS["COTS\n"]
         CS3["CoTS-N"]
         CS2["CoTS-2"]
         CS1["CoTS-1"]
-  
         CS1  -.- CS2
         CS2  -.- CS3
         CS3 ---> COTSCMD
     end
+
 end
+ 
 ```
 
 ## CoMIDs manipulation
