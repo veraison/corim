@@ -1,6 +1,27 @@
 # Corim Command Line Interface
 
-## Installing and configuring
+In this document we describe how to use Corim Command Line Interface tool `cocli` 
+
+* [Installation](#installing-and-configuring)
+* [Command Snapshot](#cocli-command-snapshot)
+* [Supported Commands](#supported-commands)
+  * [CoMID Commands](#comids-manipulation)
+    * [Create](#create)
+    * [Display](#display)
+  * [CoTS Commands](#cotss-manipulation)
+    * [Create](#create-1)
+    * [Display](#display-1)
+  * [CoRIM Commands](#corims-manipulation)
+    * [Create](#create-2)
+    * [Sign](#sign)
+    * [Verify](#verify)
+    * [Display](#display-2)
+    * [Extract](#extract-coswids-comids-and-cotss)
+  * [CoRIM Submission](#corim-submission-to-veraison)
+    * [Remote Authentication](#remote-service-authentication)
+  * [Command Synopsis](#visual-synopsis-of-the-available-commands)
+
+# Installing and configuring
 
 To install the `cocli` command, do:
 ```
@@ -66,6 +87,9 @@ subgraph CORIM["<b>CoRIM</b>"]
 end
  
 ```
+
+# Supported Commands
+This section describes all the available commands supported by `cocli` tool
 
 ## CoMIDs manipulation
 
