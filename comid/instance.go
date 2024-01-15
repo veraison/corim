@@ -8,7 +8,7 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
-// Instance stores an instance identity. The supported formats are UUID and UEID.
+// Instance stores an instance identity. The supported formats are UUID, UEID and variable length opaque bytes.
 type Instance struct {
 	Value IInstanceValue
 }
@@ -77,6 +77,7 @@ func (o *Instance) UnmarshalCBOR(data []byte) error {
 //
 //	ueid: base64-encoded bytes, e.g. "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 //	uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
+//	bytes: a variable length opaque bytes, example {0x07, 0x12, 0x34}
 func (o *Instance) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 
@@ -149,7 +150,6 @@ func MustNewUEIDInstance(val any) *Instance {
 	if err != nil {
 		panic(err)
 	}
-
 	return ret
 }
 
@@ -167,6 +167,17 @@ func NewUUIDInstance(val any) (*Instance, error) {
 	return &Instance{ret}, nil
 }
 
+// NewBytesInstance creates a new instance of type bytes
+// The supplied interface parameter could be
+// a byte slice, a pointer to a byte slice or a string
+func NewBytesInstance(val any) (*Instance, error) {
+	ret, err := NewBytes(val)
+	if err != nil {
+		return nil, err
+	}
+	return &Instance{ret}, nil
+}
+
 // MustNewUUIDInstance is like NewUUIDInstance execept it does not return an
 // error, assuming that the provided value is valid. It panics if that isn't
 // the case.
@@ -180,7 +191,7 @@ func MustNewUUIDInstance(val any) *Instance {
 }
 
 // IInstanceFactory defines the signature for the factory functions that may be
-// registred using RegisterInstanceType to provide a new implementation of the
+// registered using RegisterInstanceType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *Instance
 // with the underlying value created based on the provided input. The range of
 // valid inputs is up to the specific type choice implementation, however it
@@ -190,8 +201,9 @@ func MustNewUUIDInstance(val any) *Instance {
 type IInstanceFactory func(any) (*Instance, error)
 
 var instanceValueRegister = map[string]IInstanceFactory{
-	UEIDType: NewUEIDInstance,
-	UUIDType: NewUUIDInstance,
+	UEIDType:  NewUEIDInstance,
+	UUIDType:  NewUUIDInstance,
+	BytesType: NewBytesInstance,
 }
 
 // RegisterInstanceType registers a new IInstanceValue implementation (created

@@ -33,13 +33,24 @@ func TestRawValue_Get_Bytes_nok(t *testing.T) {
 	assert.EqualError(t, err, expectedErr)
 }
 
-func TestRawValue_Marshal_UnMarshal_ok(t *testing.T) {
+func TestRawValue_Marshal_UnMarshal_JSON_ok(t *testing.T) {
 	tv := RawValue{}
 	rv := tv.SetBytes([]byte{0x01, 0x02, 0x03})
 	bytes, err := rv.MarshalJSON()
 	assert.NoError(t, err)
 	sv := RawValue{}
 	err = sv.UnmarshalJSON(bytes)
+	assert.NoError(t, err)
+	assert.Equal(t, *rv, sv)
+}
+
+func TestRawValue_Marshal_UnMarshal_CBOR_ok(t *testing.T) {
+	tv := RawValue{}
+	rv := tv.SetBytes([]byte{0x01, 0x02, 0x03})
+	bytes, err := rv.MarshalCBOR()
+	assert.NoError(t, err)
+	sv := RawValue{}
+	err = sv.UnmarshalCBOR(bytes)
 	assert.NoError(t, err)
 	assert.Equal(t, *rv, sv)
 }

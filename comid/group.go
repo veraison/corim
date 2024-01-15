@@ -12,7 +12,7 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
-// Group stores a group identity.  The supported format is UUID.
+// Group stores a group identity. The supported format is UUID and a variable length opaque bytes.
 type Group struct {
 	Value IGroupValue
 }
@@ -42,6 +42,23 @@ func (o Group) String() string {
 	return o.Value.String()
 }
 
+// Type returns the type of the Group
+func (o Group) Type() string {
+	if o.Value == nil {
+		return ""
+	}
+
+	return o.Value.Type()
+}
+
+// Bytes returns a []byte containing the raw bytes of the group value
+func (o Group) Bytes() []byte {
+	if o.Value == nil {
+		return []byte{}
+	}
+	return o.Value.Bytes()
+}
+
 // MarshalCBOR serializes the target group to CBOR
 func (o Group) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.Value)
@@ -53,10 +70,18 @@ func (o *Group) UnmarshalCBOR(data []byte) error {
 }
 
 // UnmarshalJSON deserializes the supplied JSON type/value object into the Group
-// target.  The only supported format is UUID, e.g.:
+// target.  The following formats are supported:
+//
+//	 (a) UUID, e.g.:
+//		{
+//		  "type": "uuid",
+//		  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
+//		}
+//
+// (b) Tagged bytes, e.g. :
 //
 //	{
-//	  "type": "uuid",
+//	  "type": "bytes",
 //	  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
 //	}
 func (o *Group) UnmarshalJSON(data []byte) error {
@@ -93,6 +118,8 @@ func (o Group) MarshalJSON() ([]byte, error) {
 
 type IGroupValue interface {
 	extensions.ITypeChoiceValue
+
+	Bytes() []byte
 }
 
 func NewUUIDGroup(val any) (*Group, error) {
@@ -117,8 +144,19 @@ func MustNewUUIDGroup(val any) *Group {
 	return ret
 }
 
+// NewBytesGroup creates a New Group of type bytes
+// The supplied interface parameter could be
+// a byte slice, a pointer to a byte slice or a string
+func NewBytesGroup(val any) (*Group, error) {
+	ret, err := NewBytes(val)
+	if err != nil {
+		return nil, err
+	}
+	return &Group{ret}, nil
+}
+
 // IGroupFactory defines the signature for the factory functions that may be
-// registred using RegisterGroupType to provide a new implementation of the
+// registered using RegisterGroupType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *Group
 // with the underlying value created based on the provided input. The range of
 // valid inputs is up to the specific type choice implementation, however it
@@ -128,7 +166,8 @@ func MustNewUUIDGroup(val any) *Group {
 type IGroupFactory func(any) (*Group, error)
 
 var groupValueRegister = map[string]IGroupFactory{
-	UUIDType: NewUUIDGroup,
+	UUIDType:  NewUUIDGroup,
+	BytesType: NewBytesGroup,
 }
 
 // RegisterGroupType registers a new IGroupValue implementation
