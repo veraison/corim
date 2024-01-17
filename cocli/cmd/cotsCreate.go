@@ -54,6 +54,16 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 	                   --tas=tas_dir \
 	                   --cas=cas_dir \
 	                   --output=cots.cbor
+	
+	Alternatively one can specify individual TA files (in DER Format) or CA files (binary, DER-encoded X.509 Certificate)
+
+	cocli cots create --environment=env-template.json \
+					--purpose=eat \
+					--purpose=corim \
+					--permclaims=claims-template.json \
+					--tafile=tas_dir \
+					--cafile=cas_dir \
+					--output=cots.cbor
 	`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -100,7 +110,7 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 		&cotsCreateCtsTaDirs, "tas", "t", []string{}, "a directory containing binary DER-encoded trust anchor files",
 	)
 	cmd.Flags().StringArrayVarP(
-		&cotsCreateCtsTaFiles, "tafile", "", []string{}, "a DER-encoded trust anchor file",
+		&cotsCreateCtsTaFiles, "tafile", "f", []string{}, "a DER-encoded trust anchor file",
 	)
 
 	cmd.Flags().StringArrayVarP(
