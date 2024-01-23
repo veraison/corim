@@ -453,7 +453,7 @@ func Test_NewBytesClassID_OK(t *testing.T) {
 		classID, err := NewBytesClassID(v)
 		require.NoError(t, err)
 		got := classID.Bytes()
-		assert.Equal(t, testBytes[:], got)
+		assert.Equal(t, testBytes, got)
 	}
 }
 

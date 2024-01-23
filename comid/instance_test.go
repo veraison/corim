@@ -154,7 +154,7 @@ func TestInstance_UnmarshalJSON_Bytes_OK(t *testing.T) {
 		},
 		{
 			Name:  "valid input test 2",
-			Input: `{ "type": "bytes", "value": "deadbeef"}`,
+			Input: `{ "type": "bytes", "value": "CgsMDQ4="}`,
 		},
 	} {
 		t.Run(tv.Name, func(t *testing.T) {

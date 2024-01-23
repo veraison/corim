@@ -79,7 +79,7 @@ func Test_NewBytesGroup_OK(t *testing.T) {
 		group, err := NewBytesGroup(v)
 		require.NoError(t, err)
 		got := group.Bytes()
-		assert.Equal(t, testBytes[:], got)
+		assert.Equal(t, testBytes, got)
 	}
 }
 
