@@ -407,7 +407,7 @@ func (o *testClassID) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("bad testClassID: decoded %d bytes, want 4", len(out))
 	}
 
-	copy((*o)[:], []byte(out))
+	copy((*o)[:], out)
 
 	return nil
 }
@@ -440,4 +440,126 @@ func Test_RegisterClassIDType(t *testing.T) {
 	err = dm.Unmarshal(data, &out2)
 	require.NoError(t, err)
 	assert.Equal(t, classID.Bytes(), out2.Bytes())
+}
+
+func Test_NewBytesClassID_OK(t *testing.T) {
+	var testBytes = []byte{0x01, 0x02, 0x03, 0x04}
+
+	for _, v := range []any{
+		testBytes,
+		&testBytes,
+		string(testBytes),
+	} {
+		classID, err := NewBytesClassID(v)
+		require.NoError(t, err)
+		got := classID.Bytes()
+		assert.Equal(t, testBytes, got)
+	}
+}
+
+func Test_NewBytesClassID_NOK(t *testing.T) {
+	for _, tv := range []struct {
+		Name  string
+		Input any
+		Err   string
+	}{
+
+		{
+			Name:  "invalid input integer",
+			Input: 7,
+			Err:   "unexpected type for bytes: int",
+		},
+		{
+			Name:  "invalid input fixed array",
+			Input: [3]byte{0x01, 0x02, 0x03},
+			Err:   "unexpected type for bytes: [3]uint8",
+		},
+	} {
+		t.Run(tv.Name, func(t *testing.T) {
+			_, err := NewBytesClassID(tv.Input)
+			assert.EqualError(t, err, tv.Err)
+		})
+	}
+}
+
+func TestClassID_MarshalCBOR_Bytes(t *testing.T) {
+	tv, err := NewBytesClassID(TestBytes)
+	require.NoError(t, err)
+	// 560 (h'458999786556')
+	// tag(560): d9 0230
+	expected := MustHexDecode(t, "d90230458999786556")
+
+	actual, err := tv.MarshalCBOR()
+	fmt.Printf("CBOR: %x\n", actual)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestClassID_UnmarshalCBOR_Bytes_OK(t *testing.T) {
+	tv := MustHexDecode(t, "d90230458999786556")
+
+	var actual ClassID
+	err := actual.UnmarshalCBOR(tv)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "bytes", actual.Type())
+	assert.Equal(t, TestBytes, actual.Bytes())
+}
+
+func TestClassID_MarshalJSONBytes_OK(t *testing.T) {
+	testBytes := []byte{0x01, 0x02, 0x03}
+	tb := TaggedBytes(testBytes)
+	tv := ClassID{&tb}
+	jsonBytes, err := tv.MarshalJSON()
+	require.NoError(t, err)
+	assert.Equal(t, `{"type":"bytes","value":"AQID"}`, string(jsonBytes))
+
+}
+
+func TestClassID_UnmarshalJSON_Bytes_OK(t *testing.T) {
+	for _, tv := range []struct {
+		Name  string
+		Input string
+	}{
+		{
+			Name:  "valid input test 1",
+			Input: `{ "type": "bytes", "value": "MTIzNDU2Nzg5" }`,
+		},
+		{
+			Name:  "valid input test 2",
+			Input: `{ "type": "bytes", "value": "deadbeef"}`,
+		},
+	} {
+		t.Run(tv.Name, func(t *testing.T) {
+			var actual ClassID
+			err := actual.UnmarshalJSON([]byte(tv.Input))
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestClassID_UnmarshalJSON_Bytes_NOK(t *testing.T) {
+	for _, tv := range []struct {
+		Name  string
+		Input string
+		Err   string
+	}{
+		{
+			Name:  "invalid value",
+			Input: `{ "type": "bytes", "value": "/0" }`,
+			Err:   "cannot unmarshal class id: illegal base64 data at input byte 0",
+		},
+		{
+			Name:  "invalid input",
+			Input: `{ "type": "bytes", "value": 10 }`,
+			Err:   "cannot unmarshal class id: json: cannot unmarshal number into Go value of type comid.TaggedBytes",
+		},
+	} {
+		t.Run(tv.Name, func(t *testing.T) {
+			var actual ClassID
+			err := actual.UnmarshalJSON([]byte(tv.Input))
+			assert.EqualError(t, err, tv.Err)
+		})
+	}
 }

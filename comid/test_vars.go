@@ -28,6 +28,7 @@ var (
 	TestRegID             = "https://acme.example"
 	TestMACaddr, _        = net.ParseMAC("02:00:5e:10:00:00:00:01")
 	TestIPaddr            = net.ParseIP("2001:db8::68")
+	TestBytes             = []byte{0x89, 0x99, 0x78, 0x65, 0x56}
 	TestUEIDString        = "02deadbeefdead"
 	TestUEID              = eat.UEID(MustHexDecode(nil, TestUEIDString))
 	TestSignerID          = MustHexDecode(nil, "acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b")

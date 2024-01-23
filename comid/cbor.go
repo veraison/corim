@@ -29,7 +29,7 @@ var (
 		557: TaggedThumbprint{},
 		558: TaggedCOSEKey{},
 		559: TaggedCertThumbprint{},
-		560: TaggedRawValueBytes{},
+		560: TaggedBytes{},
 		561: TaggedCertPathThumbprint{},
 		// PSA profile tags
 		600: TaggedImplID{},

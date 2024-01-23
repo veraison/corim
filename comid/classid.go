@@ -16,7 +16,7 @@ import (
 )
 
 // ClassID identifies the environment via a well-known identifier. This can be
-// an OID, a UUID, or a profile-defined extension type.
+// an OID, a UUID, variable-length opaque bytes or a profile-defined extension type.
 type ClassID struct {
 	Value IClassIDValue
 }
@@ -85,14 +85,15 @@ func (o *ClassID) UnmarshalCBOR(data []byte) error {
 //
 // where <CLASS_ID_TYPE> must be one of the known IClassIDValue implementation
 // type names (available in this implementation: "uuid", "oid",
-// "psa.impl-id", "int"), and <CLASS_ID_VALUE> is the JSON encoding of the underlying
+// "psa.impl-id", "int", "bytes"), and <CLASS_ID_VALUE> is the JSON encoding of the underlying
 // class id value. The exact encoding is <CLASS_ID_TYPE> dependent. For the base
 // implementation types it is
 //
-//	oid: dot-separated integers, e.g. "1.2.3.4"
-//	psa.impl-id: base64-encoded bytes, e.g. "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
-//	uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
-//	int: an integer value, e.g. 7
+//		oid: dot-separated integers, e.g. "1.2.3.4"
+//		psa.impl-id: base64-encoded bytes, e.g. "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+//		uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
+//		int: an integer value, e.g. 7
+//	 bytes: a variable length opaque bytes, example {0x07, 0x12, 0x34}
 func (o *ClassID) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 
@@ -346,6 +347,17 @@ func (o TaggedInt) Bytes() []byte {
 	return ret[:]
 }
 
+// NewBytesClassID creates a New ClassID of type bytes
+// The supplied interface parameter could be
+// a byte slice, a pointer to a byte slice or a string
+func NewBytesClassID(val any) (*ClassID, error) {
+	ret, err := NewBytes(val)
+	if err != nil {
+		return nil, err
+	}
+	return &ClassID{ret}, nil
+}
+
 // IClassIDFactory defines the signature for the factory functions that may be
 // registred using RegisterClassIDType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *ClassID
@@ -357,10 +369,10 @@ func (o TaggedInt) Bytes() []byte {
 type IClassIDFactory func(any) (*ClassID, error)
 
 var classIDValueRegister = map[string]IClassIDFactory{
-	OIDType:  NewOIDClassID,
-	UUIDType: NewUUIDClassID,
-	IntType:  NewIntClassID,
-
+	OIDType:    NewOIDClassID,
+	UUIDType:   NewUUIDClassID,
+	IntType:    NewIntClassID,
+	BytesType:  NewBytesClassID,
 	ImplIDType: NewImplIDClassID,
 }
 

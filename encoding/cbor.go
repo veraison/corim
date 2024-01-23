@@ -244,17 +244,17 @@ func (o *structFieldsCBOR) ToCBOR(em cbor.EncMode) ([]byte, error) {
 	if mapLen == 0 {
 		return []byte{header}, nil
 	} else if mapLen < 24 {
-		header = header | byte(mapLen)
+		header |= byte(mapLen)
 		out = append(out, header)
 	} else if mapLen <= math.MaxUint8 {
-		header = header | byte(24)
+		header |= byte(24)
 		out = append(out, header, uint8(mapLen))
 	} else if mapLen <= math.MaxUint16 {
-		header = header | byte(25)
+		header |= byte(25)
 		out = append(out, header)
 		out = binary.BigEndian.AppendUint16(out, uint16(mapLen))
 	} else {
-		header = header | byte(26)
+		header |= byte(26)
 		out = append(out, header)
 		out = binary.BigEndian.AppendUint32(out, uint32(mapLen))
 	}
@@ -360,7 +360,7 @@ func (o *structFieldsCBOR) unmarshalKeyValue(dm cbor.DecMode, rest []byte) ([]by
 		return rest, fmt.Errorf("could not unmarshal value: %w", err)
 	}
 
-	if err = o.Add(key, val); err != nil {
+	if err := o.Add(key, val); err != nil {
 		return rest, err
 	}
 
@@ -370,40 +370,39 @@ func (o *structFieldsCBOR) unmarshalKeyValue(dm cbor.DecMode, rest []byte) ([]by
 func processAdditionalInfo(
 	additionalInfo byte,
 	data []byte,
-) (int, []byte, error) {
-	var val int
-	rest := data
+) (mapLen int, rest []byte, err error) {
+	rest = data
 
 	if additionalInfo < 24 {
-		val = int(additionalInfo)
+		mapLen = int(additionalInfo)
 	} else if additionalInfo < 28 {
 		switch additionalInfo - 23 {
 		case 1:
 			if len(data) < 1 {
 				return 0, nil, errors.New("unexpected EOF")
 			}
-			val = int(data[0])
+			mapLen = int(data[0])
 			rest = data[1:]
 		case 2:
 			if len(data) < 2 {
 				return 0, nil, errors.New("unexpected EOF")
 			}
-			val = int(binary.BigEndian.Uint16(data[:2]))
+			mapLen = int(binary.BigEndian.Uint16(data[:2]))
 			rest = data[2:]
 		case 3:
 			if len(data) < 4 {
 				return 0, nil, errors.New("unexpected EOF")
 			}
-			val = int(binary.BigEndian.Uint32(data[:4]))
+			mapLen = int(binary.BigEndian.Uint32(data[:4]))
 			rest = data[4:]
 		default:
 			return 0, nil, errors.New("cbor: cannot decode length value of 8 bytes")
 		}
 	} else if additionalInfo == 31 {
-		val = 0 // indefinite encoding
+		mapLen = 0 // indefinite encoding
 	} else {
 		return 0, nil, fmt.Errorf("cbor: unexpected additional information value %d", additionalInfo)
 	}
 
-	return val, rest, nil
+	return mapLen, rest, nil
 }

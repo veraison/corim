@@ -13,16 +13,17 @@ type RawValue struct {
 	val interface{}
 }
 
-// TaggedRawValueBytes is an alias for []byte to allow its automatic tagging
-type TaggedRawValueBytes []byte
-
 func NewRawValue() *RawValue {
 	return &RawValue{}
 }
 
 func (o *RawValue) SetBytes(val []byte) *RawValue {
 	if o != nil {
-		o.val = TaggedRawValueBytes(val)
+		v, err := NewBytes(val)
+		if err != nil {
+			return nil
+		}
+		o.val = *v
 	}
 	return o
 }
@@ -33,7 +34,7 @@ func (o RawValue) GetBytes() ([]byte, error) {
 	}
 
 	switch t := o.val.(type) {
-	case TaggedRawValueBytes:
+	case TaggedBytes:
 		return []byte(t), nil
 	default:
 		return nil, fmt.Errorf("unknown type %T for $raw-value-type-choice", t)
@@ -45,7 +46,7 @@ func (o RawValue) MarshalCBOR() ([]byte, error) {
 }
 
 func (o *RawValue) UnmarshalCBOR(data []byte) error {
-	var rawValue TaggedRawValueBytes
+	var rawValue TaggedBytes
 
 	if dm.Unmarshal(data, &rawValue) == nil {
 		o.val = rawValue
@@ -56,7 +57,7 @@ func (o *RawValue) UnmarshalCBOR(data []byte) error {
 }
 
 // UnmarshalJSON deserializes the type'n'value JSON object into the target RawValue.
-// The only supported type is "bytes" with value
+// The only supported type is BytesType with value
 func (o *RawValue) UnmarshalJSON(data []byte) error {
 	var v tnv
 
@@ -65,7 +66,7 @@ func (o *RawValue) UnmarshalJSON(data []byte) error {
 	}
 
 	switch v.Type {
-	case "bytes":
+	case BytesType:
 		var x []byte
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
@@ -73,7 +74,7 @@ func (o *RawValue) UnmarshalJSON(data []byte) error {
 				err,
 			)
 		}
-		o.val = TaggedRawValueBytes(x)
+		o.val = TaggedBytes(x)
 	default:
 		return fmt.Errorf("unknown type %s for $raw-value-type-choice", v.Type)
 	}
@@ -89,12 +90,12 @@ func (o RawValue) MarshalJSON() ([]byte, error) {
 	)
 
 	switch t := o.val.(type) {
-	case TaggedRawValueBytes:
+	case TaggedBytes:
 		b, err = json.Marshal(o.val)
 		if err != nil {
 			return nil, err
 		}
-		v = tnv{Type: "bytes", Value: b}
+		v = tnv{Type: BytesType, Value: b}
 	default:
 		return nil, fmt.Errorf("unknown type %T for raw-value-type-choice", t)
 	}
