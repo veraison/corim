@@ -140,7 +140,6 @@ func TestGroup_MarshalJSONBytes_OK(t *testing.T) {
 	jsonBytes, err := tv.MarshalJSON()
 	require.NoError(t, err)
 	assert.Equal(t, `{"type":"bytes","value":"AQID"}`, string(jsonBytes))
-
 }
 
 func TestGroup_UnmarshalJSON_Bytes_OK(t *testing.T) {

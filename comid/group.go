@@ -12,7 +12,7 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
-// Group stores a group identity. The supported format is UUID and a variable length opaque bytes.
+// Group stores a group identity. The supported formats are UUID and variable-length opaque bytes.
 type Group struct {
 	Value IGroupValue
 }
@@ -82,7 +82,7 @@ func (o *Group) UnmarshalCBOR(data []byte) error {
 //
 //	{
 //	  "type": "bytes",
-//	  "value": "69E027B2-7157-4758-BCB4-D9F167FE49EA"
+//	  "value": "MTIzNDU2Nzg5"
 //	}
 func (o *Group) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue

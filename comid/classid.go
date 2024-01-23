@@ -16,7 +16,7 @@ import (
 )
 
 // ClassID identifies the environment via a well-known identifier. This can be
-// an OID, a UUID, a variable length opaque bytes or a profile-defined extension type.
+// an OID, a UUID, variable-length opaque bytes or a profile-defined extension type.
 type ClassID struct {
 	Value IClassIDValue
 }

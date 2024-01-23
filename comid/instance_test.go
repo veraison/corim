@@ -90,7 +90,6 @@ func Test_NewBytesInstance_NOK(t *testing.T) {
 		Input any
 		Err   string
 	}{
-
 		{
 			Name:  "invalid input integer",
 			Input: 7,
