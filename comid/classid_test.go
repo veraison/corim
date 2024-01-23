@@ -407,7 +407,7 @@ func (o *testClassID) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("bad testClassID: decoded %d bytes, want 4", len(out))
 	}
 
-	copy((*o)[:], []byte(out))
+	copy((*o)[:], out)
 
 	return nil
 }
