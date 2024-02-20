@@ -98,32 +98,32 @@ func TestIntegrityRegisters_UnmarshalCBOR_UIntIndex_OK(t *testing.T) {
 func TestIntegrityRegisters_MarshalJSON_UIntIndex_OK(t *testing.T) {
 	expected := `{
 		"0": {
-			"key_type": "uint",
-			"Value": [
+			"key-type": "uint",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"1": {
-			"key_type": "uint",
-			"Value": [
+			"key-type": "uint",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"2": {
-			"key_type": "uint",
-			"Value": [
+			"key-type": "uint",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"3": {
-			"key_type": "uint",
-			"Value": [
+			"key-type": "uint",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"4": {
-			"key_type": "uint",
-			"Value": [
+			"key-type": "uint",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		}
@@ -173,32 +173,32 @@ func TestIntegrityRegisters_UnmarshalCBOR_TextIndex_OK(t *testing.T) {
 func TestIntegrityRegisters_MarshalJSON_TextIndex_OK(t *testing.T) {
 	expected := `{
 		"0": {
-			"key_type": "text",
-			"Value": [
+			"key-type": "text",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"1": {
-			"key_type": "text",
-			"Value": [
+			"key-type": "text",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"2": {
-			"key_type": "text",
-			"Value": [
+			"key-type": "text",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"3": {
-			"key_type": "text",
-			"Value": [
+			"key-type": "text",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		},
 		"4": {
-			"key_type": "text",
-			"Value": [
+			"key-type": "text",
+			"value": [
 				"sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="
 			]
 		}
@@ -213,7 +213,7 @@ func TestIntegrityRegisters_MarshalJSON_TextIndex_OK(t *testing.T) {
 }
 
 func TestIntegrityRegisters_UnmarshalJSON_TextIndex_OK(t *testing.T) {
-	j := `{"abcd":{"key_type":"text","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`
+	j := `{"abcd":{"key-type":"text","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`
 	expected := IntegrityRegisters{map[IRegisterIndex]Digests{
 		"abcd": []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
 	}}
@@ -225,11 +225,11 @@ func TestIntegrityRegisters_UnmarshalJSON_TextIndex_OK(t *testing.T) {
 
 func TestIntegrityRegisters_UnmarshalJSON_UIntIndex_OK(t *testing.T) {
 	j := `{
-	"0":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-	"1":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-	"2":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-	"3":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-	"4":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}
+	"0":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+	"1":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+	"2":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+	"3":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+	"4":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}
 	}`
 	expected := IntegrityRegisters{map[IRegisterIndex]Digests{
 		uint(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
@@ -246,11 +246,11 @@ func TestIntegrityRegisters_UnmarshalJSON_UIntIndex_OK(t *testing.T) {
 
 func TestIntegrityRegisters_UnmarshalJSON_TextUInt_Index_OK(t *testing.T) {
 	j := `{
-		"0":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-		"1":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-		"2":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-		"3":{"key_type":"text","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
-		"4":{"key_type":"text","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}
+		"0":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+		"1":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+		"2":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+		"3":{"key-type":"text","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]},
+		"4":{"key-type":"text","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}
 		}`
 	expected := IntegrityRegisters{
 		map[IRegisterIndex]Digests{
@@ -274,22 +274,22 @@ func TestIntegrityRegisters_UnmarshalJSON_NOK(t *testing.T) {
 	}{
 		{
 			Name:  "invalid input integer",
-			Input: `{"0":{"key_type":"int","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
+			Input: `{"0":{"key-type":"int","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
 			Err:   "unexpected key type for index: int",
 		},
 		{
 			Name:  "negative index",
-			Input: `{"-1":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
+			Input: `{"-1":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
 			Err:   `invalid negative integer key`,
 		},
 		{
 			Name:  "not an integer",
-			Input: `{"0.2345":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
+			Input: `{"0.2345":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}}`,
 			Err:   `unable to convert key to uint: strconv.Atoi: parsing "0.2345": invalid syntax`,
 		},
 		{
 			Name:  "invalid digest",
-			Input: `{"1":{"key_type":"uint","Value":["sha-256;5Fty9cDAtXLbTY06t+l/3TmI0eoJN7LZ6hOUiTXU="]}}`,
+			Input: `{"1":{"key-type":"uint","value":["sha-256;5Fty9cDAtXLbTY06t+l/3TmI0eoJN7LZ6hOUiTXU="]}}`,
 			Err:   `unable to unmarshal Digests: illegal base64 data at input byte 40`,
 		},
 	} {
