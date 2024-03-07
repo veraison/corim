@@ -29,13 +29,16 @@ func Example_cca_realm_refval() {
 	// Index: rim
 	// Alg: sha-384
 	// Digest: 4284b5694ca6c0d2cf4789a0b95ac8025c818de52304364be7cd2981b2d2edc685b322277ec25819962413d8c9b2c1f5
-	// Index: rem
+	// Index: rem0
 	// Alg: sha-384
 	// Digest: 2107bbe761fca52d95136a1354db7a4dd57b1b26be0d3da71d9eb23986b34ba615abf6514cf35e5a9ea55a032d068a78
+	// Index: rem1
 	// Alg: sha-384
 	// Digest: 2507bbe761fca52d95136a1354db7a4dd57b1b26be0d3da71d9eb23986b34ba615abf6514cf35e5a9ea55a032d068a78
+	// Index: rem2
 	// Alg: sha-384
 	// Digest: 3107bbe761fca52d95136a1354db7a4dd57b1b26be0d3da71d9eb23986b34ba615abf6514cf35e5a9ea55a032d068a78
+	// Index: rem3
 	// Alg: sha-384
 	// Digest: 3507bbe761fca52d95136a1354db7a4dd57b1b26be0d3da71d9eb23986b34ba615abf6514cf35e5a9ea55a032d068a78
 
@@ -144,7 +147,7 @@ func extractIntegrityRegisters(r *IntegrityRegisters) error {
 		return fmt.Errorf("no integrity registers")
 	}
 
-	keys, err := extractRegisterIndex(r)
+	keys, err := extractRegisterIndexes(r)
 	if err != nil {
 		return fmt.Errorf("unable to extract register index: %v", err)
 	}
@@ -176,8 +179,8 @@ func extractRealmDigests(digests Digests) error {
 	return nil
 }
 
-func extractRegisterIndex(r *IntegrityRegisters) ([]string, error) {
-	var keys [2]string
+func extractRegisterIndexes(r *IntegrityRegisters) ([]string, error) {
+	var keys [5]string
 	for k := range r.m {
 		switch t := k.(type) {
 		case string:
@@ -185,8 +188,14 @@ func extractRegisterIndex(r *IntegrityRegisters) ([]string, error) {
 			switch key {
 			case "rim":
 				keys[0] = key
-			case "rem":
+			case "rem0":
 				keys[1] = key
+			case "rem1":
+				keys[2] = key
+			case "rem2":
+				keys[3] = key
+			case "rem3":
+				keys[4] = key
 			default:
 				return nil, fmt.Errorf("unexpected register index: %s", key)
 			}
