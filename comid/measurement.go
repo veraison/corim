@@ -355,7 +355,8 @@ func (o Mval) Valid() error {
 		o.IPAddr == nil &&
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
-		o.UUID == nil {
+		o.UUID == nil &&
+		o.IntegrityRegisters == nil {
 		return fmt.Errorf("no measurement value set")
 	}
 

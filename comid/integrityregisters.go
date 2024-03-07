@@ -63,8 +63,8 @@ func (i *IntegrityRegisters) UnmarshalCBOR(data []byte) error {
 }
 
 type keyTypeandVal struct {
-	KeyType string `json:"key_type"`
-	Value   json.RawMessage
+	KeyType string          `json:"key-type"`
+	Value   json.RawMessage `json:"value"`
 }
 
 func (i IntegrityRegisters) MarshalJSON() ([]byte, error) {
