@@ -58,6 +58,33 @@ func TestMeasurement_NewPSAMeasurement_no_values(t *testing.T) {
 	assert.EqualError(t, err, "no measurement value set")
 }
 
+func TestGetPSARefValID(t *testing.T) {
+	psaRefValID, err := NewPSARefValID(TestSignerID)
+	require.NoError(t, err)
+	psaRefValID.SetLabel("PRoT")
+	psaRefValID.SetVersion("1.2.3")
+	mkey, err := NewMkeyPSARefvalID(psaRefValID)
+	require.NoError(t, err)
+	actual, err := mkey.GetPSARefValID()
+	require.NoError(t, err)
+	assert.Equal(t, *psaRefValID, actual)
+}
+
+func TestGetPSARefValID_NOK(t *testing.T) {
+	mkey := &Mkey{}
+	expected := "MKey is not set"
+	_, err := mkey.GetPSARefValID()
+	assert.EqualError(t, err, expected)
+}
+
+func TestGetPSARefValID_InvalidType(t *testing.T) {
+	expected := "measurement-key type is: *comid.TaggedCCAPlatformConfigID"
+	mkey, err := NewMkeyCCAPlatformConfigID(TestCCALabel)
+	require.NoError(t, err)
+	_, err = mkey.GetPSARefValID()
+	assert.EqualError(t, err, expected)
+}
+
 func TestMeasurement_NewCCAPlatCfgMeasurement_no_values(t *testing.T) {
 	ccaplatID := CCAPlatformConfigID(TestCCALabel)
 
@@ -66,6 +93,29 @@ func TestMeasurement_NewCCAPlatCfgMeasurement_no_values(t *testing.T) {
 
 	err = tv.Valid()
 	assert.EqualError(t, err, "no measurement value set")
+}
+
+func TestGetCCAPlatformConfigID(t *testing.T) {
+	ccaplatID := CCAPlatformConfigID(TestCCALabel)
+	mkey, err := NewMkeyCCAPlatformConfigID(TestCCALabel)
+	require.NoError(t, err)
+	actual, err := mkey.GetCCAPlatformConfigID()
+	require.NoError(t, err)
+	assert.Equal(t, ccaplatID, actual)
+}
+
+func TestGetCCAPlatformConfigID_NOK(t *testing.T) {
+	mkey := &Mkey{}
+	expected := "MKey is not set"
+	_, err := mkey.GetCCAPlatformConfigID()
+	assert.EqualError(t, err, expected)
+}
+
+func TestGetCCAPlatformConfigID_InvalidType(t *testing.T) {
+	mkey := &Mkey{UintMkey(10)}
+	expected := "measurement-key type is: comid.UintMkey"
+	_, err := mkey.GetCCAPlatformConfigID()
+	assert.EqualError(t, err, expected)
 }
 
 func TestMeasurement_NewCCAPlatCfgMeasurement_valid_meas(t *testing.T) {

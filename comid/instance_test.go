@@ -5,15 +5,41 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func TestInstance_SetUUID_OK(t *testing.T) {
+	inst := &Instance{}
+	testUUID, err := uuid.Parse(TestUUIDString)
+	require.NoError(t, err)
+	i := inst.SetUUID(testUUID)
+	require.NotNil(t, i)
+}
+
 func TestInstance_GetUUID_OK(t *testing.T) {
 	inst := MustNewUUIDInstance(TestUUID)
-	u, ok := inst.Value.(*TaggedUUID)
-	assert.True(t, ok)
-	assert.EqualValues(t, TestUUID, *u)
+	require.NotNil(t, inst)
+	u, err := inst.GetUUID()
+	assert.Nil(t, err)
+	assert.Equal(t, u, TestUUID)
+}
+
+func TestInstance_GetUUID_NOK(t *testing.T) {
+	inst := &Instance{}
+	expectedErr := "instance-id type is: <nil>"
+	_, err := inst.GetUUID()
+	assert.EqualError(t, err, expectedErr)
+}
+
+func TestInstance_SetGetUEID_OK(t *testing.T) {
+	inst := &Instance{}
+	inst = inst.SetUEID(TestUEID)
+	require.NotNil(t, inst)
+	expectedUEID, err := inst.GetUEID()
+	require.NoError(t, err)
+	assert.Equal(t, TestUEID, expectedUEID)
 }
 
 type testInstance string

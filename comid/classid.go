@@ -138,10 +138,53 @@ func (o ClassID) String() string {
 	return o.Value.String()
 }
 
+// SetImplID sets the value of the target ClassID to the supplied PSA
+// Implementation ID (see Section 3.2.2 of draft-tschofenig-rats-psa-token)
+func (o *ClassID) SetImplID(implID ImplID) *ClassID {
+	if o != nil {
+		o.Value = TaggedImplID(implID)
+	}
+	return o
+}
+
+// GetImplID retrieves the value of the PSA Implementation ID
+// (see Section 3.2.2 of draft-tschofenig-rats-psa-token) from ClassID
+func (o ClassID) GetImplID() (ImplID, error) {
+	switch t := o.Value.(type) {
+	case *TaggedImplID:
+		return ImplID(*t), nil
+	case TaggedImplID:
+		return ImplID(t), nil
+	default:
+		return ImplID{}, fmt.Errorf("class-id type is: %T", t)
+	}
+}
+
 type IClassIDValue interface {
 	extensions.ITypeChoiceValue
 
 	Bytes() []byte
+}
+
+// SetUUID sets the value of the target ClassID to the supplied UUID
+func (o *ClassID) SetUUID(uuid UUID) *ClassID {
+	if o != nil {
+		o.Value = TaggedUUID(uuid)
+	}
+	return o
+}
+
+// SetOID sets the value of the targed ClassID to the supplied OID.
+// The OID is a string in dotted-decimal notation
+func (o *ClassID) SetOID(s string) *ClassID {
+	if o != nil {
+		var berOID OID
+		if berOID.FromString(s) != nil {
+			return nil
+		}
+		o.Value = TaggedOID(berOID)
+	}
+	return o
 }
 
 const ImplIDType = "psa.impl-id"
