@@ -51,6 +51,11 @@ func (o Mkey) IsSet() bool {
 	return o.Value != nil
 }
 
+// Type returns the type of Mkey
+func (o Mkey) Type() string {
+	return o.Value.Type()
+}
+
 // Valid returns nil if the Mkey is valid or an error describing the problem,
 // if it is not.
 func (o Mkey) Valid() error {
@@ -63,6 +68,45 @@ func (o Mkey) Valid() error {
 	}
 
 	return nil
+}
+
+func (o Mkey) GetPSARefValID() (PSARefValID, error) {
+	if !o.IsSet() {
+		return PSARefValID{}, errors.New("MKey is not set")
+	}
+	switch t := o.Value.(type) {
+	case *TaggedPSARefValID:
+		return PSARefValID(*t), nil
+	case TaggedPSARefValID:
+		return PSARefValID(t), nil
+	default:
+		return PSARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
+	}
+}
+
+func (o Mkey) GetCCAPlatformConfigID() (CCAPlatformConfigID, error) {
+	if !o.IsSet() {
+		return "", errors.New("MKey is not set")
+	}
+	switch t := o.Value.(type) {
+	case *TaggedCCAPlatformConfigID:
+		return CCAPlatformConfigID(*t), nil
+	case TaggedCCAPlatformConfigID:
+		return CCAPlatformConfigID(t), nil
+	default:
+		return "", fmt.Errorf("measurement-key type is: %T", t)
+	}
+}
+
+func (o Mkey) GetKeyUint() (uint64, error) {
+	switch t := o.Value.(type) {
+	case UintMkey:
+		return uint64(t), nil
+	case *UintMkey:
+		return uint64(*t), nil
+	default:
+		return MaxUint64, fmt.Errorf("measurement-key type is: %T", t)
+	}
 }
 
 // UnmarshalJSON deserializes the supplied JSON object into the target MKey

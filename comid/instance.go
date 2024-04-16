@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
+	"github.com/veraison/eat"
 )
 
 // Instance stores an instance identity. The supported formats are UUID, UEID and variable-length opaque bytes.
@@ -119,6 +121,45 @@ func (o Instance) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(value)
+}
+
+// SetUEID sets the identity of the target instance to the supplied UEID
+func (o *Instance) SetUEID(val eat.UEID) *Instance {
+	if o != nil {
+		if val.Validate() != nil {
+			return nil
+		}
+		o.Value = TaggedUEID(val)
+	}
+	return o
+}
+
+// SetUUID sets the identity of the target instance to the supplied UUID
+func (o *Instance) SetUUID(val uuid.UUID) *Instance {
+	if o != nil {
+		o.Value = TaggedUUID(val)
+	}
+	return o
+}
+
+func (o Instance) GetUEID() (eat.UEID, error) {
+	switch t := o.Value.(type) {
+	case TaggedUEID:
+		return eat.UEID(t), nil
+	default:
+		return eat.UEID{}, fmt.Errorf("instance-id type is: %T", t)
+	}
+}
+
+func (o Instance) GetUUID() (UUID, error) {
+	switch t := o.Value.(type) {
+	case *TaggedUUID:
+		return UUID(*t), nil
+	case TaggedUUID:
+		return UUID(t), nil
+	default:
+		return UUID{}, fmt.Errorf("instance-id type is: %T", t)
+	}
 }
 
 // IInstanceValue is the interface implemented by all Instance value
