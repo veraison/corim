@@ -146,6 +146,8 @@ func (o Instance) GetUEID() (eat.UEID, error) {
 	switch t := o.Value.(type) {
 	case TaggedUEID:
 		return eat.UEID(t), nil
+	case *TaggedUEID:
+		return eat.UEID(*t), nil
 	default:
 		return eat.UEID{}, fmt.Errorf("instance-id type is: %T", t)
 	}
