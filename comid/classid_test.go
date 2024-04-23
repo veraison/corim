@@ -201,6 +201,92 @@ func TestClassID_SetOID_ok(t *testing.T) {
 	}
 }
 
+func TestClassID_SetOID_GetOID_ok(t *testing.T) {
+	tvs := []string{
+		"1.2.3",
+		"1.2.3.4",
+		"1.2.3.4.5",
+		"1.2.3.4.5.6",
+		"1.2.3.4.5.6.7",
+		"1.2.3.4.5.6.7.8",
+		"1.2.3.4.5.6.7.8.9",
+		"1.2.3.4.5.6.7.8.9.10",
+		"1.2.3.4.5.6.7.8.9.10.11",
+		"1.2.3.4.5.6.7.8.9.10.11.12",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16.17",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16.17.18",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16.17.18.19",
+		"1.2.3.4.5.6.7.8.9.10.11.12.13.14.15.16.17.18.19.20",
+	}
+
+	for _, tv := range tvs {
+		c := &ClassID{}
+		err := c.SetOID(tv)
+		require.Nil(t, err)
+		out, err := c.GetOID()
+		require.NoError(t, err)
+		assert.Equal(t, tv, out)
+	}
+}
+
+func TestClassID_SetOID_NOK(t *testing.T) {
+	tvs := []struct {
+		desc        string
+		input       string
+		expectedErr string
+	}{
+		{
+			desc:        "empyt OID",
+			input:       "",
+			expectedErr: "empty OID",
+		},
+		{
+			desc:        "too little OID",
+			input:       "1",
+			expectedErr: "invalid OID: got 1 arcs, expecting at least 3",
+		},
+		{
+			desc:        "still too little OID",
+			input:       "1.2",
+			expectedErr: "invalid OID: got 2 arcs, expecting at least 3",
+		},
+		{
+			desc:        "negative arc",
+			input:       "1.2.-3",
+			expectedErr: "invalid OID: negative arc -3 not allowed",
+		},
+		{
+			desc:        "not absolute",
+			input:       ".1.2.3",
+			expectedErr: "OID must be absolute",
+		},
+		{
+			desc:        "not dotted decimal",
+			input:       "iso(1) org(3) dod(6) iana(1)",
+			expectedErr: `invalid OID: strconv.Atoi: parsing "iso(1) org(3) dod(6) iana(1)": invalid syntax`,
+		},
+		{
+			desc:        "invalid format",
+			input:       "1...",
+			expectedErr: `invalid OID: strconv.Atoi: parsing "": invalid syntax`,
+		},
+		{
+			desc:        "invalid format, no digits",
+			input:       "1...",
+			expectedErr: `invalid OID: strconv.Atoi: parsing "": invalid syntax`,
+		},
+	}
+	for _, tv := range tvs {
+		c := &ClassID{}
+		err := c.SetOID(tv.input)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, tv.expectedErr)
+	}
+}
 func TestClassID_SetOID_bad(t *testing.T) {
 	tvs := []string{
 		"",                             // empty
@@ -218,6 +304,15 @@ func TestClassID_SetOID_bad(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Nil(t, c)
 	}
+}
+
+func TestClassID_SetUUID_GetUUID_OK(t *testing.T) {
+	class := &ClassID{}
+	class = class.SetUUID(TestUUID)
+	require.NotNil(t, class)
+	uuid, err := class.GetUUID()
+	require.NoError(t, err)
+	assert.Equal(t, TestUUID, uuid)
 }
 
 func Test_NewImplIDClassID(t *testing.T) {

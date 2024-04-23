@@ -26,6 +26,7 @@ func Example_cca_realm_refval() {
 	// Vendor: Workload Client Ltd
 	// ClassID: cd1f0e5526f9460db9d8f7fde171787c
 	// InstanceID: 4284b5694ca6c0d2cf4789a0b95ac8025c818de52304364be7cd2981b2d2edc685b322277ec25819962413d8c9b2c1f5
+	// RawValue: e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75
 	// Index: rim
 	// Alg: sha-384
 	// Digest: 4284b5694ca6c0d2cf4789a0b95ac8025c818de52304364be7cd2981b2d2edc685b322277ec25819962413d8c9b2c1f5
@@ -84,8 +85,8 @@ func extractMeasurements(m Measurements) error {
 		return fmt.Errorf("no measurements")
 	}
 
-	for i, m := range m {
-		if err := extractMeasurement(m); err != nil {
+	for i, meas := range m {
+		if err := extractMeasurement(meas); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
 	}
@@ -94,6 +95,9 @@ func extractMeasurements(m Measurements) error {
 }
 
 func extractMeasurement(m Measurement) error {
+	if err := extractRealmPersonalizationValue(m.Val.RawValue); err != nil {
+		return fmt.Errorf("extracting realm personalization value: %w", err)
+	}
 	if err := extractIntegrityRegisters(m.Val.IntegrityRegisters); err != nil {
 		return fmt.Errorf("extracting digest: %w", err)
 	}
@@ -142,6 +146,21 @@ func extractRealmInstanceID(i *Instance) error {
 	return nil
 }
 
+func extractRealmPersonalizationValue(r *RawValue) error {
+	if r == nil {
+		return nil
+	}
+	b, err := r.GetBytes()
+	if err != nil {
+		return err
+	}
+	if len(b) != 64 {
+		return fmt.Errorf("invalid length %d, for realm personalization value", len(b))
+	}
+	fmt.Printf("RawValue: %x\n", b)
+	return nil
+}
+
 func extractIntegrityRegisters(r *IntegrityRegisters) error {
 	if r == nil {
 		return fmt.Errorf("no integrity registers")
@@ -153,7 +172,7 @@ func extractIntegrityRegisters(r *IntegrityRegisters) error {
 	}
 
 	for _, k := range keys {
-		d, ok := r.m[k]
+		d, ok := r.IndexMap[k]
 		if !ok {
 			return fmt.Errorf("unable to locate register index for: %s", k)
 		}
@@ -181,7 +200,7 @@ func extractRealmDigests(digests Digests) error {
 
 func extractRegisterIndexes(r *IntegrityRegisters) ([]string, error) {
 	var keys [5]string
-	for k := range r.m {
+	for k := range r.IndexMap {
 		switch t := k.(type) {
 		case string:
 			key := strings.ToLower(t)
