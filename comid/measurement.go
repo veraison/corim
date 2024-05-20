@@ -14,6 +14,7 @@ import (
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
 	"github.com/veraison/swid"
+	"github.com/virtee/sev-snp-measure-go/ovmf"
 )
 
 const MaxUint64 = ^uint64(0)
@@ -343,18 +344,19 @@ func RegisterMkeyType(tag uint64, factory IMkeyFactory) error {
 
 // Mval stores a measurement-values-map with JSON and CBOR serializations.
 type Mval struct {
-	Ver                *Version            `cbor:"0,keyasint,omitempty" json:"version,omitempty"`
-	SVN                *SVN                `cbor:"1,keyasint,omitempty" json:"svn,omitempty"`
-	Digests            *Digests            `cbor:"2,keyasint,omitempty" json:"digests,omitempty"`
-	Flags              *FlagsMap           `cbor:"3,keyasint,omitempty" json:"flags,omitempty"`
-	RawValue           *RawValue           `cbor:"4,keyasint,omitempty" json:"raw-value,omitempty"`
-	RawValueMask       *[]byte             `cbor:"5,keyasint,omitempty" json:"raw-value-mask,omitempty"`
-	MACAddr            *MACaddr            `cbor:"6,keyasint,omitempty" json:"mac-addr,omitempty"`
-	IPAddr             *net.IP             `cbor:"7,keyasint,omitempty" json:"ip-addr,omitempty"`
-	SerialNumber       *string             `cbor:"8,keyasint,omitempty" json:"serial-number,omitempty"`
-	UEID               *eat.UEID           `cbor:"9,keyasint,omitempty" json:"ueid,omitempty"`
-	UUID               *UUID               `cbor:"10,keyasint,omitempty" json:"uuid,omitempty"`
-	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
+	Ver                *Version              `cbor:"0,keyasint,omitempty" json:"version,omitempty"`
+	SVN                *SVN                  `cbor:"1,keyasint,omitempty" json:"svn,omitempty"`
+	Digests            *Digests              `cbor:"2,keyasint,omitempty" json:"digests,omitempty"`
+	Flags              *FlagsMap             `cbor:"3,keyasint,omitempty" json:"flags,omitempty"`
+	RawValue           *RawValue             `cbor:"4,keyasint,omitempty" json:"raw-value,omitempty"`
+	RawValueMask       *[]byte               `cbor:"5,keyasint,omitempty" json:"raw-value-mask,omitempty"`
+	MACAddr            *MACaddr              `cbor:"6,keyasint,omitempty" json:"mac-addr,omitempty"`
+	IPAddr             *net.IP               `cbor:"7,keyasint,omitempty" json:"ip-addr,omitempty"`
+	SerialNumber       *string               `cbor:"8,keyasint,omitempty" json:"serial-number,omitempty"`
+	UEID               *eat.UEID             `cbor:"9,keyasint,omitempty" json:"ueid,omitempty"`
+	UUID               *UUID                 `cbor:"10,keyasint,omitempty" json:"uuid,omitempty"`
+	IntegrityRegisters *IntegrityRegisters   `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
+	OvmfMetadata       *ovmf.MetadataWrapper `cbor:"15,keyasint,omitempty" json:"ovmf-metadata,omitempty"`
 	Extensions
 }
 
@@ -400,7 +402,8 @@ func (o Mval) Valid() error {
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
 		o.UUID == nil &&
-		o.IntegrityRegisters == nil {
+		o.IntegrityRegisters == nil &&
+		o.OvmfMetadata == nil {
 		return fmt.Errorf("no measurement value set")
 	}
 
