@@ -46,7 +46,7 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 			--media-type="application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1"
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 
 			if err := checkSubmitArgs(); err != nil {
 				return err

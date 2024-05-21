@@ -44,7 +44,7 @@ func TestInstance_SetGetUEID_OK(t *testing.T) {
 
 type testInstance string
 
-func newTestInstance(val any) (*Instance, error) {
+func newTestInstance(_ any) (*Instance, error) {
 	ret := testInstance("test")
 	return &Instance{&ret}, nil
 }

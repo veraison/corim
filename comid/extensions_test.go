@@ -13,23 +13,23 @@ type TestExtension struct {
 	TestFlag *bool
 }
 
-func (o *TestExtension) ConstrainComid(v *Comid) error {
+func (o *TestExtension) ConstrainComid(_ *Comid) error {
 	return errors.New("invalid")
 }
 
-func (o *TestExtension) ValidTriples(v *Triples) error {
+func (o *TestExtension) ValidTriples(_ *Triples) error {
 	return errors.New("invalid")
 }
 
-func (o *TestExtension) ConstrainMval(v *Mval) error {
+func (o *TestExtension) ConstrainMval(_ *Mval) error {
 	return errors.New("invalid")
 }
 
-func (o *TestExtension) ConstrainFlagsMap(v *FlagsMap) error {
+func (o *TestExtension) ConstrainFlagsMap(_ *FlagsMap) error {
 	return errors.New("invalid")
 }
 
-func (o *TestExtension) ConstrainEntity(v *Entity) error {
+func (o *TestExtension) ConstrainEntity(_ *Entity) error {
 	return errors.New("invalid")
 }
 

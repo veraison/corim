@@ -54,7 +54,7 @@ func NewCorimCreateCmd() *cobra.Command {
 	                   --output=corim.cbor
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkCorimCreateArgs(); err != nil {
 				return err
 			}

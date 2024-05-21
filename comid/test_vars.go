@@ -36,6 +36,7 @@ var (
 	TestMKey       uint64 = 700
 	TestCCALabel          = "cca-platform-config"
 
+	// #nosec G101
 	TestECPrivKey = `-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEICAm3+mCCDTMuzKqfZso9NT8ur9U9GjuUQ/lNEJvwRFMoAoGCCqGSM49
 AwEHoUQDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8BlLT4MFHOaO+ICTtIvrEeEpr/

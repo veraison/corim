@@ -27,7 +27,7 @@ type Mkey struct {
 }
 
 // NewMkey creates a new Mkey of the specfied type using the provided value.
-func NewMkey(val any, typ string) (*Mkey, error) {
+func NewMkey(_ any, typ string) (*Mkey, error) {
 	factory, ok := mkeyValueRegister[typ]
 	if !ok {
 		return nil, fmt.Errorf("unexpected measurement key type: %q", typ)

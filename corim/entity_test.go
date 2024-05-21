@@ -128,7 +128,7 @@ type testEntityNameBadType struct {
 	testEntityName
 }
 
-func newTestEntityNameBadType(val any) (*EntityName, error) {
+func newTestEntityNameBadType(_ any) (*EntityName, error) {
 	v := testEntityNameBadType{testEntityName(7)}
 	return &EntityName{&v}, nil
 }

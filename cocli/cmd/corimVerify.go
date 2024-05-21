@@ -32,7 +32,7 @@ func NewCorimVerifyCmd() *cobra.Command {
 	  cocli corim verify --file=signed-corim.cbor --key=key.jwk
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkCorimVerifyArgs(); err != nil {
 				return err
 			}
