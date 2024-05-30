@@ -323,6 +323,8 @@ github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/veraison/apiclient v0.2.0 h1:QELvZ+eEfzh9v0ORe9B2UTMpiA7aONHpZIfwSfcRR6s=
 github.com/veraison/apiclient v0.2.0/go.mod h1:LCXFZ3D/tJ3HLAOHUg8bnAKGvgTl53e1ntwdwjVbQ5A=
+github.com/veraison/apiclient v0.2.1-0.20240531100343-8a3a730a1e94 h1:0d7vTs3K9Y4bskTtI3pvkFE0HiSHc4vWA3M6Fc0lWRM=
+github.com/veraison/apiclient v0.2.1-0.20240531100343-8a3a730a1e94/go.mod h1:LCXFZ3D/tJ3HLAOHUg8bnAKGvgTl53e1ntwdwjVbQ5A=
 github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff h1:r6I2eJL/z8dp5flsQIKHMeDjyV6UO8If3MaVBLvTjF4=
 github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff/go.mod h1:+kxt8iuFiVvKRs2VQ1Ho7bbAScXAB/kHFFuP5Biw19I=
 github.com/veraison/go-cose v1.1.1-0.20230825153510-da0f9a62ade7 h1:KcKzBthSrSZIUEWBjVvkuk/DE3PyYFbXZxhx5byGFtc=

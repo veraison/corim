@@ -1,3 +1,6 @@
+// Copyright 2021-2024 Contributors to the Veraison project.
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -133,6 +136,8 @@ func Test_CorimSubmitCmd_submit_ok(t *testing.T) {
 	require.NoError(t, err)
 	ms.EXPECT().SetAuth(gomock.Any())
 	ms.EXPECT().SetSubmitURI("http://veraison.example/endorsement-provisioning/v1/submit").Return(nil)
+	ms.EXPECT().SetIsInsecure(false)
+	ms.EXPECT().SetCerts([]string{})
 	ms.EXPECT().SetDeleteSession(true)
 	ms.EXPECT().Run(testSignedCorimValid, "application/corim-unsigned+cbor; profile=http://arm.com/psa/iot/1").Return(nil)
 	err = cmd.Execute()
@@ -158,6 +163,8 @@ func Test_CorimSubmitCmd_submit_not_ok(t *testing.T) {
 	require.NoError(t, err)
 	ms.EXPECT().SetAuth(gomock.Any())
 	ms.EXPECT().SetSubmitURI("http://veraison.example/endorsement-provisioning/v1/submit").Return(nil)
+	ms.EXPECT().SetIsInsecure(false)
+	ms.EXPECT().SetCerts([]string{})
 	ms.EXPECT().SetDeleteSession(true)
 	err = errors.New(`unexpected HTTP response code 404`)
 

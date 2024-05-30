@@ -1,4 +1,4 @@
-// Copyright 2021 Contributors to the Veraison project.
+// Copyright 2021-2024 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
@@ -7,17 +7,21 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/veraison/apiclient/provisioning"
 )
 
 var (
-	corimFile *string
-	mediaType *string
-	apiServer string
+	corimFile  *string
+	mediaType  *string
+	apiServer  string
+	isInsecure bool
+	certPaths  []string
 )
 
 var (
@@ -72,21 +76,18 @@ func NewCorimSubmitCmd(submitter ISubmitter) *cobra.Command {
 	cmd.Flags().StringP("token-url", "T", "", "token URL of the OAuth2 service")
 	cmd.Flags().StringP("username", "U", "", "service username")
 	cmd.Flags().StringP("password", "P", "", "service password")
+	cmd.Flags().BoolP(
+		"insecure", "i", false, "Allow insecure connections (e.g. do not verify TLS certs)",
+	)
+	cmd.Flags().StringArrayP(
+		"ca-cert", "E", nil, "path to a CA cert that will be used in addition to system certs; may be specified multiple times",
+	)
 
-	err := viper.BindPFlag("api_server", cmd.Flags().Lookup("api-server"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("auth", cmd.Flags().Lookup("auth"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("client_id", cmd.Flags().Lookup("client-id"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("client_secret", cmd.Flags().Lookup("client-secret"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("username", cmd.Flags().Lookup("username"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("password", cmd.Flags().Lookup("password"))
-	cobra.CheckErr(err)
-	err = viper.BindPFlag("token_url", cmd.Flags().Lookup("token-url"))
-	cobra.CheckErr(err)
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		cfgName := strings.ReplaceAll(flag.Name, "-", "_")
+		err := viper.BindPFlag(cfgName, flag)
+		cobra.CheckErr(err)
+	})
 
 	return cmd
 }
@@ -109,6 +110,9 @@ func checkSubmitArgs() error {
 		return errors.New("no media type supplied")
 	}
 
+	isInsecure = viper.GetBool("insecure")
+	certPaths = viper.GetStringSlice("ca_cert")
+
 	return nil
 }
 
@@ -118,6 +122,9 @@ func provisionData(data []byte, submitter ISubmitter, uri string, mediaType stri
 	if err := submitter.SetSubmitURI(uri); err != nil {
 		return fmt.Errorf("unable to set submit URI: %w", err)
 	}
+
+	submitter.SetIsInsecure(isInsecure)
+	submitter.SetCerts(certPaths)
 
 	submitter.SetDeleteSession(true)
 	if err := submitter.Run(data, mediaType); err != nil {

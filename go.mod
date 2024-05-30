@@ -10,9 +10,10 @@ require (
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.2.1
+	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.8.2
-	github.com/veraison/apiclient v0.2.0
+	github.com/veraison/apiclient v0.2.1-0.20240531100343-8a3a730a1e94
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.1.1-0.20230825153510-da0f9a62ade7
 	github.com/veraison/swid v1.1.1-0.20230911094910-8ffdd07a22ca
@@ -37,7 +38,6 @@ require (
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/crypto v0.12.0 // indirect

@@ -560,6 +560,15 @@ path (usually `~/.config/cocli/config.yaml` on XDG-compliant systems). Please
 see `./data/config/example-config.yaml` file for details of the configuration
 that needs to be provided.
 
+#### Note on TLS
+
+If the scheme in the API server URL is HTTPS, `cocli` will attempt to establish
+a TLS connection to the server, validating the server certificate using system CA
+certs. It is possible to disable server certificate validation with
+`-i`/`--insecure` flag. Alternatively, if the CA cert for the server is
+available but is not installed in the system, it may be specified using
+`-E`/`--ca-cert` flag.
+
 ## Visual Synopsis of the Available Commands
 
 ```mermaid
