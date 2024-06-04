@@ -38,7 +38,7 @@ func NewCorimDisplayCmd() *cobra.Command {
 	  cocli corim display --file yet-another-signed-corim.cbor --show-tags
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkCorimDisplayArgs(); err != nil {
 				return err
 			}

@@ -11,7 +11,7 @@ import (
 
 type testGroup uint64
 
-func newTestGroup(val any) (*Group, error) {
+func newTestGroup(_ any) (*Group, error) {
 	v := testGroup(7)
 	return &Group{&v}, nil
 }
@@ -37,7 +37,7 @@ type testGroupBadType struct {
 	testGroup
 }
 
-func newTestGroupBadType(val any) (*Group, error) {
+func newTestGroupBadType(_ any) (*Group, error) {
 	v := testGroupBadType{testGroup(7)}
 	return &Group{&v}, nil
 }

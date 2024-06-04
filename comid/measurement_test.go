@@ -524,7 +524,7 @@ func TestNewMkeyOID(t *testing.T) {
 
 type testMkey [4]byte
 
-func newTestMkey(val any) (*Mkey, error) {
+func newTestMkey(_ any) (*Mkey, error) {
 	return &Mkey{&testMkey{0x74, 0x64, 0x73, 0x74}}, nil
 }
 
@@ -552,7 +552,7 @@ func (o badMkey) Type() string {
 	return "uuid"
 }
 
-func newBadMkey(val any) (*Mkey, error) {
+func newBadMkey(_ any) (*Mkey, error) {
 	return &Mkey{&badMkey{testMkey{0x74, 0x64, 0x73, 0x74}}}, nil
 }
 

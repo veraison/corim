@@ -38,7 +38,7 @@ func NewCorimSignCmd() *cobra.Command {
 					--output=signed-corim.cbor
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkCorimSignArgs(); err != nil {
 				return err
 			}

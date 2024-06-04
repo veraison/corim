@@ -40,7 +40,7 @@ func NewCorimExtractCmd() *cobra.Command {
 	    				--output-dir=my-dir
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkCorimExtractArgs(); err != nil {
 				return err
 			}

@@ -42,7 +42,7 @@ func NewComidCreateCmd() *cobra.Command {
 	file name, all the template file names (when from different directories)
 	MUST be different.
 	`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkComidCreateArgs(); err != nil {
 				return err
 			}

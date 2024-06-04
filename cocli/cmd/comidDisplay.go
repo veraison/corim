@@ -35,7 +35,7 @@ func NewComidDisplayCmd() *cobra.Command {
 	  cocli comid display --file=c1.cbor --file=c2.cbor --dir=comids
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkComidDisplayArgs(); err != nil {
 				return err
 			}

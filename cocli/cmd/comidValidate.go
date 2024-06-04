@@ -35,7 +35,7 @@ func NewComidValidateCmd() *cobra.Command {
 	  cocli comid validate --file=c1.cbor --file=c2.cbor --dir=comids
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkComidValidateArgs(); err != nil {
 				return err
 			}

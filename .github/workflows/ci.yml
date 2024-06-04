@@ -4,7 +4,7 @@ name: ci
 on: [push, pull_request]
 jobs:
 
-  # Test on various OS with default Go version.
+  # Test on various OS with the specified Go version.
   tests:
     name: Test on ${{matrix.os}}
     runs-on: ${{ matrix.os }}
@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/setup-go@v3
       with:
-        go-version: "1.19"
+        go-version: "1.20"
     - name: Checkout code
       uses: actions/checkout@v2
       with:

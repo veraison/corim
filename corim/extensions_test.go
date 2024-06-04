@@ -24,11 +24,11 @@ func (o TestExtensions) ConstrainEntity(ent *Entity) error {
 	return nil
 }
 
-func (o TestExtensions) ConstrainCorim(c *UnsignedCorim) error {
+func (o TestExtensions) ConstrainCorim(_ *UnsignedCorim) error {
 	return errors.New("invalid")
 }
 
-func (o TestExtensions) ConstrainSigner(s *Signer) error {
+func (o TestExtensions) ConstrainSigner(_ *Signer) error {
 	return errors.New("invalid")
 }
 

@@ -66,7 +66,7 @@ func NewCotsCreateCtsCmd() *cobra.Command {
 					--output=cots.cbor
 	`,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := checkctsCreateCtsArgs(); err != nil {
 				return err
 			}

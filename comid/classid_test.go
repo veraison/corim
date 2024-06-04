@@ -373,7 +373,7 @@ func Test_TaggedInt(t *testing.T) {
 
 type testClassID [4]byte
 
-func newTestClassID(val any) (*ClassID, error) {
+func newTestClassID(_ any) (*ClassID, error) {
 	return &ClassID{&testClassID{0x74, 0x65, 0x73, 0x74}}, nil
 }
 
