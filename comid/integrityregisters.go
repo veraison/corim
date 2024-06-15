@@ -18,11 +18,11 @@ type IRegisterIndex interface{}
 
 // IntegrityRegisters holds the Integrity Registers
 type IntegrityRegisters struct {
-	m map[IRegisterIndex]Digests
+	IndexMap map[IRegisterIndex]Digests
 }
 
 func NewIntegrityRegisters() *IntegrityRegisters {
-	return &IntegrityRegisters{m: make(map[IRegisterIndex]Digests)}
+	return &IntegrityRegisters{IndexMap: make(map[IRegisterIndex]Digests)}
 }
 
 // AddDigests allows inserting an array of digests at a specific index
@@ -42,12 +42,12 @@ func (i *IntegrityRegisters) AddDigests(index IRegisterIndex, digests Digests) e
 // AddDigest allows inserting a digest at a specific index
 // Supported index types are uint and text
 func (i *IntegrityRegisters) AddDigest(index IRegisterIndex, digest swid.HashEntry) error {
-	if i.m == nil {
+	if i.IndexMap == nil {
 		return fmt.Errorf("no register to add digest")
 	}
 	switch t := index.(type) {
 	case string, uint, uint64:
-		i.m[t] = append(i.m[t], digest)
+		i.IndexMap[t] = append(i.IndexMap[t], digest)
 	default:
 		return fmt.Errorf("unexpected type for index: %T", t)
 	}
@@ -55,11 +55,11 @@ func (i *IntegrityRegisters) AddDigest(index IRegisterIndex, digest swid.HashEnt
 }
 
 func (i IntegrityRegisters) MarshalCBOR() ([]byte, error) {
-	return em.Marshal(i.m)
+	return em.Marshal(i.IndexMap)
 }
 
 func (i *IntegrityRegisters) UnmarshalCBOR(data []byte) error {
-	return dm.Unmarshal(data, &i.m)
+	return dm.Unmarshal(data, &i.IndexMap)
 }
 
 type keyTypeandVal struct {
@@ -70,7 +70,7 @@ type keyTypeandVal struct {
 func (i IntegrityRegisters) MarshalJSON() ([]byte, error) {
 	jmap := make(map[string]json.RawMessage)
 	var newkey string
-	for key, val := range i.m {
+	for key, val := range i.IndexMap {
 		var ktv keyTypeandVal
 		switch t := key.(type) {
 		case uint, uint64:
@@ -98,8 +98,8 @@ func (i IntegrityRegisters) MarshalJSON() ([]byte, error) {
 }
 
 func (i *IntegrityRegisters) UnmarshalJSON(data []byte) error {
-	if i.m == nil {
-		i.m = make(map[IRegisterIndex]Digests)
+	if i.IndexMap == nil {
+		i.IndexMap = make(map[IRegisterIndex]Digests)
 	}
 	jmap := make(map[string]json.RawMessage)
 	var index IRegisterIndex

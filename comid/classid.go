@@ -174,17 +174,44 @@ func (o *ClassID) SetUUID(uuid UUID) *ClassID {
 	return o
 }
 
-// SetOID sets the value of the targed ClassID to the supplied OID.
+func (o ClassID) GetUUID() (UUID, error) {
+	switch t := o.Value.(type) {
+	case *TaggedUUID:
+		return UUID(*t), nil
+	case TaggedUUID:
+		return UUID(t), nil
+	default:
+		return UUID{}, fmt.Errorf("class-id type is: %T", t)
+	}
+}
+
+// SetOID sets the value of the target ClassID to the supplied OID.
 // The OID is a string in dotted-decimal notation
-func (o *ClassID) SetOID(s string) *ClassID {
+func (o *ClassID) SetOID(s string) error {
 	if o != nil {
 		var berOID OID
-		if berOID.FromString(s) != nil {
-			return nil
+		if err := berOID.FromString(s); err != nil {
+			return err
 		}
 		o.Value = TaggedOID(berOID)
 	}
-	return o
+	return nil
+}
+
+// GetOID gets the value of the OID in a string dotted-decimal notation
+func (o ClassID) GetOID() (string, error) {
+	switch t := o.Value.(type) {
+	case *TaggedOID:
+		oid := OID(*t)
+		stringOID := oid.String()
+		return stringOID, nil
+	case TaggedOID:
+		oid := OID(t)
+		stringOID := oid.String()
+		return stringOID, nil
+	default:
+		return "", fmt.Errorf("class-id type is: %T", t)
+	}
 }
 
 const ImplIDType = "psa.impl-id"
