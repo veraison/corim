@@ -103,7 +103,7 @@ func (o *Entity) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o *Entity) MarshalCBOR() ([]byte, error) {
+func (o Entity) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -113,7 +113,7 @@ func (o *Entity) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o *Entity) MarshalJSON() ([]byte, error) {
+func (o Entity) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 

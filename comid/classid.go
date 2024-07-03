@@ -293,8 +293,8 @@ func (o TaggedImplID) Bytes() []byte {
 	return o[:]
 }
 
-func (o *TaggedImplID) MarshalJSON() ([]byte, error) {
-	return json.Marshal((*o)[:])
+func (o TaggedImplID) MarshalJSON() ([]byte, error) {
+	return json.Marshal((o)[:])
 }
 
 func (o *TaggedImplID) UnmarshalJSON(data []byte) error {
