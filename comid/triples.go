@@ -35,7 +35,7 @@ func (o *Triples) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o *Triples) MarshalCBOR() ([]byte, error) {
+func (o Triples) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -45,7 +45,7 @@ func (o *Triples) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o *Triples) MarshalJSON() ([]byte, error) {
+func (o Triples) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 

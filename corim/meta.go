@@ -84,7 +84,7 @@ func (o *Signer) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o *Signer) MarshalCBOR() ([]byte, error) {
+func (o Signer) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -94,7 +94,7 @@ func (o *Signer) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o *Signer) MarshalJSON() ([]byte, error) {
+func (o Signer) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 

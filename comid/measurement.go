@@ -374,7 +374,7 @@ func (o *Mval) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o *Mval) MarshalCBOR() ([]byte, error) {
+func (o Mval) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -384,7 +384,7 @@ func (o *Mval) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o *Mval) MarshalJSON() ([]byte, error) {
+func (o Mval) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 

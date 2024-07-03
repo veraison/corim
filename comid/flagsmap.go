@@ -197,7 +197,7 @@ func (o *FlagsMap) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o *FlagsMap) MarshalCBOR() ([]byte, error) {
+func (o FlagsMap) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -207,7 +207,7 @@ func (o *FlagsMap) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o *FlagsMap) MarshalJSON() ([]byte, error) {
+func (o FlagsMap) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
