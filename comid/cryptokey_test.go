@@ -403,7 +403,7 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 
 type testCryptoKey [4]byte
 
-func newTestCryptoKey(val any) (*CryptoKey, error) {
+func newTestCryptoKey(_ any) (*CryptoKey, error) {
 	return &CryptoKey{&testCryptoKey{0x74, 0x64, 0x73, 0x74}}, nil
 }
 

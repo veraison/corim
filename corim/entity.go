@@ -28,13 +28,22 @@ func NewEntity() *Entity {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *Entity) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *Entity) RegisterExtensions(exts extensions.Map) error {
+	for p, v := range exts {
+		switch p {
+		case ExtEntity:
+			o.Extensions.Register(v)
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	return nil
 }
 
 // GetExtensions returns pervisouosly registered extension
-func (o *Entity) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+func (o *Entity) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // SetEntityName is used to set the EntityName field of Entity using supplied name
@@ -117,30 +126,49 @@ func (o Entity) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
-// Entities is an array of entity-map's
-type Entities []Entity
+// Entities is a container for Entity instances and their extensions.
+// It is a thin wrapper around extensions.Collection.
+type Entities extensions.Collection[Entity, *Entity]
 
-// NewEntities instantiates an empty entity-map array
 func NewEntities() *Entities {
-	return new(Entities)
+	return (*Entities)(extensions.NewCollection[Entity]())
 }
 
-// AddEntity adds the supplied entity-map to the target Entities
-func (o *Entities) AddEntity(e Entity) *Entities {
-	if o != nil {
-		*o = append(*o, e)
-	}
-	return o
+func (o *Entities) RegisterExtensions(exts extensions.Map) error {
+	return (*extensions.Collection[Entity, *Entity])(o).RegisterExtensions(exts)
 }
 
-// Valid iterates over the range of individual entities to check for validity
-func (o Entities) Valid() error {
-	for i, m := range o {
-		if err := m.Valid(); err != nil {
-			return fmt.Errorf("entity at index %d: %w", i, err)
-		}
-	}
-	return nil
+func (o *Entities) GetExtensions() extensions.IMapValue {
+	return (*extensions.Collection[Entity, *Entity])(o).GetExtensions()
+}
+
+func (o *Entities) Valid() error {
+	return (*extensions.Collection[Entity, *Entity])(o).Valid()
+}
+
+func (o *Entities) IsEmpty() bool {
+	return (*extensions.Collection[Entity, *Entity])(o).IsEmpty()
+}
+
+func (o *Entities) Add(val *Entity) *Entities {
+	ret := (*extensions.Collection[Entity, *Entity])(o).Add(val)
+	return (*Entities)(ret)
+}
+
+func (o Entities) MarshalCBOR() ([]byte, error) {
+	return (extensions.Collection[Entity, *Entity])(o).MarshalCBOR()
+}
+
+func (o *Entities) UnmarshalCBOR(data []byte) error {
+	return (*extensions.Collection[Entity, *Entity])(o).UnmarshalCBOR(data)
+}
+
+func (o Entities) MarshalJSON() ([]byte, error) {
+	return (extensions.Collection[Entity, *Entity])(o).MarshalJSON()
+}
+
+func (o *Entities) UnmarshalJSON(data []byte) error {
+	return (*extensions.Collection[Entity, *Entity])(o).UnmarshalJSON(data)
 }
 
 // EntityName encapsulates the name of the associated Entity. The CoRIM

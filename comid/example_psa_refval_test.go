@@ -41,7 +41,7 @@ func extractRefVals(c *Comid) error {
 		return fmt.Errorf("no reference values triples")
 	}
 
-	for i, rv := range *c.Triples.ReferenceValues {
+	for i, rv := range c.Triples.ReferenceValues.Values {
 		if err := extractPSARefVal(rv); err != nil {
 			return fmt.Errorf("bad PSA reference value at index %d: %w", i, err)
 		}
@@ -50,7 +50,7 @@ func extractRefVals(c *Comid) error {
 	return nil
 }
 
-func extractPSARefVal(rv ReferenceValue) error {
+func extractPSARefVal(rv ValueTriple) error {
 	class := rv.Environment.Class
 
 	if err := extractImplementationID(class); err != nil {
@@ -67,11 +67,11 @@ func extractPSARefVal(rv ReferenceValue) error {
 }
 
 func extractSwMeasurements(m Measurements) error {
-	if len(m) == 0 {
+	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
 
-	for i, m := range m {
+	for i, m := range m.Values {
 		if err := extractSwMeasurement(m); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}

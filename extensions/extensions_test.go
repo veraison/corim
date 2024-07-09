@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type Entity struct {
@@ -52,7 +53,7 @@ func TestExtensions_GetSet(t *testing.T) {
 			"Lisa":  "elementary school student",
 		},
 	}
-	exts := Extensions{IExtensionsValue: &extsVal}
+	exts := Extensions{IMapValue: &extsVal}
 
 	v, err := exts.GetInt("size")
 	assert.NoError(t, err)
@@ -119,4 +120,32 @@ func TestExtensions_GetSet(t *testing.T) {
 
 	assert.Equal(t, "", exts.MustGetString("does-not-exist"))
 	assert.Equal(t, 0, exts.MustGetInt("does-not-exist"))
+}
+
+func Test_Extensions_New(t *testing.T) {
+	exts := Extensions{}
+
+	assert.Nil(t, exts.New())
+
+	exts.Register(&TestExtensions{})
+
+	newValOne, ok := exts.New().(*TestExtensions)
+	require.True(t, ok)
+
+	newValTwo, ok := exts.New().(*TestExtensions)
+	require.True(t, ok)
+
+	newValOne.Address = "123 Fake Street"
+	assert.Equal(t, "", newValTwo.Address)
+}
+
+func Test_Extensions_IsEmpty(t *testing.T) {
+	exts := Extensions{}
+	assert.True(t, exts.IsEmpty())
+
+	exts.Register(&TestExtensions{})
+	assert.True(t, exts.IsEmpty())
+
+	exts.Register(&TestExtensions{Address: "123 Fake Street"})
+	assert.False(t, exts.IsEmpty())
 }

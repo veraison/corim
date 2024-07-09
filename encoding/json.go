@@ -52,6 +52,10 @@ func doSerializeStructToJSON(
 		parts := strings.Split(tag, ",")
 		key := parts[0]
 
+		if key == "-" {
+			continue // field is not marshaled
+		}
+
 		isOmitEmpty := false
 		if len(parts) > 1 {
 			for _, option := range parts[1:] {
@@ -130,6 +134,10 @@ func doPopulateStructFromJSON(
 
 		parts := strings.Split(tag, ",")
 		key := parts[0]
+
+		if key == "-" {
+			continue // field is not marshaled
+		}
 
 		isOmitEmpty := false
 		if len(parts) > 1 {

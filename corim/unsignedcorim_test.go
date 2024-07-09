@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/cots"
+	"github.com/veraison/corim/extensions"
 	"github.com/veraison/swid"
 )
 
@@ -262,10 +263,12 @@ func TestUnsignedCorim_AddEntity_full(t *testing.T) {
 
 	expected := UnsignedCorim{
 		Entities: &Entities{
-			Entity{
-				EntityName: MustNewStringEntityName(name),
-				Roles:      Roles{role},
-				RegID:      &taggedRegID,
+			Values: []Entity{
+				{
+					EntityName: MustNewStringEntityName(name),
+					Roles:      Roles{role},
+					RegID:      &taggedRegID,
+				},
 			},
 		},
 	}
@@ -305,4 +308,115 @@ func TestUnsignedCorim_FromJSON(t *testing.T) {
 	err := NewUnsignedCorim().FromJSON(data)
 
 	assert.NoError(t, err)
+}
+
+func TestUnsignedCorim_ToJSON(t *testing.T) {
+	c := comid.NewComid().
+		SetTagIdentity("vendor.example/prod/1", 0).
+		AddAttestVerifKey(
+			comid.AttestVerifKey{
+				Environment: comid.Environment{
+					Instance: comid.MustNewUUIDInstance(comid.TestUUID),
+				},
+				VerifKeys: *comid.NewCryptoKeys().
+					Add(
+						comid.MustNewPKIXBase64Key(comid.TestECPubKey),
+					),
+			},
+		)
+	require.NotNil(t, c)
+
+	tv := NewUnsignedCorim().
+		SetID("invalid.tags.corim").
+		AddDependentRim("http://endorser.example/addon.corim", nil).
+		AddProfile("https://arm.com/psa/iot/2.0.0").
+		AddComid(*c)
+
+	require.NotNil(t, tv)
+
+	extMap := extensions.NewMap().Add(ExtEntity, &struct{}{})
+	err := tv.RegisterExtensions(extMap)
+	assert.NoError(t, err)
+
+	buf, err := tv.ToJSON()
+
+	assert.NoError(t, err)
+	expectedJSON := `
+	{
+		"corim-id":"invalid.tags.corim",
+		"tags":["2QH6ogGhAHV2ZW5kb3IuZXhhbXBsZS9wcm9kLzEEoQKBgqEB2CVQMftavwI+SZKqTpX5wVA7+oHZAip4sS0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tCk1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRVcxQnZxRisvcnk4QldhN1pFTVUxeFlZSEVROEIKbExUNE1GSE9hTytJQ1R0SXZyRWVFcHIvc2ZUQVA2NkgyaENIZGI1SEVYS3RSS29kNlFMY09MUEExUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="],
+		"dependent-rims":[{"href":"http://endorser.example/addon.corim"}],
+		"profiles":["https://arm.com/psa/iot/2.0.0"]
+	}
+	`
+
+	assert.JSONEq(t, expectedJSON, string(buf))
+}
+
+func TestUnsignedCorim_ToCBOR(t *testing.T) {
+	c := comid.NewComid().
+		SetTagIdentity("vendor.example/prod/1", 0).
+		AddAttestVerifKey(
+			comid.AttestVerifKey{
+				Environment: comid.Environment{
+					Instance: comid.MustNewUUIDInstance(comid.TestUUID),
+				},
+				VerifKeys: *comid.NewCryptoKeys().
+					Add(
+						comid.MustNewPKIXBase64Key(comid.TestECPubKey),
+					),
+			},
+		)
+	require.NotNil(t, c)
+
+	tv := NewUnsignedCorim().
+		SetID("invalid.tags.corim").
+		AddDependentRim("http://endorser.example/addon.corim", nil).
+		AddProfile("https://arm.com/psa/iot/2.0.0").
+		AddComid(*c)
+
+	require.NotNil(t, tv)
+
+	extMap := extensions.NewMap().Add(ExtEntity, &struct{}{})
+	err := tv.RegisterExtensions(extMap)
+	assert.NoError(t, err)
+
+	buf, err := tv.ToCBOR()
+	assert.NoError(t, err)
+
+	other := NewUnsignedCorim()
+	err = other.FromCBOR(buf)
+	assert.NoError(t, err)
+
+	assert.EqualValues(t, tv.Profiles, other.Profiles)
+	assert.EqualValues(t, tv.ID, other.ID)
+	assert.Nil(t, other.Entities)
+}
+
+func TestUnsignedCorim_extensions(t *testing.T) {
+	c := NewUnsignedCorim()
+	corimExts := struct{}{}
+	extMap := extensions.NewMap().
+		Add(ExtUnsignedCorim, &corimExts).
+		Add(ExtEntity, &struct{}{})
+
+	err := c.RegisterExtensions(extMap)
+	assert.NoError(t, err)
+	assert.Equal(t, &corimExts, c.GetExtensions())
+
+	badMap := extensions.NewMap().Add(extensions.Point("test"), &struct{}{})
+	err = c.RegisterExtensions(badMap)
+	assert.EqualError(t, err, `unexpected extension point: "test"`)
+}
+
+func TestLocator_Valid(t *testing.T) {
+	l := Locator{}
+	assert.EqualError(t, l.Valid(), "empty href")
+
+	l.Href = comid.TaggedURI("https://example.com")
+	assert.NoError(t, l.Valid())
+
+	l.Thumbprint = &swid.HashEntry{}
+	assert.EqualError(t, l.Valid(), "invalid locator thumbprint: unknown hash algorithm 0")
+
 }

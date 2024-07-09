@@ -468,7 +468,7 @@ func Test_TaggedInt(t *testing.T) {
 
 type testClassID [4]byte
 
-func newTestClassID(val any) (*ClassID, error) {
+func newTestClassID(_ any) (*ClassID, error) {
 	return &ClassID{&testClassID{0x74, 0x65, 0x73, 0x74}}, nil
 }
 
@@ -657,4 +657,17 @@ func TestClassID_UnmarshalJSON_Bytes_NOK(t *testing.T) {
 			assert.EqualError(t, err, tv.Err)
 		})
 	}
+}
+
+func TestClassID_ImplID(t *testing.T) {
+	var implID ImplID
+	copy(implID[:], MustHexDecode(t,
+		"deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"))
+
+	var classID ClassID
+
+	classID.SetImplID(implID)
+	other, err := classID.GetImplID()
+	assert.NoError(t, err)
+	assert.Equal(t, implID, other)
 }

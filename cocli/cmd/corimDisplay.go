@@ -43,11 +43,7 @@ func NewCorimDisplayCmd() *cobra.Command {
 				return err
 			}
 
-			if err := display(*corimDisplayCorimFile, *corimDisplayShowTags); err != nil {
-				return err
-			}
-
-			return nil
+			return display(*corimDisplayCorimFile, *corimDisplayShowTags)
 		},
 	}
 

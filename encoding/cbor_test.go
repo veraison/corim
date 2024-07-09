@@ -12,8 +12,9 @@ import (
 
 func Test_PopulateStructFromCBOR_simple(t *testing.T) {
 	type SimpleStruct struct {
-		FieldOne string `cbor:"0,keyasint,omitempty"`
-		FieldTwo int    `cbor:"1,keyasint"`
+		FieldOne     string `cbor:"0,keyasint,omitempty"`
+		FieldTwo     int    `cbor:"1,keyasint"`
+		IgnoredField int    `cbor:"-"`
 	}
 
 	var v SimpleStruct

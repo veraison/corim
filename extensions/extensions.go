@@ -13,31 +13,35 @@ import (
 
 var ErrExtensionNotFound = errors.New("extension not found")
 
-type IExtensionsValue any
+type IMapValue any
 
 type Extensions struct {
-	IExtensionsValue `json:"extensions,omitempty"`
+	IMapValue `json:"extensions,omitempty"`
 }
 
-func (o *Extensions) Register(exts IExtensionsValue) {
+func (o *Extensions) Register(exts IMapValue) {
 	if reflect.TypeOf(exts).Kind() != reflect.Pointer {
-		panic("attempting to register a non-pointer IExtensionsValue")
+		panic("attempting to register a non-pointer IMapValue")
 	}
 
-	o.IExtensionsValue = exts
+	o.IMapValue = exts
 }
 
 func (o *Extensions) HaveExtensions() bool {
-	return o.IExtensionsValue != nil
+	return o.IMapValue != nil
+}
+
+func (o Extensions) New() IMapValue {
+	return newIMapValue(o.IMapValue)
 }
 
 func (o *Extensions) Get(name string) (any, error) {
-	if o.IExtensionsValue == nil {
+	if o.IMapValue == nil {
 		return nil, fmt.Errorf("%w: %s", ErrExtensionNotFound, name)
 	}
 
-	extType := reflect.TypeOf(o.IExtensionsValue)
-	extVal := reflect.ValueOf(o.IExtensionsValue)
+	extType := reflect.TypeOf(o.IMapValue)
+	extVal := reflect.ValueOf(o.IMapValue)
 	if extType.Kind() == reflect.Pointer {
 		extType = extType.Elem()
 		extVal = extVal.Elem()
@@ -64,6 +68,25 @@ func (o *Extensions) Get(name string) (any, error) {
 	}
 
 	return nil, fmt.Errorf("%w: %s", ErrExtensionNotFound, name)
+}
+
+func (o *Extensions) IsEmpty() bool {
+	if o.IMapValue == nil {
+		return true
+	}
+
+	extVal := reflect.ValueOf(o.IMapValue)
+	if reflect.TypeOf(o.IMapValue).Kind() == reflect.Pointer {
+		extVal = extVal.Elem()
+	}
+
+	for i := 0; i < extVal.NumField(); i++ {
+		if !extVal.Field(i).IsZero() {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (o *Extensions) MustGetString(name string) string {
@@ -333,12 +356,12 @@ func (o *Extensions) GetStringMapString(name string) (map[string]string, error) 
 }
 
 func (o *Extensions) Set(name string, value any) error {
-	if o.IExtensionsValue == nil {
+	if o.IMapValue == nil {
 		return fmt.Errorf("%w: %s", ErrExtensionNotFound, name)
 	}
 
-	extType := reflect.TypeOf(o.IExtensionsValue)
-	extVal := reflect.ValueOf(o.IExtensionsValue)
+	extType := reflect.TypeOf(o.IMapValue)
+	extVal := reflect.ValueOf(o.IMapValue)
 	if extType.Kind() == reflect.Pointer {
 		extType = extType.Elem()
 		extVal = extVal.Elem()
@@ -376,4 +399,14 @@ func (o *Extensions) Set(name string, value any) error {
 	}
 
 	return fmt.Errorf("%w: %s", ErrExtensionNotFound, name)
+}
+
+func newIMapValue(v IMapValue) IMapValue {
+	if v == nil {
+		return nil
+	}
+
+	valType := reflect.Indirect(reflect.ValueOf(v)).Type()
+
+	return reflect.New(valType).Interface()
 }

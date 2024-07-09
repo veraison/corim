@@ -44,13 +44,31 @@ func NewUnsignedCorim() *UnsignedCorim {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *UnsignedCorim) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *UnsignedCorim) RegisterExtensions(exts extensions.Map) error {
+	for p, v := range exts {
+		switch p {
+		case ExtUnsignedCorim:
+			o.Extensions.Register(v)
+		case ExtEntity:
+			if o.Entities == nil {
+				o.Entities = NewEntities()
+			}
+
+			entMap := extensions.NewMap().Add(ExtEntity, v)
+			if err := o.Entities.RegisterExtensions(entMap); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	return nil
 }
 
 // GetExtensions returns pervisouosly registered extension
-func (o *UnsignedCorim) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+func (o *UnsignedCorim) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // SetID sets the corim-id in the unsigned-corim-map to the supplied value.  The
@@ -207,7 +225,7 @@ func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *Un
 			o.Entities = new(Entities)
 		}
 
-		if o.Entities.AddEntity(*e) == nil {
+		if o.Entities.Add(e) == nil {
 			return nil
 		}
 	}
@@ -253,7 +271,7 @@ func (o UnsignedCorim) Valid() error {
 	}
 
 	if o.Entities != nil {
-		for i, e := range *o.Entities {
+		for i, e := range o.Entities.Values {
 			if err := e.Valid(); err != nil {
 				return fmt.Errorf("entity validation failed at pos %d: %w", i, err)
 			}
@@ -264,13 +282,38 @@ func (o UnsignedCorim) Valid() error {
 }
 
 // ToCBOR serializes the target unsigned CoRIM to CBOR
-func (o *UnsignedCorim) ToCBOR() ([]byte, error) {
+func (o UnsignedCorim) ToCBOR() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Entities != nil && o.Entities.IsEmpty() {
+		o.Entities = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
 // FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target UnsignedCorim
 func (o *UnsignedCorim) FromCBOR(data []byte) error {
 	return encoding.PopulateStructFromCBOR(dm, data, o)
+}
+
+// ToJSON serializes the target unsigned CoRIM to JSON
+func (o UnsignedCorim) ToJSON() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Entities != nil && o.Entities.IsEmpty() {
+		o.Entities = nil
+	}
+
+	return encoding.SerializeStructToJSON(o)
 }
 
 // FromJSON deserializes a JSON-encoded unsigned CoRIM into the target UnsignedCorim

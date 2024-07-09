@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/veraison/corim/extensions"
 )
 
 var (
@@ -422,4 +423,18 @@ func TestSignedCorim_Sign_fail_no_signer(t *testing.T) {
 
 	_, err := SignedCorimIn.Sign(nil)
 	assert.EqualError(t, err, "nil signer")
+}
+
+func TestSignedCorim_extensions(t *testing.T) {
+	extMap := extensions.NewMap().
+		Add(ExtSigner, &struct{}{}).
+		Add(ExtUnsignedCorim, &struct{}{})
+
+	var s SignedCorim
+	err := s.RegisterExtensions(extMap)
+	assert.NoError(t, err)
+
+	badMap := extensions.NewMap().Add(extensions.Point("test"), &struct{}{})
+	err = s.RegisterExtensions(badMap)
+	assert.EqualError(t, err, `unexpected extension point: "test"`)
 }

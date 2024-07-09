@@ -6,6 +6,18 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
+const (
+	ExtComid               extensions.Point = "Comid"
+	ExtEntity              extensions.Point = "ComidEntity"
+	ExtTriples             extensions.Point = "Triples"
+	ExtReferenceValue      extensions.Point = "ReferenceValue"
+	ExtReferenceValueFlags extensions.Point = "ReferenceValueFlags"
+	ExtEndorsedValue       extensions.Point = "EndorsedValue"
+	ExtEndorsedValueFlags  extensions.Point = "EndorsedValueFlags"
+	ExtMval                extensions.Point = "Mval"
+	ExtFlags               extensions.Point = "Flags"
+)
+
 type IComidConstrainer interface {
 	ConstrainComid(*Comid) error
 }
@@ -43,7 +55,7 @@ func (o *Extensions) validComid(comid *Comid) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IComidConstrainer)
+	ev, ok := o.IMapValue.(IComidConstrainer)
 	if ok {
 		if err := ev.ConstrainComid(comid); err != nil {
 			return err
@@ -58,7 +70,7 @@ func (o *Extensions) validTriples(triples *Triples) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(ITriplesConstrainer)
+	ev, ok := o.IMapValue.(ITriplesConstrainer)
 	if ok {
 		if err := ev.ValidTriples(triples); err != nil {
 			return err
@@ -73,7 +85,7 @@ func (o *Extensions) validMval(triples *Mval) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IMvalConstrainer)
+	ev, ok := o.IMapValue.(IMvalConstrainer)
 	if ok {
 		if err := ev.ConstrainMval(triples); err != nil {
 			return err
@@ -88,7 +100,7 @@ func (o *Extensions) validEntity(triples *Entity) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IEntityConstrainer)
+	ev, ok := o.IMapValue.(IEntityConstrainer)
 	if ok {
 		if err := ev.ConstrainEntity(triples); err != nil {
 			return err
@@ -103,7 +115,7 @@ func (o *Extensions) validFlagsMap(triples *FlagsMap) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagsMapConstrainer)
+	ev, ok := o.IMapValue.(IFlagsMapConstrainer)
 	if ok {
 		if err := ev.ConstrainFlagsMap(triples); err != nil {
 			return err
@@ -118,7 +130,7 @@ func (o *Extensions) setTrue(flag Flag) {
 		return
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagSetter)
+	ev, ok := o.IMapValue.(IFlagSetter)
 	if ok {
 		ev.SetTrue(flag)
 	}
@@ -129,7 +141,7 @@ func (o *Extensions) setFalse(flag Flag) {
 		return
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagSetter)
+	ev, ok := o.IMapValue.(IFlagSetter)
 	if ok {
 		ev.SetFalse(flag)
 	}
@@ -140,7 +152,7 @@ func (o *Extensions) clear(flag Flag) {
 		return
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagSetter)
+	ev, ok := o.IMapValue.(IFlagSetter)
 	if ok {
 		ev.Clear(flag)
 	}
@@ -151,7 +163,7 @@ func (o *Extensions) get(flag Flag) *bool {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagSetter)
+	ev, ok := o.IMapValue.(IFlagSetter)
 	if ok {
 		return ev.Get(flag)
 	}
@@ -164,7 +176,7 @@ func (o *Extensions) anySet() bool {
 		return false
 	}
 
-	ev, ok := o.IExtensionsValue.(IFlagSetter)
+	ev, ok := o.IMapValue.(IFlagSetter)
 	if ok {
 		return ev.AnySet()
 	}

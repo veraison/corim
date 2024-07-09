@@ -1,5 +1,5 @@
 [CoRIM
-specification](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/02)
+specification](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/04)
 may be extended by CoRIM Profiles documented in other specifications at well
 defined points identified in the base CoRIM spec using CDDL extension sockets.
 CoRIM profiles may
@@ -37,32 +37,58 @@ types. This is done via three distinct extension mechanisms:
 > CoRIM also "imports" CDDL from the CoSWID spec. Some of
 > these CoSWID CDDL definitions also feature extension sockets.
 > However, as they are defined in a different spec and are implemented
-> in the [`veraison/swid`](https://github.com/veraison/swid) library, they cannot be extended
-> using the extension feature provided in the CoRIM library. The extension
-> support in CoRIM library is applicable ONLY to CoRIM and CoMID maps and
-> type choices
+> in the [`veraison/swid`](https://github.com/veraison/swid) library, they
+> cannot be extended using the extension feature provided in the CoRIM library.
+> The extension support in CoRIM library is applicable ONLY to CoRIM and CoMID
+> maps and type choices
 
 
 ## Map Extensions
 
-Map extensions allow extending CoRIM maps with additional keys, effectively
-defining new fields for the corresponding structures. In the code base, these
-can be identified by the embedded `Extensions` struct. These are
+Map extensions allow extending CoRIM and CoMID maps with additional keys,
+effectively defining new fields for the corresponding structures. In the code
+base, these can be identified by the embedded `Extensions` struct. Each
+extensible type has a corresponding `extensions.Point`. These are:
 
-- `comid.Comid`
-- `comid.Entity`
-- `comid.FlagsMap`
-- `comid.Mval`
-- `comid.Triples`
-- `corim.Entity`
-- `corim.Signer`
-- `corim.UnsignedCorim`
+| type                  | extension point                                               |
+| --------------------- | ------------------------------------------------------------- |
+| `comid.Comid`         | `comid.ExtComid`                                              |
+| `comid.Entity`        | `comid.ExtEntity`                                             |
+| `comid.FlagsMap`      | `comid.ExtReferenceValueFlags`, `comid.ExtEndorsedValueFlags` |
+| `comid.Mval`          | `comid.ExtReferenceValue`, `comid.ExtEndorsedValue`           |
+| `comid.Triples`       | `comid.ExtTriples`                                            |
+| `corim.Entity`        | `corim.ExtEntity`                                             |
+| `corim.Signer`        | `corim.ExtSigner`                                             |
+| `corim.UnsignedCorim` | `corim.ExtUnsignedCorim`                                      |
+
+Note that `comid.Mval` and `comid.FlagsMap` are used for both reference values
+and endorsed values, which may be extended separately. This is why there are
+two extension points associated with each. Additionally, `comid.ExtMval` and
+`comid.ExtFlags` also exist when you want to register extensions with a
+`comid.Mval` or `comid.Measurment` (and so don't have the context of whether it
+will be going into a reference or an endorsed value).
+
+The diagram below shows a visual representation of where these extension points
+originate in the `struct` hierarchy, and which CoRIM object are "aware" of
+which extension points:
+
+![map extensions](corim-map-extensions.png?)
+
+(note: the diagram shows the logical relationships between structures and does
+not meant to accurately reflect the code -- e.g. it omits the container types,
+representing them as slices)
 
 To extend the above types, you need to define a struct containing your
-extensions and pass a pointer to an instance of that struct to the
-`RegisterExtensions()` method of the corresponding instance of the type that is
-being extended. This should be done as early as possible, before any marshaling
-is performed.
+extensions for each extension point that you want to extend. You then need to
+create an `extensions.Map` that maps the extension points to a pointer to an
+instance of the corresponding struct. Finally, you need to pass  the map to the
+`RegisterExtensions()` method of an instance of the top-most type that is being
+extended. For example, if you want to extend the comid, reference values, and
+entities, you would create a struct defining the extensions for each, call
+`extensions.NewMap()` to create a new map, call `Add()` on the map to add
+mappings from the three extension points to pointers to empty instances of your
+structs, and, finally, pass the map to `comid.Comid.RegisterExtensions()`. This
+should be done as early as possible, before any marshaling is performed.
 
 These types can be extended in two ways: by adding additional fields, and by
 introducing additional constraints over existing fields.
@@ -121,6 +147,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/extensions"
 )
 
 // the struct containing the extensions
@@ -154,7 +181,8 @@ var sampleText = `
 
 func main() {
 	var entity comid.Entity
-	entity.RegisterExtensions(&EntityExtensions{})
+	extMap := extensions.NewMap().Add(comid.ExtEntity, &EntityExtensions{})
+	entity.RegisterExtensions(extMap)
 
 	if err := json.Unmarshal([]byte(sampleText), &entity); err != nil {
 		log.Fatalf("ERROR: %s", err.Error())
@@ -166,11 +194,11 @@ func main() {
 		fmt.Println("validation succeeded")
 	}
 
-    // obtain the extension field value via a generic getter
+	// obtain the extension field value via a generic getter
 	email := entity.Extensions.MustGetString("email")
 	fmt.Printf("entity email: %s\n", email)
 
-    // retrive the extensions struct and get value via its field.
+	// retrive the extensions struct and get value via its field.
 	exts := entity.GetExtensions().(*EntityExtensions)
 	fmt.Printf("also entity email: %s\n", exts.Email)
 }

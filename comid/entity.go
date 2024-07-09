@@ -23,13 +23,22 @@ type Entity struct {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *Entity) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *Entity) RegisterExtensions(exts extensions.Map) error {
+	for p, v := range exts {
+		switch p {
+		case ExtEntity:
+			o.Extensions.Register(v)
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	return nil
 }
 
-// GetExtensions returns pervisouosly registered extension
-func (o *Entity) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+// GetExtensions returns previously registered extension
+func (o *Entity) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // SetEntityName is used to set the EntityName field of Entity using supplied name
@@ -104,30 +113,14 @@ func (o Entity) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
-// Entities is an array of entity-map's
-type Entities []Entity
+// Entities is a container for Entity instances and their extensions.
+// It is a thin wrapper around extensions.Collection.
+type Entities struct {
+	extensions.Collection[Entity, *Entity]
+}
 
-// NewEntities instantiates an empty entity-map array
 func NewEntities() *Entities {
-	return new(Entities)
-}
-
-// AddEntity adds the supplied entity-map to the target Entities
-func (o *Entities) AddEntity(e Entity) *Entities {
-	if o != nil {
-		*o = append(*o, e)
-	}
-	return o
-}
-
-// Valid iterates over the range of individual entities to check for validity
-func (o Entities) Valid() error {
-	for i, m := range o {
-		if err := m.Valid(); err != nil {
-			return fmt.Errorf("entity at index %d: %w", i, err)
-		}
-	}
-	return nil
+	return &Entities{*extensions.NewCollection[Entity]()}
 }
 
 // EntityName encapsulates the name of the associated Entity. The CoRIM

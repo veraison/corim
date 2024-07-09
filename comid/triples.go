@@ -11,8 +11,8 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues *[]ReferenceValue `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues  *[]EndorsedValue  `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	ReferenceValues *ValueTriples     `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues  *ValueTriples     `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
 	AttestVerifKeys *[]AttestVerifKey `cbor:"2,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
 	DevIdentityKeys *[]DevIdentityKey `cbor:"3,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
 
@@ -20,13 +20,53 @@ type Triples struct {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *Triples) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *Triples) RegisterExtensions(exts extensions.Map) error {
+	refValExts := extensions.NewMap()
+	endValExts := extensions.NewMap()
+
+	for p, v := range exts {
+		switch p {
+		case ExtTriples:
+			o.Extensions.Register(v)
+		case ExtReferenceValue:
+			refValExts[ExtMval] = v
+		case ExtReferenceValueFlags:
+			refValExts[ExtFlags] = v
+		case ExtEndorsedValue:
+			endValExts[ExtMval] = v
+		case ExtEndorsedValueFlags:
+			endValExts[ExtFlags] = v
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	if len(refValExts) != 0 {
+		if o.ReferenceValues == nil {
+			o.ReferenceValues = NewValueTriples()
+		}
+
+		if err := o.ReferenceValues.RegisterExtensions(refValExts); err != nil {
+			return err
+		}
+	}
+
+	if len(endValExts) != 0 {
+		if o.EndorsedValues == nil {
+			o.EndorsedValues = NewValueTriples()
+		}
+
+		if err := o.EndorsedValues.RegisterExtensions(refValExts); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // GetExtensions returns pervisouosly registered extension
-func (o *Triples) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+func (o *Triples) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
@@ -36,6 +76,20 @@ func (o *Triples) UnmarshalCBOR(data []byte) error {
 
 // MarshalCBOR serializes to CBOR
 func (o Triples) MarshalCBOR() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.ReferenceValues != nil && o.ReferenceValues.IsEmpty() {
+		o.ReferenceValues = nil
+	}
+
+	if o.EndorsedValues != nil && o.EndorsedValues.IsEmpty() {
+		o.EndorsedValues = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -46,30 +100,42 @@ func (o *Triples) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON serializes to JSON
 func (o Triples) MarshalJSON() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.ReferenceValues != nil && o.ReferenceValues.IsEmpty() {
+		o.ReferenceValues = nil
+	}
+
+	if o.EndorsedValues != nil && o.EndorsedValues.IsEmpty() {
+		o.EndorsedValues = nil
+	}
+
 	return encoding.SerializeStructToJSON(o)
 }
 
 // Valid checks that the Triples is valid as per the specification
 func (o Triples) Valid() error {
 	// non-empty<>
-	if o.ReferenceValues == nil && o.EndorsedValues == nil &&
-		o.AttestVerifKeys == nil && o.DevIdentityKeys == nil {
+	if (o.ReferenceValues == nil || o.ReferenceValues.IsEmpty()) &&
+		(o.EndorsedValues == nil || o.EndorsedValues.IsEmpty()) &&
+		(o.AttestVerifKeys == nil || len(*o.AttestVerifKeys) == 0) &&
+		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) {
 		return fmt.Errorf("triples struct must not be empty")
 	}
 
 	if o.ReferenceValues != nil {
-		for i, rv := range *o.ReferenceValues {
-			if err := rv.Valid(); err != nil {
-				return fmt.Errorf("reference value at index %d: %w", i, err)
-			}
+		if err := o.ReferenceValues.Valid(); err != nil {
+			return fmt.Errorf("reference values: %w", err)
 		}
 	}
 
 	if o.EndorsedValues != nil {
-		for i, ev := range *o.EndorsedValues {
-			if err := ev.Valid(); err != nil {
-				return fmt.Errorf("endorsed value at index %d: %w", i, err)
-			}
+		if err := o.EndorsedValues.Valid(); err != nil {
+			return fmt.Errorf("endorsed values: %w", err)
 		}
 	}
 
@@ -92,17 +158,27 @@ func (o Triples) Valid() error {
 	return o.Extensions.validTriples(&o)
 }
 
-func (o *Triples) AddReferenceValue(val ReferenceValue) *Triples {
+func (o *Triples) AddReferenceValue(val ValueTriple) *Triples {
 	if o != nil {
-		*o.ReferenceValues = append(*o.ReferenceValues, val)
+		if o.ReferenceValues == nil {
+			o.ReferenceValues = new(ValueTriples)
+		}
+
+		o.ReferenceValues.Add(&val)
 	}
+
 	return o
 }
 
-func (o *Triples) AddEndorsedValue(val EndorsedValue) *Triples {
+func (o *Triples) AddEndorsedValue(val ValueTriple) *Triples {
 	if o != nil {
-		*o.EndorsedValues = append(*o.EndorsedValues, val)
+		if o.EndorsedValues == nil {
+			o.EndorsedValues = new(ValueTriples)
+		}
+
+		o.EndorsedValues.Add(&val)
 	}
+
 	return o
 }
 
@@ -110,6 +186,7 @@ func (o *Triples) AddAttestVerifKey(val AttestVerifKey) *Triples {
 	if o != nil {
 		*o.AttestVerifKeys = append(*o.AttestVerifKeys, val)
 	}
+
 	return o
 }
 
@@ -117,5 +194,6 @@ func (o *Triples) AddDevIdentityKey(val DevIdentityKey) *Triples {
 	if o != nil {
 		*o.DevIdentityKeys = append(*o.DevIdentityKeys, val)
 	}
+
 	return o
 }

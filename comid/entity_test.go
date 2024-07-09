@@ -50,16 +50,16 @@ func TestEntity_Valid_name_regid_and_roles(t *testing.T) {
 }
 
 func TestEntities_Valid_empty(t *testing.T) {
-	e := Entity{}
-	tv := NewEntities().AddEntity(e)
+	e := &Entity{}
+	tv := NewEntities().Add(e)
 	require.NotNil(t, tv)
 
 	err := tv.Valid()
-	assert.EqualError(t, err, "entity at index 0: invalid entity: empty entity-name")
+	assert.EqualError(t, err, "error at index 0: invalid entity: empty entity-name")
 }
 
 func TestEntities_Valid_ok(t *testing.T) {
-	e := Entity{}
+	e := &Entity{}
 
 	require.NotNil(t,
 		e.SetEntityName("ACME Ltd.").
@@ -67,7 +67,7 @@ func TestEntities_Valid_ok(t *testing.T) {
 			SetRoles(RoleTagCreator, RoleCreator),
 	)
 
-	tv := NewEntities().AddEntity(e)
+	tv := NewEntities().Add(e)
 	require.NotNil(t, tv)
 
 	err := tv.Valid()
@@ -119,7 +119,7 @@ type testEntityNameBadType struct {
 	testEntityName
 }
 
-func newTestEntityNameBadType(val any) (*EntityName, error) {
+func newTestEntityNameBadType(_ any) (*EntityName, error) {
 	v := testEntityNameBadType{testEntityName(7)}
 	return &EntityName{&v}, nil
 }
