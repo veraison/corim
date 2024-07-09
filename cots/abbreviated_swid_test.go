@@ -1,4 +1,4 @@
-// Copyright 2020 Contributors to the Veraison project.
+// Copyright 2020-2024 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 // The tests in this file were copied from softwareidentity_test.go in github.com/veraison/swid with minor edits made
