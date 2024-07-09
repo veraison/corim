@@ -9,6 +9,7 @@ import (
 	"github.com/fxamacker/cbor/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/veraison/corim/extensions"
 )
 
 type TestExtensions struct {
@@ -24,11 +25,11 @@ func (o TestExtensions) ConstrainEntity(ent *Entity) error {
 	return nil
 }
 
-func (o TestExtensions) ConstrainCorim(c *UnsignedCorim) error {
+func (o TestExtensions) ConstrainCorim(_ *UnsignedCorim) error {
 	return errors.New("invalid")
 }
 
-func (o TestExtensions) ConstrainSigner(s *Signer) error {
+func (o TestExtensions) ConstrainSigner(_ *Signer) error {
 	return errors.New("invalid")
 }
 
@@ -40,7 +41,10 @@ func TestEntityExtensions_Valid(t *testing.T) {
 	err := ent.Valid()
 	assert.NoError(t, err)
 
-	ent.RegisterExtensions(&TestExtensions{})
+	extMap := extensions.NewMap().Add(ExtEntity, &TestExtensions{})
+	err = ent.RegisterExtensions(extMap)
+	require.NoError(t, err)
+
 	err = ent.Valid()
 	assert.EqualError(t, err, `EntityName must be "Futurama"`)
 
@@ -73,9 +77,11 @@ func TestEntityExtensions_CBOR(t *testing.T) {
 	}
 
 	ent := NewEntity()
-	ent.RegisterExtensions(&TestExtensions{})
+	extMap := extensions.NewMap().Add(ExtEntity, &TestExtensions{})
+	err := ent.RegisterExtensions(extMap)
+	require.NoError(t, err)
 
-	err := cbor.Unmarshal(data, &ent)
+	err = cbor.Unmarshal(data, &ent)
 	assert.NoError(t, err)
 
 	assert.Equal(t, ent.EntityName.String(), "acme")

@@ -31,13 +31,33 @@ func NewComid() *Comid {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *Comid) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *Comid) RegisterExtensions(exts extensions.Map) error {
+	triplesExts := extensions.NewMap()
+
+	for p, v := range exts {
+		switch p {
+		case ExtComid:
+			o.Extensions.Register(v)
+		case ExtEntity:
+			if o.Entities == nil {
+				o.Entities = NewEntities()
+			}
+
+			entMap := extensions.NewMap().Add(ExtEntity, v)
+			if err := o.Entities.RegisterExtensions(entMap); err != nil {
+				return err
+			}
+		default:
+			triplesExts.Add(p, v)
+		}
+	}
+
+	return o.Triples.RegisterExtensions(triplesExts)
 }
 
-// GetExtensions returns pervisouosly registered extension
-func (o *Comid) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+// GetExtensions returns previously registered extension
+func (o *Comid) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // SetLanguage sets the language used in the target Comid to the supplied
@@ -129,7 +149,7 @@ func (o *Comid) AddEntity(name string, regID *string, roles ...Role) *Comid {
 			o.Entities = new(Entities)
 		}
 
-		if o.Entities.AddEntity(e) == nil {
+		if o.Entities.Add(&e) == nil {
 			return nil
 		}
 	}
@@ -164,10 +184,10 @@ func (o *Comid) AddLinkedTag(tagID interface{}, rel Rel) *Comid {
 
 // AddReferenceValue adds the supplied reference value to the
 // reference-triples list of the target Comid.
-func (o *Comid) AddReferenceValue(val ReferenceValue) *Comid {
+func (o *Comid) AddReferenceValue(val ValueTriple) *Comid {
 	if o != nil {
 		if o.Triples.ReferenceValues == nil {
-			o.Triples.ReferenceValues = new([]ReferenceValue)
+			o.Triples.ReferenceValues = NewValueTriples()
 		}
 
 		if o.Triples.AddReferenceValue(val) == nil {
@@ -179,10 +199,10 @@ func (o *Comid) AddReferenceValue(val ReferenceValue) *Comid {
 
 // AddEndorsedValue adds the supplied endorsed value to the
 // endorsed-triples list of the target Comid.
-func (o *Comid) AddEndorsedValue(val EndorsedValue) *Comid {
+func (o *Comid) AddEndorsedValue(val ValueTriple) *Comid {
 	if o != nil {
 		if o.Triples.EndorsedValues == nil {
-			o.Triples.EndorsedValues = new([]EndorsedValue)
+			o.Triples.EndorsedValues = NewValueTriples()
 		}
 
 		if o.Triples.AddEndorsedValue(val) == nil {
@@ -252,6 +272,16 @@ func (o Comid) ToCBOR() ([]byte, error) {
 		return nil, err
 	}
 
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Entities != nil && o.Entities.IsEmpty() {
+		o.Entities = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, &o)
 }
 
@@ -260,18 +290,28 @@ func (o *Comid) FromCBOR(data []byte) error {
 	return encoding.PopulateStructFromCBOR(dm, data, o)
 }
 
-// FromJSON deserializes a JSON-encoded CoMID into the target Comid
-func (o *Comid) FromJSON(data []byte) error {
-	return encoding.PopulateStructFromJSON(data, o)
-}
-
 // ToJSON serializes the target Comid to JSON
 func (o Comid) ToJSON() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
 	}
 
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Entities != nil && o.Entities.IsEmpty() {
+		o.Entities = nil
+	}
+
 	return encoding.SerializeStructToJSON(&o)
+}
+
+// FromJSON deserializes a JSON-encoded CoMID into the target Comid
+func (o *Comid) FromJSON(data []byte) error {
+	return encoding.PopulateStructFromJSON(data, o)
 }
 
 func (o Comid) ToJSONPretty(indent string) ([]byte, error) {

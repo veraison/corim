@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/extensions"
 )
 
 var (
@@ -184,14 +185,34 @@ func TestMeta_FromCBOR_full(t *testing.T) {
 	assert.Equal(t, notAfter.Unix(), actual.Validity.NotAfter.Unix())
 }
 
-func Test_Signer_Valid(t *testing.T) {
-	var signer Signer
+func Test_Meata_extensions(t *testing.T) {
+	meta := NewMeta()
 
-	assert.EqualError(t, signer.Valid(), "empty name")
+	exts := &signerExtensions{}
+	extMap := extensions.NewMap().Add(ExtSigner, exts)
 
-	signer.Name = "test-signer"
-	uri := comid.TaggedURI("@@@")
-	signer.URI = &uri
+	err := meta.RegisterExtensions(extMap)
+	assert.NoError(t, err)
+	assert.True(t, meta.Signer.Extensions.HaveExtensions())
+	assert.Equal(t, exts, meta.Signer.GetExtensions())
 
-	assert.EqualError(t, signer.Valid(), `invalid URI: "@@@" is not an absolute URI`)
+	badMap := extensions.NewMap().Add(extensions.Point("test"), exts)
+	err = meta.RegisterExtensions(badMap)
+	assert.EqualError(t, err, `unexpected extension point: "test"`)
+}
+
+func Test_meta_Valid(t *testing.T) {
+	meta := NewMeta()
+
+	assert.EqualError(t, meta.Valid(), "invalid signer: empty name")
+
+	uri := "http://example.com"
+	meta.SetSigner("test", &uri)
+	assert.NoError(t, meta.Valid())
+
+	ts := time.Now()
+	meta.Validity = &Validity{NotBefore: &ts}
+	err := meta.Valid()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid validity: invalid not-before / not-after")
 }

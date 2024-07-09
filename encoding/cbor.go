@@ -57,6 +57,10 @@ func doSerializeStructToCBOR(
 		parts := strings.Split(tag, ",")
 		keyString := parts[0]
 
+		if keyString == "-" {
+			continue // field is not marshaled
+		}
+
 		isOmitEmpty := false
 		if len(parts) > 1 {
 			for _, option := range parts[1:] {
@@ -141,6 +145,10 @@ func doPopulateStructFromCBOR(
 
 		parts := strings.Split(tag, ",")
 		keyString := parts[0]
+
+		if keyString == "-" { // field is not marshaled
+			continue
+		}
 
 		isOmitEmpty := false
 		if len(parts) > 1 {

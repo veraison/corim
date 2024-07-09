@@ -6,6 +6,12 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
+const (
+	ExtUnsignedCorim extensions.Point = "UnsignedCorim"
+	ExtEntity        extensions.Point = "CorimEntity"
+	ExtSigner        extensions.Point = "Signer"
+)
+
 type IEntityConstrainer interface {
 	ConstrainEntity(*Entity) error
 }
@@ -27,7 +33,7 @@ func (o *Extensions) validEntity(entity *Entity) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(IEntityConstrainer)
+	ev, ok := o.IMapValue.(IEntityConstrainer)
 	if ok {
 		if err := ev.ConstrainEntity(entity); err != nil {
 			return err
@@ -42,7 +48,7 @@ func (o *Extensions) validCorim(c *UnsignedCorim) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(ICorimConstrainer)
+	ev, ok := o.IMapValue.(ICorimConstrainer)
 	if ok {
 		if err := ev.ConstrainCorim(c); err != nil {
 			return err
@@ -57,7 +63,7 @@ func (o *Extensions) validSigner(signer *Signer) error {
 		return nil
 	}
 
-	ev, ok := o.IExtensionsValue.(ISignerConstrainer)
+	ev, ok := o.IMapValue.(ISignerConstrainer)
 	if ok {
 		if err := ev.ConstrainSigner(signer); err != nil {
 			return err

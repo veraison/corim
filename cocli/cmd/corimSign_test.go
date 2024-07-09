@@ -167,7 +167,7 @@ func Test_CorimSignCmd_invalid_meta_file(t *testing.T) {
 	require.NoError(t, err)
 
 	err = cmd.Execute()
-	assert.EqualError(t, err, "error validating CoRIM Meta: invalid meta: empty name")
+	assert.EqualError(t, err, "error validating CoRIM Meta: invalid signer: empty name")
 }
 
 func Test_CorimSignCmd_non_existent_key_file(t *testing.T) {

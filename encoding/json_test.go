@@ -13,8 +13,9 @@ import (
 
 func Test_PopulateStructFromJSON(t *testing.T) {
 	type SimpleStruct struct {
-		FieldOne string `json:"field-one,omitempty"`
-		FieldTwo int    `json:"field-two"`
+		FieldOne     string `json:"field-one,omitempty"`
+		FieldTwo     int    `json:"field-two"`
+		IgnoredField int    `json:"-"`
 	}
 
 	var v SimpleStruct

@@ -524,7 +524,7 @@ func TestNewMkeyOID(t *testing.T) {
 
 type testMkey [4]byte
 
-func newTestMkey(val any) (*Mkey, error) {
+func newTestMkey(_ any) (*Mkey, error) {
 	return &Mkey{&testMkey{0x74, 0x64, 0x73, 0x74}}, nil
 }
 
@@ -552,7 +552,7 @@ func (o badMkey) Type() string {
 	return "uuid"
 }
 
-func newBadMkey(val any) (*Mkey, error) {
+func newBadMkey(_ any) (*Mkey, error) {
 	return &Mkey{&badMkey{testMkey{0x74, 0x64, 0x73, 0x74}}}, nil
 }
 
@@ -561,7 +561,7 @@ func TestRegisterMkeyType(t *testing.T) {
 	assert.EqualError(t, err, "tag 32 is already registered")
 
 	err = RegisterMkeyType(99996, newBadMkey)
-	assert.EqualError(t, err, `mesurement key type with name "uuid" already exists`)
+	assert.EqualError(t, err, `measurement key type with name "uuid" already exists`)
 
 	err = RegisterMkeyType(99996, newTestMkey)
 	assert.NoError(t, err)
@@ -580,4 +580,24 @@ func TestMkey_UnmarshalJSON_regression_issue_100(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
+}
+
+func TestMkey_new(t *testing.T) {
+	psaRefValID, err := NewPSARefValID(TestSignerID)
+	require.NoError(t, err)
+
+	key := MustNewMkey(psaRefValID, PSARefValIDType)
+	assert.EqualValues(t, psaRefValID, key.Value)
+	assert.Equal(t, PSARefValIDType, key.Type())
+}
+
+func TestMkey_UintMkey(t *testing.T) {
+	var v uint64 = 7
+	key, err := NewMkey(v, UintType)
+	assert.NoError(t, err)
+	assert.Equal(t, "7", key.Value.String())
+
+	ret, err := key.GetKeyUint()
+	assert.NoError(t, err)
+	assert.EqualValues(t, 7, ret)
 }

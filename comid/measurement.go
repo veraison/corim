@@ -32,7 +32,7 @@ func NewMkey(val any, typ string) (*Mkey, error) {
 		return nil, fmt.Errorf("unexpected measurement key type: %q", typ)
 	}
 
-	return factory(nil)
+	return factory(val)
 }
 
 // MustNewMkey is like NewMkey, execept it does not return an error, assuming
@@ -329,7 +329,7 @@ func RegisterMkeyType(tag uint64, factory IMkeyFactory) error {
 
 	typ := nilVal.Value.Type()
 	if _, exists := mkeyValueRegister[typ]; exists {
-		return fmt.Errorf("mesurement key type with name %q already exists", typ)
+		return fmt.Errorf("measurement key type with name %q already exists", typ)
 	}
 
 	if err := registerCOMIDTag(tag, nilVal.Value); err != nil {
@@ -359,13 +359,28 @@ type Mval struct {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *Mval) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *Mval) RegisterExtensions(exts extensions.Map) error {
+	for p, v := range exts {
+		switch p {
+		case ExtMval:
+			o.Extensions.Register(v)
+		case ExtFlags:
+			if o.Flags == nil {
+				o.Flags = new(FlagsMap)
+			}
+
+			o.Flags.Extensions.Register(v)
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	return nil
 }
 
 // GetExtensions returns pervisouosly registered extension
-func (o *Mval) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+func (o *Mval) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
@@ -375,6 +390,16 @@ func (o *Mval) UnmarshalCBOR(data []byte) error {
 
 // MarshalCBOR serializes to CBOR
 func (o Mval) MarshalCBOR() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Flags != nil && o.Flags.IsEmpty() {
+		o.Flags = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -385,6 +410,16 @@ func (o *Mval) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON serializes to JSON
 func (o Mval) MarshalJSON() ([]byte, error) {
+	// If extensions have been registered, the collection will exist, but
+	// might be empty. If that is the case, set it to nil to avoid
+	// marshaling an empty list (and let the marshaller omit the claim
+	// instead). Note that since the receiver was passed by value, we do not
+	// need to worry about saving the field's value before setting it to
+	// nil.
+	if o.Flags != nil && o.Flags.IsEmpty() {
+		o.Flags = nil
+	}
+
 	return encoding.SerializeStructToJSON(o)
 }
 
@@ -570,6 +605,14 @@ func NewOIDMeasurement(key any) (*Measurement, error) {
 	return NewMeasurement(key, OIDType)
 }
 
+func (o *Measurement) RegisterExtensions(exts extensions.Map) error {
+	return o.Val.RegisterExtensions(exts)
+}
+
+func (o Measurement) GetExtensions() extensions.IMapValue {
+	return o.Val.GetExtensions()
+}
+
 func (o *Measurement) SetVersion(ver string, scheme int64) *Measurement {
 	if o != nil {
 		v := NewVersion().SetVersion(ver).SetScheme(scheme)
@@ -728,10 +771,50 @@ func (o Measurement) Valid() error {
 		}
 	}
 
-	// check non-empty<> condition on measurement-values-map
-	if err := o.Val.Valid(); err != nil {
-		return err
-	}
+	return o.Val.Valid()
+}
 
-	return nil
+// Measurements is a container for Measurement instances and their extensions.
+// It is a thin wrapper around extensions.Collection.
+type Measurements extensions.Collection[Measurement, *Measurement]
+
+func NewMeasurements() *Measurements {
+	return (*Measurements)(extensions.NewCollection[Measurement]())
+}
+
+func (o *Measurements) RegisterExtensions(exts extensions.Map) error {
+	return (*extensions.Collection[Measurement, *Measurement])(o).RegisterExtensions(exts)
+}
+
+func (o *Measurements) GetExtensions() extensions.IMapValue {
+	return (*extensions.Collection[Measurement, *Measurement])(o).GetExtensions()
+}
+
+func (o *Measurements) Valid() error {
+	return (*extensions.Collection[Measurement, *Measurement])(o).Valid()
+}
+
+func (o *Measurements) IsEmpty() bool {
+	return (*extensions.Collection[Measurement, *Measurement])(o).IsEmpty()
+}
+
+func (o *Measurements) Add(val *Measurement) *Measurements {
+	ret := (*extensions.Collection[Measurement, *Measurement])(o).Add(val)
+	return (*Measurements)(ret)
+}
+
+func (o Measurements) MarshalCBOR() ([]byte, error) {
+	return (extensions.Collection[Measurement, *Measurement])(o).MarshalCBOR()
+}
+
+func (o *Measurements) UnmarshalCBOR(data []byte) error {
+	return (*extensions.Collection[Measurement, *Measurement])(o).UnmarshalCBOR(data)
+}
+
+func (o Measurements) MarshalJSON() ([]byte, error) {
+	return (extensions.Collection[Measurement, *Measurement])(o).MarshalJSON()
+}
+
+func (o *Measurements) UnmarshalJSON(data []byte) error {
+	return (*extensions.Collection[Measurement, *Measurement])(o).UnmarshalJSON(data)
 }

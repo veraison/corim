@@ -1,4 +1,4 @@
-// Copyright 2021 Contributors to the Veraison project.
+// Copyright 2021-2024 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -19,7 +19,7 @@ func Example_encode() {
 		AddLinkedTag("my-ns:acme-roadrunner-base", RelSupplements).
 		AddLinkedTag("my-ns:acme-roadrunner-old", RelReplaces).
 		AddReferenceValue(
-			ReferenceValue{
+			ValueTriple{
 				Environment: Environment{
 					Class: NewClassOID(TestOID).
 						SetVendor("ACME Ltd.").
@@ -30,7 +30,7 @@ func Example_encode() {
 					Group:    MustNewUUIDGroup(TestUUID),
 				},
 				Measurements: *NewMeasurements().
-					AddMeasurement(
+					Add(
 						MustNewUUIDMeasurement(TestUUID).
 							SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetSVN(2).
@@ -47,7 +47,7 @@ func Example_encode() {
 			},
 		).
 		AddEndorsedValue(
-			EndorsedValue{
+			ValueTriple{
 				Environment: Environment{
 					Class: NewClassUUID(TestUUID).
 						SetVendor("ACME Ltd.").
@@ -58,7 +58,7 @@ func Example_encode() {
 					Group:    MustNewUUIDGroup(TestUUID),
 				},
 				Measurements: *NewMeasurements().
-					AddMeasurement(
+					Add(
 						MustNewUUIDMeasurement(TestUUID).
 							SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
 							SetMinSVN(2).
@@ -116,20 +116,20 @@ func Example_encode_PSA() {
 		SetTagIdentity("my-ns:acme-roadrunner-supplement", 0).
 		AddEntity("ACME Ltd.", &TestRegID, RoleCreator, RoleTagCreator, RoleMaintainer).
 		AddReferenceValue(
-			ReferenceValue{
+			ValueTriple{
 				Environment: Environment{
 					Class: NewClassImplID(TestImplID).
 						SetVendor("ACME Ltd.").
 						SetModel("RoadRunner 2.0"),
 				},
 				Measurements: *NewMeasurements().
-					AddMeasurement(
+					Add(
 						MustNewPSAMeasurement(
 							MustCreatePSARefValID(
 								TestSignerID, "BL", "5.0.5",
 							)).AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}),
 					).
-					AddMeasurement(
+					Add(
 						MustNewPSAMeasurement(
 							MustCreatePSARefValID(
 								TestSignerID, "PRoT", "1.3.5",

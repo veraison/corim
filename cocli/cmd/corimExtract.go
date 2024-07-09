@@ -45,11 +45,7 @@ func NewCorimExtractCmd() *cobra.Command {
 				return err
 			}
 
-			if err := extract(*corimExtractCorimFile, corimExtractOutputDir); err != nil {
-				return err
-			}
-
-			return nil
+			return extract(*corimExtractCorimFile, corimExtractOutputDir)
 		},
 	}
 

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/veraison/corim/extensions"
 	cose "github.com/veraison/go-cose"
 )
 
@@ -25,6 +26,24 @@ type SignedCorim struct {
 	UnsignedCorim UnsignedCorim
 	Meta          Meta
 	message       *cose.Sign1Message
+}
+
+func (o *SignedCorim) RegisterExtensions(exts extensions.Map) error {
+	unsignedExts := extensions.NewMap()
+
+	for p, v := range exts {
+		switch p {
+		case ExtSigner:
+			signerExts := extensions.NewMap().Add(ExtSigner, v)
+			if err := o.Meta.RegisterExtensions(signerExts); err != nil {
+				return err
+			}
+		default:
+			unsignedExts.Add(p, v)
+		}
+	}
+
+	return o.UnsignedCorim.RegisterExtensions(unsignedExts)
 }
 
 func (o *SignedCorim) processHdrs() error {

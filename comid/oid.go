@@ -144,11 +144,7 @@ func (o *OID) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if err := o.FromString(s); err != nil {
-		return err
-	}
-
-	return nil
+	return o.FromString(s)
 }
 
 func (o OID) MarshalJSON() ([]byte, error) {
@@ -219,11 +215,7 @@ func (o *TaggedOID) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if err := o.FromString(s); err != nil {
-		return err
-	}
-
-	return nil
+	return o.FromString(s)
 }
 
 func (o TaggedOID) MarshalJSON() ([]byte, error) {

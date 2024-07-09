@@ -4,6 +4,8 @@
 package comid
 
 import (
+	"fmt"
+
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 )
@@ -63,6 +65,16 @@ type FlagsMap struct {
 
 func NewFlagsMap() *FlagsMap {
 	return &FlagsMap{}
+}
+
+func (o FlagsMap) IsEmpty() bool {
+	if o.IsConfigured != nil || o.IsSecure != nil || o.IsRecovery != nil ||
+		o.IsDebug != nil || o.IsReplayProtected != nil || o.IsIntegrityProtected != nil ||
+		o.IsRuntimeMeasured != nil || o.IsImmutable != nil || o.IsTcb != nil {
+		return false
+	}
+
+	return o.Extensions.IsEmpty()
 }
 
 func (o *FlagsMap) AnySet() bool {
@@ -182,13 +194,22 @@ func (o *FlagsMap) Get(flag Flag) *bool {
 }
 
 // RegisterExtensions registers a struct as a collections of extensions
-func (o *FlagsMap) RegisterExtensions(exts extensions.IExtensionsValue) {
-	o.Extensions.Register(exts)
+func (o *FlagsMap) RegisterExtensions(exts extensions.Map) error {
+	for p, v := range exts {
+		switch p {
+		case ExtFlags:
+			o.Extensions.Register(v)
+		default:
+			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
+		}
+	}
+
+	return nil
 }
 
-// GetExtensions returns pervisouosly registered extension
-func (o *FlagsMap) GetExtensions() extensions.IExtensionsValue {
-	return o.Extensions.IExtensionsValue
+// GetExtensions returns previously registered extension
+func (o *FlagsMap) GetExtensions() extensions.IMapValue {
+	return o.Extensions.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR

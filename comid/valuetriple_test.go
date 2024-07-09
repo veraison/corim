@@ -11,7 +11,7 @@ import (
 )
 
 func Test_ReferenceValue(t *testing.T) {
-	rv := ReferenceValue{}
+	rv := ValueTriple{}
 	err := rv.Valid()
 	assert.EqualError(t, err, "environment validation failed: environment must not be empty")
 

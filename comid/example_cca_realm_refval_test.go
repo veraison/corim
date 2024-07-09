@@ -50,7 +50,7 @@ func extractRealmRefVals(c *Comid) error {
 		return fmt.Errorf("no reference values triples")
 	}
 
-	for i, rv := range *c.Triples.ReferenceValues {
+	for i, rv := range c.Triples.ReferenceValues.Values {
 		if err := extractRealmRefVal(rv); err != nil {
 			return fmt.Errorf("bad Realm reference value at index %d: %w", i, err)
 		}
@@ -59,7 +59,7 @@ func extractRealmRefVals(c *Comid) error {
 	return nil
 }
 
-func extractRealmRefVal(rv ReferenceValue) error {
+func extractRealmRefVal(rv ValueTriple) error {
 	class := rv.Environment.Class
 	instance := rv.Environment.Instance
 
@@ -81,11 +81,11 @@ func extractRealmRefVal(rv ReferenceValue) error {
 }
 
 func extractMeasurements(m Measurements) error {
-	if len(m) == 0 {
+	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
 
-	for i, meas := range m {
+	for i, meas := range m.Values {
 		if err := extractMeasurement(meas); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}

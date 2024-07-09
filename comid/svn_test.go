@@ -141,7 +141,7 @@ func TestSVN_JSON(t *testing.T) {
 
 type testSVN uint64
 
-func newTestSVN(val any) (*SVN, error) {
+func newTestSVN(_ any) (*SVN, error) {
 	v := testSVN(7)
 	return &SVN{&v}, nil
 }
@@ -162,7 +162,7 @@ type testSVNBadType struct {
 	testSVN
 }
 
-func newTestSVNBadType(val any) (*SVN, error) {
+func newTestSVNBadType(_ any) (*SVN, error) {
 	v := testSVNBadType{testSVN(7)}
 	return &SVN{&v}, nil
 }

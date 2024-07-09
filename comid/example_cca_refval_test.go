@@ -43,7 +43,7 @@ func extractCcaRefVals(c *Comid) error {
 		return fmt.Errorf("no reference values triples")
 	}
 
-	for i, rv := range *c.Triples.ReferenceValues {
+	for i, rv := range c.Triples.ReferenceValues.Values {
 		if err := extractCCARefVal(rv); err != nil {
 			return fmt.Errorf("bad PSA reference value at index %d: %w", i, err)
 		}
@@ -52,14 +52,14 @@ func extractCcaRefVals(c *Comid) error {
 	return nil
 }
 
-func extractCCARefVal(rv ReferenceValue) error {
+func extractCCARefVal(rv ValueTriple) error {
 	class := rv.Environment.Class
 
 	if err := extractImplementationID(class); err != nil {
 		return fmt.Errorf("extracting impl-id: %w", err)
 	}
 
-	for i, m := range rv.Measurements {
+	for i, m := range rv.Measurements.Values {
 		if m.Key == nil {
 			return fmt.Errorf("missing mKey at index %d", i)
 		}
