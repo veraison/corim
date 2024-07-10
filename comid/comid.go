@@ -214,10 +214,10 @@ func (o *Comid) AddEndorsedValue(val ValueTriple) *Comid {
 
 // AddAttestVerifKey adds the supplied endorsed value to the
 // attest-key-triples list of the target Comid.
-func (o *Comid) AddAttestVerifKey(val AttestVerifKey) *Comid {
+func (o *Comid) AddAttestVerifKey(val KeyTriple) *Comid {
 	if o != nil {
 		if o.Triples.AttestVerifKeys == nil {
-			o.Triples.AttestVerifKeys = new([]AttestVerifKey)
+			o.Triples.AttestVerifKeys = NewKeyTriples()
 		}
 
 		if o.Triples.AddAttestVerifKey(val) == nil {
@@ -229,10 +229,10 @@ func (o *Comid) AddAttestVerifKey(val AttestVerifKey) *Comid {
 
 // AddDevIdentityKey adds the supplied identity key to the
 // identity-triples list of the target Comid.
-func (o *Comid) AddDevIdentityKey(val DevIdentityKey) *Comid {
+func (o *Comid) AddDevIdentityKey(val KeyTriple) *Comid {
 	if o != nil {
 		if o.Triples.DevIdentityKeys == nil {
-			o.Triples.DevIdentityKeys = new([]DevIdentityKey)
+			o.Triples.DevIdentityKeys = NewKeyTriples()
 		}
 
 		if o.Triples.AddDevIdentityKey(val) == nil {

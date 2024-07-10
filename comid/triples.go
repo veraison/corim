@@ -11,10 +11,10 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues *ValueTriples     `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues  *ValueTriples     `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
-	AttestVerifKeys *[]AttestVerifKey `cbor:"2,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
-	DevIdentityKeys *[]DevIdentityKey `cbor:"3,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+	ReferenceValues *ValueTriples `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues  *ValueTriples `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	AttestVerifKeys *KeyTriples   `cbor:"2,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
+	DevIdentityKeys *KeyTriples   `cbor:"3,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
 
 	Extensions
 }
@@ -182,7 +182,7 @@ func (o *Triples) AddEndorsedValue(val ValueTriple) *Triples {
 	return o
 }
 
-func (o *Triples) AddAttestVerifKey(val AttestVerifKey) *Triples {
+func (o *Triples) AddAttestVerifKey(val KeyTriple) *Triples {
 	if o != nil {
 		*o.AttestVerifKeys = append(*o.AttestVerifKeys, val)
 	}
@@ -190,7 +190,7 @@ func (o *Triples) AddAttestVerifKey(val AttestVerifKey) *Triples {
 	return o
 }
 
-func (o *Triples) AddDevIdentityKey(val DevIdentityKey) *Triples {
+func (o *Triples) AddDevIdentityKey(val KeyTriple) *Triples {
 	if o != nil {
 		*o.DevIdentityKeys = append(*o.DevIdentityKeys, val)
 	}

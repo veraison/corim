@@ -75,7 +75,7 @@ func Example_encode() {
 			},
 		).
 		AddAttestVerifKey(
-			AttestVerifKey{
+			KeyTriple{
 				Environment: Environment{
 					Instance: MustNewUUIDInstance(uuid.UUID(TestUUID)),
 				},
@@ -85,7 +85,7 @@ func Example_encode() {
 					),
 			},
 		).AddDevIdentityKey(
-		DevIdentityKey{
+		KeyTriple{
 			Environment: Environment{
 				Instance: MustNewUEIDInstance(TestUEID),
 			},
@@ -138,7 +138,7 @@ func Example_encode_PSA() {
 			},
 		).
 		AddAttestVerifKey(
-			AttestVerifKey{
+			KeyTriple{
 				Environment: Environment{
 					Instance: MustNewUEIDInstance(TestUEID),
 				},
@@ -169,7 +169,7 @@ func Example_encode_PSA_attestation_verification() {
 		SetTagIdentity("my-ns:acme-roadrunner-supplement", 0).
 		AddEntity("ACME Ltd.", &TestRegID, RoleCreator, RoleTagCreator, RoleMaintainer).
 		AddAttestVerifKey(
-			AttestVerifKey{
+			KeyTriple{
 				Environment: Environment{
 					Instance: MustNewUEIDInstance(TestUEID),
 				},

@@ -1,4 +1,4 @@
-// Copyright 2021-2023 Contributors to the Veraison project.
+// Copyright 2021-2024 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAttestVerifKey_Valid_empty(t *testing.T) {
+func TestVerificationKeys_Valid_empty(t *testing.T) {
 	invalidKey := CryptoKey{TaggedPKIXBase64Key("")}
 
 	tvs := []struct {
@@ -33,9 +33,8 @@ func TestAttestVerifKey_Valid_empty(t *testing.T) {
 			testerr:  "verification keys validation failed: invalid key at index 0: key value not set",
 		},
 	}
-
 	for _, tv := range tvs {
-		av := AttestVerifKey{Environment: tv.env, VerifKeys: tv.verifkey}
+		av := KeyTriple{Environment: tv.env, VerifKeys: tv.verifkey}
 		err := av.Valid()
 		assert.EqualError(t, err, tv.testerr)
 	}
