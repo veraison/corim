@@ -212,7 +212,7 @@ func (o *Comid) AddEndorsedValue(val ValueTriple) *Comid {
 	return o
 }
 
-// AddAttestVerifKey adds the supplied endorsed value to the
+// AddAttestVerifKey adds the supplied verification key to the
 // attest-key-triples list of the target Comid.
 func (o *Comid) AddAttestVerifKey(val KeyTriple) *Comid {
 	if o != nil {

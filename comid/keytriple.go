@@ -5,10 +5,10 @@ package comid
 
 import "fmt"
 
-// KeyTriple stores an identity-triple-record with CBOR and JSON
-// serializations.  Note that the CBOR serialization packs the structure into an
-// array.  Instead, when serializing to JSON, the structure is converted into an
-// object.
+// KeyTriple stores a cryptographic key triple record (identity-triple-record
+// or attest-key-triple-record) with CBOR and JSON serializations.  Note that
+// the CBOR serialization packs the structure into an array.  Instead, when
+// serializing to JSON, the structure is converted into an object.
 type KeyTriple struct {
 	_           struct{}    `cbor:",toarray"`
 	Environment Environment `json:"environment"`
