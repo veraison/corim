@@ -180,7 +180,7 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 	c := comid.NewComid().
 		SetTagIdentity("vendor.example/prod/1", 0).
 		AddAttestVerifKey(
-			comid.AttestVerifKey{
+			comid.KeyTriple{
 				Environment: comid.Environment{
 					Instance: comid.MustNewUUIDInstance(comid.TestUUID),
 				},
@@ -314,7 +314,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 	c := comid.NewComid().
 		SetTagIdentity("vendor.example/prod/1", 0).
 		AddAttestVerifKey(
-			comid.AttestVerifKey{
+			comid.KeyTriple{
 				Environment: comid.Environment{
 					Instance: comid.MustNewUUIDInstance(comid.TestUUID),
 				},
@@ -357,7 +357,7 @@ func TestUnsignedCorim_ToCBOR(t *testing.T) {
 	c := comid.NewComid().
 		SetTagIdentity("vendor.example/prod/1", 0).
 		AddAttestVerifKey(
-			comid.AttestVerifKey{
+			comid.KeyTriple{
 				Environment: comid.Environment{
 					Instance: comid.MustNewUUIDInstance(comid.TestUUID),
 				},

@@ -43,7 +43,7 @@ func extractKeys(c *Comid) error {
 	return nil
 }
 
-func extractPSAKey(k AttestVerifKey) error {
+func extractPSAKey(k KeyTriple) error {
 	class := k.Environment.Class
 
 	if err := extractImplementationID(class); err != nil {

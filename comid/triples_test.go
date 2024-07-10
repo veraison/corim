@@ -67,12 +67,12 @@ func TestTriples_Valid(t *testing.T) {
 	assert.EqualError(t, err, "endorsed values: error at index 0: environment validation failed: environment must not be empty")
 
 	triples.EndorsedValues = nil
-	triples.AttestVerifKeys = &[]AttestVerifKey{{}}
+	triples.AttestVerifKeys = &KeyTriples{{}}
 	err = triples.Valid()
 	assert.EqualError(t, err, "attestation verification key at index 0: environment validation failed: environment must not be empty")
 
 	triples.AttestVerifKeys = nil
-	triples.DevIdentityKeys = &[]DevIdentityKey{{}}
+	triples.DevIdentityKeys = &KeyTriples{{}}
 	err = triples.Valid()
 	assert.EqualError(t, err, "device identity key at index 0: environment validation failed: environment must not be empty")
 }
