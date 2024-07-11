@@ -1,0 +1,35 @@
+---
+0: com.acme.rrd2013-ce-sp1-v4-1-5-0
+12: 0
+1: ACME Roadrunner Detector 2013 Coyote Edition SP1
+13: 4.1.5
+5:
+  43: trial
+  45: '2013'
+  47: coyote
+  52: Roadrunner Detector
+  54: sp1
+2:
+- 31: The ACME Corporation
+  32: acme.com
+  33:
+  - 1
+  - 2
+- 31: Coyote Services, Inc.
+  32: mycoyote.com
+  33: 4
+4:
+  38: www.gnu.org/licenses/gpl.txt
+  40: license
+6:
+  16:
+    24: rrdetector
+    25: "%programdata%"
+    26:
+      17:
+        24: rrdetector.exe
+        20: 532712
+        7:
+        - 1
+        - !!binary |-
+          oxT8LcZjrnpra8Z4dZQFc5bms/VpzVD9XdtNG7r9K2o=

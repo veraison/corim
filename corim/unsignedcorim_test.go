@@ -195,7 +195,7 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		AddProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("https://arm.com/psa/iot/2.0.0").
 		AddComid(*c).
 		SetRimValidity(time.Now().Add(time.Hour), nil).
 		AddEntity("ACME Ltd.", nil, RoleManifestCreator)
@@ -329,7 +329,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		AddProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("https://arm.com/psa/iot/2.0.0").
 		AddComid(*c)
 
 	require.NotNil(t, tv)
@@ -346,7 +346,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 		"corim-id":"invalid.tags.corim",
 		"tags":["2QH6ogGhAHV2ZW5kb3IuZXhhbXBsZS9wcm9kLzEEoQOBgqEB2CVQMftavwI+SZKqTpX5wVA7+oHZAip4sS0tLS0tQkVHSU4gUFVCTElDIEtFWS0tLS0tCk1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRVcxQnZxRisvcnk4QldhN1pFTVUxeFlZSEVROEIKbExUNE1GSE9hTytJQ1R0SXZyRWVFcHIvc2ZUQVA2NkgyaENIZGI1SEVYS3RSS29kNlFMY09MUEExUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="],
 		"dependent-rims":[{"href":"http://endorser.example/addon.corim"}],
-		"profiles":["https://arm.com/psa/iot/2.0.0"]
+		"profile":"https://arm.com/psa/iot/2.0.0"
 	}
 	`
 
@@ -372,7 +372,7 @@ func TestUnsignedCorim_ToCBOR(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		AddProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("https://arm.com/psa/iot/2.0.0").
 		AddComid(*c)
 
 	require.NotNil(t, tv)
@@ -388,7 +388,7 @@ func TestUnsignedCorim_ToCBOR(t *testing.T) {
 	err = other.FromCBOR(buf)
 	assert.NoError(t, err)
 
-	assert.EqualValues(t, tv.Profiles, other.Profiles)
+	assert.EqualValues(t, tv.Profile, other.Profile)
 	assert.EqualValues(t, tv.ID, other.ID)
 	assert.Nil(t, other.Entities)
 }

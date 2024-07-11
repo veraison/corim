@@ -1,0 +1,87 @@
+0: !!binary |-
+  XFfo9EbNQhuRyQjPk+E8/A==
+1:
+- encodedCBOR:
+      tag: 506
+      value:
+        0: en-GB
+        1:
+          0: !!binary |-
+            Q7vjfy5hSzOu01PP8UKLFg==
+        2:
+        - 0: ACME Ltd.
+          1:
+            tag: 32
+            value: https://acme.example
+          2:
+          - 0
+          - 1
+          - 2
+        4:
+          0:
+          - - 0:
+                0:
+                  tag: 600
+                  value: acme-implementation-id-000000001
+                1: ACME
+                2: RoadRunner
+            - - 0:
+                  tag: 601
+                  value:
+                    1: BL
+                    4: 2.1.0
+                    5: !!binary |-
+                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                1:
+                  2:
+                  - - 1
+                    - !!binary |-
+                      h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=
+              - 0:
+                  tag: 601
+                  value:
+                    1: PRoT
+                    4: 1.3.5
+                    5: !!binary |-
+                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                1:
+                  2:
+                  - - 1
+                    - !!binary |-
+                      AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8=
+              - 0:
+                  tag: 601
+                  value:
+                    1: ARoT
+                    4: 0.1.4
+                    5: !!binary |-
+                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                1:
+                  2:
+                  - - 1
+                    - !!binary |-
+                      o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg=
+2:
+- 0:
+    tag: 32
+    value: https://parent.example/rims/ccb3aa85-61b4-40f1-848e-02ad6e8a254b
+  1:
+  - 1
+  - !!binary |-
+    5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=
+3: http://arm.com/iot/profile/1
+4:
+  0:
+    tag: 1
+    value: 1640908800
+  1:
+    tag: 1
+    value: 1767139200
+5:
+- 0: ACME Ltd.
+  1:
+    tag: 32
+    value: acme.example
+  2:
+  - 1
+
