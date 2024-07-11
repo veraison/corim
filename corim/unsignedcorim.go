@@ -26,14 +26,14 @@ type UnsignedCorim struct {
 	// corim-id). Since we're never writing JSON (so far), this normally
 	// wouldn't matter, however the custom serialization code we use to
 	// handle embedded structs relies on the omitempty entry to determine
-	// if a fieled is optional, so we use it during unmarshaling as well as
+	// if a field is optional, so we use it during unmarshaling as well as
 	// marshaling. Hence omitempty is present for the json tag, but not
 	// cbor.
-	Tags          []Tag          `cbor:"1,keyasint" json:"tags,omitempty"`
-	DependentRims *[]Locator     `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
-	Profiles      *[]eat.Profile `cbor:"3,keyasint,omitempty" json:"profiles,omitempty"`
-	RimValidity   *Validity      `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
-	Entities      *Entities      `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
+	Tags          []Tag        `cbor:"1,keyasint" json:"tags,omitempty"`
+	DependentRims *[]Locator   `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
+	Profile       *eat.Profile `cbor:"3,keyasint,omitempty" json:"profile,omitempty"`
+	RimValidity   *Validity    `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
+	Entities      *Entities    `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
 
 	Extensions
 }
@@ -170,20 +170,17 @@ func (o *UnsignedCorim) AddDependentRim(href string, thumbprint *swid.HashEntry)
 	return o
 }
 
-// AddProfile appends the supplied profile identifier (either a URL or OID) to
-// the profiles array in the unsigned-corim-map
-func (o *UnsignedCorim) AddProfile(urlOrOID string) *UnsignedCorim {
+// SetProfile sets the supplied profile identifier (either a URL or OID) as
+// the profile in the unsigned-corim-map
+func (o *UnsignedCorim) SetProfile(urlOrOID string) *UnsignedCorim {
 	if o != nil {
 		p, err := eat.NewProfile(urlOrOID)
 		if err != nil {
 			return nil
 		}
 
-		if o.Profiles == nil {
-			o.Profiles = new([]eat.Profile)
-		}
+		o.Profile = p
 
-		*o.Profiles = append(*o.Profiles, *p)
 	}
 	return o
 }
@@ -256,11 +253,9 @@ func (o UnsignedCorim) Valid() error {
 		}
 	}
 
-	if o.Profiles != nil {
-		for i, p := range *o.Profiles {
-			if err := ValidProfile(p); err != nil {
-				return fmt.Errorf("profile validation failed at pos %d: %w", i, err)
-			}
+	if o.Profile != nil {
+		if err := ValidProfile(*o.Profile); err != nil {
+			return fmt.Errorf("profile validation failed: %w", err)
 		}
 	}
 
