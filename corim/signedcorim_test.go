@@ -346,7 +346,7 @@ func TestSignedCorim_SignVerify_ok(t *testing.T) {
 
 		var SignedCorimIn SignedCorim
 
-		SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorim)
+		SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
 		SignedCorimIn.Meta = *metaGood(t)
 
 		cbor, err := SignedCorimIn.Sign(signer)
@@ -373,7 +373,7 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 
 	var SignedCorimIn SignedCorim
 
-	SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorim)
+	SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
 
 	cbor, err := SignedCorimIn.Sign(signer)
 	assert.Nil(t, err)

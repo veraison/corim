@@ -28,6 +28,11 @@ type SignedCorim struct {
 	message       *cose.Sign1Message
 }
 
+// NewSignedCorim instantiates an empty SignedCorim
+func NewSignedCorim() *SignedCorim {
+	return &SignedCorim{}
+}
+
 func (o *SignedCorim) RegisterExtensions(exts extensions.Map) error {
 	unsignedExts := extensions.NewMap()
 
