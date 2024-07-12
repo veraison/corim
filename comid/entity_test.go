@@ -22,7 +22,7 @@ func TestEntity_Valid_empty(t *testing.T) {
 func TestEntity_Valid_name_but_no_roles(t *testing.T) {
 	tv := Entity{}
 
-	require.NotNil(t, tv.SetEntityName("ACME Ltd."))
+	require.NotNil(t, tv.SetName("ACME Ltd."))
 
 	err := tv.Valid()
 	assert.EqualError(t, err, "invalid entity: empty roles")
@@ -31,7 +31,7 @@ func TestEntity_Valid_name_but_no_roles(t *testing.T) {
 func TestEntity_Valid_name_regid_but_no_roles(t *testing.T) {
 	tv := Entity{}
 
-	require.NotNil(t, tv.SetEntityName("ACME Ltd."))
+	require.NotNil(t, tv.SetName("ACME Ltd."))
 	require.NotNil(t, tv.SetRegID("https://acme.example"))
 
 	err := tv.Valid()
@@ -41,7 +41,7 @@ func TestEntity_Valid_name_regid_but_no_roles(t *testing.T) {
 func TestEntity_Valid_name_regid_and_roles(t *testing.T) {
 	tv := Entity{}
 
-	require.NotNil(t, tv.SetEntityName("ACME Ltd."))
+	require.NotNil(t, tv.SetName("ACME Ltd."))
 	require.NotNil(t, tv.SetRegID("https://acme.example"))
 	require.NotNil(t, tv.SetRoles(RoleTagCreator))
 
@@ -62,7 +62,7 @@ func TestEntities_Valid_ok(t *testing.T) {
 	e := &Entity{}
 
 	require.NotNil(t,
-		e.SetEntityName("ACME Ltd.").
+		e.SetName("ACME Ltd.").
 			SetRegID("https://acme.example").
 			SetRoles(RoleTagCreator, RoleCreator),
 	)
@@ -77,7 +77,7 @@ func TestEntities_Valid_ok(t *testing.T) {
 func TestEntity_SetEntityName_empty(t *testing.T) {
 	e := Entity{}
 
-	assert.Nil(t, e.SetEntityName(""))
+	assert.Nil(t, e.SetName(""))
 }
 
 func TestEntity_SetRegID_empty(t *testing.T) {

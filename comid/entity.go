@@ -15,9 +15,9 @@ import (
 
 // Entity stores an entity-map capable of CBOR and JSON serializations.
 type Entity struct {
-	EntityName *EntityName `cbor:"0,keyasint" json:"name"`
-	RegID      *TaggedURI  `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
-	Roles      Roles       `cbor:"2,keyasint" json:"roles"`
+	Name  *EntityName `cbor:"0,keyasint" json:"name"`
+	RegID *TaggedURI  `cbor:"1,keyasint,omitempty" json:"regid,omitempty"`
+	Roles Roles       `cbor:"2,keyasint" json:"roles"`
 
 	Extensions
 }
@@ -41,13 +41,13 @@ func (o *Entity) GetExtensions() extensions.IMapValue {
 	return o.Extensions.IMapValue
 }
 
-// SetEntityName is used to set the EntityName field of Entity using supplied name
-func (o *Entity) SetEntityName(name string) *Entity {
+// SetName is used to set the Name field of Entity using supplied name
+func (o *Entity) SetName(name string) *Entity {
 	if o != nil {
 		if name == "" {
 			return nil
 		}
-		o.EntityName = MustNewStringEntityName(name)
+		o.Name = MustNewStringEntityName(name)
 	}
 	return o
 }
@@ -74,11 +74,11 @@ func (o *Entity) SetRoles(roles ...Role) *Entity {
 
 // Valid checks for validity of the fields within each Entity
 func (o Entity) Valid() error {
-	if o.EntityName == nil {
+	if o.Name == nil {
 		return fmt.Errorf("invalid entity: empty entity-name")
 	}
 
-	if err := o.EntityName.Valid(); err != nil {
+	if err := o.Name.Valid(); err != nil {
 		return fmt.Errorf("invalid entity: %w", err)
 	}
 

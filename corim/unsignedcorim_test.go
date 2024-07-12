@@ -260,9 +260,9 @@ func TestUnsignedCorim_AddEntity_full(t *testing.T) {
 		Entities: &Entities{
 			Values: []Entity{
 				{
-					EntityName: MustNewStringEntityName(name),
-					Roles:      Roles{role},
-					RegID:      &taggedRegID,
+					Name:  MustNewStringEntityName(name),
+					Roles: Roles{role},
+					RegID: &taggedRegID,
 				},
 			},
 		},

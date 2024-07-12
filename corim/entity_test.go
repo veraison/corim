@@ -23,7 +23,7 @@ func TestEntity_Valid_uninitialized(t *testing.T) {
 
 func TestEntity_Valid_empty_name(t *testing.T) {
 	tv := Entity{
-		EntityName: MustNewStringEntityName(""),
+		Name: MustNewStringEntityName(""),
 	}
 
 	err := tv.Valid()
@@ -35,8 +35,8 @@ func TestEntity_Valid_non_nil_empty_URI(t *testing.T) {
 	emptyRegID := comid.TaggedURI("")
 
 	tv := Entity{
-		EntityName: MustNewStringEntityName("ACME Ltd."),
-		RegID:      &emptyRegID,
+		Name:  MustNewStringEntityName("ACME Ltd."),
+		RegID: &emptyRegID,
 	}
 
 	err := tv.Valid()
@@ -48,8 +48,8 @@ func TestEntity_Valid_missing_roles(t *testing.T) {
 	regID := comid.TaggedURI("http://acme.example")
 
 	tv := Entity{
-		EntityName: MustNewStringEntityName("ACME Ltd."),
-		RegID:      &regID,
+		Name:  MustNewStringEntityName("ACME Ltd."),
+		RegID: &regID,
 	}
 
 	err := tv.Valid()
@@ -61,9 +61,9 @@ func TestEntity_Valid_unknown_role(t *testing.T) {
 	regID := comid.TaggedURI("http://acme.example")
 
 	tv := Entity{
-		EntityName: MustNewStringEntityName("ACME Ltd."),
-		RegID:      &regID,
-		Roles:      Roles{Role(666)},
+		Name:  MustNewStringEntityName("ACME Ltd."),
+		RegID: &regID,
+		Roles: Roles{Role(666)},
 	}
 
 	err := tv.Valid()
@@ -73,7 +73,7 @@ func TestEntity_Valid_unknown_role(t *testing.T) {
 
 func TestEntities_Valid_ok(t *testing.T) {
 	e := NewEntity().
-		SetEntityName("ACME Ltd.").
+		SetName("ACME Ltd.").
 		SetRegID("http://acme.example").
 		SetRoles(RoleManifestCreator)
 	require.NotNil(t, e)
