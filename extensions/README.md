@@ -88,7 +88,8 @@ entities, you would create a struct defining the extensions for each, call
 `extensions.NewMap()` to create a new map, call `Add()` on the map to add
 mappings from the three extension points to pointers to empty instances of your
 structs, and, finally, pass the map to `comid.Comid.RegisterExtensions()`. This
-should be done as early as possible, before any marshaling is performed.
+should be done as early as possible, before any marshaling is performed (see
+the example below).
 
 These types can be extended in two ways: by adding additional fields, and by
 introducing additional constraints over existing fields.
@@ -203,6 +204,73 @@ func main() {
 	fmt.Printf("also entity email: %s\n", exts.Email)
 }
 ```
+
+### Profiles
+
+Map extensions may be grouped into profiles. A profile is registered,
+associating an `eat.Profile` with an `extensions.Map`. A registered profile can
+be obtained by calling `corim.GetProfile()`, which returns a `corim.Profile`
+object which can be used to obtain `corim.UnsignedCorim`, `corim.SignedCorim`
+and `comid.Comid` instances that have the associated extensions registered.
+`corim.UnmarshalUnsignedCorimFromCBOR()` will automatically look up a
+registered profile based on the `eat.Profile` in the provided data (there are
+corresponding functions for JSON and signed CoRIM).
+
+```go
+// define extensions
+type EntityExtensions struct {
+	Address *string `cbor:"-1,keyasint,omitempty" json:"address,omitempty"`
+}
+
+type RefValExtensions struct {
+	Timestamp *int `cbor:"-1,keyasint,omitempty" json:"timestamp,omitempty"`
+}
+
+
+// register profile
+func init() {
+	profileID, err := eat.NewProfile("http://example.com/example-profile")
+	if err != nil {
+		panic(err) // will not error, as the hard-coded string above is valid
+	}
+
+	extMap := extensions.NewMap().
+		Add(comid.ExtEntity, &EntityExtensions{}).
+		Add(comid.ExtReferenceValue, &RefValExtensions{})
+
+	if err := RegisterProfile(profileID, extMap); err != nil {
+		// will not error, assuming our profile ID is unique, and we've
+		// correctly set up the extensions Map above
+		panic(err)
+	}
+}
+
+
+// use the profile
+func main() {
+	buf, err := os.ReadFile("testcases/unsigned-example-corim.cbor")
+	if err != nil {
+		log.Fatalf("could not read corim file: %v", err)
+	}
+
+	// UnmarshalUnsignedCorimFromCBOR will detect the profile and ensure
+	// the correct extensions are loaded before unmarshalling
+	extractedCorim, err := UnmarshalUnsignedCorimFromCBOR(buf)
+	if err != nil {
+		log.Fatalf("could not unmarshal corim: %v", err)
+	}
+
+    // ...
+}
+
+```
+
+Please see [example_profile_test.go](../corim/example_profile_test.go) for the complete
+example of creating and using CoRIM profiles.
+
+> [!NOTE]
+> Currently, only map extensions can be associated with profiles. Type choice
+> and enum value extensions (described below) can only be registered globally.
 
 
 ## Type Choice Extensions
