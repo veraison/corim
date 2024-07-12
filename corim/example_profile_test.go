@@ -99,7 +99,7 @@ func Example_profile_unmarshal() {
 	}
 
 	fmt.Printf("Language: %s\n", *extractedComid.Language)
-	fmt.Printf("Entity: %s\n", *extractedComid.Entities.Values[0].EntityName)
+	fmt.Printf("Entity: %s\n", *extractedComid.Entities.Values[0].Name)
 	fmt.Printf("        %s\n", extractedComid.Entities.Values[0].
 		Extensions.MustGetString("Address"))
 

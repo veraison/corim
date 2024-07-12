@@ -18,7 +18,7 @@ type TestExtensions struct {
 }
 
 func (o TestExtensions) ConstrainEntity(ent *Entity) error {
-	if ent.EntityName.String() != "Futurama" {
+	if ent.Name.String() != "Futurama" {
 		return errors.New(`EntityName must be "Futurama"`) // nolint:golint
 	}
 
@@ -35,7 +35,7 @@ func (o TestExtensions) ConstrainSigner(_ *Signer) error {
 
 func TestEntityExtensions_Valid(t *testing.T) {
 	ent := NewEntity()
-	ent.SetEntityName("The Simpsons")
+	ent.SetName("The Simpsons")
 	ent.SetRoles(RoleManifestCreator)
 
 	err := ent.Valid()
@@ -48,7 +48,7 @@ func TestEntityExtensions_Valid(t *testing.T) {
 	err = ent.Valid()
 	assert.EqualError(t, err, `EntityName must be "Futurama"`)
 
-	ent.SetEntityName("Futurama")
+	ent.SetName("Futurama")
 	err = ent.Valid()
 	assert.NoError(t, err)
 
@@ -84,7 +84,7 @@ func TestEntityExtensions_CBOR(t *testing.T) {
 	err = cbor.Unmarshal(data, &ent)
 	assert.NoError(t, err)
 
-	assert.Equal(t, ent.EntityName.String(), "acme")
+	assert.Equal(t, ent.Name.String(), "acme")
 
 	address, err := ent.Get("address")
 	require.NoError(t, err)

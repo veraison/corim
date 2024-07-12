@@ -207,7 +207,7 @@ func (o *UnsignedCorim) SetRimValidity(notAfter time.Time, notBefore *time.Time)
 func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *UnsignedCorim {
 	if o != nil {
 		e := NewEntity().
-			SetEntityName(name).
+			SetName(name).
 			SetRoles(roles...)
 
 		if regID != nil {
