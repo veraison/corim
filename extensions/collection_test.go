@@ -170,6 +170,18 @@ func Test_Collection_GetExtensions(t *testing.T) {
 	assert.NotNil(t, c.GetExtensions())
 }
 
+func Test_Collection_RegisterExtensions(t *testing.T) {
+	c := NewCollection[testExtensible]()
+
+	e := testExtensible{}
+	c.Add(&e)
+
+	err := c.RegisterExtensions(Map{testPoint: &testExtensions{}})
+	require.NoError(t, err)
+
+	assert.NotNil(t, c.Values[0].GetExtensions())
+}
+
 func Test_Map(t *testing.T) {
 	m := NewMap()
 	assert.Equal(t, 0, len(m))

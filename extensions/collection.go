@@ -134,6 +134,15 @@ func (o *Collection[P, I]) RegisterExtensions(exts Map) error {
 
 	o.valueExtensions.Set(exts)
 
+	for i := 0; i < len(o.Values); i++ {
+		var vi I = &o.Values[i]
+		if vi.GetExtensions() == nil {
+			if err := vi.RegisterExtensions(exts); err != nil {
+				return fmt.Errorf("error at index %d: %w", i, err)
+			}
+		}
+	}
+
 	return nil
 }
 
