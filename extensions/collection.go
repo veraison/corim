@@ -94,6 +94,10 @@ func (o *Collection[P, I]) Clear() {
 // GetExtensions returns the extensions IMapValue that has been registered with
 // the collection.
 func (o *Collection[P, I]) GetExtensions() IMapValue {
+	if o.valueExtensions.IsEmpty() {
+		return nil
+	}
+
 	return o.valueExtensions.Get()
 }
 

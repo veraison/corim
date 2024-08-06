@@ -160,6 +160,16 @@ func Test_Collection_Valid(t *testing.T) {
 	assert.EqualError(t, c.Valid(), "error at index 1: test error")
 }
 
+func Test_Collection_GetExtensions(t *testing.T) {
+	c := NewCollection[testExtensible]()
+	assert.Nil(t, c.GetExtensions())
+
+	err := c.RegisterExtensions(Map{testPoint: &testExtensions{}})
+	require.NoError(t, err)
+
+	assert.NotNil(t, c.GetExtensions())
+}
+
 func Test_Map(t *testing.T) {
 	m := NewMap()
 	assert.Equal(t, 0, len(m))
