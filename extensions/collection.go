@@ -94,6 +94,10 @@ func (o *Collection[P, I]) Clear() {
 // GetExtensions returns the extensions IMapValue that has been registered with
 // the collection.
 func (o *Collection[P, I]) GetExtensions() IMapValue {
+	if o.valueExtensions.IsEmpty() {
+		return nil
+	}
+
 	return o.valueExtensions.Get()
 }
 
@@ -129,6 +133,15 @@ func (o *Collection[P, I]) RegisterExtensions(exts Map) error {
 	}
 
 	o.valueExtensions.Set(exts)
+
+	for i := 0; i < len(o.Values); i++ {
+		var vi I = &o.Values[i]
+		if vi.GetExtensions() == nil {
+			if err := vi.RegisterExtensions(exts); err != nil {
+				return fmt.Errorf("error at index %d: %w", i, err)
+			}
+		}
+	}
 
 	return nil
 }
