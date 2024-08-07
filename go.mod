@@ -13,7 +13,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.8.2
-	github.com/veraison/apiclient v0.2.1-0.20240531100343-8a3a730a1e94
+	github.com/veraison/apiclient v0.3.1-0.20240807160142-9141ad363e45
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.1.1-0.20230825153510-da0f9a62ade7
 	github.com/veraison/swid v1.1.1-0.20230911094910-8ffdd07a22ca

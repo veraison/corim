@@ -73,6 +73,7 @@ func initConfig() {
 			"token_url":     v.GetString("token_url"),
 			"username":      v.GetString("username"),
 			"password":      v.GetString("password"),
+			"ca_certs":      v.GetStringSlice("ca_cert"),
 		})
 		cobra.CheckErr(err)
 	default:
