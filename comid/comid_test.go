@@ -48,11 +48,11 @@ func Test_Comid_ToJSONPretty(t *testing.T) {
 			Environment: Environment{
 				Instance: MustNewUUIDInstance(TestUUID),
 			},
-			Measurements: *NewMeasurements().Add(&Measurement{
+			Measurement: Measurement{
 				Val: Mval{
 					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
 				},
-			}),
+			},
 		}),
 	}
 
@@ -70,16 +70,14 @@ func Test_Comid_ToJSONPretty(t *testing.T) {
                         "value": "31fb5abf-023e-4992-aa4e-95f9c1503bfa"
                     }
                 },
-                "measurements": [
-                    {
-                        "value": {
-                            "raw-value": {
-                                "type": "bytes",
-                                "value": "3q2+7w=="
-                            }
+                "measurement": {
+                    "value": {
+                        "raw-value": {
+                            "type": "bytes",
+                            "value": "3q2+7w=="
                         }
                     }
-                ]
+                }
             }
         ]
     }

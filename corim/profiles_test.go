@@ -126,7 +126,7 @@ func TestProfile_marshaling(t *testing.T) {
 	address := cmd.Entities.Values[0].Extensions.MustGetString("Address")
 	assert.Equal(t, "123 Fake Street", address)
 
-	ts := cmd.Triples.ReferenceValues.Values[0].Measurements.Values[0].
+	ts := cmd.Triples.ReferenceValues.Values[0].Measurement.
 		Val.Extensions.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
@@ -169,7 +169,7 @@ func TestProfile_marshaling(t *testing.T) {
 	address = cmd.Entities.Values[0].Extensions.MustGetString("Address")
 	assert.Equal(t, "123 Fake Street", address)
 
-	ts = cmd.Triples.ReferenceValues.Values[0].Measurements.Values[0].
+	ts = cmd.Triples.ReferenceValues.Values[0].Measurement.
 		Val.Extensions.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
