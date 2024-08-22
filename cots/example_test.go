@@ -173,8 +173,8 @@ func Example_decode_CBOR() {
 }
 
 func Example_list_of_cots_roundtrip() {
-	snobTa, _ := os.ReadFile("../cocli/data/cots/Snobbish Apparel_ta.ta")
-	sharedTa, _ := os.ReadFile("../cocli/data/cots/shared_ta.ta")
+	snobTa, _ := os.ReadFile("./data/Snobbish Apparel_ta.ta")
+	sharedTa, _ := os.ReadFile("./data/shared_ta.ta")
 
 	// cts1
 	egSnob := NewEnvironmentGroup()

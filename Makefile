@@ -7,13 +7,8 @@ GO111MODULE := on
 GOPKG := github.com/veraison/corim/corim
 GOPKG += github.com/veraison/corim/comid
 GOPKG += github.com/veraison/corim/cots
-GOPKG += github.com/veraison/corim/cocli/cmd
 GOPKG += github.com/veraison/corim/encoding
 GOPKG += github.com/veraison/corim/extensions
-
-MOCKGEN := $(shell go env GOPATH)/bin/mockgen
-INTERFACES := cocli/cmd/isubmitter.go
-MOCKPKG := mocks
 
 GOLINT ?= golangci-lint
 
@@ -26,7 +21,8 @@ else
 endif
 
 .PHONY: lint lint-extra
-lint lint-extra: _mocks; $(GOLINT) $(GOLINT_ARGS)
+lint lint-extra:
+	$(GOLINT) $(GOLINT_ARGS)
 
 ifeq ($(MAKECMDGOALS),test)
 GOTEST_ARGS ?= -v -race $(GOPKG)
@@ -38,27 +34,13 @@ endif
 
 COVER_THRESHOLD := $(shell grep '^name: cover' .github/workflows/ci-go-cover.yml | cut -c13-)
 
-
-define MOCK_template
-mock_$(1): $(1)
-	$$(MOCKGEN) -source=$$< -destination=cocli/cmd/mocks/$$$$(basename $$@) -package=$$(MOCKPKG)
-endef
-
-$(foreach m,$(INTERFACES),$(eval $(call MOCK_template,$(m))))
-MOCK_FILES := $(foreach m,$(INTERFACES),$(join mock_,$(m)))
-CLEANFILES := $(MOCK_FILES)
-
-_mocks: $(MOCK_FILES)
-.PHONY: _mocks
-
 .PHONY: test test-cover
-test test-cover: _mocks; go test $(GOTEST_ARGS)
+test test-cover:
+	go test $(GOTEST_ARGS)
 
-realtest: _mocks; go test $(GOTEST_ARGS)
+realtest:
+	go test $(GOTEST_ARGS)
 .PHONY: realtest
-
-.PHONY: clean
-clean: ; $(RM) $(CLEANFILES)
 
 presubmit:
 	@echo

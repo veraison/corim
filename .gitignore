@@ -15,7 +15,3 @@
 # vendor/
 
 mocks/
-
-# Generated during testing
-cocli/cocli
-cocli/cmd/output.cbor
