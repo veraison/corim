@@ -128,7 +128,7 @@ func Test_CryptoKey_NewCOSEKey(t *testing.T) {
 		0x03, 0x41, 0x01, // alg: bstr(1)
 	}
 	_, err = NewCOSEKey(badKey)
-	assert.Contains(t, err.Error(), "alg: invalid type")
+	assert.Contains(t, err.Error(), "invalid algorithm value")
 
 	keySet, err := NewCOSEKey(TestCOSEKeySetOne)
 	require.NoError(t, err)
