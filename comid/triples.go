@@ -64,7 +64,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 	return nil
 }
 
-// GetExtensions returns pervisouosly registered extension
+// GetExtensions returns previously registered extension
 func (o *Triples) GetExtensions() extensions.IMapValue {
 	return o.Extensions.IMapValue
 }

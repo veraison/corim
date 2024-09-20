@@ -76,7 +76,6 @@ func TestDigests_AddDigest_OK(t *testing.T) {
 		assert.Nil(t, d.Valid())
 	}
 }
-
 func TestDigests_Valid_empty(t *testing.T) {
 	d := NewDigests()
 	require.NotNil(t, d)
@@ -89,7 +88,6 @@ func TestDigests_Valid_empty(t *testing.T) {
 
 	assert.EqualError(t, d.Valid(), "digest at index 0: unknown hash algorithm 666")
 }
-
 func TestDigests_AddDigest_unknown_algo(t *testing.T) {
 	d := NewDigests()
 	require.NotNil(t, d)

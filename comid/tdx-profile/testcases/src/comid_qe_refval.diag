@@ -1,0 +1,44 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : "Sample SGX QE reference tag"
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "INTEL",
+    / comid.reg-id / 1 : 32("https://intel.com"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+    / comid.reference-triples / 0 : [ [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-oid-type / 111(
+              h'6086480186F84D0102030401' / 2.16.840.1.113741.1.2.3.4.1 - <OID-for-SGX-QE-TCB>/
+            ),
+          / comid.vendor / 1 : "Intel Corporation",
+          / comid.model / 2 : "SGX QE TCB"
+        }
+      },
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+              / comid.miscselect / -81 :h'A0B0C0D000000000',
+              / comid.isvprodid / -85 : 1,
+              / comid.mrsigner / -84 : [ 
+                [
+                / alg-id / 1, / sha256 /
+                / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
+                ],
+                [
+                / alg-id / 8, / sha384 /
+                / digest / h'a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a'
+                ]
+              ],
+              /comid.tcbevalnum / -86 : 11
+          },
+          / authorized-by / 2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
+        }
+      ]
+    ] ]
+  }
+}
