@@ -20,18 +20,20 @@
               / comid.index / 4 : 0
             }
           },
-          / measurement-map /
-            {
-              / comid.mval / 1 : {
-                / comid.svn / 1 : 552(1),
-                / comid.digests / 2 : [
-                  [
-                    / hash-alg-id / 7, / SHA384 /
-                    / hash-value / h'15E77D6F133252F1DB7044901313884F2977D2109B33C79F33E079BFC78865255C0FB733C240FDDA544B8215D7B8F815'
+          [
+            / measurement-map /
+              {
+                / comid.mval / 1 : {
+                  / comid.svn / 1 : 552(1),
+                  / comid.digests / 2 : [
+                    [
+                      / hash-alg-id / 7, / SHA384 /
+                      / hash-value / h'15E77D6F133252F1DB7044901313884F2977D2109B33C79F33E079BFC78865255C0FB733C240FDDA544B8215D7B8F815'
+                    ]
                   ]
-                ]
+                }
               }
-            }
+          ]
         ],
         [
           / environment-map / {
@@ -43,18 +45,20 @@
               / comid.index / 4 : 0
             }
           },
-          / measurement-map /
-            {
-              / comid.mval / 1 : {
-                / comid.svn / 1 : 552(1),
-                / comid.digests / 2 : [
-                  [
-                    / hash-alg-id / 7, / SHA384 /
-                    / hash-value / h'3D90B6BF003DA2D94EA5463F97FB3C53DDC51CFBA1E3E38EEF7AF071A67986595D22729131DF9FE80F5451EEF154F85E'
+          [
+            / measurement-map /
+              {
+                / comid.mval / 1 : {
+                  / comid.svn / 1 : 552(1),
+                  / comid.digests / 2 : [
+                    [
+                      / hash-alg-id / 7, / SHA384 /
+                      / hash-value / h'3D90B6BF003DA2D94EA5463F97FB3C53DDC51CFBA1E3E38EEF7AF071A67986595D22729131DF9FE80F5451EEF154F85E'
+                    ]
                   ]
-                ]
+                }
               }
-            }
+          ]
         ]
       ],
       / comid.endorsed-triples / 1 : [
@@ -67,13 +71,15 @@
               / comid.vendor / 1 : "fwmfginc.example"
            }
           },
-          / measurement-map / {
-           / comid.mval / 1 : {
-            / raw-value-group /
-             / comid.raw-value / 4 : 560(h'0000000000000000'),
-             / comid.raw-value-mask / 5 : h'FFFFFFFF00000000'
-           }
-          }
+          [
+            / measurement-map / {
+             / comid.mval / 1 : {
+              / raw-value-group /
+               / comid.raw-value / 4 : 560(h'0000000000000000'),
+               / comid.raw-value-mask / 5 : h'FFFFFFFF00000000'
+             }
+            }
+          ]
         ]
       ]
     }

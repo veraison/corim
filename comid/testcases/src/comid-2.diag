@@ -21,14 +21,16 @@
             / comid.layer / 3 : 1
           }
         },
-        / measurement-map / {
-          / comid.mval / 1 : {
-            / comid.digests / 2 : [ [
-              / hash-alg-id / 1, / sha256 /
-              / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
-            ] ]
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+              ] ]
+            }
           }
-        }
+        ]
       ],
       [
         / environment-map / {
@@ -43,14 +45,16 @@
 	      / comid.index / 4 : 0
           }
         },
-        / measurement-map / {
-          / comid.mval / 1 : {
-            / comid.digests / 2 : [ [
-              / hash-alg-id / 1, / sha256 /
-              / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
-            ] ]
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
+              ] ]
+            }
           }
-        }
+        ]
       ],
       [
         / environment-map / {
@@ -65,14 +69,16 @@
 	      / comid.index / 4 : 1
           }
         },
-        / measurement-map / {
-          / comid.mval / 1 : {
-            / comid.digests / 2 : [ [
-              / hash-alg-id / 1, / sha256 /
-              / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
-            ] ]
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
+              ] ]
+            }
           }
-        }
+        ]
       ]
     ],
     / comid.endorsed-triples / 1 : [ [
@@ -87,11 +93,13 @@
           / comid.layer / 3 : 0
         }
       },
-      / measurement-map / {
-        / comid.mval / 1 : {
-          / comid.svn / 1 : 552(1)
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+            / comid.svn / 1 : 552(1)
+          }
         }
-      }
+      ]
     ] ]
   }
 }

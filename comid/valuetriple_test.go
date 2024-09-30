@@ -19,5 +19,5 @@ func Test_ReferenceValue(t *testing.T) {
 	require.NoError(t, err)
 	rv.Environment.Instance = MustNewUUIDInstance(id)
 	err = rv.Valid()
-	assert.EqualError(t, err, "measurement validation failed: no measurement value set")
+	assert.EqualError(t, err, "measurements validation failed: no measurement entries")
 }
