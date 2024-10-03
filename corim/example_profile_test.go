@@ -104,10 +104,10 @@ func Example_profile_unmarshal() {
 		Extensions.MustGetString("Address"))
 
 	fmt.Printf("Measurements:\n")
-	for _, refVal := range extractedComid.Triples.ReferenceValues.Values {
+	for _, m := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
 
-		val := hex.EncodeToString((*refVal.Measurement.Val.Digests)[0].HashValue)
-		tsInt := refVal.Measurement.Val.Extensions.MustGetInt64("timestamp")
+		val := hex.EncodeToString((*m.Val.Digests)[0].HashValue)
+		tsInt := m.Val.Extensions.MustGetInt64("timestamp")
 		ts := time.Unix(tsInt, 0).UTC()
 
 		fmt.Printf("    %v taken at %s\n", val, ts.Format("2006-01-02T15:04:05"))
@@ -152,6 +152,15 @@ func Example_profile_marshal() {
 		log.Fatalf("could not set entity Address: %v", err)
 	}
 
+	refVal := comid.ValueTriple{
+		Environment: comid.Environment{
+			Class: comid.NewClassImplID(comid.TestImplID).
+				SetVendor("ACME Ltd.").
+				SetModel("RoadRunner 2.0"),
+		},
+		Measurements: *comid.NewMeasurements(),
+	}
+
 	measurement := comid.MustNewPSAMeasurement(
 		comid.MustCreatePSARefValID(
 			comid.TestSignerID, "BL", "5.0.5",
@@ -168,15 +177,7 @@ func Example_profile_marshal() {
 		log.Fatal("could not register refval extensions")
 	}
 
-	refVal := comid.ValueTriple{
-		Environment: comid.Environment{
-			Class: comid.NewClassImplID(comid.TestImplID).
-				SetVendor("ACME Ltd.").
-				SetModel("RoadRunner 2.0"),
-		},
-		Measurement: *measurement,
-	}
-
+	refVal.Measurements.Add(measurement)
 	myComid.Triples.AddReferenceValue(refVal)
 
 	err = myComid.Valid()
@@ -194,5 +195,5 @@ func Example_profile_marshal() {
 	fmt.Printf("corim: %v", hex.EncodeToString(buf))
 
 	// output:
-	// corim: a300f6018158d8d901faa40065656e2d474201a100676578616d706c650281a4006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028101206f3132332046616b652053747265657404a1008182a100a300d90258582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031016941434d45204c74642e026e526f616452756e6e657220322e30a200d90259a30162424c0465352e302e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00037822687474703a2f2f6578616d706c652e636f6d2f6578616d706c652d70726f66696c65
+	// corim: a300f6018158d9d901faa40065656e2d474201a100676578616d706c650281a4006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028101206f3132332046616b652053747265657404a1008182a100a300d90258582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031016941434d45204c74642e026e526f616452756e6e657220322e3081a200d90259a30162424c0465352e302e35055820acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b01a10281820644abcdef00037822687474703a2f2f6578616d706c652e636f6d2f6578616d706c652d70726f66696c65
 }

@@ -21,24 +21,21 @@ func Example_cca_refval() {
 	}
 
 	// output:
-	//ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
-	//SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
-	//Label: BL
-	//Version: 2.1.0
-	//Digest: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
-	//ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
-	//SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
-	//Label: PRoT
-	//Version: 1.3.5
-	//Digest: 0263829989b6fd954f72baaf2fc64bc2e2f01d692d4de72986ea808f6e99813f
-	//ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
-	//SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
-	//Label: ARoT
-	//Version: 0.1.4
-	//Digest: a3a5e715f0cc574a73c3f9bebb6bc24f32ffd5b67b387244c2c909da779a1478
-	//ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
-	//Label: a non-empty (unique) label
-	//Raw value: 72617776616c75650a72617776616c75650a
+	// ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
+	// SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
+	// Label: BL
+	// Version: 2.1.0
+	// Digest: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
+	// SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
+	// Label: PRoT
+	// Version: 1.3.5
+	// Digest: 0263829989b6fd954f72baaf2fc64bc2e2f01d692d4de72986ea808f6e99813f
+	// SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
+	// Label: ARoT
+	// Version: 0.1.4
+	// Digest: a3a5e715f0cc574a73c3f9bebb6bc24f32ffd5b67b387244c2c909da779a1478
+	// Label: a non-empty (unique) label
+	// Raw value: 72617776616c75650a72617776616c75650a
 }
 
 func extractCcaRefVals(c *Comid) error {
@@ -57,33 +54,35 @@ func extractCcaRefVals(c *Comid) error {
 
 func extractCCARefVal(rv ValueTriple) error {
 	class := rv.Environment.Class
-	m := rv.Measurement
 
 	if err := extractImplementationID(class); err != nil {
 		return fmt.Errorf("extracting impl-id: %w", err)
 	}
 
-	if m.Key == nil {
-		return fmt.Errorf("missing mKey")
-	}
-	if !m.Key.IsSet() {
-		return fmt.Errorf("mKey not set")
-	}
+	for i, m := range rv.Measurements.Values {
+		if m.Key == nil {
+			return fmt.Errorf("missing mKey at index %d", i)
+		}
+		if !m.Key.IsSet() {
+			return fmt.Errorf("mKey not set at index %d", i)
+		}
 
-	switch t := m.Key.Value.(type) {
-	case *TaggedPSARefValID:
-		if err := extractSwMeasurement(m); err != nil {
-			return fmt.Errorf("extracting measurement: %w", err)
+		switch t := m.Key.Value.(type) {
+		case *TaggedPSARefValID:
+			if err := extractSwMeasurement(m); err != nil {
+				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
+			}
+		case *TaggedCCAPlatformConfigID:
+			if err := extractCCARefValID(m.Key); err != nil {
+				return fmt.Errorf("extracting cca-refval-id: %w", err)
+			}
+			if err := extractRawValue(m.Val.RawValue); err != nil {
+				return fmt.Errorf("extracting raw vlue: %w", err)
+			}
+		default:
+			return fmt.Errorf("unexpected  Mkey type: %T", t)
 		}
-	case *TaggedCCAPlatformConfigID:
-		if err := extractCCARefValID(m.Key); err != nil {
-			return fmt.Errorf("extracting cca-refval-id: %w", err)
-		}
-		if err := extractRawValue(m.Val.RawValue); err != nil {
-			return fmt.Errorf("extracting raw vlue: %w", err)
-		}
-	default:
-		return fmt.Errorf("unexpected  Mkey type: %T", t)
+
 	}
 
 	return nil
