@@ -72,11 +72,9 @@ func extractRealmRefVal(rv ValueTriple) error {
 	}
 
 	measurements := rv.Measurements
-
 	if err := extractMeasurements(measurements); err != nil {
 		return fmt.Errorf("extracting measurements: %w", err)
 	}
-
 	return nil
 }
 
@@ -84,7 +82,6 @@ func extractMeasurements(m Measurements) error {
 	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
-
 	for i, meas := range m.Values {
 		if err := extractMeasurement(meas); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)

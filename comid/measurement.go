@@ -810,7 +810,6 @@ func (o Measurements) MarshalCBOR() ([]byte, error) {
 func (o *Measurements) UnmarshalCBOR(data []byte) error {
 	return (*extensions.Collection[Measurement, *Measurement])(o).UnmarshalCBOR(data)
 }
-
 func (o Measurements) MarshalJSON() ([]byte, error) {
 	return (extensions.Collection[Measurement, *Measurement])(o).MarshalJSON()
 }

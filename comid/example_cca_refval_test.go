@@ -19,7 +19,6 @@ func Example_cca_refval() {
 	if err := extractCcaRefVals(&comid); err != nil {
 		panic(err)
 	}
-
 	// output:
 	// ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
 	// SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
@@ -66,7 +65,6 @@ func extractCCARefVal(rv ValueTriple) error {
 		if !m.Key.IsSet() {
 			return fmt.Errorf("mKey not set at index %d", i)
 		}
-
 		switch t := m.Key.Value.(type) {
 		case *TaggedPSARefValID:
 			if err := extractSwMeasurement(m); err != nil {
@@ -82,7 +80,6 @@ func extractCCARefVal(rv ValueTriple) error {
 		default:
 			return fmt.Errorf("unexpected  Mkey type: %T", t)
 		}
-
 	}
 
 	return nil

@@ -19,7 +19,6 @@ func Example_psa_refval() {
 	if err := extractRefVals(&comid); err != nil {
 		panic(err)
 	}
-
 	// output:
 	// ImplementationID: 61636d652d696d706c656d656e746174696f6e2d69642d303030303030303031
 	// SignerID: acbb11c7e4da217205523ce4ce1a245ae1a239ae3c6bfd9e7871f7e5d8bae86b
@@ -34,6 +33,7 @@ func Example_psa_refval() {
 	// Label: ARoT
 	// Version: 0.1.4
 	// Digest: a3a5e715f0cc574a73c3f9bebb6bc24f32ffd5b67b387244c2c909da779a1478
+
 }
 
 func extractRefVals(c *Comid) error {
@@ -58,7 +58,6 @@ func extractPSARefVal(rv ValueTriple) error {
 	}
 
 	measurements := rv.Measurements
-
 	if err := extractSwMeasurements(measurements); err != nil {
 		return fmt.Errorf("extracting measurements: %w", err)
 	}
@@ -70,13 +69,11 @@ func extractSwMeasurements(m Measurements) error {
 	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
-
 	for i, m := range m.Values {
 		if err := extractSwMeasurement(m); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
 	}
-
 	return nil
 }
 
