@@ -20,14 +20,16 @@
             / comid.model / 2 : "ACME RoadRunner Firmware"
           }
         },
-        / measurement-map / {
-          / comid.mkey / 0: 700,
-          / comid.mval / 1 : {
-            / comid.digests / 2 : [[
-            / hash-alg-id / 6, / sha-256-32 /
-            / hash-value /  h'ABCDEF00' ]]
+        [
+          / measurement-map / {
+            / comid.mkey / 0: 700,
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [[
+              / hash-alg-id / 6, / sha-256-32 /
+              / hash-value /  h'ABCDEF00' ]]
+            }
           }
-        }
+        ]
       ]
     ]
   }

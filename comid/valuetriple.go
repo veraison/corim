@@ -4,28 +4,29 @@
 package comid
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/veraison/corim/extensions"
 )
 
-// ValueTriple relates a measurement to a target environment, essentially
-// forming a subject-predicate-object triple of
-// "measurement-pertains-to-environment". This structure is used to represent
-// both reference-triple-record and endorsed-triple-record in the CoRIM spec
-// (as of rev. 04).
+// ValueTriple relates measurements to a target environment, essentially
+// forming a subject-predicate-object triple of "measurements-pertain
+// to-environment". This structure is used to represent both
+// reference-triple-record and endorsed-triple-record in the CoRIM spec (as of
+// rev. 04).
 type ValueTriple struct {
-	_           struct{}    `cbor:",toarray"`
-	Environment Environment `json:"environment"`
-	Measurement Measurement `json:"measurement"`
+	_            struct{}     `cbor:",toarray"`
+	Environment  Environment  `json:"environment"`
+	Measurements Measurements `json:"measurements"`
 }
 
 func (o *ValueTriple) RegisterExtensions(exts extensions.Map) error {
-	return o.Measurement.RegisterExtensions(exts)
+	return o.Measurements.RegisterExtensions(exts)
 }
 
 func (o *ValueTriple) GetExtensions() extensions.IMapValue {
-	return o.Measurement.GetExtensions()
+	return o.Measurements.GetExtensions()
 }
 
 func (o ValueTriple) Valid() error {
@@ -33,8 +34,12 @@ func (o ValueTriple) Valid() error {
 		return fmt.Errorf("environment validation failed: %w", err)
 	}
 
-	if err := o.Measurement.Valid(); err != nil {
-		return fmt.Errorf("measurement validation failed: %w", err)
+	if o.Measurements.IsEmpty() {
+		return errors.New("measurements validation failed: no measurement entries")
+	}
+
+	if err := o.Measurements.Valid(); err != nil {
+		return fmt.Errorf("measurements validation failed: %w", err)
 	}
 
 	return nil

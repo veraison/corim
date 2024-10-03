@@ -234,75 +234,53 @@ var (
 						"model": "RoadRunner"
 					}
 				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
-						"value": {
-							"label": "BL",
-							"version": "2.1.0",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
-						}
-					},
-					"value": {
-						"digests": [
-							"sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
-						]
-					}
-				}
-			},
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "psa.impl-id",
-							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+				"measurements": [
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "BL",
+								"version": "2.1.0",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
 						},
-						"vendor": "ACME",
-						"model": "RoadRunner"
-					}
-				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
 						"value": {
-							"label": "PRoT",
-							"version": "1.3.5",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							"digests": [
+								"sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
+							]
 						}
 					},
-					"value": {
-						"digests": [
-							"sha-256:AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8="
-						]
-					}
-				}
-			},
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "psa.impl-id",
-							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "PRoT",
+								"version": "1.3.5",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
 						},
-						"vendor": "ACME",
-						"model": "RoadRunner"
-					}
-				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
 						"value": {
-							"label": "ARoT",
-							"version": "0.1.4",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							"digests": [
+								"sha-256:AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8="
+							]
 						}
 					},
-					"value": {
-						"digests": [
-							"sha-256:o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg="
-						]
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "ARoT",
+								"version": "0.1.4",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
+						},
+						"value": {
+							"digests": [
+								"sha-256:o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg="
+							]
+						}
 					}
-				}
+				]
 			}
 		]
 	}
@@ -371,7 +349,7 @@ var (
 	}
 }
 `
-	CCARefValJSONTemplate = ` {
+	CCARefValJSONTemplate = `{
 	"lang": "en-GB",
 	"tag-identity": {
 		"id": "43BBE37F-2E61-4B33-AED3-53CFF1428B16",
@@ -397,99 +375,65 @@ var (
 						"model": "RoadRunner"
 					}
 				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
-						"value": {
-							"label": "BL",
-							"version": "2.1.0",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
-						}
-					},
-					"value": {
-						"digests": [
-							"sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
-						]
-					}
-				}
-			},
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "psa.impl-id",
-							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+				"measurements": [
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "BL",
+								"version": "2.1.0",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
 						},
-						"vendor": "ACME",
-						"model": "RoadRunner"
-					}
-				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
 						"value": {
-							"label": "PRoT",
-							"version": "1.3.5",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							"digests": [
+								"sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
+							]
 						}
 					},
-					"value": {
-						"digests": [
-							"sha-256:AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8="
-						]
-					}
-				}
-			},
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "psa.impl-id",
-							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "PRoT",
+								"version": "1.3.5",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
 						},
-						"vendor": "ACME",
-						"model": "RoadRunner"
-					}
-				},
-				"measurement": {
-					"key": {
-						"type": "psa.refval-id",
 						"value": {
-							"label": "ARoT",
-							"version": "0.1.4",
-							"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							"digests": [
+								"sha-256:AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8="
+							]
 						}
 					},
-					"value": {
-						"digests": [
-							"sha-256:o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg="
-						]
-					}
-				}
-			},
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "psa.impl-id",
-							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
+					{
+						"key": {
+							"type": "psa.refval-id",
+							"value": {
+								"label": "ARoT",
+								"version": "0.1.4",
+								"signer-id": "rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs="
+							}
 						},
-						"vendor": "ACME",
-						"model": "RoadRunner"
-					}
-				},
-				"measurement": {
-					"key": {
-						"type": "cca.platform-config-id",
-						"value": "a non-empty (unique) label"
+						"value": {
+							"digests": [
+								"sha-256:o6XnFfDMV0pzw/m+u2vCTzL/1bZ7OHJEwskJ2neaFHg="
+							]
+						}
 					},
-					"value": {
-						"raw-value": {
-							"type": "bytes",
-							"value": "cmF3dmFsdWUKcmF3dmFsdWUK"
+					{
+						"key": {
+							"type": "cca.platform-config-id",
+							"value": "a non-empty (unique) label"
+						},
+						"value": {
+							"raw-value": {
+								"type": "bytes",
+								"value": "cmF3dmFsdWUKcmF3dmFsdWUK"
+							}
 						}
 					}
-				}
+				]
 			}
 		]
 	}
@@ -500,35 +444,36 @@ var (
 	"tag-identity": {
 	"id": "99019224-57AA-44BC-BEF8-D36BDD6BD035",
 	"version": 0
-	},
-	"entities": [
+},
+"entities": [
+	{
+		"name": "Workload Client Ltd.",
+		"regid": "https://workloadclient.example",
+		"roles": [
+			"tagCreator",
+			"creator",
+			"maintainer"
+		]
+	}
+],
+"triples": {
+	"reference-values": [
 		{
-			"name": "Workload Client Ltd.",
-			"regid": "https://workloadclient.example",
-			"roles": [
-				"tagCreator",
-				"creator",
-				"maintainer"
-			]
-		}
-	],
-	"triples": {
-		"reference-values": [
-			{
-				"environment": {
-					"class": {
-						"id": {
-							"type": "uuid",
-							"value": "CD1F0E55-26F9-460D-B9D8-F7FDE171787C"
-						},
-						"vendor": "Workload Client Ltd"
+			"environment": {
+				"class": {
+					"id": {
+						"type": "uuid",
+						"value": "CD1F0E55-26F9-460D-B9D8-F7FDE171787C"
 					},
-					"instance": {
-						"type": "bytes",
-						"value": "QoS1aUymwNLPR4mguVrIAlyBjeUjBDZL580pgbLS7caFsyInfsJYGZYkE9jJssH1"
-					}
+					"vendor": "Workload Client Ltd"
 				},
-				"measurement": {
+				"instance": {
+					"type": "bytes",
+					"value": "QoS1aUymwNLPR4mguVrIAlyBjeUjBDZL580pgbLS7caFsyInfsJYGZYkE9jJssH1"
+				}
+			},
+			"measurements": [
+				{
 					"value": {
 						"raw-value": {
 							"type": "bytes",
@@ -568,9 +513,9 @@ var (
 						}
 					}
 				}
-			}
-		]
-	}
-}
-`
+			]
+		}
+	]
+  }
+}`
 )

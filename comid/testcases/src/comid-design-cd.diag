@@ -24,7 +24,8 @@
             / comid.layer / 3 : 2
         }
       },
-      / measurement-map /
+      [
+        / measurement-map /
         {
           / comid.mval / 1 : {
             / raw-value-group /
@@ -32,6 +33,7 @@
               / comid.raw-value-mask / 5 : h'FFFFFFFF00000000'
           }
         }
+      ]
     ],
       [
           / environment-map / {
@@ -43,17 +45,19 @@
              / comid.layer / 3 : 2
             }
           },
-          / measurement-map /
-           {
-            / comid.mval / 1 : {
-             / comid.digests / 2 : [
-              [
-               / hash-alg-id / 7, / SHA384 /
-               / hash-value / h'3FE18ECA4053879E017EF5EB7A3E5157659C5F9BB15B7D09959B8B8647822A4CC21C3AA6721CEF87F5BFA53495DB0833'
-              ]
-             ]
+          [
+            / measurement-map /
+             {
+               / comid.mval / 1 : {
+               / comid.digests / 2 : [
+                [
+                  / hash-alg-id / 7, / SHA384 /
+                  / hash-value / h'3FE18ECA4053879E017EF5EB7A3E5157659C5F9BB15B7D09959B8B8647822A4CC21C3AA6721CEF87F5BFA53495DB0833'
+                ]
+               ]
+              }
             }
-           }
+          ]
         ],
         [
           / environment-map / {
@@ -65,17 +69,19 @@
               / comid.layer / 3 : 2
             }
           },
-          / measurement-map /
-            {
-              / comid.mval / 1 : {
-                / comid.digests / 2 : [
-                 [
-                   / hash-alg-id / 7, / SHA384 /
-                   / hash-value / h'20FF681A0882E29B481953888936209CB53DF9C5AAEC606A2C24A0FB138595124B8E3F24A12771BC3854CC68B40361AD'
-                 ]
-                ]
+          [
+            / measurement-map /
+              {
+                / comid.mval / 1 : {
+                  / comid.digests / 2 : [
+                   [
+                     / hash-alg-id / 7, / SHA384 /
+                     / hash-value / h'20FF681A0882E29B481953888936209CB53DF9C5AAEC606A2C24A0FB138595124B8E3F24A12771BC3854CC68B40361AD'
+                   ]
+                  ]
+                }
               }
-            }
+          ]
         ],
         [
           / environment-map / {
@@ -86,14 +92,16 @@
               / comid.vendor / 1 : "fpgadesignsrus.example"
             }
            },
-           / measurement-map /
-             {
-               / comid.mval / 1 : {
-               / raw-value-group /
-                 / comid.raw-value / 4 : 560(h'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'),
-                 / comid.raw-value-mask / 5 : h'466224343D681802C1506BBED7D7F00B969BADDD6346E4F2E7CE146692996F22A45814DE81D248F583B65F817B5FCEAB'
+           [
+             / measurement-map /
+               {
+                 / comid.mval / 1 : {
+                 / raw-value-group /
+                   / comid.raw-value / 4 : 560(h'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'),
+                   / comid.raw-value-mask / 5 : h'466224343D681802C1506BBED7D7F00B969BADDD6346E4F2E7CE146692996F22A45814DE81D248F583B65F817B5FCEAB'
+                 }
                }
-             }
+           ]
         ]
       ],
       / comid.endorsed-triples / 1 : [
@@ -106,13 +114,15 @@
                / comid.vendor / 1 : "fpgadesignsrus.example"
              }
           },
-          / measurement-map / {
-            / comid.mval / 1 : {
-              / raw-value-group /
-                / comid.raw-value / 4 : 560(h'0000000000000000'),
-                / comid.raw-value-mask / 5 : h'FFFFFFFF00000000'
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / raw-value-group /
+                  / comid.raw-value / 4 : 560(h'0000000000000000'),
+                  / comid.raw-value-mask / 5 : h'FFFFFFFF00000000'
+              }
             }
-          }
+          ]
         ]
       ]
     }
