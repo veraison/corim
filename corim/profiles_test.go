@@ -65,7 +65,7 @@ func TestProfile_getters(t *testing.T) {
 	id, err := eat.NewProfile("1.2.3")
 	require.NoError(t, err)
 
-	profile := Profile{
+	profile := ProfileManifest{
 		ID: id,
 		MapExtensions: extensions.NewMap().
 			Add(comid.ExtComid, &struct{}{}).
