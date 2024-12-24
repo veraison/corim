@@ -192,14 +192,14 @@ func GetUnsignedCorim(profileID *eat.Profile) *UnsignedCorim {
 // Profile associates an EAT profile ID with a set of extensions. It allows
 // obtaining new CoRIM and CoMID structures that had associated extensions
 // registered.
-type Profile struct {
+type ProfileManifest struct {
 	ID            *eat.Profile
 	MapExtensions extensions.Map
 }
 
 // GetComid returns a pointer to a new comid.Comid that had the Profile's
 // extensions (if any) registered.
-func (o *Profile) GetComid() *comid.Comid {
+func (o *ProfileManifest) GetComid() *comid.Comid {
 	ret := comid.NewComid()
 	o.registerExtensions(ret, ComidMapExtensionPoints)
 	return ret
@@ -207,7 +207,7 @@ func (o *Profile) GetComid() *comid.Comid {
 
 // GetUnsignedCorim returns a pointer to a new UnsignedCorim that had the
 // Profile's extensions (if any) registered.
-func (o *Profile) GetUnsignedCorim() *UnsignedCorim {
+func (o *ProfileManifest) GetUnsignedCorim() *UnsignedCorim {
 	ret := NewUnsignedCorim()
 	ret.Profile = o.ID
 	o.registerExtensions(ret, UnsignedCorimMapExtensionPoints)
@@ -216,14 +216,14 @@ func (o *Profile) GetUnsignedCorim() *UnsignedCorim {
 
 // GetSignedCorim returns a pointer to a new SignedCorim that had the
 // Profile's extensions (if any) registered.
-func (o *Profile) GetSignedCorim() *SignedCorim {
+func (o *ProfileManifest) GetSignedCorim() *SignedCorim {
 	ret := NewSignedCorim()
 	ret.UnsignedCorim.Profile = o.ID
 	o.registerExtensions(ret, SignedCorimMapExtensionPoints)
 	return ret
 }
 
-func (o *Profile) registerExtensions(e iextensible, points []extensions.Point) {
+func (o *ProfileManifest) registerExtensions(e iextensible, points []extensions.Point) {
 	exts := extensions.NewMap()
 	for _, p := range points {
 		if v, ok := o.MapExtensions[p]; ok {
@@ -262,7 +262,7 @@ func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
 		}
 	}
 
-	profilesRegister[strID] = Profile{ID: id, MapExtensions: exts}
+	profilesRegister[strID] = ProfileManifest{ID: id, MapExtensions: exts}
 
 	return nil
 }
@@ -291,14 +291,14 @@ func UnregisterProfile(id *eat.Profile) bool {
 // GetProfile returns the Profile associated with the specified ID, or an empty
 // profile if no Profile has been registered for the id. The second return
 // value indicates whether a profile for the ID has been found.
-func GetProfile(id *eat.Profile) (Profile, bool) {
+func GetProfile(id *eat.Profile) (ProfileManifest, bool) {
 	if id == nil {
-		return Profile{}, false
+		return ProfileManifest{}, false
 	}
 
 	strID, err := id.Get()
 	if err != nil {
-		return Profile{}, false
+		return ProfileManifest{}, false
 	}
 
 	prof, ok := profilesRegister[strID]
@@ -309,7 +309,7 @@ type iextensible interface {
 	RegisterExtensions(exts extensions.Map) error
 }
 
-var profilesRegister = make(map[string]Profile)
+var profilesRegister = make(map[string]ProfileManifest)
 
 func init() {
 	for _, p := range SignedCorimMapExtensionPoints {
