@@ -16,8 +16,7 @@ import (
 )
 
 var (
-	ContentType          = "application/corim-unsigned+cbor"
-	oldContentType       = "application/rim+cbor"
+	ContentType          = "application/rim+cbor"
 	NoExternalData       = []byte("")
 	HeaderLabelCorimMeta = int64(8)
 )
@@ -63,11 +62,6 @@ func (o *SignedCorim) processHdrs() error {
 	v, ok := hdr.Protected[cose.HeaderLabelContentType]
 	if !ok {
 		return errors.New("missing mandatory content type")
-	}
-
-	// Compatibility step from older spec draft
-	if v == oldContentType {
-		v = ContentType
 	}
 
 	if v != ContentType {

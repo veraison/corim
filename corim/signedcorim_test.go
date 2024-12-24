@@ -285,7 +285,7 @@ func TestSignedCorim_FromCOSE_fail_corim_bad_cbor(t *testing.T) {
 		  [
 		    / protected / << {
 		      / alg / 1: -7, / ECDSA 256 /
-		      / content-type / 3: "application/corim-unsigned+cbor",
+		      / content-type / 3: "application/rim+cbor",
 		      / corim-meta / 8: h'a200a1006941434d45204c74642e01a101c11a5fad2056'
 		    } >>,
 		    / unprotected / {},
@@ -315,7 +315,7 @@ func TestSignedCorim_FromCOSE_fail_invalid_corim(t *testing.T) {
 		  [
 		    / protected / << {
 		      / alg / 1: -7, / ECDSA 256 /
-		      / content-type / 3: "application/corim-unsigned+cbor",
+		      / content-type / 3: "application/rim+cbor",
 		      / corim-meta / 8: h'a200a1006941434d45204c74642e01a101c11a5fad2056'
 		    } >>,
 		    / unprotected / {},
@@ -396,7 +396,7 @@ func TestSignedCorim_FromCOSE_fail_unexpected_content_type(t *testing.T) {
 	var actual SignedCorim
 	err := actual.FromCOSE(tv)
 
-	assert.EqualError(t, err, `processing COSE headers: expecting content type "application/corim-unsigned+cbor", got "application/cbor" instead`)
+	assert.EqualError(t, err, `processing COSE headers: expecting content type "application/rim+cbor", got "application/cbor" instead`)
 }
 
 func unsignedCorimFromCBOR(t *testing.T, cbor []byte) *UnsignedCorim {
