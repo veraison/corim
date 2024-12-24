@@ -38,6 +38,8 @@ type UnsignedCorim struct {
 	Extensions
 }
 
+type TaggedUnsignedCorim UnsignedCorim
+
 // NewUnsignedCorim instantiates an empty UnsignedCorim
 func NewUnsignedCorim() *UnsignedCorim {
 	return &UnsignedCorim{}

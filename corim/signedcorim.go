@@ -4,6 +4,7 @@
 package corim
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/rand"
 	"errors"
@@ -99,6 +100,12 @@ func (o *SignedCorim) processHdrs() error {
 // field while the corim-meta-map is decoded into the Meta field.
 func (o *SignedCorim) FromCOSE(buf []byte) error {
 	o.message = cose.NewSign1Message()
+
+	// If a tagged-corim-type-choice #6.500 of tagged-signed-corim #6.502, strip the prefix.
+	// This is a remnant of an older draft of the specification before
+	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/pull/337
+	corimTypeChoice := []byte("\xd9\x01\xf4\xd9\x01\xf6")
+	buf, _ = bytes.CutPrefix(buf, corimTypeChoice)
 
 	if err := o.message.UnmarshalCBOR(buf); err != nil {
 		return fmt.Errorf("failed CBOR decoding for COSE-Sign1 signed CoRIM: %w", err)
