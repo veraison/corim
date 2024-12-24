@@ -192,6 +192,12 @@ func TestMeasurement_NewUUIDMeasurement_bad_uuid(t *testing.T) {
 	assert.Nil(t, tv.SetUUID(nonRFC4122UUID))
 }
 
+func TestMeasurement_NameMeasurement(t *testing.T) {
+	want := "Maureen"
+	got := *(&Measurement{}).SetName("Maureen").Val.Name
+	assert.Equal(t, want, got)
+}
+
 var (
 	testMKeyUintMin uint64
 	testMKeyUintMax = ^uint64(0)
