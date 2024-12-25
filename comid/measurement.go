@@ -436,11 +436,9 @@ func (o Mval) Valid() error {
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
 		o.UUID == nil &&
-		o.IntegrityRegisters == nil {
-
-		if o.Extensions.IsEmpty() {
-			return fmt.Errorf("no measurement value set")
-		}	
+		o.IntegrityRegisters == nil &&
+        o.Extensions.IsEmpty() {
+        return fmt.Errorf("no measurement value set")
 	}
 
 	if o.Ver != nil {
