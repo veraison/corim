@@ -423,8 +423,8 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
+// Valid returns an error if none of the measurement values are set and the Extensions are empty.
 func (o Mval) Valid() error {
-	 // Check if all base types are nil and Extensions are not nil
 	if o.Ver == nil &&
 		o.SVN == nil &&
 		o.Digests == nil &&
@@ -437,8 +437,8 @@ func (o Mval) Valid() error {
 		o.UEID == nil &&
 		o.UUID == nil &&
 		o.IntegrityRegisters == nil &&
-        o.Extensions.IsEmpty() {
-        return fmt.Errorf("no measurement value set")
+		o.Extensions.IsEmpty() {
+		return fmt.Errorf("no measurement value set")
 	}
 
 	if o.Ver != nil {
