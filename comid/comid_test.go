@@ -94,3 +94,33 @@ func Test_String2URI_nok(t *testing.T) {
 	_, err := String2URI(&s)
 	assert.EqualError(t, err, `expecting an absolute URI: "@@@" is not an absolute URI`)
 }
+
+
+func Test_Comid_SimpleReferenceValue(t *testing.T) {
+    c := NewComid()
+    env := Environment{
+        Instance: MustNewUUIDInstance(TestUUID),
+    }
+    
+    // Test digest reference value
+	err := c.AddDigestReferenceValue(env, "sha-256", []byte{
+		0x00, 0x01, 0x02, 0x03,
+		0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b,
+		0x0c, 0x0d, 0x0e, 0x0f,
+		0x10, 0x11, 0x12, 0x13,
+		0x14, 0x15, 0x16, 0x17,
+		0x18, 0x19, 0x1a, 0x1b,
+		0x1c, 0x1d, 0x1e, 0x1f,
+	})
+    require.NoError(t, err)
+    
+    // Verify values were added
+    require.NotNil(t, c.Triples.ReferenceValues)
+    require.Len(t, c.Triples.ReferenceValues.Values, 1)
+    
+    // Verify digest value
+    rv := c.Triples.ReferenceValues.Values[0]
+    require.NotNil(t, rv.Measurements.Values[0].Val.Digests)
+    require.Equal(t, HashAlgSHA256.ToUint64(), (*rv.Measurements.Values[0].Val.Digests)[0].HashAlgID)
+}

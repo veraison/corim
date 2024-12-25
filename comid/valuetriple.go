@@ -89,3 +89,34 @@ func (o ValueTriples) MarshalJSON() ([]byte, error) {
 func (o *ValueTriples) UnmarshalJSON(data []byte) error {
 	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).UnmarshalJSON(data)
 }
+
+// ReferenceValueBuilder provides a fluent interface for building reference values
+type ReferenceValueBuilder struct {
+    triple ValueTriple
+}
+
+// NewReferenceValueBuilder creates a new builder for reference values
+func NewReferenceValueBuilder() *ReferenceValueBuilder {
+    return &ReferenceValueBuilder{
+        triple: ValueTriple{
+            Measurements: *NewMeasurements(),
+        },
+    }
+}
+
+func (b *ReferenceValueBuilder) WithEnvironment(env Environment) *ReferenceValueBuilder {
+    b.triple.Environment = env
+    return b
+}
+
+func (b *ReferenceValueBuilder) WithMeasurement(m *Measurement) *ReferenceValueBuilder {
+    b.triple.Measurements.Add(m)
+    return b
+}
+
+func (b *ReferenceValueBuilder) Build() (*ValueTriple, error) {
+    if err := b.triple.Valid(); err != nil {
+        return nil, fmt.Errorf("invalid reference value: %w", err)
+    }
+    return &b.triple, nil
+}
