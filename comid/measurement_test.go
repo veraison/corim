@@ -6,6 +6,7 @@ package comid
 import (
 	"crypto"
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -600,4 +601,82 @@ func TestMkey_UintMkey(t *testing.T) {
 	ret, err := key.GetKeyUint()
 	assert.NoError(t, err)
 	assert.EqualValues(t, 7, ret)
+}
+
+func TestMval_Valid(t *testing.T) {
+	t.Run("No fields set", func(t *testing.T) {
+		mval := Mval{}
+		err := mval.Valid()
+		assert.EqualError(t, err, "no measurement value set")
+	})
+
+	t.Run("All fields nil except Ver, which is valid", func(t *testing.T) {
+		var scheme swid.VersionScheme
+		_ = scheme.SetCode(swid.VersionSchemeSemVer)
+		mval := Mval{
+			Ver: &Version{
+				Version: "1.0",
+				Scheme:  scheme,
+			},
+		}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("MACAddr invalid (too few bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04})
+		mval := Mval{MACAddr: &mac}
+		err := mval.Valid()
+		assert.EqualError(t, err, "invalid MAC address length: expected 6 bytes, got 4")
+	})
+
+	t.Run("MACAddr invalid (too many bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07})
+		mval := Mval{MACAddr: &mac}
+		err := mval.Valid()
+		assert.EqualError(t, err, "invalid MAC address length: expected 6 bytes, got 7")
+	})
+
+	t.Run("MACAddr valid (6 bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06})
+		mval := Mval{MACAddr: &mac}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("IPAddr valid (IPv4)", func(t *testing.T) {
+		ip := net.IPv4(192, 168, 1, 100)
+		mval := Mval{IPAddr: &ip}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("IPAddr valid (IPv6)", func(t *testing.T) {
+		ip := net.ParseIP("2001:db8::1")
+		mval := Mval{IPAddr: &ip}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("Digests valid", func(t *testing.T) {
+		ds := NewDigests()
+		_ = ds.AddDigest(swid.Sha256, []byte{0xAA, 0xBB})
+		mval := Mval{
+			Digests: ds,
+		}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("Extensions valid", func(t *testing.T) {
+		// Suppose we have some extension data that is considered valid
+		ext := Extensions{}
+		mval := Mval{
+			Extensions: ext,
+			// Must also set one non-empty field to pass "no measurement value set"
+			Ver: &Version{Version: "1.0"},
+		}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
 }
