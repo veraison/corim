@@ -424,6 +424,7 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 }
 
 func (o Mval) Valid() error {
+	// Check if no measurement values are set
 	if o.Ver == nil &&
 		o.SVN == nil &&
 		o.Digests == nil &&
@@ -439,28 +440,46 @@ func (o Mval) Valid() error {
 		return fmt.Errorf("no measurement value set")
 	}
 
+	// Validate Version
 	if o.Ver != nil {
 		if err := o.Ver.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Digests
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Flags
 	if o.Flags != nil {
 		if err := o.Flags.Valid(); err != nil {
 			return err
 		}
 	}
 
-	// raw value and mask have no specific semantics
+	// Validate MAC Address
+	if o.MACAddr != nil {
+		if len(*o.MACAddr) != 6 { // MAC address must be exactly 6 bytes
+			return fmt.Errorf("invalid MAC address length: expected 6 bytes, got %d", len(*o.MACAddr))
+		}
+	}
 
-	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
+	// Validate IP Address
+	if o.IPAddr != nil {
+		ip := *o.IPAddr
+		// Must be valid IPv4 or IPv6 (i.e., .To4() != nil or .To16() != nil)
+		if ip.To4() == nil && ip.To16() == nil {
+			return fmt.Errorf("invalid IP address: %s", ip.String())
+		}
+	}
 
+	// raw value and raw-value-mask have no specific semantics here
+
+	// Validate extensions (custom logic implemented in validMval())
 	return o.Extensions.validMval(&o)
 }
 
