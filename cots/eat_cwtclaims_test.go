@@ -67,7 +67,7 @@ func getNonce() eat.Nonce {
 	return nonce
 }
 
-func cborRoundTripper(t *testing.T, tv EatCWTClaim, expected []byte) {
+func cborRoundTripper(t *testing.T, tv *EatCWTClaim, expected []byte) {
 	data, err := tv.ToCBOR()
 
 	t.Logf("CBOR: %x", data)
@@ -79,10 +79,10 @@ func cborRoundTripper(t *testing.T, tv EatCWTClaim, expected []byte) {
 	err = actual.FromCBOR(data)
 
 	assert.Nil(t, err)
-	assert.Equal(t, tv, actual)
+	assert.Equal(t, *tv, actual)
 }
 
-func jsonRoundTripper(t *testing.T, tv EatCWTClaim, expected string) {
+func jsonRoundTripper(t *testing.T, tv *EatCWTClaim, expected string) {
 	data, err := tv.ToJSON()
 
 	t.Logf("JSON: '%s'", string(data))
@@ -94,7 +94,7 @@ func jsonRoundTripper(t *testing.T, tv EatCWTClaim, expected string) {
 	err = actual.FromJSON(data)
 
 	assert.Nil(t, err)
-	assert.Equal(t, tv, actual)
+	assert.Equal(t, *tv, actual)
 }
 
 func TestEatCWTClaim_Full_RoundtripCBOR(t *testing.T) {
@@ -116,7 +116,7 @@ func TestEatCWTClaim_Full_RoundtripCBOR(t *testing.T) {
 		0xff, 0xff, 0xff, 0xff, 0xff,
 	}
 
-	cborRoundTripper(t, tv, expected)
+	cborRoundTripper(t, &tv, expected)
 }
 
 func TestEatCWTClaim_Full_RoundtripJSON(t *testing.T) {
@@ -143,7 +143,7 @@ func TestEatCWTClaim_Full_RoundtripJSON(t *testing.T) {
 	"iat": 0,
 	"cti": "////////"
 }`
-	jsonRoundTripper(t, tv, expected)
+	jsonRoundTripper(t, &tv, expected)
 }
 
 func TestEatCWTClaims_Valid_empty_list(t *testing.T) {
