@@ -34,7 +34,7 @@ func (o *ConciseTaStore) SetTagIdentity(tagID interface{}, tagIDVersion *uint) *
 		}
 		o.TagIdentity = &comid.TagIdentity{}
 		o.TagIdentity.TagID = *id
-		if nil != tagIDVersion {
+		if tagIDVersion != nil {
 			o.TagIdentity.TagVersion = *tagIDVersion
 		}
 	}

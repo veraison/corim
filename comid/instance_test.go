@@ -108,7 +108,7 @@ func Test_NewBytesInstance_OK(t *testing.T) {
 		instance, err := NewBytesInstance(v)
 		require.NoError(t, err)
 		got := instance.Bytes()
-		assert.Equal(t, testBytes[:], got)
+		assert.Equal(t, testBytes, got)
 	}
 }
 
