@@ -50,16 +50,16 @@ effectively defining new fields for the corresponding structures. In the code
 base, these can be identified by the embedded `Extensions` struct. Each
 extensible type has a corresponding `extensions.Point`. These are:
 
-| type                  | extension point                                               |
-| --------------------- | ------------------------------------------------------------- |
-| `comid.Comid`         | `comid.ExtComid`                                              |
-| `comid.Entity`        | `comid.ExtEntity`                                             |
-| `comid.FlagsMap`      | `comid.ExtReferenceValueFlags`, `comid.ExtEndorsedValueFlags` |
-| `comid.Mval`          | `comid.ExtReferenceValue`, `comid.ExtEndorsedValue`           |
-| `comid.Triples`       | `comid.ExtTriples`                                            |
-| `corim.Entity`        | `corim.ExtEntity`                                             |
-| `corim.Signer`        | `corim.ExtSigner`                                             |
-| `corim.UnsignedCorim` | `corim.ExtUnsignedCorim`                                      |
+|    Extension Type   |                             Extension Point(s)                            |                   Parent Structure                   |                     Where to Call RegisterExtensions()                    |
+|:-------------------:|:-------------------------------------------------------------------------:|:----------------------------------------------------:|:-------------------------------------------------------------------------:|
+| comid.Comid         | comid.ExtComid                                                            | comid.Comid (the top-level CoMID)                    | On a comid.Comid instance (e.g. myComid.RegisterExtensions(extMap))       |
+| comid.Entity        | comid.ExtEntity                                                           | comid.Entity                                         | Usually indirect via myComid.RegisterExtensions(...) (the Comid sees it). |
+| comid.Triples       | comid.ExtTriples                                                          | comid.Triples                                        | Typically indirect via myComid.RegisterExtensions(...).                   |
+| comid.Mval          | comid.ExtReferenceValue, comid.ExtEndorsedValue, comid.ExtMval            | comid.Mval (measurement-value in reference/endorsed) | Usually indirect via myComid.RegisterExtensions(...).                     |
+| comid.FlagsMap      | comid.ExtReferenceValueFlags, comid.ExtEndorsedValueFlags, comid.ExtFlags | comid.FlagsMap                                       | Typically indirect via myComid.RegisterExtensions(...).                   |
+| corim.UnsignedCorim | corim.ExtUnsignedCorim                                                    | corim.UnsignedCorim (the top-level CoRIM)            | On a corim.UnsignedCorim instance (e.g. myCorim.RegisterExtensions(...))  |
+| corim.Entity        | corim.ExtEntity                                                           | corim.Entity                                         | Usually indirect via myCorim.RegisterExtensions(...).                     |
+| corim.Signer        | corim.ExtSigner                                                           | corim.Signer                                         | Usually indirect via myCorim.RegisterExtensions(...).                     |
 
 Note that `comid.Mval` and `comid.FlagsMap` are used for both reference values
 and endorsed values, which may be extended separately. This is why there are
