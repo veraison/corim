@@ -10,6 +10,13 @@ The [`corim/corim`](corim) and [`corim/comid`](comid) packages provide a golang 
 > These API are still in active development (as is the underlying CoRIM spec).
 > They are **subject to change** in the future.
 
+## Required Tools
+
+Ensure you have the following tools installed with the specified versions on your machine:
+
+- **Go**: Version 1.22
+- **golangci-lint**: Version 1.54.2
+
 ## Developer tips
 
 Before requesting a PR (and routinely during the dev/test cycle), you are encouraged to run:
