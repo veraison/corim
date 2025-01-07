@@ -639,7 +639,7 @@ func TestMval_Valid(t *testing.T) {
 		assert.NoError(t, err, "8-byte MAC should be valid")
 	})
 
-	// Test with invalid MAC length (too many bytes)
+	// Test with invalid MAC length
 	t.Run("MACAddr invalid (too many bytes)", func(t *testing.T) {
 		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07}) // 7 bytes
 		mval := Mval{MACAddr: &mac}
@@ -647,7 +647,7 @@ func TestMval_Valid(t *testing.T) {
 		assert.EqualError(t, err, "invalid MAC address length: expected 6 or 8 bytes, got 7")
 	})
 
-	// Test with invalid MAC length (too few bytes)
+	// Test with invalid MAC length
 	t.Run("MACAddr invalid (too few bytes)", func(t *testing.T) {
 		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04}) // 4 bytes
 		mval := Mval{MACAddr: &mac}
