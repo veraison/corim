@@ -463,8 +463,9 @@ func (o Mval) Valid() error {
 
 	// Validate MAC Address
 	if o.MACAddr != nil {
-		if len(*o.MACAddr) != 6 { // MAC address must be exactly 6 bytes
-			return fmt.Errorf("invalid MAC address length: expected 6 bytes, got %d", len(*o.MACAddr))
+		macLen := len(*o.MACAddr)
+		if macLen != 6 && macLen != 8 { // MAC address must be either 6 or 8 bytes
+			return fmt.Errorf("invalid MAC address length: expected 6 or 8 bytes, got %d", macLen)
 		}
 	}
 

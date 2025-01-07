@@ -623,18 +623,36 @@ func TestMval_Valid(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("MACAddr invalid (too few bytes)", func(t *testing.T) {
-		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04})
+	// Test with valid 6-byte MAC
+	t.Run("MACAddr valid (6 bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06}) // EUI-48
 		mval := Mval{MACAddr: &mac}
 		err := mval.Valid()
-		assert.EqualError(t, err, "invalid MAC address length: expected 6 bytes, got 4")
+		assert.NoError(t, err, "6-byte MAC should be valid")
 	})
 
-	t.Run("MACAddr invalid (too many bytes)", func(t *testing.T) {
-		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07})
+	// Test with valid 8-byte MAC
+	t.Run("MACAddr valid (8 bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}) // EUI-64
 		mval := Mval{MACAddr: &mac}
 		err := mval.Valid()
-		assert.EqualError(t, err, "invalid MAC address length: expected 6 bytes, got 7")
+		assert.NoError(t, err, "8-byte MAC should be valid")
+	})
+
+	// Test with invalid MAC length (too many bytes)
+	t.Run("MACAddr invalid (too many bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07}) // 7 bytes
+		mval := Mval{MACAddr: &mac}
+		err := mval.Valid()
+		assert.EqualError(t, err, "invalid MAC address length: expected 6 or 8 bytes, got 7")
+	})
+
+	// Test with invalid MAC length (too few bytes)
+	t.Run("MACAddr invalid (too few bytes)", func(t *testing.T) {
+		mac := MACaddr([]byte{0x01, 0x02, 0x03, 0x04}) // 4 bytes
+		mval := Mval{MACAddr: &mac}
+		err := mval.Valid()
+		assert.EqualError(t, err, "invalid MAC address length: expected 6 or 8 bytes, got 4")
 	})
 
 	t.Run("MACAddr valid (6 bytes)", func(t *testing.T) {
