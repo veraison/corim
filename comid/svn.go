@@ -182,7 +182,7 @@ func (o TaggedMinSVN) Valid() error {
 	return nil
 }
 
-// This function converts various types to uint64 for SVN.
+// convertToSVNUint64 converts various SVN types to uint64.
 func convertToSVNUint64(val any) (uint64, error) {
 	switch t := val.(type) {
 	case string:
