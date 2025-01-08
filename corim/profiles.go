@@ -117,9 +117,9 @@ func UnmarshalUnsignedCorimFromJSON(buf []byte) (*UnsignedCorim, error) {
 func UnmarshalComidFromCBOR(buf []byte, profileID *eat.Profile) (*comid.Comid, error) {
 	var ret *comid.Comid
 
-	profile, ok := GetProfile(profileID)
+	profileManifest, ok := GetProfileManifest(profileID)
 	if ok {
-		ret = profile.GetComid()
+		ret = profileManifest.GetComid()
 	} else {
 		ret = comid.NewComid()
 	}
@@ -140,7 +140,7 @@ func GetSignedCorim(profileID *eat.Profile) *SignedCorim {
 	if profileID == nil {
 		ret = NewSignedCorim()
 	} else {
-		profile, ok := GetProfile(profileID)
+		profileManifest, ok := GetProfileManifest(profileID)
 		if !ok {
 			// unknown profile -- treat here like an unprofiled
 			// CoRIM. While the CoRIM spec states that unknown
@@ -153,7 +153,7 @@ func GetSignedCorim(profileID *eat.Profile) *SignedCorim {
 			// additional fields may not be registered.
 			ret = NewSignedCorim()
 		} else {
-			ret = profile.GetSignedCorim()
+			ret = profileManifest.GetSignedCorim()
 		}
 	}
 
@@ -169,7 +169,7 @@ func GetUnsignedCorim(profileID *eat.Profile) *UnsignedCorim {
 	if profileID == nil {
 		ret = NewUnsignedCorim()
 	} else {
-		profile, ok := GetProfile(profileID)
+		profileManifest, ok := GetProfileManifest(profileID)
 		if !ok {
 			// unknown profile -- treat here like an unprofiled
 			// CoRIM. While the CoRIM spec states that unknown
@@ -182,14 +182,14 @@ func GetUnsignedCorim(profileID *eat.Profile) *UnsignedCorim {
 			// additional fields may not be registered.
 			ret = NewUnsignedCorim()
 		} else {
-			ret = profile.GetUnsignedCorim()
+			ret = profileManifest.GetUnsignedCorim()
 		}
 	}
 
 	return ret
 }
 
-// Profile associates an EAT profile ID with a set of extensions. It allows
+// ProfileManifest associates an EAT profile ID with a set of extensions. It allows
 // obtaining new CoRIM and CoMID structures that had associated extensions
 // registered.
 type ProfileManifest struct {
@@ -197,7 +197,7 @@ type ProfileManifest struct {
 	MapExtensions extensions.Map
 }
 
-// GetComid returns a pointer to a new comid.Comid that had the Profile's
+// GetComid returns a pointer to a new comid.Comid that had the ProfileManifest's
 // extensions (if any) registered.
 func (o *ProfileManifest) GetComid() *comid.Comid {
 	ret := comid.NewComid()
@@ -206,7 +206,7 @@ func (o *ProfileManifest) GetComid() *comid.Comid {
 }
 
 // GetUnsignedCorim returns a pointer to a new UnsignedCorim that had the
-// Profile's extensions (if any) registered.
+// ProfileManifest's extensions (if any) registered.
 func (o *ProfileManifest) GetUnsignedCorim() *UnsignedCorim {
 	ret := NewUnsignedCorim()
 	ret.Profile = o.ID
@@ -215,7 +215,7 @@ func (o *ProfileManifest) GetUnsignedCorim() *UnsignedCorim {
 }
 
 // GetSignedCorim returns a pointer to a new SignedCorim that had the
-// Profile's extensions (if any) registered.
+// ProfileManifest's extensions (if any) registered.
 func (o *ProfileManifest) GetSignedCorim() *SignedCorim {
 	ret := NewSignedCorim()
 	ret.UnsignedCorim.Profile = o.ID
@@ -288,10 +288,10 @@ func UnregisterProfile(id *eat.Profile) bool {
 	return false
 }
 
-// GetProfile returns the Profile associated with the specified ID, or an empty
-// profile if no Profile has been registered for the id. The second return
-// value indicates whether a profile for the ID has been found.
-func GetProfile(id *eat.Profile) (ProfileManifest, bool) {
+// GetProfileManifest returns the ProfileManifest associated with the specified ID, or an empty
+// profileManifest if no ProfileManifest has been registered for the id. The second return
+// value indicates whether a profileManifest for the ID has been found.
+func GetProfileManifest(id *eat.Profile) (ProfileManifest, bool) {
 	if id == nil {
 		return ProfileManifest{}, false
 	}
