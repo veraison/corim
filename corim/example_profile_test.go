@@ -134,13 +134,13 @@ func Example_profile_marshal() {
 		panic(err)
 	}
 
-	profile, ok := GetProfile(profileID)
+	profileManifest, ok := GetProfileManifest(profileID)
 	if !ok {
 		log.Fatalf("profile %v not found", profileID)
 	}
 
-	myCorim := profile.GetUnsignedCorim()
-	myComid := profile.GetComid().
+	myCorim := profileManifest.GetUnsignedCorim()
+	myComid := profileManifest.GetComid().
 		SetLanguage("en-GB").
 		SetTagIdentity("example", 0).
 		// Adding an entity to the Entities collection also registers

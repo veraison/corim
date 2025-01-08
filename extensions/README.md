@@ -209,7 +209,7 @@ func main() {
 
 Map extensions may be grouped into profiles. A profile is registered,
 associating an `eat.Profile` with an `extensions.Map`. A registered profile can
-be obtained by calling `corim.GetProfile()`, which returns a `corim.Profile`
+be obtained by calling `corim.GetProfileManifest()`, which returns a `corim.ProfileManifest`
 object which can be used to obtain `corim.UnsignedCorim`, `corim.SignedCorim`
 and `comid.Comid` instances that have the associated extensions registered.
 `corim.UnmarshalUnsignedCorimFromCBOR()` will automatically look up a
