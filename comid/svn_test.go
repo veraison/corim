@@ -103,7 +103,7 @@ func Test_NewSVN(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = NewSVN(true, "exact-value")
-	assert.EqualError(t, err, "unexpected type for SVN exact-value: bool")
+	assert.EqualError(t, err, "unexpected type for SVN: bool")
 
 	inMin := TaggedMinSVN(7)
 
@@ -114,7 +114,7 @@ func Test_NewSVN(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = NewSVN(true, "min-value")
-	assert.EqualError(t, err, "unexpected type for SVN min-value: bool")
+	assert.EqualError(t, err, "unexpected type for SVN: bool")
 
 	_, err = NewSVN(true, "test")
 	assert.EqualError(t, err, "unknown SVN type: test")

@@ -183,31 +183,40 @@ func (o TaggedMinSVN) Valid() error {
 }
 
 // This function converts various types to uint64 for SVN.
+// convertToSVNUint64 converts various types to uint64 for SVN
 func convertToSVNUint64(val any) (uint64, error) {
-	switch t := val.(type) {
-	case string:
-		u, err := strconv.ParseUint(t, 10, 64)
-		if err != nil {
-			return 0, err
-		}
-		return u, nil
-	case uint64:
-		return t, nil
-	case uint:
-		return uint64(t), nil
-	case int:
-		if t < 0 {
-			return 0, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		return uint64(t), nil
-	case int64:
-		if t < 0 {
-			return 0, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		return uint64(t), nil
-	default:
-		return 0, fmt.Errorf("unexpected type for SVN: %T", t)
-	}
+    switch t := val.(type) {
+    case string:
+        u, err := strconv.ParseUint(t, 10, 64)
+        if err != nil {
+            return 0, err
+        }
+        return u, nil
+    case uint64:
+        return t, nil
+    case uint:
+        return uint64(t), nil
+    case int:
+        if t < 0 {
+            return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+        }
+        return uint64(t), nil
+    case int64:
+        if t < 0 {
+            return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+        }
+        return uint64(t), nil
+    case TaggedSVN:
+        return uint64(t), nil
+    case *TaggedSVN:
+        return uint64(*t), nil
+    case TaggedMinSVN:
+        return uint64(t), nil
+    case *TaggedMinSVN:
+        return uint64(*t), nil
+    default:
+        return 0, fmt.Errorf("unexpected type for SVN: %T", t)
+    }
 }
 
 // ISVNFactory defines the signature for the factory functions that may be
