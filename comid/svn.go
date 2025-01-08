@@ -107,42 +107,19 @@ const (
 type TaggedSVN uint64
 
 func NewTaggedSVN(val any) (*SVN, error) {
-	var ret TaggedSVN
+    var ret TaggedSVN
 
-	if val == nil {
-		return &SVN{&ret}, nil
-	}
+    if val == nil {
+        return &SVN{&ret}, nil
+    }
 
-	switch t := val.(type) {
-	case string:
-		u, err := strconv.ParseUint(t, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedSVN(u)
-	case TaggedSVN:
-		ret = t
-	case *TaggedSVN:
-		ret = *t
-	case uint64:
-		ret = TaggedSVN(t)
-	case uint:
-		ret = TaggedSVN(t)
-	case int:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedSVN(t)
-	case int64:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedSVN(t)
-	default:
-		return nil, fmt.Errorf("unexpected type for SVN exact-value: %T", t)
-	}
+    u, err := convertToSVNUint64(val)
+    if err != nil {
+        return nil, err
+    }
+    ret = TaggedSVN(u)
 
-	return &SVN{&ret}, nil
+    return &SVN{&ret}, nil
 }
 
 func MustNewTaggedSVN(val any) *SVN {
@@ -169,42 +146,19 @@ func (o TaggedSVN) Valid() error {
 type TaggedMinSVN uint64
 
 func NewTaggedMinSVN(val any) (*SVN, error) {
-	var ret TaggedMinSVN
+    var ret TaggedMinSVN
 
-	if val == nil {
-		return &SVN{&ret}, nil
-	}
+    if val == nil {
+        return &SVN{&ret}, nil
+    }
 
-	switch t := val.(type) {
-	case string:
-		u, err := strconv.ParseUint(t, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedMinSVN(u)
-	case TaggedMinSVN:
-		ret = t
-	case *TaggedMinSVN:
-		ret = *t
-	case uint64:
-		ret = TaggedMinSVN(t)
-	case uint:
-		ret = TaggedMinSVN(t)
-	case int:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedMinSVN(t)
-	case int64:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedMinSVN(t)
-	default:
-		return nil, fmt.Errorf("unexpected type for SVN min-value: %T", t)
-	}
+    u, err := convertToSVNUint64(val)
+    if err != nil {
+        return nil, err
+    }
+    ret = TaggedMinSVN(u)
 
-	return &SVN{&ret}, nil
+    return &SVN{&ret}, nil
 }
 
 func MustNewTaggedMinSVN(val any) *SVN {
@@ -226,6 +180,34 @@ func (o TaggedMinSVN) Type() string {
 
 func (o TaggedMinSVN) Valid() error {
 	return nil
+}
+
+// This function converts various types to uint64 for SVN.
+func convertToSVNUint64(val any) (uint64, error) {
+    switch t := val.(type) {
+    case string:
+        u, err := strconv.ParseUint(t, 10, 64)
+        if err != nil {
+            return 0, err
+        }
+        return u, nil
+    case uint64:
+        return t, nil
+    case uint:
+        return uint64(t), nil
+    case int:
+        if t < 0 {
+            return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+        }
+        return uint64(t), nil
+    case int64:
+        if t < 0 {
+            return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+        }
+        return uint64(t), nil
+    default:
+        return 0, fmt.Errorf("unexpected type for SVN: %T", t)
+    }
 }
 
 // ISVNFactory defines the signature for the factory functions that may be
