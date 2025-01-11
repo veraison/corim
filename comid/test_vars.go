@@ -26,7 +26,7 @@ var (
 	})
 	TestOID               = "2.5.2.8192"
 	TestRegID             = "https://acme.example"
-	TestMACaddr, _        = net.ParseMAC("02:00:5e:10:00:01")
+	TestMACaddr, _        = net.ParseMAC("02:00:5e:10:00:00:00:01")
 	TestIPaddr            = net.ParseIP("2001:db8::68")
 	TestBytes             = []byte{0x89, 0x99, 0x78, 0x65, 0x56}
 	TestUEIDString        = "02deadbeefdead"
