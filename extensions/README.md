@@ -50,7 +50,7 @@ effectively defining new fields for the corresponding structures. In the code
 base, these can be identified by the embedded `Extensions` struct. Each
 extensible type has a corresponding `extensions.Point`. These are:
 
-|    Extension Type   |                             Extension Point(s)                            |                   Parent Structure                   |                     Where to Call RegisterExtensions()                    |
+|    Extended Type   |                             Extension Point(s)                            |                   Parent Structure                   |                     Where to Call RegisterExtensions()                    |
 |:-------------------:|:-------------------------------------------------------------------------:|:----------------------------------------------------:|:-------------------------------------------------------------------------:|
 | comid.Comid         | comid.ExtComid                                                            | comid.Comid (the top-level CoMID)                    | On a comid.Comid instance (e.g. myComid.RegisterExtensions(extMap))       |
 | comid.Entity        | comid.ExtEntity                                                           | comid.Entity                                         | Usually indirect via myComid.RegisterExtensions(...) (the Comid sees it). |
