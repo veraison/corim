@@ -16,6 +16,7 @@ import (
 	"github.com/veraison/swid"
 )
 
+//nolint:lll
 var (
 	TestUUIDString = "31fb5abf-023e-4992-aa4e-95f9c1503bfa"
 	TestUUID       = UUID(uuid.Must(uuid.Parse(TestUUIDString)))
@@ -207,6 +208,7 @@ func b64TestImplID() string {
 	return base64.StdEncoding.EncodeToString(implID)
 }
 
+//nolint:lll
 var (
 	PSARefValJSONTemplate = `{
 	"lang": "en-GB",

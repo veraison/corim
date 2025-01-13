@@ -88,13 +88,14 @@ func (o *UnsignedCorim) SetID(v interface{}) *UnsignedCorim {
 }
 
 // GetID retrieves the corim-id from the unsigned-corim-map as a string
+// nolint:gocritic
 func (o UnsignedCorim) GetID() string {
 	return o.ID.String()
 }
 
 // AddComid appends the CBOR encoded (and appropriately tagged) CoMID to the
 // tags array of the unsigned-corim-map
-func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
+func (o *UnsignedCorim) AddComid(c *comid.Comid) *UnsignedCorim {
 	if o != nil {
 		if c.Valid() != nil {
 			return nil
@@ -105,7 +106,7 @@ func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
 			return nil
 		}
 
-		taggedComid := append(ComidTag, comidCBOR...)
+		taggedComid := append(ComidTag, comidCBOR...) //nolint:gocritic
 
 		o.Tags = append(o.Tags, taggedComid)
 	}
@@ -114,7 +115,7 @@ func (o *UnsignedCorim) AddComid(c comid.Comid) *UnsignedCorim {
 
 // AddCots appends the CBOR encoded (and appropriately tagged) CoTS to the
 // tags array of the unsigned-corim-map
-func (o *UnsignedCorim) AddCots(c cots.ConciseTaStore) *UnsignedCorim {
+func (o *UnsignedCorim) AddCots(c *cots.ConciseTaStore) *UnsignedCorim {
 	if o != nil {
 		if c.Valid() != nil {
 			return nil
@@ -125,7 +126,7 @@ func (o *UnsignedCorim) AddCots(c cots.ConciseTaStore) *UnsignedCorim {
 			return nil
 		}
 
-		taggedCots := append(cots.CotsTag, cotsCBOR...)
+		taggedCots := append(cots.CotsTag, cotsCBOR...) //nolint:gocritic
 
 		o.Tags = append(o.Tags, taggedCots)
 	}
@@ -134,7 +135,7 @@ func (o *UnsignedCorim) AddCots(c cots.ConciseTaStore) *UnsignedCorim {
 
 // AddCoswid appends the CBOR encoded (and appropriately tagged) CoSWID to the
 // tags array of the unsigned-corim-map
-func (o *UnsignedCorim) AddCoswid(c swid.SoftwareIdentity) *UnsignedCorim {
+func (o *UnsignedCorim) AddCoswid(c *swid.SoftwareIdentity) *UnsignedCorim {
 	if o != nil {
 		// Currently the swid package doesn't offer an interface
 		// for validating the supplied CoSWID, so -- for now --
@@ -146,7 +147,7 @@ func (o *UnsignedCorim) AddCoswid(c swid.SoftwareIdentity) *UnsignedCorim {
 			return nil
 		}
 
-		taggedCoswid := append(CoswidTag, coswidCBOR...)
+		taggedCoswid := append(CoswidTag, coswidCBOR...) //nolint:gocritic
 
 		o.Tags = append(o.Tags, taggedCoswid)
 	}
@@ -232,6 +233,7 @@ func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *Un
 }
 
 // Valid checks the validity (according to the spec) of the target unsigned CoRIM
+// nolint:gocritic
 func (o UnsignedCorim) Valid() error {
 	if o.ID == (swid.TagID{}) {
 		return fmt.Errorf("empty id")
@@ -279,6 +281,7 @@ func (o UnsignedCorim) Valid() error {
 }
 
 // ToCBOR serializes the target unsigned CoRIM to CBOR
+// nolint:gocritic
 func (o UnsignedCorim) ToCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -299,6 +302,7 @@ func (o *UnsignedCorim) FromCBOR(data []byte) error {
 }
 
 // ToJSON serializes the target unsigned CoRIM to JSON
+// nolint:gocritic
 func (o UnsignedCorim) ToJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid

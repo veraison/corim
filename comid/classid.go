@@ -94,6 +94,8 @@ func (o *ClassID) UnmarshalCBOR(data []byte) error {
 //		uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
 //		int: an integer value, e.g. 7
 //	 bytes: a variable length opaque bytes, example {0x07, 0x12, 0x34}
+
+//nolint:dupl
 func (o *ClassID) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 

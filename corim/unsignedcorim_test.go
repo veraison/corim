@@ -56,7 +56,7 @@ func TestUnsignedCorim_AddComid_and_marshal(t *testing.T) {
 	tv := NewUnsignedCorim().SetID("test corim id")
 	require.NotNil(t, tv)
 
-	c := comid.Comid{}
+	c := &comid.Comid{}
 	err := c.FromJSON([]byte(comid.PSARefValJSONTemplate))
 	require.Nil(t, err)
 
@@ -76,7 +76,7 @@ func TestUnsignedCorim_AddCots_and_marshal(t *testing.T) {
 	tv := NewUnsignedCorim().SetID("test corim id with CoTS")
 	require.NotNil(t, tv)
 
-	c := cots.ConciseTaStore{}
+	c := &cots.ConciseTaStore{}
 
 	err := c.FromJSON([]byte(cots.ConciseTaStoreTemplateSingleOrg))
 	require.Nil(t, err)
@@ -102,7 +102,7 @@ func TestUnsignedCorim_AddCoswid_and_marshal(t *testing.T) {
 	err := c.FromXML(data)
 	require.Nil(t, err)
 
-	assert.NotNil(t, tv.AddCoswid(c))
+	assert.NotNil(t, tv.AddCoswid(&c))
 
 	actual, err := tv.ToCBOR()
 	assert.Nil(t, err)
@@ -191,7 +191,7 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
 		SetProfile("https://arm.com/psa/iot/2.0.0").
-		AddComid(*c).
+		AddComid(c).
 		SetRimValidity(time.Now().Add(time.Hour), nil).
 		AddEntity("ACME Ltd.", nil, RoleManifestCreator)
 
@@ -325,7 +325,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
 		SetProfile("https://arm.com/psa/iot/2.0.0").
-		AddComid(*c)
+		AddComid(c)
 
 	require.NotNil(t, tv)
 
@@ -368,7 +368,7 @@ func TestUnsignedCorim_ToCBOR(t *testing.T) {
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
 		SetProfile("https://arm.com/psa/iot/2.0.0").
-		AddComid(*c)
+		AddComid(c)
 
 	require.NotNil(t, tv)
 

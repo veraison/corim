@@ -30,9 +30,9 @@ func (o *EnvironmentGroup) SetEnvironment(environment comid.Environment) *Enviro
 	return o
 }
 
-func (o *EnvironmentGroup) SetAbbreviatedSwidTag(swidtag AbbreviatedSwidTag) *EnvironmentGroup {
+func (o *EnvironmentGroup) SetAbbreviatedSwidTag(swidtag *AbbreviatedSwidTag) *EnvironmentGroup {
 	if o != nil {
-		o.SwidTag = &swidtag
+		o.SwidTag = swidtag
 	}
 	return o
 }

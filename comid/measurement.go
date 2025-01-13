@@ -389,6 +389,7 @@ func (o *Mval) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
+// nolint:gocritic
 func (o Mval) MarshalCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -409,6 +410,7 @@ func (o *Mval) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
+// nolint:gocritic
 func (o Mval) MarshalJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -423,6 +425,7 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
+// nolint:gocritic
 func (o Mval) Valid() error {
 	// Check if no measurement values are set
 	if o.Ver == nil &&
@@ -629,6 +632,7 @@ func (o *Measurement) RegisterExtensions(exts extensions.Map) error {
 	return o.Val.RegisterExtensions(exts)
 }
 
+// nolint:gocritic
 func (o Measurement) GetExtensions() extensions.IMapValue {
 	return o.Val.GetExtensions()
 }
@@ -784,6 +788,7 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 	return o
 }
 
+// nolint:gocritic
 func (o Measurement) Valid() error {
 	if o.Key != nil && o.Key.IsSet() {
 		if err := o.Key.Valid(); err != nil {
