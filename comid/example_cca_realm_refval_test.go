@@ -77,12 +77,12 @@ func extractRealmRefVal(rv ValueTriple) error {
 	}
 	return nil
 }
-
 func extractMeasurements(m Measurements) error {
 	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
-	for i, meas := range m.Values {
+	for i := range m.Values {
+		meas := &m.Values[i]
 		if err := extractMeasurement(meas); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
@@ -91,7 +91,7 @@ func extractMeasurements(m Measurements) error {
 	return nil
 }
 
-func extractMeasurement(m Measurement) error {
+func extractMeasurement(m *Measurement) error {
 	if err := extractRealmPersonalizationValue(m.Val.RawValue); err != nil {
 		return fmt.Errorf("extracting realm personalization value: %w", err)
 	}

@@ -242,6 +242,7 @@ func (o *Comid) AddDevIdentityKey(val KeyTriple) *Comid {
 	return o
 }
 
+// nolint:gocritic
 func (o Comid) Valid() error {
 	if err := o.TagIdentity.Valid(); err != nil {
 		return fmt.Errorf("tag-identity validation failed: %w", err)
@@ -267,6 +268,7 @@ func (o Comid) Valid() error {
 }
 
 // ToCBOR serializes the target Comid to CBOR
+// nolint:gocritic
 func (o Comid) ToCBOR() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -291,6 +293,7 @@ func (o *Comid) FromCBOR(data []byte) error {
 }
 
 // ToJSON serializes the target Comid to JSON
+// nolint:gocritic
 func (o Comid) ToJSON() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
@@ -314,6 +317,7 @@ func (o *Comid) FromJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
 }
 
+// nolint:gocritic
 func (o Comid) ToJSONPretty(indent string) ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err

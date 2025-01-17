@@ -17,20 +17,20 @@ func Example_links() {
 	// make entity and add it to the tag
 	entity, _ := swid.NewEntity("ACME Ltd", swid.RoleTagCreator, swid.RoleSoftwareCreator, swid.RoleAggregator)
 	_ = entity.SetRegID("acme.example")
-	_ = tag.AddEntity(*entity)
+	_ = tag.AddEntity(entity)
 
 	// make links and append them to tag
 	link, _ := swid.NewLink("example.acme.roadrunner-hw-v1-0-0", *swid.NewRel("psa-rot-compound"))
-	_ = tag.AddLink(*link)
+	_ = tag.AddLink(link)
 
 	link, _ = swid.NewLink("example.acme.roadrunner-sw-bl-v1-0-0", *swid.NewRel(swid.RelComponent))
-	_ = tag.AddLink(*link)
+	_ = tag.AddLink(link)
 
 	link, _ = swid.NewLink("example.acme.roadrunner-sw-prot-v1-0-0", *swid.NewRel(swid.RelComponent))
-	_ = tag.AddLink(*link)
+	_ = tag.AddLink(link)
 
 	link, _ = swid.NewLink("example.acme.roadrunner-sw-arot-v1-0-0", *swid.NewRel(swid.RelComponent))
-	_ = tag.AddLink(*link)
+	_ = tag.AddLink(link)
 
 	// encode tag to JSON
 	data, _ := tag.ToJSON()
@@ -54,14 +54,14 @@ func Example_completePrimaryTag() {
 
 	entity, _ := swid.NewEntity("The ACME Corporation", swid.RoleTagCreator, swid.RoleSoftwareCreator)
 	_ = entity.SetRegID("acme.com")
-	_ = tag.AddEntity(*entity)
+	_ = tag.AddEntity(entity)
 
 	entity, _ = swid.NewEntity("Coyote Services, Inc.", swid.RoleDistributor)
 	_ = entity.SetRegID("mycoyote.com")
-	_ = tag.AddEntity(*entity)
+	_ = tag.AddEntity(entity)
 
 	link, _ := swid.NewLink("www.gnu.org/licenses/gpl.txt", *swid.NewRel("license"))
-	_ = tag.AddLink(*link)
+	_ = tag.AddLink(link)
 
 	meta := swid.SoftwareMeta{
 		ActivationStatus:  "trial",
@@ -70,7 +70,7 @@ func Example_completePrimaryTag() {
 		Edition:           "coyote",
 		Revision:          "sp1",
 	}
-	_ = tag.AddSoftwareMeta(meta)
+	_ = tag.AddSoftwareMeta(&meta)
 
 	fileSize := int64(532712)
 	fileHash, _ := hex.DecodeString("a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a")

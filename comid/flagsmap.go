@@ -67,6 +67,7 @@ func NewFlagsMap() *FlagsMap {
 	return &FlagsMap{}
 }
 
+// nolint:gocritic
 func (o FlagsMap) IsEmpty() bool {
 	if o.IsConfigured != nil || o.IsSecure != nil || o.IsRecovery != nil ||
 		o.IsDebug != nil || o.IsReplayProtected != nil || o.IsIntegrityProtected != nil ||
@@ -87,58 +88,43 @@ func (o *FlagsMap) AnySet() bool {
 	return o.Extensions.anySet()
 }
 
-func (o *FlagsMap) SetTrue(flags ...Flag) {
+func (o *FlagsMap) setFlag(value *bool, flags ...Flag) {
 	for _, flag := range flags {
 		switch flag {
 		case FlagIsConfigured:
-			o.IsConfigured = &True
+			o.IsConfigured = value
 		case FlagIsSecure:
-			o.IsSecure = &True
+			o.IsSecure = value
 		case FlagIsRecovery:
-			o.IsRecovery = &True
+			o.IsRecovery = value
 		case FlagIsDebug:
-			o.IsDebug = &True
+			o.IsDebug = value
 		case FlagIsReplayProtected:
-			o.IsReplayProtected = &True
+			o.IsReplayProtected = value
 		case FlagIsIntegrityProtected:
-			o.IsIntegrityProtected = &True
+			o.IsIntegrityProtected = value
 		case FlagIsRuntimeMeasured:
-			o.IsRuntimeMeasured = &True
+			o.IsRuntimeMeasured = value
 		case FlagIsImmutable:
-			o.IsImmutable = &True
+			o.IsImmutable = value
 		case FlagIsTcb:
-			o.IsTcb = &True
+			o.IsTcb = value
 		default:
-			o.Extensions.setTrue(flag)
+			if value == &True {
+				o.Extensions.setTrue(flag)
+			} else {
+				o.Extensions.setFalse(flag)
+			}
 		}
 	}
 }
 
+func (o *FlagsMap) SetTrue(flags ...Flag) {
+	o.setFlag(&True, flags...)
+}
+
 func (o *FlagsMap) SetFalse(flags ...Flag) {
-	for _, flag := range flags {
-		switch flag {
-		case FlagIsConfigured:
-			o.IsConfigured = &False
-		case FlagIsSecure:
-			o.IsSecure = &False
-		case FlagIsRecovery:
-			o.IsRecovery = &False
-		case FlagIsDebug:
-			o.IsDebug = &False
-		case FlagIsReplayProtected:
-			o.IsReplayProtected = &False
-		case FlagIsIntegrityProtected:
-			o.IsIntegrityProtected = &False
-		case FlagIsRuntimeMeasured:
-			o.IsRuntimeMeasured = &False
-		case FlagIsImmutable:
-			o.IsImmutable = &False
-		case FlagIsTcb:
-			o.IsTcb = &False
-		default:
-			o.Extensions.setFalse(flag)
-		}
-	}
+	o.setFlag(&False, flags...)
 }
 
 func (o *FlagsMap) Clear(flags ...Flag) {
@@ -218,6 +204,7 @@ func (o *FlagsMap) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
+// nolint:gocritic
 func (o FlagsMap) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
@@ -228,11 +215,13 @@ func (o *FlagsMap) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
+// nolint:gocritic
 func (o FlagsMap) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
 // Valid returns an error if the FlagsMap is invalid.
+// nolint:gocritic
 func (o FlagsMap) Valid() error {
 	return o.Extensions.validFlagsMap(&o)
 }
