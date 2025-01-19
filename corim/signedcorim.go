@@ -59,7 +59,21 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory protected header")
 	}
 
-	v, ok := hdr.Protected[cose.HeaderLabelContentType]
+	v, ok := hdr.Protected[cose.HeaderLabelAlgorithm]
+	if !ok {
+		return errors.New("missing mandatory algorithm")
+	}
+
+	// TODO: make this consistent, either int64 or cose.Algorithm
+	// cose.Algorithm is an alias to int64 defined in veraison/go-cose
+	switch v.(type) {
+	case int64:
+	case cose.Algorithm:
+	default:
+		return fmt.Errorf("expecting integer CoRIM Algorithm, got %T instead", v)
+	}
+
+	v, ok = hdr.Protected[cose.HeaderLabelContentType]
 	if !ok {
 		return errors.New("missing mandatory content type")
 	}
@@ -68,9 +82,15 @@ func (o *SignedCorim) processHdrs() error {
 		return fmt.Errorf("expecting content type %q, got %q instead", ContentType, v)
 	}
 
-	// TODO(tho) key id is apparently mandatory, which doesn't look right.
-	// TODO(tho) Check with the CoRIM design team.
-	// See https://github.com/veraison/corim/issues/14
+	v, ok = hdr.Protected[cose.HeaderLabelKeyID]
+	if !ok {
+		return errors.New("missing mandatory key id")
+	}
+
+	_, ok = v.([]byte)
+	if !ok {
+		return fmt.Errorf("expecting byte string CoRIM Key ID, got %T instead", v)
+	}
 
 	v, ok = hdr.Protected[HeaderLabelCorimMeta]
 	if !ok {
@@ -129,7 +149,7 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
 // The target SignedCorim must have its UnsignedCorim field correctly
 // populated.
-func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
+func (o *SignedCorim) Sign(signer cose.Signer, kid []byte) ([]byte, error) {
 	if signer == nil {
 		return nil, errors.New("nil signer")
 	}
@@ -159,6 +179,7 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 
 	o.message.Headers.Protected.SetAlgorithm(alg)
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
+	o.message.Headers.Protected[cose.HeaderLabelKeyID] = kid
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
 
 	err = o.message.Sign(rand.Reader, NoExternalData, signer)
