@@ -69,15 +69,16 @@ func extractSwMeasurements(m Measurements) error {
 	if len(m.Values) == 0 {
 		return fmt.Errorf("no measurements")
 	}
-	for i, m := range m.Values {
-		if err := extractSwMeasurement(m); err != nil {
+	for i := range m.Values {
+		meas := &m.Values[i]
+		if err := extractSwMeasurement(meas); err != nil {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
 	}
 	return nil
 }
 
-func extractSwMeasurement(m Measurement) error {
+func extractSwMeasurement(m *Measurement) error {
 	if err := extractPSARefValID(m.Key); err != nil {
 		return fmt.Errorf("extracting PSA refval id: %w", err)
 	}

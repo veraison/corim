@@ -34,7 +34,7 @@ func (o *ConciseTaStore) SetTagIdentity(tagID interface{}, tagIDVersion *uint) *
 		}
 		o.TagIdentity = &comid.TagIdentity{}
 		o.TagIdentity.TagID = *id
-		if nil != tagIDVersion {
+		if tagIDVersion != nil {
 			o.TagIdentity.TagVersion = *tagIDVersion
 		}
 	}
@@ -62,16 +62,16 @@ func (o *ConciseTaStore) AddPurpose(purpose string) *ConciseTaStore {
 	return o
 }
 
-func (o *ConciseTaStore) AddPermClaims(permclaim EatCWTClaim) *ConciseTaStore {
+func (o *ConciseTaStore) AddPermClaims(permclaim *EatCWTClaim) *ConciseTaStore {
 	if o != nil {
-		o.PermClaims = append(o.PermClaims, permclaim)
+		o.PermClaims = append(o.PermClaims, *permclaim)
 	}
 	return o
 }
 
-func (o *ConciseTaStore) AddExclClaims(exclclaim EatCWTClaim) *ConciseTaStore {
+func (o *ConciseTaStore) AddExclClaims(exclclaim *EatCWTClaim) *ConciseTaStore {
 	if o != nil {
-		o.ExclClaims = append(o.ExclClaims, exclclaim)
+		o.ExclClaims = append(o.ExclClaims, *exclclaim)
 	}
 	return o
 }
@@ -83,21 +83,23 @@ func (o *ConciseTaStore) SetKeys(keys TasAndCas) *ConciseTaStore {
 	return o
 }
 
-// ToCBOR serializes the target ConciseTaStore to CBOR
+// ToCBOR serializes the target ConciseTaStore to CBOR.
+// nolint:gocritic
 func (o ConciseTaStore) ToCBOR() ([]byte, error) {
 	if err := o.Valid(); err != nil {
 		return nil, err
 	}
 
-	return em.Marshal(&o)
+	return em.Marshal(o)
 }
 
-// FromCBOR deserializes a CBOR-encoded CoTS into the target ConciseTaStore
+// FromCBOR deserializes a CBOR-encoded CoTS into the target ConciseTaStore.
 func (o *ConciseTaStore) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// Valid iterates over the range of individual entities to check for validity
+// Valid iterates over the range of individual entities to check for validity.
+// nolint:gocritic
 func (o ConciseTaStore) Valid() error {
 	if o.Environments == nil {
 		return fmt.Errorf("environmentGroups must be present")
@@ -121,14 +123,15 @@ func (o ConciseTaStore) Valid() error {
 	return nil
 }
 
-// FromJSON deserializes a JSON-encoded CoTS into the target ConciseTaStore
+// FromJSON deserializes a JSON-encoded CoTS into the target ConciseTaStore.
 func (o *ConciseTaStore) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }
 
-// FromJSON deserializes a JSON-encoded CoTS into the target ConsiseTaStore
+// FromJSON deserializes a JSON-encoded CoTS into the target ConsiseTaStore.
+// nolint:gocritic
 func (o ConciseTaStore) ToJSON() ([]byte, error) {
-	return json.Marshal(&o)
+	return json.Marshal(o)
 }
 
 type ConciseTaStores []ConciseTaStore
@@ -137,13 +140,13 @@ func NewConciseTaStores() *ConciseTaStores {
 	return new(ConciseTaStores)
 }
 
-func (o *ConciseTaStores) AddConciseTaStores(cts ConciseTaStore) *ConciseTaStores {
+func (o *ConciseTaStores) AddConciseTaStores(cts *ConciseTaStore) *ConciseTaStores {
 	if o != nil {
 		if cts.Valid() != nil {
 			return nil
 		}
 
-		*o = append(*o, cts)
+		*o = append(*o, *cts)
 	}
 	return o
 }

@@ -104,7 +104,8 @@ func Example_profile_unmarshal() {
 		Extensions.MustGetString("Address"))
 
 	fmt.Printf("Measurements:\n")
-	for _, m := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
+	for i := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
+		m := &extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values[i]
 
 		val := hex.EncodeToString((*m.Val.Digests)[0].HashValue)
 		tsInt := m.Val.Extensions.MustGetInt64("timestamp")
@@ -185,7 +186,7 @@ func Example_profile_marshal() {
 		log.Fatalf("comid validity: %v", err)
 	}
 
-	myCorim.AddComid(*myComid)
+	myCorim.AddComid(myComid)
 
 	buf, err := myCorim.ToCBOR()
 	if err != nil {

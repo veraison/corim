@@ -389,6 +389,7 @@ func (o *Mval) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
+// nolint:gocritic
 func (o Mval) MarshalCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -409,6 +410,7 @@ func (o *Mval) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
+// nolint:gocritic
 func (o Mval) MarshalJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -424,7 +426,9 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 }
 
 // Valid returns an error if none of the measurement values are set and the Extensions are empty.
+// nolint:gocritic
 func (o Mval) Valid() error {
+	// Check if no measurement values are set
 	if o.Ver == nil &&
 		o.SVN == nil &&
 		o.Digests == nil &&
@@ -441,28 +445,47 @@ func (o Mval) Valid() error {
 		return fmt.Errorf("no measurement value set")
 	}
 
+	// Validate Version
 	if o.Ver != nil {
 		if err := o.Ver.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Digests
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Flags
 	if o.Flags != nil {
 		if err := o.Flags.Valid(); err != nil {
 			return err
 		}
 	}
 
-	// raw value and mask have no specific semantics
+	// Validate MAC Address
+	if o.MACAddr != nil {
+		macLen := len(*o.MACAddr)
+		if macLen != 6 && macLen != 8 { // MAC address must be either 6 or 8 bytes
+			return fmt.Errorf("invalid MAC address length: expected 6 or 8 bytes, got %d", macLen)
+		}
+	}
 
-	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
+	// Validate IP Address
+	if o.IPAddr != nil {
+		ip := *o.IPAddr
+		// Must be valid IPv4 or IPv6 (i.e., .To4() != nil or .To16() != nil)
+		if ip.To4() == nil && ip.To16() == nil {
+			return fmt.Errorf("invalid IP address: %s", ip.String())
+		}
+	}
 
+	// raw value and raw-value-mask have no specific semantics here
+
+	// Validate extensions (custom logic implemented in validMval())
 	return o.Extensions.validMval(&o)
 }
 
@@ -611,6 +634,7 @@ func (o *Measurement) RegisterExtensions(exts extensions.Map) error {
 	return o.Val.RegisterExtensions(exts)
 }
 
+// nolint:gocritic
 func (o Measurement) GetExtensions() extensions.IMapValue {
 	return o.Val.GetExtensions()
 }
@@ -766,6 +790,7 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 	return o
 }
 
+// nolint:gocritic
 func (o Measurement) Valid() error {
 	if o.Key != nil && o.Key.IsSet() {
 		if err := o.Key.Valid(); err != nil {

@@ -109,7 +109,7 @@ func Example_encode_environment_SWID_keys_cert() {
 		AddEnvironmentGroup(
 			*NewEnvironmentGroup().
 				SetAbbreviatedSwidTag(
-					AbbreviatedSwidTag{
+					&AbbreviatedSwidTag{
 						Entities: swid.Entities{
 							makeZestyEntityWithRoles(swid.RoleSoftwareCreator),
 						},
@@ -117,7 +117,7 @@ func Example_encode_environment_SWID_keys_cert() {
 				),
 		).
 		AddPermClaims(
-			EatCWTClaim{
+			&EatCWTClaim{
 				SoftwareNameLabel: &swname,
 			},
 		).
@@ -178,7 +178,7 @@ func Example_list_of_cots_roundtrip() {
 
 	// cts1
 	egSnob := NewEnvironmentGroup()
-	egSnob.SetAbbreviatedSwidTag(AbbreviatedSwidTag{})
+	egSnob.SetAbbreviatedSwidTag(&AbbreviatedSwidTag{})
 	egSnob.SwidTag.Entities = swid.Entities{}
 	eSnob := swid.Entity{EntityName: "Snobbish Apparel, Inc."}
 	_ = eSnob.SetRoles(swid.RoleSoftwareCreator)
@@ -192,7 +192,7 @@ func Example_list_of_cots_roundtrip() {
 
 	exclName := "Legal Lawyer"
 	exclClaims1 := EatCWTClaim{SoftwareNameLabel: &exclName}
-	cts1.AddExclClaims(exclClaims1)
+	cts1.AddExclClaims(&exclClaims1)
 
 	// cts2
 	egShared := NewEnvironmentGroup()
@@ -206,8 +206,8 @@ func Example_list_of_cots_roundtrip() {
 	cts2.AddEnvironmentGroup(*egShared)
 
 	cts := NewConciseTaStores()
-	cts.AddConciseTaStores(cts1)
-	cts.AddConciseTaStores(cts2)
+	cts.AddConciseTaStores(&cts1)
+	cts.AddConciseTaStores(&cts2)
 
 	ctsCBOR, _ := cts.ToCBOR()
 	var roundtripCBOR ConciseTaStores
