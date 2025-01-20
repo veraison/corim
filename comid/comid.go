@@ -244,27 +244,27 @@ func (o *Comid) AddDevIdentityKey(val KeyTriple) *Comid {
 
 // nolint:gocritic
 func (o Comid) Valid() error {
-	if err := o.TagIdentity.Valid(); err != nil {
-		return fmt.Errorf("tag-identity validation failed: %w", err)
-	}
+    if err := o.TagIdentity.Valid(); err != nil {
+        return fmt.Errorf("tag-identity validation failed: %v", err) // Changed %w to %v
+    }
 
-	if o.Entities != nil {
-		if err := o.Entities.Valid(); err != nil {
-			return fmt.Errorf("entities validation failed: %w", err)
-		}
-	}
+    if o.Entities != nil {
+        if err := o.Entities.Valid(); err != nil {
+            return fmt.Errorf("entities validation failed: %v", err) // Changed %w to %v
+        }
+    }
 
-	if o.LinkedTags != nil {
-		if err := o.LinkedTags.Valid(); err != nil {
-			return fmt.Errorf("linked-tags validation failed: %w", err)
-		}
-	}
+    if o.LinkedTags != nil {
+        if err := o.LinkedTags.Valid(); err != nil {
+            return fmt.Errorf("linked-tags validation failed: %v", err) // Changed %w to %v
+        }
+    }
 
-	if err := o.Triples.Valid(); err != nil {
-		return fmt.Errorf("triples validation failed: %w", err)
-	}
+    if err := o.Triples.Valid(); err != nil {
+        return fmt.Errorf("triples validation failed: %v", err) // Changed %w to %v
+    }
 
-	return o.Extensions.validComid(&o)
+    return o.Extensions.validComid(&o)
 }
 
 // ToCBOR serializes the target Comid to CBOR
@@ -324,4 +324,104 @@ func (o Comid) ToJSONPretty(indent string) ([]byte, error) {
 	}
 
 	return json.MarshalIndent(&o, "", indent)
+}
+
+// AddSimpleReferenceValue adds a reference value with a single measurement
+func (o *Comid) AddSimpleReferenceValue(env Environment, measurement *Measurement) error {
+    if err := env.Valid(); err != nil {
+        return fmt.Errorf("invalid environment: %w", err)
+    }
+    
+    if measurement == nil {
+        return fmt.Errorf("measurement cannot be nil")
+    }
+
+    if o.Triples.ReferenceValues == nil {
+        o.Triples.ReferenceValues = NewValueTriples()
+    }
+    
+    builder := NewReferenceValueBuilder().
+        WithEnvironment(env).
+        WithMeasurement(measurement)
+        
+    triple, err := builder.Build()
+    if err != nil {
+        return fmt.Errorf("building reference value: %w", err)
+    }
+    
+    if res := o.AddReferenceValue(*triple); res == nil {
+		return fmt.Errorf("failed to add reference value")
+	}
+    
+    return nil
+}
+
+func (o *Comid) AddDigestReferenceValue(env Environment, alg string, digest []byte) error {
+    if len(digest) == 0 {
+        return fmt.Errorf("digest cannot be empty")
+    }
+    hashAlg := HashAlgFromString(alg)
+    if !hashAlg.Valid() {
+        return fmt.Errorf("unrecognized algorithm %q", alg)
+    }
+    m := &Measurement{
+        Val: Mval{
+            Digests: NewDigests(),
+        },
+    }
+    if m.Val.Digests.AddDigest(hashAlg.ToUint64(), digest) == nil {
+        return fmt.Errorf("failed to create hash entry")
+    }
+    return o.AddSimpleReferenceValue(env, m)
+}
+
+// AddRawReferenceValue adds a reference value with raw measurement data
+func (o *Comid) AddRawReferenceValue(env Environment, raw []byte) error {
+    if len(raw) == 0 {
+        return fmt.Errorf("raw value cannot be empty")
+    }
+    
+    m := &Measurement{
+        Val: Mval{
+            RawValue: NewRawValue().SetBytes(raw),
+        },
+    }
+    
+    return o.AddSimpleReferenceValue(env, m)
+}
+
+// AddReferenceValueDirect adds a reference value directly to the reference-triples list without creating instances for Measurement and ValueTriples.
+func (o *Comid) AddReferenceValueDirect(environment Environment, measurements Measurements) *Comid {
+    if o != nil {
+        val := ValueTriple{
+            Environment:  environment,
+            Measurements: measurements,
+        }
+        if o.Triples.ReferenceValues == nil {
+            o.Triples.ReferenceValues = NewValueTriples()
+        }
+
+        if o.Triples.AddReferenceValue(val) == nil {
+            return nil
+        }
+    }
+    return o
+}
+
+// AddEndorsedValueDirect adds an endorsed value directly to the endorsed-triples list without creating instances for Measurement and ValueTriples.
+func (o *Comid) AddEndorsedValueDirect(environment Environment, measurements Measurements) *Comid {
+    if o != nil {
+        val := ValueTriple{
+            Environment:  environment,
+            Measurements: measurements,
+        }
+        if o.Triples.EndorsedValues == nil {
+            o.Triples.EndorsedValues = NewValueTriples()
+        }
+
+		if o.Triples.AddEndorsedValue(val) == nil {
+            return nil
+        }
+    }
+    return o
 }
