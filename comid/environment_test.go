@@ -137,8 +137,8 @@ func TestEnvironment_ToCBOR_class_and_instance(t *testing.T) {
 
 func TestEnvironment_ToCBOR_class_and_group(t *testing.T) {
 	tv := Environment{
-		Class:    NewClassUUID(TestUUID),
-		Group:    MustNewUUIDGroup(TestUUID),
+		Class: NewClassUUID(TestUUID),
+		Group: MustNewUUIDGroup(TestUUID),
 	}
 	require.NotNil(t, tv.Class)
 	require.NotNil(t, tv.Group)
