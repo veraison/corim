@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -146,4 +146,86 @@ func TestDigests_UnmarshalCBOR(t *testing.T) {
 	assert.Equal(t, MustHexDecode(t, "e45b72ab"), actual[0].HashValue)
 	assert.Equal(t, swid.Sha256_64, actual[1].HashAlgID)
 	assert.Equal(t, MustHexDecode(t, "e45b72f5c0c0b572"), actual[1].HashValue)
+}
+
+func TestDigests_Equal_True(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572")).
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572")).
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab"))
+
+	assert.True(t, claim.Equal(*ref))
+}
+
+func TestDigests_Equal_False_Length(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab"))
+
+	assert.False(t, claim.Equal(*ref))
+}
+
+func TestDigests_Equal_False_Mismatch(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "a26c83e2d0c0b572"))
+
+	assert.False(t, claim.Equal(*ref))
+}
+
+func TestDigests_Compare_True(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha384, MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha384, MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
+
+	assert.True(t, claim.CompareAgainstReference(*ref))
+}
+
+func TestDigests_Compare_False(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "f39a61fe"))
+
+	assert.False(t, claim.CompareAgainstReference(*ref))
+}
+
+func TestDigests_Compare_False_DuplicateIDs(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "f34a51de"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab"))
+
+	assert.False(t, claim.CompareAgainstReference(*ref))
+}
+
+func TestDigests_Compare_False_PartialMatch(t *testing.T) {
+	ref := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "e45b72f5c0c0b572"))
+
+	claim := NewDigests().
+		AddDigest(swid.Sha256_32, MustHexDecode(t, "e45b72ab")).
+		AddDigest(swid.Sha256_64, MustHexDecode(t, "f39c2473a0c0f592"))
+
+	assert.False(t, claim.CompareAgainstReference(*ref))
 }
