@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -6,6 +6,7 @@ package comid
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/veraison/corim/encoding"
@@ -143,6 +144,30 @@ func (o TaggedSVN) Valid() error {
 	return nil
 }
 
+func (o TaggedSVN) Equal(r TaggedSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedSVN:Equal: %v", err)
+		return false
+	}
+
+	return ret == 0
+}
+
+func (o TaggedSVN) CompareAgainstRefSVN(r TaggedSVN) bool {
+	return o.Equal(r)
+}
+
+func (o TaggedSVN) CompareAgainstRefMinSVN(r TaggedMinSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedSVN:CompareAgainstRefMinSVN: %v", err)
+		return false
+	}
+
+	return ret >= 0
+}
+
 type TaggedMinSVN uint64
 
 func NewTaggedMinSVN(val any) (*SVN, error) {
@@ -180,6 +205,42 @@ func (o TaggedMinSVN) Type() string {
 
 func (o TaggedMinSVN) Valid() error {
 	return nil
+}
+
+func (o TaggedMinSVN) Equal(r TaggedMinSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedMinSVN:Equal: %v", err)
+		return false
+	}
+
+	return ret == 0
+}
+
+// Compare helper function to compare two SVNs, object and reference
+//
+// returns:
+// 0 if they are equal; no error
+// 1 if object is newer than the reference; no error
+// -1 if object is older than reference or if the function encounters an error
+func compare(o any, r any) (int, error) {
+	obj, err := convertToSVNUint64(o)
+	if err != nil {
+		return -1, fmt.Errorf("object Error: %v", err)
+	}
+
+	ref, err := convertToSVNUint64(r)
+	if err != nil {
+		return -1, fmt.Errorf("reference Error: %v", err)
+	}
+
+	if obj < ref {
+		return -1, nil
+	} else if obj > ref {
+		return 1, nil
+	}
+
+	return 0, nil
 }
 
 // convertToSVNUint64 converts various SVN types to uint64.
