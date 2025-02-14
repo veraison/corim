@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/rand"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"strings"
@@ -24,9 +25,11 @@ var (
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
 // with signature and verification methods
 type SignedCorim struct {
-	UnsignedCorim UnsignedCorim
-	Meta          Meta
-	message       *cose.Sign1Message
+	UnsignedCorim     UnsignedCorim
+	Meta              Meta
+	message           *cose.Sign1Message
+	signingCert       *x509.Certificate
+	intermediateCerts []*x509.Certificate
 }
 
 // NewSignedCorim instantiates an empty SignedCorim
@@ -126,9 +129,45 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 	return nil
 }
 
+// AddSigningCert adds a DER-encoded X.509 certificate to be included in the
+// protected header of the COSE Sign1 message as the leaf certificate in X5Chain.
+func (o *SignedCorim) AddSigningCert(der []byte) error {
+	if der == nil {
+		return errors.New("nil signing cert")
+	}
+
+	cert, err := x509.ParseCertificate(der)
+	if err != nil {
+		return fmt.Errorf("invalid signing certificate: %w", err)
+	}
+
+	o.signingCert = cert
+	return nil
+}
+
+// AddIntermediateCerts adds DER-encoded X.509 certificates to be included in the protected
+// header of the COSE Sign1 message as part of the X5Chain.
+// The certificates must be concatenated with no intermediate padding, as per X.509 convention.
+func (o *SignedCorim) AddIntermediateCerts(der []byte) error {
+	if len(der) == 0 {
+		return errors.New("nil or empty intermediate certs")
+	}
+
+	certs, err := x509.ParseCertificates(der)
+	if err != nil {
+		return fmt.Errorf("invalid intermediate certificates: %w", err)
+	}
+
+	if len(certs) == 0 {
+		return errors.New("no certificates found in intermediate cert data")
+	}
+
+	o.intermediateCerts = certs
+	return nil
+}
+
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
-// The target SignedCorim must have its UnsignedCorim field correctly
-// populated.
+// The target SignedCorim must have its UnsignedCorim field correctly populated.
 func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	if signer == nil {
 		return nil, errors.New("nil signer")
@@ -160,6 +199,14 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected.SetAlgorithm(alg)
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
+
+	if o.signingCert != nil {
+		certChain := [][]byte{o.signingCert.Raw}
+		for _, cert := range o.intermediateCerts {
+			certChain = append(certChain, cert.Raw)
+		}
+		o.message.Headers.Protected[cose.HeaderLabelX5Chain] = certChain
+	}
 
 	err = o.message.Sign(rand.Reader, NoExternalData, signer)
 	if err != nil {
