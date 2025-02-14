@@ -441,7 +441,11 @@ func TestSignedCorim_SignVerify_ok(t *testing.T) {
 		SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
 		SignedCorimIn.Meta = *metaGood(t)
 
-		cbor, err := SignedCorimIn.Sign(signer)
+		// WIP
+		leafCert := []byte("leaf certificate")
+		intermediateCert := []byte("intermediate certificate")
+
+		cbor, err := SignedCorimIn.Sign(signer, leafCert, intermediateCert)
 		assert.Nil(t, err)
 
 		var SignedCorimOut SignedCorim
@@ -467,8 +471,12 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 
 	SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
 
-	cbor, err := SignedCorimIn.Sign(signer)
-	assert.Nil(t, err)
+		// WIP
+		leafCert := []byte("leaf certificate")
+		intermediateCert := []byte("intermediate certificate")
+
+		cbor, err := SignedCorimIn.Sign(signer, leafCert, intermediateCert)
+		assert.Nil(t, err)
 
 	var SignedCorimOut SignedCorim
 
@@ -491,30 +499,38 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 }
 
 func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
-	signer, err := NewSignerFromJWK(testES256Key)
-	require.NoError(t, err)
+    signer, err := NewSignerFromJWK(testES256Key)
+    require.NoError(t, err)
 
-	var SignedCorimIn SignedCorim
+    var SignedCorimIn SignedCorim
 
-	emptyCorim := NewUnsignedCorim()
-	require.NotNil(t, emptyCorim)
+    emptyCorim := NewUnsignedCorim()
+    require.NotNil(t, emptyCorim)
 
-	SignedCorimIn.UnsignedCorim = *emptyCorim
+    SignedCorimIn.UnsignedCorim = *emptyCorim
 
-	_, err = SignedCorimIn.Sign(signer)
-	assert.EqualError(t, err, "failed validation of unsigned CoRIM: empty id")
+    // wip
+    leafCert := []byte("leaf certificate")
+    intermediateCert := []byte("intermediate certificate")
+
+    _, err = SignedCorimIn.Sign(signer, leafCert, intermediateCert)
+    assert.EqualError(t, err, "failed validation of unsigned CoRIM: empty id")
 }
 
 func TestSignedCorim_Sign_fail_no_signer(t *testing.T) {
-	var SignedCorimIn SignedCorim
+    var SignedCorimIn SignedCorim
 
-	emptyCorim := NewUnsignedCorim()
-	require.NotNil(t, emptyCorim)
+    emptyCorim := NewUnsignedCorim()
+    require.NotNil(t, emptyCorim)
 
-	SignedCorimIn.UnsignedCorim = *emptyCorim
+    SignedCorimIn.UnsignedCorim = *emptyCorim
 
-	_, err := SignedCorimIn.Sign(nil)
-	assert.EqualError(t, err, "nil signer")
+    // wip
+    leafCert := []byte("leaf certificate")
+    intermediateCert := []byte("intermediate certificate")
+
+    _, err := SignedCorimIn.Sign(nil, leafCert, intermediateCert)
+    assert.EqualError(t, err, "nil signer")
 }
 
 func TestSignedCorim_extensions(t *testing.T) {
