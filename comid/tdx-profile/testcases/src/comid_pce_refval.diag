@@ -1,0 +1,34 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : "Sample Provisioning Certification Enclave reference tag"
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "INTEL",
+    / comid.reg-id / 1 : 32("https://intel.com"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+    / comid.reference-triples / 0 : [ [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-oid-type / 111(
+              h'6086480186F84D0102030405' /  2.16.840.1.113741.1.2.3.4.5 - <OID-for-TDX-PCE-TCB>/
+            ),
+          / comid.vendor / 1 : "Intel Corporation",
+          / comid.model / 2 : "TDX PCE TCB"
+        }
+      },
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+              / comid.instanceid / -77 : h'00112233445566778899aabbccddeeff',
+              / tcb-comp-svn / -125 : [ 10, 10, 2, 2, 2, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+              / pceid / -80 : "0000"
+          },
+          / authorized-by / 2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
+        }
+      ]
+    ] ]
+  }
+}
