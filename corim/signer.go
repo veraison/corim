@@ -154,6 +154,25 @@ func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, crypto.Signer, error) {
 	return alg, key, nil
 }
 
+func getKidFromJWK(j []byte) ([]byte, error) {
+	k, err := jwk.ParseKey(j)
+	if err != nil {
+		return nil, err
+	}
+
+	if k.KeyID() != "" {
+		return []byte(k.KeyID()), nil
+	}
+
+	// Generate a key ID from the JWK Thumbprint if none exist
+	// See https://datatracker.ietf.org/doc/html/rfc7638
+	kid, err := k.Thumbprint(crypto.SHA256)
+	if err != nil {
+		return nil, err
+	}
+	return kid, nil
+}
+
 func ellipticCurveToAlg(c elliptic.Curve) cose.Algorithm {
 	switch c {
 	case elliptic.P256():

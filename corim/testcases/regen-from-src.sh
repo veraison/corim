@@ -7,7 +7,7 @@ GEN_TESTCASE=$(go env GOPATH)/bin/gen-testcase
 
 if [[ ! -f ${GEN_TESTCASE} ]]; then
 	echo "installing gen-testcase"
-	go install github.com/veraison/gen-testcase@v0.0.1
+	go install github.com/veraison/gen-testcase@v0.0.2
 fi
 
 testcases=(
