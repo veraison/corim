@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -13,7 +13,6 @@ import (
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
-	"github.com/veraison/swid"
 )
 
 const MaxUint64 = ^uint64(0)
@@ -487,39 +486,6 @@ func (o Mval) Valid() error {
 
 	// Validate extensions (custom logic implemented in validMval())
 	return o.Extensions.validMval(&o)
-}
-
-// Version stores a version-map with JSON and CBOR serializations.
-type Version struct {
-	Version string             `cbor:"0,keyasint" json:"value"`
-	Scheme  swid.VersionScheme `cbor:"1,keyasint" json:"scheme"`
-}
-
-func NewVersion() *Version {
-	return &Version{}
-}
-
-func (o *Version) SetVersion(v string) *Version {
-	if o != nil {
-		o.Version = v
-	}
-	return o
-}
-
-func (o *Version) SetScheme(v int64) *Version {
-	if o != nil {
-		if o.Scheme.SetCode(v) != nil {
-			return nil
-		}
-	}
-	return o
-}
-
-func (o Version) Valid() error {
-	if o.Version == "" {
-		return fmt.Errorf("empty version")
-	}
-	return nil
 }
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.

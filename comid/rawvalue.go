@@ -1,11 +1,14 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
+	"reflect"
 )
 
 // RawValue models a $raw-value-type-choice.  For now, the only available type is bytes.
@@ -39,6 +42,36 @@ func (o RawValue) GetBytes() ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("unknown type %T for $raw-value-type-choice", t)
 	}
+}
+
+func (o RawValue) Equal(r RawValue) bool {
+	return reflect.DeepEqual(o, r)
+}
+
+func (o RawValue) CompareAgainstReference(ref []byte, mask *[]byte) bool {
+	claim, err := o.GetBytes()
+	if err != nil {
+		log.Printf("RawValue:CompareAgainstReference: Error: %v", err)
+		return false
+	}
+
+	if mask != nil {
+		if len(claim) != len(ref) {
+			return false
+		}
+
+		if len(*mask) != len(claim) {
+			log.Printf("RawValue:CompareAgainstReference: Error: mask length")
+			return false
+		}
+
+		for i := range *mask {
+			claim[i] = (*mask)[i] & claim[i]
+			ref[i] = (*mask)[i] & ref[i]
+		}
+	}
+
+	return bytes.Equal(claim, ref)
 }
 
 func (o RawValue) MarshalCBOR() ([]byte, error) {

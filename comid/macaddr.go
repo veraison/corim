@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"reflect"
 )
 
 // MACaddr is an HW address (e.g., IEEE 802 MAC-48, EUI-48, EUI-64)
@@ -15,6 +16,14 @@ import (
 // (see: https://github.com/golang/go/issues/29678)
 // we need to create an alias type with a custom decoder.
 type MACaddr net.HardwareAddr
+
+func (o MACaddr) Equal(r MACaddr) bool {
+	return reflect.DeepEqual(o, r)
+}
+
+func (o MACaddr) CompareAgainstReference(r MACaddr) bool {
+	return o.Equal(r)
+}
 
 // UnmarshalJSON deserialize a MAC address in textual form into the MACaddr
 // target, e.g.:

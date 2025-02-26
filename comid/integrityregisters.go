@@ -1,10 +1,11 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/veraison/swid"
@@ -135,4 +136,33 @@ func (i *IntegrityRegisters) UnmarshalJSON(data []byte) error {
 		}
 	}
 	return nil
+}
+
+func (i IntegrityRegisters) Equal(r IntegrityRegisters) bool {
+	return reflect.DeepEqual(i, r)
+}
+
+// CompareAgainstReference checks if IntegrityRegisters object matches with a reference
+//
+//	See the following CoRIM spec for rules to compare
+//	IntegrityRegisters against a reference:
+//	https://ietf-rats-wg.github.io/draft-ietf-rats-corim/draft-ietf-rats-corim.html#name-comparison-for-integrity-re
+func (i IntegrityRegisters) CompareAgainstReference(r IntegrityRegisters) bool {
+	result := false
+
+	for refIndex, refDigests := range r.IndexMap {
+		claimDigests, ok := i.IndexMap[refIndex]
+		if !ok {
+			return false
+		}
+
+		ref := refDigests
+		if !claimDigests.CompareAgainstReference(ref) {
+			return false
+		}
+
+		result = true
+	}
+
+	return result
 }

@@ -1,10 +1,11 @@
-// Copyright 2023-2024 Contributors to the Veraison project.
+// Copyright 2023-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -177,6 +178,14 @@ func (o *FlagsMap) Get(flag Flag) *bool {
 	default:
 		return o.Extensions.get(flag)
 	}
+}
+
+func (o FlagsMap) Equal(r FlagsMap) bool { //nolint:gocritic
+	return reflect.DeepEqual(o, r)
+}
+
+func (o FlagsMap) CompareAgainstReference(r FlagsMap) bool { //nolint:gocritic
+	return o.Equal(r)
 }
 
 // RegisterExtensions registers a struct as a collections of extensions

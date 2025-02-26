@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
@@ -181,4 +181,46 @@ func Test_RegisterSVNType(t *testing.T) {
 	err = RegisterSVNType(99995, newTestSVN)
 	require.NoError(t, err)
 
+}
+
+func Test_TaggedSVN_Equal_True(t *testing.T) {
+	claim := TaggedSVN(7)
+	ref := TaggedSVN(7)
+
+	assert.True(t, claim.Equal(ref))
+}
+
+func Test_TaggedSVN_Equal_False(t *testing.T) {
+	claim := TaggedSVN(7)
+	ref := TaggedSVN(8)
+
+	assert.False(t, claim.Equal(ref))
+}
+
+func Test_TaggedSVN_CompareAgainstRefMinSVN_True(t *testing.T) {
+	claim := TaggedSVN(8)
+	ref := TaggedMinSVN(7)
+
+	assert.True(t, claim.CompareAgainstRefMinSVN(ref))
+}
+
+func Test_TaggedSVN_CompareAgainstRefMinSVN_False(t *testing.T) {
+	claim := TaggedSVN(7)
+	ref := TaggedMinSVN(8)
+
+	assert.False(t, claim.CompareAgainstRefMinSVN(ref))
+}
+
+func Test_TaggedMinSVN_Equal_True(t *testing.T) {
+	claim := TaggedMinSVN(8)
+	ref := TaggedMinSVN(8)
+
+	assert.True(t, claim.Equal(ref))
+}
+
+func Test_TaggedMinSVN_Equal_False(t *testing.T) {
+	claim := TaggedMinSVN(7)
+	ref := TaggedMinSVN(8)
+
+	assert.False(t, claim.Equal(ref))
 }
