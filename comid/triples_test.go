@@ -20,7 +20,9 @@ func TestTriples_extensions(t *testing.T) {
 		Add(ExtReferenceValue, &struct{}{}).
 		Add(ExtReferenceValueFlags, &struct{}{}).
 		Add(ExtEndorsedValue, &struct{}{}).
-		Add(ExtEndorsedValueFlags, &struct{}{})
+		Add(ExtEndorsedValueFlags, &struct{}{}).
+		Add(ExtCondEndorseSeriesValue, &struct{}{}).
+		Add(ExtCondEndorseSeriesValueFlags, &struct{}{})
 
 	err := triples.RegisterExtensions(extMap)
 	assert.NoError(t, err)
@@ -36,7 +38,8 @@ func TestTriples_marshaling(t *testing.T) {
 
 	extMap := extensions.NewMap().
 		Add(ExtReferenceValue, &struct{}{}).
-		Add(ExtEndorsedValue, &struct{}{})
+		Add(ExtEndorsedValue, &struct{}{}).
+		Add(ExtCondEndorseSeriesValue, &struct{}{})
 
 	require.NoError(t, triples.RegisterExtensions(extMap))
 
@@ -47,6 +50,7 @@ func TestTriples_marshaling(t *testing.T) {
 	data, err = triples.MarshalJSON()
 	assert.NoError(t, err)
 	assert.JSONEq(t, "{}", string(data))
+
 }
 
 func TestTriples_Valid(t *testing.T) {
@@ -75,12 +79,18 @@ func TestTriples_Valid(t *testing.T) {
 	triples.DevIdentityKeys = &KeyTriples{{}}
 	err = triples.Valid()
 	assert.EqualError(t, err, "device identity key at index 0: environment validation failed: environment must not be empty")
+
+	triples.DevIdentityKeys = nil
+	triples.CondEndorseSeries = &CondEndorseSeriesTriples{}
+	triples.CondEndorseSeries.Add(&CondEndorseSeriesTriple{})
+	err = triples.Valid()
+	assert.EqualError(t, err, "conditional series: error at index 0: stateful environment validation failed: environment validation failed: environment must not be empty")
 }
 
 func TestTriples_adders(t *testing.T) {
 	triples := Triples{}
 
-	triples.AddReferenceValue(ValueTriple{}).AddEndorsedValue(ValueTriple{})
+	triples.AddReferenceValue(&ValueTriple{}).AddEndorsedValue(&ValueTriple{})
 	assert.Len(t, triples.ReferenceValues.Values, 1)
 	assert.Len(t, triples.EndorsedValues.Values, 1)
 }
