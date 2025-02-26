@@ -276,7 +276,7 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	}
 
 	refVal.Measurements.Add(measurement)
-	m.Triples.AddReferenceValue(*refVal)
+	m.Triples.AddReferenceValue(refVal)
 
 	err = setTDXPCEMvalExtension(&m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
 	if err != nil {

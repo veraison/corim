@@ -7,15 +7,17 @@ import (
 )
 
 const (
-	ExtComid               extensions.Point = "Comid"
-	ExtEntity              extensions.Point = "ComidEntity"
-	ExtTriples             extensions.Point = "Triples"
-	ExtReferenceValue      extensions.Point = "ReferenceValue"
-	ExtReferenceValueFlags extensions.Point = "ReferenceValueFlags"
-	ExtEndorsedValue       extensions.Point = "EndorsedValue"
-	ExtEndorsedValueFlags  extensions.Point = "EndorsedValueFlags"
-	ExtMval                extensions.Point = "Mval"
-	ExtFlags               extensions.Point = "Flags"
+	ExtComid                       extensions.Point = "Comid"
+	ExtEntity                      extensions.Point = "ComidEntity"
+	ExtTriples                     extensions.Point = "Triples"
+	ExtReferenceValue              extensions.Point = "ReferenceValue"
+	ExtReferenceValueFlags         extensions.Point = "ReferenceValueFlags"
+	ExtEndorsedValue               extensions.Point = "EndorsedValue"
+	ExtEndorsedValueFlags          extensions.Point = "EndorsedValueFlags"
+	ExtCondEndorseSeriesValue      extensions.Point = "CondEndorseSeriesValue"
+	ExtCondEndorseSeriesValueFlags extensions.Point = "CondEndorseSeriesValueFlags"
+	ExtMval                        extensions.Point = "Mval"
+	ExtFlags                       extensions.Point = "Flags"
 )
 
 type IComidConstrainer interface {
