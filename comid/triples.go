@@ -11,11 +11,11 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues *ValueTriples `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues  *ValueTriples `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
-	DevIdentityKeys *KeyTriples   `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
-	AttestVerifKeys *KeyTriples   `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
-
+	ReferenceValues      *ValueTriples         `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues       *ValueTriples         `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	DevIdentityKeys      *KeyTriples           `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+	AttestVerifKeys      *KeyTriples           `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
+	CondEndSeriesTriples *CondEndSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
 	Extensions
 }
 
