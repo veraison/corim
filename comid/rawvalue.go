@@ -44,10 +44,15 @@ func (o RawValue) GetBytes() ([]byte, error) {
 	}
 }
 
+// Equal confirms if the RawValue instances are equal
 func (o RawValue) Equal(r RawValue) bool {
 	return reflect.DeepEqual(o, r)
 }
 
+// CompareAgainstReference checks if a RawValue object matches with a reference
+//
+// See section-8.9.6.1.4 in the IETF CoRIM spec for the rules to compare a
+// RawValue object against a reference.
 func (o RawValue) CompareAgainstReference(ref []byte, mask *[]byte) bool {
 	claim, err := o.GetBytes()
 	if err != nil {

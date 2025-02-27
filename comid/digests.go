@@ -42,7 +42,7 @@ func (o Digests) Valid() error {
 	return nil
 }
 
-// Equal confirms if the Digests object is the same as another
+// Equal confirms if the Digests instances are equal
 //
 // Two digests are considered to be equal if they meet the following criteria:
 //   - They contain the same number of elements
