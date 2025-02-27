@@ -29,9 +29,6 @@ type SignedCorim struct {
 	Meta          Meta
 	message       *cose.Sign1Message
 }
-type ProtectedHeader struct {
-	X5Chain [][]byte `cbor:"33,keyasint,omitempty"`
-}
 
 // NewSignedCorim instantiates an empty SignedCorim
 func NewSignedCorim() *SignedCorim {
@@ -130,65 +127,71 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 	return nil
 }
 
+func (o *SignedCorim) AddSigningCert(der []byte) error {
+    if der == nil {
+        return errors.New("nil signing cert")
+    }
+    o.message.Headers.Protected[cose.HeaderLabelX5Chain] = [][]byte{der}
+    return nil
+}
+
+func (o *SignedCorim) AddIntermediateCerts(ders [][]byte) error {
+    if ders == nil || len(ders) == 0 {
+        return errors.New("nil or empty intermediate certs")
+    }
+    existing, ok := o.message.Headers.Protected[cose.HeaderLabelX5Chain].([][]byte)
+    if !ok {
+        existing = [][]byte{}
+    }
+    o.message.Headers.Protected[cose.HeaderLabelX5Chain] = append(existing, ders...)
+    return nil
+}
+
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
 // The target SignedCorim must have its UnsignedCorim field correctly populated.
-func (o *SignedCorim) Sign(signer cose.Signer, leafCert, intermediateCert []byte) ([]byte, error) {
-	if signer == nil {
-		return nil, errors.New("nil signer")
-	}
+func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
+    if signer == nil {
+        return nil, errors.New("nil signer")
+    }
 
-	if leafCert == nil || intermediateCert == nil {
-		return nil, errors.New("nil certs")
-	}
+    if err := o.UnsignedCorim.Valid(); err != nil {
+        return nil, fmt.Errorf("failed validation of unsigned CoRIM: %w", err)
+    }
 
-	if err := o.UnsignedCorim.Valid(); err != nil {
-		return nil, fmt.Errorf("failed validation of unsigned CoRIM: %w", err)
-	}
+    o.message = cose.NewSign1Message()
 
-	o.message = cose.NewSign1Message()
+    var err error
+    o.message.Payload, err = o.UnsignedCorim.ToCBOR()
+    if err != nil {
+        return nil, fmt.Errorf("failed CBOR encoding of unsigned CoRIM: %w", err)
+    }
 
-	var err error
-	o.message.Payload, err = o.UnsignedCorim.ToCBOR()
-	if err != nil {
-		return nil, fmt.Errorf("failed CBOR encoding of unsigned CoRIM: %w", err)
-	}
+    metaCBOR, err := o.Meta.ToCBOR()
+    if err != nil {
+        return nil, fmt.Errorf("failed CBOR encoding of CoRIM Meta: %w", err)
+    }
 
-	metaCBOR, err := o.Meta.ToCBOR()
-	if err != nil {
-		return nil, fmt.Errorf("failed CBOR encoding of CoRIM Meta: %w", err)
-	}
+    alg := signer.Algorithm()
 
-	alg := signer.Algorithm()
+    if strings.Contains(alg.String(), "unknown algorithm value") {
+        return nil, errors.New("signer has no algorithm")
+    }
 
-	if strings.Contains(alg.String(), "unknown algorithm value") {
-		return nil, errors.New("signer has no algorithm")
-	}
+    o.message.Headers.Protected.SetAlgorithm(alg)
+    o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
+    o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
 
-	protectedHeaders := ProtectedHeader{
-		X5Chain: [][]byte{leafCert, intermediateCert},
-	}
+    err = o.message.Sign(rand.Reader, NoExternalData, signer)
+    if err != nil {
+        return nil, fmt.Errorf("COSE Sign1 signature failed: %w", err)
+    }
 
-	protectedHeadersCBOR, err := cbor.Marshal(protectedHeaders)
-	if err != nil {
-		return nil, fmt.Errorf("failed CBOR encoding of protected headers: %w", err)
-	}
+    wrap, err := o.message.MarshalCBOR()
+    if err != nil {
+        return nil, fmt.Errorf("signed-corim marshaling failed: %w", err)
+    }
 
-	o.message.Headers.Protected.SetAlgorithm(alg)
-	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
-	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
-	o.message.Headers.Protected[33] = protectedHeadersCBOR
-
-	err = o.message.Sign(rand.Reader, NoExternalData, signer)
-	if err != nil {
-		return nil, fmt.Errorf("COSE Sign1 signature failed: %w", err)
-	}
-
-	wrap, err := o.message.MarshalCBOR()
-	if err != nil {
-		return nil, fmt.Errorf("signed-corim marshaling failed: %w", err)
-	}
-
-	return wrap, nil
+    return wrap, nil
 }
 
 // Verify verifies the signature of the target SignedCorim object using the
