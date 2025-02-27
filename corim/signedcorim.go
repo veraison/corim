@@ -135,15 +135,15 @@ func (o *SignedCorim) AddSigningCert(der []byte) error {
 }
 
 func (o *SignedCorim) AddIntermediateCerts(ders [][]byte) error {
-	if ders == nil || len(ders) == 0 {
-		return errors.New("nil or empty intermediate certs")
-	}
-	existing, ok := o.message.Headers.Protected[cose.HeaderLabelX5Chain].([][]byte)
-	if !ok {
-		existing = [][]byte{}
-	}
-	o.message.Headers.Protected[cose.HeaderLabelX5Chain] = append(existing, ders...)
-	return nil
+    if len(ders) == 0 {
+        return errors.New("nil or empty intermediate certs")
+    }
+    existing, ok := o.message.Headers.Protected[cose.HeaderLabelX5Chain].([][]byte)
+    if !ok {
+        existing = [][]byte{}
+    }
+    o.message.Headers.Protected[cose.HeaderLabelX5Chain] = append(existing, ders...)
+    return nil
 }
 
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
