@@ -471,12 +471,12 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 
 	SignedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
 
-		// WIP
-		leafCert := []byte("leaf certificate")
-		intermediateCert := []byte("intermediate certificate")
+	// WIP
+	leafCert := []byte("leaf certificate")
+	intermediateCert := []byte("intermediate certificate")
 
-		cbor, err := SignedCorimIn.Sign(signer, leafCert, intermediateCert)
-		assert.Nil(t, err)
+	cbor, err := SignedCorimIn.Sign(signer, leafCert, intermediateCert)
+	assert.Nil(t, err)
 
 	var SignedCorimOut SignedCorim
 
@@ -499,38 +499,38 @@ func TestSignedCorim_SignVerify_fail_tampered(t *testing.T) {
 }
 
 func TestSignedCorim_Sign_fail_bad_corim(t *testing.T) {
-    signer, err := NewSignerFromJWK(testES256Key)
-    require.NoError(t, err)
+	signer, err := NewSignerFromJWK(testES256Key)
+	require.NoError(t, err)
 
-    var SignedCorimIn SignedCorim
+	var SignedCorimIn SignedCorim
 
-    emptyCorim := NewUnsignedCorim()
-    require.NotNil(t, emptyCorim)
+	emptyCorim := NewUnsignedCorim()
+	require.NotNil(t, emptyCorim)
 
-    SignedCorimIn.UnsignedCorim = *emptyCorim
+	SignedCorimIn.UnsignedCorim = *emptyCorim
 
-    // wip
-    leafCert := []byte("leaf certificate")
-    intermediateCert := []byte("intermediate certificate")
+	// wip
+	leafCert := []byte("leaf certificate")
+	intermediateCert := []byte("intermediate certificate")
 
-    _, err = SignedCorimIn.Sign(signer, leafCert, intermediateCert)
-    assert.EqualError(t, err, "failed validation of unsigned CoRIM: empty id")
+	_, err = SignedCorimIn.Sign(signer, leafCert, intermediateCert)
+	assert.EqualError(t, err, "failed validation of unsigned CoRIM: empty id")
 }
 
 func TestSignedCorim_Sign_fail_no_signer(t *testing.T) {
-    var SignedCorimIn SignedCorim
+	var SignedCorimIn SignedCorim
 
-    emptyCorim := NewUnsignedCorim()
-    require.NotNil(t, emptyCorim)
+	emptyCorim := NewUnsignedCorim()
+	require.NotNil(t, emptyCorim)
 
-    SignedCorimIn.UnsignedCorim = *emptyCorim
+	SignedCorimIn.UnsignedCorim = *emptyCorim
 
-    // wip
-    leafCert := []byte("leaf certificate")
-    intermediateCert := []byte("intermediate certificate")
+	// wip
+	leafCert := []byte("leaf certificate")
+	intermediateCert := []byte("intermediate certificate")
 
-    _, err := SignedCorimIn.Sign(nil, leafCert, intermediateCert)
-    assert.EqualError(t, err, "nil signer")
+	_, err := SignedCorimIn.Sign(nil, leafCert, intermediateCert)
+	assert.EqualError(t, err, "nil signer")
 }
 
 func TestSignedCorim_extensions(t *testing.T) {
