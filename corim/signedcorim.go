@@ -138,10 +138,12 @@ func (o *SignedCorim) AddIntermediateCerts(ders [][]byte) error {
     if len(ders) == 0 {
         return errors.New("nil or empty intermediate certs")
     }
+    
     existing, ok := o.message.Headers.Protected[cose.HeaderLabelX5Chain].([][]byte)
-    if !ok {
-        existing = [][]byte{}
+    if !ok || len(existing) == 0 {
+        return errors.New("no signing certificate found; call AddSigningCert() first")
     }
+    
     o.message.Headers.Protected[cose.HeaderLabelX5Chain] = append(existing, ders...)
     return nil
 }
