@@ -217,7 +217,7 @@ func (o TaggedMinSVN) Equal(r TaggedMinSVN) bool {
 	return ret == 0
 }
 
-// Compare helper function to compare two SVNs, object and reference
+// compare is a helper function to compare two SVNs, object and reference
 //
 // returns:
 // 0 if they are equal; no error
