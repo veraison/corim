@@ -24,9 +24,11 @@ var (
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
 // with signature and verification methods
 type SignedCorim struct {
-	UnsignedCorim UnsignedCorim
-	Meta          Meta
-	message       *cose.Sign1Message
+	UnsignedCorim     UnsignedCorim
+	Meta              Meta
+	message           *cose.Sign1Message
+	signingCert       []byte
+	intermediateCerts [][]byte
 }
 
 // NewSignedCorim instantiates an empty SignedCorim
@@ -126,9 +128,25 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 	return nil
 }
 
+func (o *SignedCorim) AddSigningCert(der []byte) error {
+	if der == nil {
+		return errors.New("nil signing cert")
+	}
+	o.signingCert = der
+	return nil
+}
+
+func (o *SignedCorim) AddIntermediateCerts(ders [][]byte) error {
+	if len(ders) == 0 {
+		return errors.New("nil or empty intermediate certs")
+	}
+
+	o.intermediateCerts = ders
+	return nil
+}
+
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
-// The target SignedCorim must have its UnsignedCorim field correctly
-// populated.
+// The target SignedCorim must have its UnsignedCorim field correctly populated.
 func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	if signer == nil {
 		return nil, errors.New("nil signer")
@@ -160,6 +178,14 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected.SetAlgorithm(alg)
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
+
+	if o.signingCert != nil {
+		certChain := [][]byte{o.signingCert}
+		if len(o.intermediateCerts) > 0 {
+			certChain = append(certChain, o.intermediateCerts...)
+		}
+		o.message.Headers.Protected[cose.HeaderLabelX5Chain] = certChain
+	}
 
 	err = o.message.Sign(rand.Reader, NoExternalData, signer)
 	if err != nil {
