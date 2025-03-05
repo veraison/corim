@@ -17,6 +17,14 @@ import (
 )
 
 var (
+	testEndEntityKey = []byte(`{
+		"kty": "EC",
+		"crv": "P-256",
+		"x": "Cc8hy7bQIFZJBtS1pQW9E0LT56doX04VB_lWX3S0fJA",
+		"y": "ggEG3MHZL7QSJk4Mfepi-GcmUiaPKysielICBFBxBz0",
+		"d": "VpaDza6El3l6OZDFvkebEu94Tg1n1b8J7JjBiOIXGKY"
+	}`)
+
 	testES256Key = []byte(`{
 		"kty": "EC",
 		"crv": "P-256",
@@ -560,11 +568,11 @@ func TestSignedCorim_AddSigningCert(t *testing.T) {
 
 			if tt.wantErr {
 				assert.Error(t, err)
-				assert.Nil(t, s.signingCert)
+				assert.Nil(t, s.SigningCert)
 				assert.EqualError(t, err, tt.errMsg)
 			} else {
 				assert.NoError(t, err)
-				assert.NotNil(t, s.signingCert)
+				assert.NotNil(t, s.SigningCert)
 			}
 		})
 	}
@@ -619,17 +627,60 @@ func TestSignedCorim_AddIntermediateCerts(t *testing.T) {
 
 			if tt.wantErr {
 				assert.Error(t, err)
-				assert.Empty(t, s.intermediateCerts)
+				assert.Empty(t, s.IntermediateCerts)
 				assert.EqualError(t, err, tt.errMsg)
 			} else {
 				assert.NoError(t, err)
-				assert.NotEmpty(t, s.intermediateCerts)
+				assert.NotEmpty(t, s.IntermediateCerts)
 
 				if tt.certCount > 0 {
-					assert.Equal(t, tt.certCount, len(s.intermediateCerts),
+					assert.Equal(t, tt.certCount, len(s.IntermediateCerts),
 						"Should have %d certificates", tt.certCount)
 				}
 			}
 		})
 	}
+}
+
+func TestSignedCorim_SignVerify_with_x5chain_ok(t *testing.T) {
+	signer, err := NewSignerFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	var signedCorimIn SignedCorim
+
+	signedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
+	signedCorimIn.Meta = *metaGood(t)
+
+	endEntityCertPath := filepath.Join("..", "misc", "endEntity.der")
+	endEntityCert, err := os.ReadFile(endEntityCertPath)
+	require.NoError(t, err, "Failed to read EE certificate")
+
+	err = signedCorimIn.AddSigningCert(endEntityCert)
+	require.NoError(t, err, "Failed to add EE certificate")
+
+	certChain, err := concatFiles(
+		filepath.Join("..", "misc", "intermediateCA.der"),
+		filepath.Join("..", "misc", "rootCA.der"))
+	require.NoError(t, err, "Failed to read certificate chain")
+
+	err = signedCorimIn.AddIntermediateCerts(certChain)
+	require.NoError(t, err, "Failed to add cert chain")
+
+	cbor, err := signedCorimIn.Sign(signer)
+	assert.Nil(t, err)
+
+	var signedCorimOut SignedCorim
+
+	fmt.Printf("signed-corim: %x\n", cbor)
+
+	err = signedCorimOut.FromCOSE(cbor)
+	assert.Nil(t, err)
+
+	pk, err := NewPublicKeyFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	err = signedCorimOut.Verify(pk)
+	assert.Nil(t, err)
+
+	assert.Equal(t, signedCorimIn.SigningCert, signedCorimOut.SigningCert)
 }

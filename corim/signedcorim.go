@@ -28,8 +28,8 @@ type SignedCorim struct {
 	UnsignedCorim     UnsignedCorim
 	Meta              Meta
 	message           *cose.Sign1Message
-	signingCert       *x509.Certificate
-	intermediateCerts []*x509.Certificate
+	SigningCert       *x509.Certificate
+	IntermediateCerts []*x509.Certificate
 }
 
 // NewSignedCorim instantiates an empty SignedCorim
@@ -94,6 +94,46 @@ func (o *SignedCorim) processHdrs() error {
 
 	o.Meta = meta
 
+	if v, ok := hdr.Protected[cose.HeaderLabelX5Chain]; ok {
+		arr, ok := v.([]interface{})
+		if !ok {
+			return fmt.Errorf("decoding x5chain: got %T, want []interface", v)
+		}
+
+		if err := o.extractX5Chain(arr); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *SignedCorim) extractX5Chain(arr []interface{}) error {
+	var buf bytes.Buffer
+
+	for i, elem := range arr {
+		cert, ok := elem.([]byte)
+		if !ok {
+			return fmt.Errorf("accessing x5chain[%d]: got %T, want []byte", i, elem)
+		}
+
+		switch i {
+		case 0:
+			if err := o.AddSigningCert(cert); err != nil {
+				return fmt.Errorf("decoding x5chain[0]: %w", err)
+			}
+		default:
+			buf.Write(cert)
+		}
+
+	}
+
+	if buf.Len() > 0 {
+		if err := o.AddIntermediateCerts(buf.Bytes()); err != nil {
+			return fmt.Errorf("decoding x5chain: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -141,7 +181,7 @@ func (o *SignedCorim) AddSigningCert(der []byte) error {
 		return fmt.Errorf("invalid signing certificate: %w", err)
 	}
 
-	o.signingCert = cert
+	o.SigningCert = cert
 	return nil
 }
 
@@ -162,7 +202,7 @@ func (o *SignedCorim) AddIntermediateCerts(der []byte) error {
 		return errors.New("no certificates found in intermediate cert data")
 	}
 
-	o.intermediateCerts = certs
+	o.IntermediateCerts = certs
 	return nil
 }
 
@@ -200,9 +240,9 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
 
-	if o.signingCert != nil {
-		certChain := [][]byte{o.signingCert.Raw}
-		for _, cert := range o.intermediateCerts {
+	if o.SigningCert != nil {
+		certChain := [][]byte{o.SigningCert.Raw}
+		for _, cert := range o.IntermediateCerts {
 			certChain = append(certChain, cert.Raw)
 		}
 		o.message.Headers.Protected[cose.HeaderLabelX5Chain] = certChain
