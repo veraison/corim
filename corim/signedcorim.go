@@ -27,9 +27,9 @@ var (
 type SignedCorim struct {
 	UnsignedCorim     UnsignedCorim
 	Meta              Meta
-	message           *cose.Sign1Message
 	SigningCert       *x509.Certificate
 	IntermediateCerts []*x509.Certificate
+	message           *cose.Sign1Message
 }
 
 // NewSignedCorim instantiates an empty SignedCorim
@@ -62,24 +62,41 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory protected header")
 	}
 
-	v, ok := hdr.Protected[cose.HeaderLabelContentType]
-	if !ok {
+	if v, ok := hdr.Protected[cose.HeaderLabelContentType]; ok {
+		if v != ContentType {
+			return fmt.Errorf("expecting content type %q, got %q instead", ContentType, v)
+		}
+	} else {
 		return errors.New("missing mandatory content type")
-	}
-
-	if v != ContentType {
-		return fmt.Errorf("expecting content type %q, got %q instead", ContentType, v)
 	}
 
 	// TODO(tho) key id is apparently mandatory, which doesn't look right.
 	// TODO(tho) Check with the CoRIM design team.
 	// See https://github.com/veraison/corim/issues/14
 
-	v, ok = hdr.Protected[HeaderLabelCorimMeta]
-	if !ok {
+	if v, ok := hdr.Protected[HeaderLabelCorimMeta]; ok {
+		if err := o.extractMeta(v); err != nil {
+			return err
+		}
+	} else {
 		return errors.New("missing mandatory corim.meta")
 	}
 
+	if v, ok := hdr.Protected[cose.HeaderLabelX5Chain]; ok {
+		arr, ok := v.([]interface{})
+		if !ok {
+			return fmt.Errorf("decoding x5chain: got %T, want []interface{}", v)
+		}
+
+		if err := o.extractX5Chain(arr); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *SignedCorim) extractMeta(v interface{}) error {
 	metaCBOR, ok := v.([]byte)
 	if !ok {
 		return fmt.Errorf("expecting CBOR-encoded CoRIM Meta, got %T instead", v)
@@ -93,17 +110,6 @@ func (o *SignedCorim) processHdrs() error {
 	}
 
 	o.Meta = meta
-
-	if v, ok := hdr.Protected[cose.HeaderLabelX5Chain]; ok {
-		arr, ok := v.([]interface{})
-		if !ok {
-			return fmt.Errorf("decoding x5chain: got %T, want []interface", v)
-		}
-
-		if err := o.extractX5Chain(arr); err != nil {
-			return err
-		}
-	}
 
 	return nil
 }
