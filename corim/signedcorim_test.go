@@ -683,4 +683,5 @@ func TestSignedCorim_SignVerify_with_x5chain_ok(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, signedCorimIn.SigningCert, signedCorimOut.SigningCert)
+	assert.Equal(t, signedCorimIn.IntermediateCerts, signedCorimOut.IntermediateCerts)
 }
