@@ -72,7 +72,7 @@ func (o *SignedCorim) processHdrs() error {
 
 	// TODO(tho) key id is apparently mandatory, which doesn't look right.
 	// TODO(tho) Check with the CoRIM design team.
-	// See https://github.com/veraison/corim/issues/14
+	// See https://github.com/ietf-rats-wg/draft-ietf-rats-corim/issues/363
 
 	if v, ok := hdr.Protected[HeaderLabelCorimMeta]; ok {
 		if err := o.extractMeta(v); err != nil {
