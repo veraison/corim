@@ -685,3 +685,39 @@ func TestSignedCorim_SignVerify_with_x5chain_ok(t *testing.T) {
 	assert.Equal(t, signedCorimIn.SigningCert, signedCorimOut.SigningCert)
 	assert.Equal(t, signedCorimIn.IntermediateCerts, signedCorimOut.IntermediateCerts)
 }
+
+func TestSignedCorim_SignVerify_with_single_cert_x5chain_ok(t *testing.T) {
+	signer, err := NewSignerFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	var signedCorimIn SignedCorim
+
+	signedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
+	signedCorimIn.Meta = *metaGood(t)
+
+	endEntityCertPath := filepath.Join("..", "misc", "endEntity.der")
+	endEntityCert, err := os.ReadFile(endEntityCertPath)
+	require.NoError(t, err, "Failed to read EE certificate")
+
+	err = signedCorimIn.AddSigningCert(endEntityCert)
+	require.NoError(t, err, "Failed to add EE certificate")
+
+	cbor, err := signedCorimIn.Sign(signer)
+	assert.Nil(t, err)
+
+	var signedCorimOut SignedCorim
+
+	fmt.Printf("signed-corim: %x\n", cbor)
+
+	err = signedCorimOut.FromCOSE(cbor)
+	assert.Nil(t, err)
+
+	pk, err := NewPublicKeyFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	err = signedCorimOut.Verify(pk)
+	assert.Nil(t, err)
+
+	assert.Equal(t, signedCorimIn.SigningCert, signedCorimOut.SigningCert)
+	assert.Equal(t, signedCorimIn.IntermediateCerts, signedCorimOut.IntermediateCerts)
+}
