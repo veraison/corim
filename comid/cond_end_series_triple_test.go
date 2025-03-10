@@ -21,14 +21,10 @@ func Test_CondEndSeries_Valid_NOK(t *testing.T) {
 	c := NewCondEndSeriesTriples()
 	err := c.Valid()
 	assert.EqualError(t, err, expectedErr)
-}
-
-func Test_CondEndSeries_Valid1_NOK(t *testing.T) {
-	expectedErr := "error at index 0: stateful environment validation failed: environment validation failed: environment must not be empty"
-	c := NewCondEndSeriesTriples()
+	expectedErr = "error at index 0: stateful environment validation failed: environment validation failed: environment must not be empty"
 	series := &CondEndSeriesTriple{}
 	c.Add(series)
-	err := c.Valid()
+	err = c.Valid()
 	assert.EqualError(t, err, expectedErr)
 }
 
@@ -42,4 +38,13 @@ func Test_CondEndSeries_RegisterExtensions(t *testing.T) {
 	series := &CondEndSeriesTriple{}
 	err := series.RegisterExtensions(extMap)
 	require.NoError(t, err)
+}
+
+func Test_CondEndSeries_RegisterExtensions_NOK(t *testing.T) {
+	expectedErr := `condition: unexpected extension point: "ReferenceValue"`
+	extMap := extensions.NewMap().
+		Add(ExtReferenceValue, &testExtensions{})
+	series := &CondEndSeriesTriple{}
+	err := series.RegisterExtensions(extMap)
+	assert.EqualError(t, err, expectedErr)
 }
