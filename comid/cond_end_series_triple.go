@@ -43,7 +43,7 @@ func (o *CondSeriesRecord) RegisterExtensions(exts extensions.Map) error {
 		return fmt.Errorf("selection: %w", err)
 	}
 	if err := o.Addition.RegisterExtensions(exts); err != nil {
-		return fmt.Errorf("selection: %w", err)
+		return fmt.Errorf("addition: %w", err)
 	}
 
 	return nil
@@ -76,7 +76,7 @@ type CondEndSeriesTriple struct {
 // all Measurements contained within CondEndSeriesTriple structure
 func (o *CondEndSeriesTriple) RegisterExtensions(exts extensions.Map) error {
 	if err := o.Condition.RegisterExtensions(exts); err != nil {
-		return fmt.Errorf("selection: %w", err)
+		return fmt.Errorf("condition: %w", err)
 	}
 	if err := o.Series.RegisterExtensions(exts); err != nil {
 		return fmt.Errorf("selection: %w", err)
@@ -87,7 +87,6 @@ func (o *CondEndSeriesTriple) RegisterExtensions(exts extensions.Map) error {
 
 // nolint:gocritic
 func (o CondEndSeriesTriple) Valid() error {
-	fmt.Printf("Yogesh: Valid Called")
 	if err := o.Condition.Valid(); err != nil {
 		return fmt.Errorf("stateful environment validation failed: %w", err)
 	}

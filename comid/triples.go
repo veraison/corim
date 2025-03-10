@@ -38,9 +38,9 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 		case ExtEndorsedValueFlags:
 			endValExts[ExtFlags] = v
 		case ExtConditionalSeriesValue:
-			conSeriesExts[ExtConditionalSeriesValue] = v
+			conSeriesExts[ExtMval] = v
 		case ExtConditionalSeriesValueFlags:
-			conSeriesExts[ExtConditionalSeriesValueFlags] = v
+			conSeriesExts[ExtFlags] = v
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -61,7 +61,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 			o.EndorsedValues = NewValueTriples()
 		}
 
-		if err := o.EndorsedValues.RegisterExtensions(refValExts); err != nil {
+		if err := o.EndorsedValues.RegisterExtensions(endValExts); err != nil {
 			return err
 		}
 	}

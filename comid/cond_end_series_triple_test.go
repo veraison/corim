@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/veraison/corim/extensions"
 )
 
 func Test_CondEndSeries_NewCondEndSeriesTriples_OK(t *testing.T) {
@@ -29,4 +30,16 @@ func Test_CondEndSeries_Valid1_NOK(t *testing.T) {
 	c.Add(series)
 	err := c.Valid()
 	assert.EqualError(t, err, expectedErr)
+}
+
+type testExtensions struct {
+	TestSVN uint `cbor:"-72,keyasint,omitempty" json:"testsvn,omitempty"`
+}
+
+func Test_CondEndSeries_RegisterExtensions(t *testing.T) {
+	extMap := extensions.NewMap().
+		Add(ExtMval, &testExtensions{})
+	series := &CondEndSeriesTriple{}
+	err := series.RegisterExtensions(extMap)
+	require.NoError(t, err)
 }
