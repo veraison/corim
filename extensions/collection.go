@@ -104,6 +104,9 @@ func (o *Collection[P, I]) GetExtensions() IMapValue {
 // Valid returns an error if the collection is invalid, i.e. if it is empty or
 // if any of its contents are invalid.
 func (o Collection[P, I]) Valid() error {
+	if len(o.Values) == 0 {
+		return fmt.Errorf("Empty Collection")
+	}
 	for i, p := range o.Values {
 		var m I = &p // #nosec G601 -- not an issue in Go 1.22
 		if err := m.Valid(); err != nil {

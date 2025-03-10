@@ -87,11 +87,12 @@ func (o *CondEndSeriesTriple) RegisterExtensions(exts extensions.Map) error {
 
 // nolint:gocritic
 func (o CondEndSeriesTriple) Valid() error {
+	fmt.Printf("Yogesh: Valid Called")
 	if err := o.Condition.Valid(); err != nil {
 		return fmt.Errorf("stateful environment validation failed: %w", err)
 	}
 	if err := o.Series.Valid(); err != nil {
-		return fmt.Errorf("stateful environment validation failed: %w", err)
+		return fmt.Errorf("conditional series validation failed: %w", err)
 	}
 
 	return nil
@@ -115,4 +116,33 @@ func (o *CondEndSeriesTriples) GetExtensions() extensions.IMapValue {
 
 func (o *CondEndSeriesTriples) RegisterExtensions(exts extensions.Map) error {
 	return (*extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).RegisterExtensions(exts)
+}
+
+func (o CondEndSeriesTriples) Valid() error {
+	return (extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).Valid()
+}
+
+func (o *CondEndSeriesTriples) IsEmpty() bool {
+	return (*extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).IsEmpty()
+}
+
+func (o *CondEndSeriesTriples) Add(val *CondEndSeriesTriple) *CondEndSeriesTriples {
+	ret := (*extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).Add(val)
+	return (*CondEndSeriesTriples)(ret)
+}
+
+func (o CondEndSeriesTriples) MarshalCBOR() ([]byte, error) {
+	return (extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).MarshalCBOR()
+}
+
+func (o *CondEndSeriesTriples) UnmarshalCBOR(data []byte) error {
+	return (*extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).UnmarshalCBOR(data)
+}
+
+func (o CondEndSeriesTriples) MarshalJSON() ([]byte, error) {
+	return (extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).MarshalJSON()
+}
+
+func (o *CondEndSeriesTriples) UnmarshalJSON(data []byte) error {
+	return (*extensions.Collection[CondEndSeriesTriple, *CondEndSeriesTriple])(o).UnmarshalJSON(data)
 }
