@@ -85,6 +85,7 @@ func (o *CondEndSeriesTriple) RegisterExtensions(exts extensions.Map) error {
 	return nil
 }
 
+// nolint:gocritic
 func (o CondEndSeriesTriple) Valid() error {
 	if err := o.Condition.Valid(); err != nil {
 		return fmt.Errorf("stateful environment validation failed: %w", err)
