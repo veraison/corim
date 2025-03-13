@@ -78,7 +78,7 @@ func Example_encode_tdx_seam_refval_without_profile() {
 		AddEntity("INTEL", &TestRegID, comid.RoleCreator, comid.RoleTagCreator, comid.RoleMaintainer)
 
 	refVal.Measurements.Add(measurement)
-	m.Triples.AddReferenceValue(*refVal)
+	m.Triples.AddReferenceValue(refVal)
 	if err := m.RegisterExtensions(extMap); err != nil {
 		panic(err)
 	}
@@ -136,7 +136,7 @@ func Example_encode_tdx_seam_refval_with_profile() {
 	}
 
 	refVal.Measurements.Add(measurement)
-	m.Triples.AddReferenceValue(*refVal)
+	m.Triples.AddReferenceValue(refVal)
 
 	err = setTDXSeamMvalExtensions(&m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
 	if err != nil {
@@ -190,7 +190,7 @@ func Example_encode_tdx_seam_refval_direct() {
 	}
 
 	refVal.Measurements.Add(measurement)
-	m.Triples.AddReferenceValue(*refVal)
+	m.Triples.AddReferenceValue(refVal)
 
 	err := m.Valid()
 	if err != nil {

@@ -184,7 +184,7 @@ func (o *Comid) AddLinkedTag(tagID interface{}, rel Rel) *Comid {
 
 // AddReferenceValue adds the supplied reference value to the
 // reference-triples list of the target Comid.
-func (o *Comid) AddReferenceValue(val ValueTriple) *Comid {
+func (o *Comid) AddReferenceValue(val *ValueTriple) *Comid {
 	if o != nil {
 		if o.Triples.ReferenceValues == nil {
 			o.Triples.ReferenceValues = NewValueTriples()
@@ -199,7 +199,7 @@ func (o *Comid) AddReferenceValue(val ValueTriple) *Comid {
 
 // AddEndorsedValue adds the supplied endorsed value to the
 // endorsed-triples list of the target Comid.
-func (o *Comid) AddEndorsedValue(val ValueTriple) *Comid {
+func (o *Comid) AddEndorsedValue(val *ValueTriple) *Comid {
 	if o != nil {
 		if o.Triples.EndorsedValues == nil {
 			o.Triples.EndorsedValues = NewValueTriples()
@@ -214,7 +214,7 @@ func (o *Comid) AddEndorsedValue(val ValueTriple) *Comid {
 
 // AddAttestVerifKey adds the supplied verification key to the
 // attest-key-triples list of the target Comid.
-func (o *Comid) AddAttestVerifKey(val KeyTriple) *Comid {
+func (o *Comid) AddAttestVerifKey(val *KeyTriple) *Comid {
 	if o != nil {
 		if o.Triples.AttestVerifKeys == nil {
 			o.Triples.AttestVerifKeys = NewKeyTriples()
@@ -229,13 +229,28 @@ func (o *Comid) AddAttestVerifKey(val KeyTriple) *Comid {
 
 // AddDevIdentityKey adds the supplied identity key to the
 // identity-triples list of the target Comid.
-func (o *Comid) AddDevIdentityKey(val KeyTriple) *Comid {
+func (o *Comid) AddDevIdentityKey(val *KeyTriple) *Comid {
 	if o != nil {
 		if o.Triples.DevIdentityKeys == nil {
 			o.Triples.DevIdentityKeys = NewKeyTriples()
 		}
 
 		if o.Triples.AddDevIdentityKey(val) == nil {
+			return nil
+		}
+	}
+	return o
+}
+
+// AddCondEndorseSeries adds the supplied conditional series triple to the
+// conditional series triple list of the target Comid.
+func (o *Comid) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Comid {
+	if o != nil {
+		if o.Triples.CondEndorseSeries == nil {
+			o.Triples.CondEndorseSeries = NewCondEndorseSeriesTriples()
+		}
+
+		if o.Triples.AddCondEndorseSeries(val) == nil {
 			return nil
 		}
 	}

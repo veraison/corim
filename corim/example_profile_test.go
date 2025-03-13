@@ -179,7 +179,7 @@ func Example_profile_marshal() {
 	}
 
 	refVal.Measurements.Add(measurement)
-	myComid.Triples.AddReferenceValue(refVal)
+	myComid.Triples.AddReferenceValue(&refVal)
 
 	err = myComid.Valid()
 	if err != nil {

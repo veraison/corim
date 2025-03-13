@@ -101,7 +101,7 @@ func (o *Collection[P, I]) GetExtensions() IMapValue {
 	return o.valueExtensions.Get()
 }
 
-// Valid returns an error if the collection is invalid, i.e. if it is empty or
+// Valid returns an error if the collection is invalid, i.e.
 // if any of its contents are invalid.
 func (o Collection[P, I]) Valid() error {
 	for i, p := range o.Values {

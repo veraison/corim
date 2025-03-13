@@ -187,7 +187,7 @@ func Example_encode_tdx_QE_refval_without_profile() {
 		AddEntity("INTEL", &TestRegID, comid.RoleCreator, comid.RoleTagCreator, comid.RoleMaintainer)
 
 	refVal.Measurements.Add(measurement)
-	m.Triples.AddReferenceValue(*refVal)
+	m.Triples.AddReferenceValue(refVal)
 	if err := m.RegisterExtensions(extMap); err != nil {
 		panic(err)
 	}
