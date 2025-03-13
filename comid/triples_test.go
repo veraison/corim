@@ -50,7 +50,6 @@ func TestTriples_marshaling(t *testing.T) {
 	data, err = triples.MarshalJSON()
 	assert.NoError(t, err)
 	assert.JSONEq(t, "{}", string(data))
-
 }
 
 func TestTriples_Valid(t *testing.T) {

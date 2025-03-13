@@ -12,7 +12,7 @@ import (
 // A Stateful Environment is an Environment in a known reference state
 type StatefulEnv = ValueTriple
 
-// A Conditional Series Record, has a series of conditions identified by
+// A Conditional Endorsement Series Record, has a series of conditions identified by
 // the selection which are matched with the Attester Actual State(from Evidence)
 // First successful match terminates matching and corresponding addition are added
 // as Endorsements
@@ -77,7 +77,7 @@ func (o *CondEndorseSeriesRecords) Valid() error {
 }
 
 // The Conditional Endorsement Series Triple is used to assert endorsed values based
-// on an initial condition match (specified in condition:) followed by a series
+// on an initial condition match (specified by Condition StatefulEnv) followed by a series
 // condition match (specified in selection: inside conditional-series-record).
 type CondEndorseSeriesTriple struct {
 	_         struct{}                 `cbor:",toarray"`
