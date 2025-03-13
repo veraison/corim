@@ -10,71 +10,63 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func initTcbStatus() []any {
-	s := make([]any, len(TestTCBStatus))
-	for i := range TestTCBStatus {
-		s[i] = TestTCBStatus[i]
-	}
-	return s
-}
-
-func TestTcbStatus_NewTeeTcbStatus_OK(t *testing.T) {
-	s := initTcbStatus()
-	_, err := NewTeeTcbStatus(s)
+func TestTcbStatus_NewTeeTcbStatusString_OK(t *testing.T) {
+	s := TestTCBStatus
+	_, err := NewTeeTcbStatusString(s)
 	require.NoError(t, err)
 }
 
-func TestTcbStatus_NewTeeTcbStatus_NOK(t *testing.T) {
-	s := make([]any, len(TestTCBStatus))
-	for i := range TestTCBStatus {
-		s[i] = i
-	}
-	expectedErr := "invalid type: int for tcb status at index: 0"
-	_, err := NewTeeTcbStatus(s)
+func TestTcbStatus_NewTeeTcbStatusExpr_OK(t *testing.T) {
+	s := TestTCBStatus
+	_, err := NewTcbStatusExpr(MEM, s)
+	require.NoError(t, err)
+}
+
+func TestTcbStatus_NewTeeTcbStatusString_NOK(t *testing.T) {
+	expectedErr := "zero len value for TeeTcbStatus"
+	s := []string{}
+	_, err := NewTeeTcbStatusString(s)
 	assert.EqualError(t, err, expectedErr)
-	var m []any
-	expectedErr = "nil value argument"
-	_, err = NewTeeTcbStatus(m)
+}
+
+func TestTcbStatus_NewTeeTcbStatusExpr_NOK(t *testing.T) {
+	expectedErr := "invalid operator : 5"
+	s := TestTCBStatus
+	_, err := NewTcbStatusExpr(NOP, s)
 	assert.EqualError(t, err, expectedErr)
 }
 
 func TestTcbStatus_AddTcbStatus_OK(t *testing.T) {
-	s := initTcbStatus()
-	status := TeeTcbStatus{}
-	err := status.AddTeeTcbStatus(s)
+	s := TestTCBStatus
+	status := TeeTcbStatus{val: []string{"abcd"}}
+	_, err := status.AddTeeTcbStatus(NOP, s)
 	require.Nil(t, err)
 }
 
 func TestTcbStatus_AddTcbStatus_NOK(t *testing.T) {
-	expectedErr := "invalid type: int for tcb status at index: 0"
-	s := make([]any, len(TestInvalidTCBStatus))
-	for i := range TestInvalidTCBStatus {
-		s[i] = TestInvalidTCBStatus[i]
-	}
-	status := TeeTcbStatus{}
-	err := status.AddTeeTcbStatus(s)
+	expectedErr := "operator mis-match TeeTcbStatus Op: 6, Input Op: 2"
+	s := TestTCBStatus
+	status, err := NewTcbStatusExpr(MEM, s)
+	require.Nil(t, err)
+	_, err = status.AddTeeTcbStatus(GE, []string{"abcd"})
 	assert.EqualError(t, err, expectedErr)
 }
 
 func TestTcbStatus_Valid_OK(t *testing.T) {
-	s := initTcbStatus()
-	status, err := NewTeeTcbStatus(s)
+	s := TestTCBStatus
+	status, err := NewTeeTcbStatusString(s)
 	require.Nil(t, err)
 	err = status.Valid()
 	require.Nil(t, err)
 }
 
 func TestTcbStatus_Valid_NOK(t *testing.T) {
-	expectedErr := "empty tcb status"
-	status := TeeTcbStatus{}
+	expectedErr := "invalid operator in a TeeTcbStatus: 2"
+	status := TeeTcbStatus{val: TaggedSetStringExpression(SetStringExpression{SetOperator: 2, SetString: []string{"valid"}})}
 	err := status.Valid()
 	assert.EqualError(t, err, expectedErr)
-	expectedErr = "invalid type: int for tcb status at index: 0"
-	s := make([]any, len(TestInvalidTCBStatus))
-	for i := range TestInvalidTCBStatus {
-		s[i] = TestInvalidTCBStatus[i]
-	}
-	status = TeeTcbStatus(s)
+	expectedErr = "unknown type []int for TeeTcbStatus"
+	status = TeeTcbStatus{val: TestInvalidTCBStatus}
 	err = status.Valid()
 	assert.EqualError(t, err, expectedErr)
 }

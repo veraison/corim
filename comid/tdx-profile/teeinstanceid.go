@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/fxamacker/cbor/v2"
 	"github.com/veraison/corim/encoding"
 )
 
@@ -150,14 +149,14 @@ func (o *TeeInstanceID) UnmarshalJSON(data []byte) error {
 	}
 
 	switch v.Type {
-	case "uint":
+	case UintType:
 		var x uint
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
 				"cannot unmarshal TeeInstanceID of type uint: %w", err)
 		}
 		o.val = x
-	case "bytes":
+	case BytesType:
 		var x []byte
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
@@ -170,10 +169,10 @@ func (o *TeeInstanceID) UnmarshalJSON(data []byte) error {
 
 // MarshalCBOR Marshals TeeInstanceID to CBOR
 func (o TeeInstanceID) MarshalCBOR() ([]byte, error) {
-	return cbor.Marshal(o.val)
+	return em.Marshal(o.val)
 }
 
 // UnmarshalCBOR UnMarshals supplied CBOR bytes to TeeInstanceID
 func (o *TeeInstanceID) UnmarshalCBOR(data []byte) error {
-	return cbor.Unmarshal(data, &o.val)
+	return dm.Unmarshal(data, &o.val)
 }

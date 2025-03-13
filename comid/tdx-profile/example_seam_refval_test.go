@@ -45,12 +45,16 @@ func Example_decode_JSON() {
 	// OID: 2.16.840.1.113741.1.2.3.4.5
 	// Vendor: Intel Corporation
 	// Model: TDX SEAM
-	// tcbEvalNum: 11
+	// tcbEvalNum Operator: greater_or_equal
+	// tcbEvalNum Value: 11
 	// IsvProdID: 0303
-	// ISVSVN: 10
+	// SVN Operator: greater_or_equal
+	// SVN Value: 10
 	// Attributes: f00a0b
+	// mrtee Digest Operator: member
 	// mrtee Digest Alg: 1
 	// mrtee Digest Value: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
+	// mrsigner Digest Operator: member
 	// mrsigner Digest Alg: 1
 	// mrsigner Digest Value: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
 	// mrsigner Digest Alg: 8
@@ -100,13 +104,10 @@ func Example_encode_tdx_seam_refval_without_profile() {
 	json, err := m.ToJSON()
 	if err == nil {
 		fmt.Printf("%s\n", string(json))
-	} else {
-		fmt.Printf("To JSON failed \n")
 	}
-
 	// Output:
-	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc8038480a385142010138528182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7538538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36385442010138550b
-	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":10,"attributes":"AQE=","mrtee":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="],"mrsigner":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"],"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":11}}]}]}}
+	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc803848d9ea6a82020a38514201013852d9ea7482068182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d753853d9ea7482068282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638544201013855d9ea6a82020b
+	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":10}}},"attributes":"AQE=","mrtee":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}},"mrsigner":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]}},"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":11}}}}}]}]}}
 }
 
 func Example_encode_tdx_seam_refval_with_profile() {
@@ -163,8 +164,8 @@ func Example_encode_tdx_seam_refval_with_profile() {
 	}
 
 	// Output:
-	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc8038480a385142010138528182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7538538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36385442010138550b
-	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":10,"attributes":"AQE=","mrtee":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="],"mrsigner":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"],"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":11}}]}]}}
+	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc803848d9ea6a82020a38514201013852d9ea7482068182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d753853d9ea7482068282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638544201013855d9ea6a82020b
+	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":10}}},"attributes":"AQE=","mrtee":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}},"mrsigner":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]}},"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":11}}}}}]}]}}
 }
 
 func Example_encode_tdx_seam_refval_direct() {
@@ -212,8 +213,8 @@ func Example_encode_tdx_seam_refval_direct() {
 	}
 
 	// Output:
-	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc8038480a385142010138528182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7538538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36385442010138550b
-	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":10,"attributes":"AQE=","mrtee":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="],"mrsigner":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"],"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":11}}]}]}}
+	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02675444585345414d81a101a73847c11a6796cc803848d9ea6a82020a38514201013852d9ea7482068182015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d753853d9ea7482068282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638544201013855d9ea6a82020b
+	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":10}}},"attributes":"AQE=","mrtee":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}},"mrsigner":{"type":"digest-expression","value":{"set-operator":6,"set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]}},"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":11}}}}}]}]}}
 }
 
 func setTDXSeamMvalExtensions(val *comid.Mval) error {
@@ -231,13 +232,19 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to set isvprodid %w", err)
 	}
-	svn := TeeSVN(TestISVSVN)
-	err = val.Extensions.Set("isvsvn", &svn)
+	svn, err := NewSvnNumeric(TestISVSVN)
+	if err != nil {
+		return fmt.Errorf("unable to get isvsvn numeric %w", err)
+	}
+	err = val.Extensions.Set("isvsvn", svn)
 	if err != nil {
 		return fmt.Errorf("unable to set isvsvn %w", err)
 	}
-	teeTcbEvNum := TeeTcbEvalNum(TestTCBEvalNum)
-	err = val.Extensions.Set("tcbevalnum", &teeTcbEvNum)
+	teeTcbEvNum, err := NewTeeTcbEvalNumberNumeric(TestTCBEvalNum)
+	if err != nil {
+		return fmt.Errorf("unable to get tcbevalnum numeric %w", err)
+	}
+	err = val.Extensions.Set("tcbevalnum", teeTcbEvNum)
 	if err != nil {
 		return fmt.Errorf("unable to set tcbevalnum %w", err)
 	}
@@ -253,7 +260,12 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 
 	d := comid.NewDigests()
 	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
-	err = val.Extensions.Set("mrtee", d)
+	td, err := NewTeeDigestExpr(MEM, *d)
+	if err != nil {
+		return fmt.Errorf("unable to get TeeDigest: %w", err)
+	}
+
+	err = val.Extensions.Set("mrtee", td)
 	if err != nil {
 		return fmt.Errorf("unable to set mrtee %w", err)
 	}
@@ -262,7 +274,12 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
 	d.AddDigest(swid.Sha384, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
 
-	err = val.Extensions.Set("mrsigner", d)
+	td, err = NewTeeDigestExpr(MEM, *d)
+	if err != nil {
+		return fmt.Errorf("unable to get TeeDigest: %w", err)
+	}
+
+	err = val.Extensions.Set("mrsigner", td)
 	if err != nil {
 		return fmt.Errorf("unable to set mrsigner %w", err)
 	}
@@ -272,14 +289,27 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 func decodeMValExtensions(m *comid.Measurement) error {
 	val, err := m.Val.Extensions.Get("tcbevalnum")
 	if err != nil {
-		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions")
+		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions: %w", err)
 	}
-	f, ok := val.(*TeeTcbEvalNum)
+	f, ok := val.(*TeeTcbEvalNumber)
 	if !ok {
 		fmt.Printf("val was not pointer to TeeTcbEvalNum")
 	}
 	tcbValNum := *f
-	fmt.Printf("\ntcbEvalNum: %d", tcbValNum)
+	if tcbValNum.IsNumeric() {
+		ne, err1 := tcbValNum.GetNumericExpression()
+		if err1 != nil {
+			return fmt.Errorf("failed to get tcbEvalNum numeric expression: %w", err1)
+		}
+		fmt.Printf("\ntcbEvalNum Operator: %s", NumericOperatorToString[ne.NumericOperator])
+		fmt.Printf("\ntcbEvalNum Value: %d", ne.NumericType.val)
+	} else if tcbValNum.IsUint() {
+		nv, err1 := tcbValNum.GetUint()
+		if err1 != nil {
+			return fmt.Errorf("failed to get tcbEvalNum uint: %w", err1)
+		}
+		fmt.Printf("\ntcbEvalNum: %d", nv)
+	}
 
 	val, err = m.Val.Extensions.Get("isvprodid")
 	if err != nil {
@@ -309,12 +339,31 @@ func decodeMValExtensions(m *comid.Measurement) error {
 	if err != nil {
 		return fmt.Errorf("failed to decode isvsvn from measurement extensions")
 	}
-	tSV, ok := val.(*TeeSVN)
+	teesvn, ok := val.(*TeeSVN)
 	if !ok {
-		fmt.Printf("val was not pointer to tee svn")
+		return fmt.Errorf("val was not pointer to tee svn")
+	}
+	err = teesvn.Valid()
+	if err != nil {
+		return fmt.Errorf("invalid tee svn: %w", err)
 	}
 
-	fmt.Printf("\nISVSVN: %d", *tSV)
+	if teesvn.IsUint() {
+		svn, err1 := teesvn.GetUint()
+		if err1 != nil {
+			return fmt.Errorf("unable to get Uint SVN at index: %w", err)
+		}
+		fmt.Printf("\nISVSVN: %d", svn)
+	} else if teesvn.IsNumeric() {
+		svn, err1 := teesvn.GetNumericExpression()
+		if err1 != nil {
+			return fmt.Errorf("unable to get SVN Expression: %w", err)
+		}
+		fmt.Printf("\nSVN Operator: %s", NumericOperatorToString[svn.NumericOperator])
+		fmt.Printf("\nSVN Value: %d", svn.NumericType.val)
+	} else {
+		return fmt.Errorf("teesvn, is neither uint or numeric")
+	}
 
 	val, err = m.Val.Extensions.Get("attributes")
 	if err != nil {
@@ -325,7 +374,6 @@ func decodeMValExtensions(m *comid.Measurement) error {
 	if !ok {
 		fmt.Printf("val was not pointer to teeAttributes")
 	}
-
 	fmt.Printf("\nAttributes: %x", *tA)
 
 	val, err = m.Val.Extensions.Get("mrtee")
@@ -338,14 +386,13 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		fmt.Printf("val was not pointer to TeeDigest")
 	}
 
-	err = extractDigest("mrtee", tD)
-	if err != nil {
-		return fmt.Errorf("unable to extract TEE Digest: %w", err)
+	if err = extractTeeDigest("mrtee", tD); err != nil {
+		return fmt.Errorf("failed to decode mrtee from digest: %w", err)
 	}
 
 	val, err = m.Val.Extensions.Get("mrsigner")
 	if err != nil {
-		return fmt.Errorf("failed to decode mrsigner from measurement extensions")
+		return fmt.Errorf("failed to decode mrsigner from measurement extensions: %w", err)
 	}
 
 	tD, ok = val.(*TeeDigest)
@@ -353,9 +400,8 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		fmt.Printf("val was not pointer to TeeDigest")
 	}
 
-	err = extractDigest("mrsigner", tD)
-	if err != nil {
-		return fmt.Errorf("unable to extract TEE Digest: %w", err)
+	if err := extractTeeDigest("mrsigner", tD); err != nil {
+		return fmt.Errorf("failed to extarct mrsigner digest: %w", err)
 	}
 	return nil
 }
@@ -405,12 +451,16 @@ func Example_decode_CBOR() {
 	// OID: 2.16.840.1.113741.1.2.3.4.3
 	// Vendor: Intel Corporation
 	// Model: TDX SEAM
-	// tcbEvalNum: 11
+	// tcbEvalNum Operator: greater_or_equal
+	// tcbEvalNum Value: 11
 	// IsvProdID: abcd
-	// ISVSVN: 6
+	// SVN Operator: greater_or_equal
+	// SVN Value: 6
 	// Attributes: 0102
+	// mrtee Digest Operator: member
 	// mrtee Digest Alg: 1
 	// mrtee Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
+	// mrsigner Digest Operator: member
 	// mrsigner Digest Alg: 1
 	// mrsigner Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
 	// mrsigner Digest Alg: 8
@@ -419,6 +469,7 @@ func Example_decode_CBOR() {
 	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
 	// -----END PUBLIC KEY-----
+
 }
 
 func extractRefVals(c *comid.Comid) error {
@@ -499,7 +550,20 @@ func extractClassElements(c *comid.Class) error {
 	return nil
 }
 
-func extractDigest(typ string, d *TeeDigest) error {
+func extractDigest(typ string, d *Digests) error {
+	if d == nil {
+		return fmt.Errorf("no digest")
+	}
+
+	for _, digest := range *d {
+		fmt.Printf("\n%s Digest Alg: %d", typ, digest.HashAlgID)
+		fmt.Printf("\n%s Digest Value: %x", typ, digest.HashValue)
+	}
+
+	return nil
+}
+
+func extractTeeDigest(typ string, d *TeeDigest) error {
 	if d == nil {
 		return fmt.Errorf("no TEE digest")
 	}
@@ -507,10 +571,27 @@ func extractDigest(typ string, d *TeeDigest) error {
 	if typ != "mrsigner" && typ != "mrtee" {
 		return fmt.Errorf("invalid type for TEE digest: %s", typ)
 	}
-	for _, digest := range *d {
-		fmt.Printf("\n%s Digest Alg: %d", typ, digest.HashAlgID)
-		fmt.Printf("\n%s Digest Value: %x", typ, digest.HashValue)
-	}
 
+	if d.IsDigests() {
+		dg, err := d.GetDigest()
+		if err != nil {
+			return fmt.Errorf("unable to extract TEE Digest: %w", err)
+		}
+		err = extractDigest(typ, &dg)
+		if err != nil {
+			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
+		}
+	} else {
+		de, err := d.GetDigestExpr()
+		if err != nil {
+			return fmt.Errorf("unable to extract TEE Digest Expression: %w", err)
+		}
+		fmt.Printf("\n%s Digest Operator: %s", typ, NumericOperatorToString[de.SetOperator])
+		dg := comid.Digests(de.SetDigest)
+		err = extractDigest(typ, &dg)
+		if err != nil {
+			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
+		}
+	}
 	return nil
 }

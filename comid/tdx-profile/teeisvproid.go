@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/fxamacker/cbor/v2"
 	"github.com/veraison/corim/encoding"
 )
 
@@ -128,13 +127,13 @@ func (o TeeISVProdID) MarshalJSON() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		v = encoding.TypeAndValue{Type: "uint", Value: b}
+		v = encoding.TypeAndValue{Type: UintType, Value: b}
 	case []byte:
 		b, err = json.Marshal(t)
 		if err != nil {
 			return nil, err
 		}
-		v = encoding.TypeAndValue{Type: "bytes", Value: b}
+		v = encoding.TypeAndValue{Type: BytesType, Value: b}
 	default:
 		return nil, fmt.Errorf("unknown type %T for TeeISVProdID", t)
 	}
@@ -150,14 +149,14 @@ func (o *TeeISVProdID) UnmarshalJSON(data []byte) error {
 	}
 
 	switch v.Type {
-	case "uint":
+	case UintType:
 		var x uint
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
 				"cannot unmarshal TeeISVProdID of type uint: %w", err)
 		}
 		o.val = x
-	case "bytes":
+	case BytesType:
 		var x []byte
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
@@ -170,10 +169,10 @@ func (o *TeeISVProdID) UnmarshalJSON(data []byte) error {
 
 // MarshalCBOR Marshals TeeISVProdID to CBOR bytes
 func (o TeeISVProdID) MarshalCBOR() ([]byte, error) {
-	return cbor.Marshal(o.val)
+	return em.Marshal(o.val)
 }
 
 // UnmarshalCBOR UnMarshals supplied CBOR bytes to TeeISVProdID
 func (o *TeeISVProdID) UnmarshalCBOR(data []byte) error {
-	return cbor.Unmarshal(data, &o.val)
+	return dm.Unmarshal(data, &o.val)
 }

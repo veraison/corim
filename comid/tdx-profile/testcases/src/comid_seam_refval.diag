@@ -24,14 +24,17 @@
           / comid.mval / 1 : {
               / comid.attributes / -82 :[ 1, 2],
               / comid.isvprodid / -85 : h'ABCD',
-              / comid.isvsvn / -73 : 6,
-              / comid.mrtee / -83 : [
+              / comid.isvsvn / -73 : 60010([ / op.ge / 2, 6 ]),
+              / comid.mrtee / -83 : 60020([ / op.member / 6, 
+              [
                 [
                 / alg-id / 1, / sha256 /
                 / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
                 ]
-              ],
-              / comid.mrsigner / -84 : [ 
+              ]
+              ]),
+              / comid.mrsigner / -84 : 60020([ / op.member / 6, 
+              [ 
                 [
                 / alg-id / 1, / sha256 /
                 / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
@@ -40,8 +43,9 @@
                 / alg-id / 8, / sha384 /
                 / digest / h'a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a'
                 ]
-              ],
-              /comid.tcbevalnum / -86 : 11
+              ]
+              ]),
+              / tcb-eval-num / -86 : 60010([ / op.ge / 2, 11 ])
           },
           2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
         }

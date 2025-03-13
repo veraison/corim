@@ -43,22 +43,38 @@ func Example_decode_PCE_JSON() {
 	// Model: 0123456789ABCDEF
 	// InstanceID: 11
 	// pceID: 0000
-	// SVN[0]: 10
-	// SVN[1]: 10
-	// SVN[2]: 2
-	// SVN[3]: 2
-	// SVN[4]: 2
-	// SVN[5]: 1
-	// SVN[6]: 4
-	// SVN[7]: 0
-	// SVN[8]: 0
-	// SVN[9]: 0
-	// SVN[10]: 0
-	// SVN[11]: 0
-	// SVN[12]: 0
-	// SVN[13]: 0
-	// SVN[14]: 0
-	// SVN[15]: 0
+	// SVN Operator[0]: 2
+	// SVN Value[0]: 10
+	// SVN Operator[1]: 2
+	// SVN Value[1]: 10
+	// SVN Operator[2]: 2
+	// SVN Value[2]: 2
+	// SVN Operator[3]: 2
+	// SVN Value[3]: 10
+	// SVN Operator[4]: 2
+	// SVN Value[4]: 10
+	// SVN Operator[5]: 2
+	// SVN Value[5]: 10
+	// SVN Operator[6]: 2
+	// SVN Value[6]: 10
+	// SVN Operator[7]: 2
+	// SVN Value[7]: 10
+	// SVN Operator[8]: 2
+	// SVN Value[8]: 10
+	// SVN Operator[9]: 2
+	// SVN Value[9]: 10
+	// SVN Operator[10]: 2
+	// SVN Value[10]: 10
+	// SVN Operator[11]: 2
+	// SVN Value[11]: 10
+	// SVN Operator[12]: 2
+	// SVN Value[12]: 10
+	// SVN Operator[13]: 2
+	// SVN Value[13]: 10
+	// SVN Operator[14]: 2
+	// SVN Value[14]: 10
+	// SVN Operator[15]: 2
+	// SVN Value[15]: 10
 	// CryptoKey Type: pkix-base64-key
 	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
@@ -145,13 +161,14 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to decode teetcbcompsvn from measurement extensions")
 	}
 
-	tD, ok := val.(*TeeTcbCompSvn)
+	tcs, ok := val.(*TeeTcbCompSvn)
 	if !ok {
 		fmt.Printf("val was not pointer to teetcbcompsvn")
 	}
-	if err = tD.Valid(); err != nil {
+	if err = tcs.Valid(); err != nil {
 		return fmt.Errorf("invalid computed SVN: %w", err)
 	}
+
 	val, err = m.Val.Extensions.Get("pceid")
 	if err != nil {
 		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions")
@@ -166,14 +183,14 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 	pceID := *t
 	fmt.Printf("\npceID: %s", pceID)
 
-	err = extractSVN(tD)
+	err = extractCompSvn(tcs)
 	if err != nil {
-		return fmt.Errorf("unable to extract TEE Digest: %w", err)
+		return fmt.Errorf("unable to extract TeeTcbCompSVN: %w", err)
 	}
 	return nil
 }
 
-func extractSVN(s *TeeTcbCompSvn) error {
+func extractCompSvn(s *TeeTcbCompSvn) error {
 	if s == nil {
 		return fmt.Errorf("no TEE TCB Comp SVN")
 	}
@@ -182,8 +199,23 @@ func extractSVN(s *TeeTcbCompSvn) error {
 		return fmt.Errorf("computed SVN cannot be greater than 16")
 	}
 
-	for i, svn := range *s {
-		fmt.Printf("\nSVN[%d]: %d", i, svn)
+	for i, teesvn := range *s {
+		if teesvn.IsUint() {
+			svn, err := teesvn.GetUint()
+			if err != nil {
+				return fmt.Errorf("unable to get Uint SVN at index: %d %w", i, err)
+			}
+			fmt.Printf("\nSVN[%d]: %d", i, svn)
+		} else if teesvn.IsNumeric() {
+			svn, err := teesvn.GetNumericExpression()
+			if err != nil {
+				return fmt.Errorf("unable to get SVN Expression at index: %d %w", i, err)
+			}
+			fmt.Printf("\nSVN Operator[%d]: %d", i, svn.NumericOperator)
+			fmt.Printf("\nSVN Value[%d]: %d", i, svn.NumericType.val)
+		} else {
+			return fmt.Errorf("invalid teesvn at index: %d", i)
+		}
 	}
 
 	return nil
@@ -221,28 +253,44 @@ func Example_decode_PCE_CBOR() {
 		panic(err)
 	}
 
-	// Output:
+	// output:
 	// OID: 2.16.840.1.113741.1.2.3.4.5
 	// Vendor: Intel Corporation
 	// Model: TDX PCE TCB
 	// InstanceID: 00112233445566778899aabbccddeeff
 	// pceID: 0000
-	// SVN[0]: 10
-	// SVN[1]: 10
-	// SVN[2]: 2
-	// SVN[3]: 2
-	// SVN[4]: 2
-	// SVN[5]: 1
-	// SVN[6]: 4
-	// SVN[7]: 0
-	// SVN[8]: 0
-	// SVN[9]: 0
-	// SVN[10]: 0
-	// SVN[11]: 0
-	// SVN[12]: 0
-	// SVN[13]: 0
-	// SVN[14]: 0
-	// SVN[15]: 0
+	// SVN Operator[0]: 2
+	// SVN Value[0]: 10
+	// SVN Operator[1]: 2
+	// SVN Value[1]: 10
+	// SVN Operator[2]: 2
+	// SVN Value[2]: 2
+	// SVN Operator[3]: 2
+	// SVN Value[3]: 2
+	// SVN Operator[4]: 2
+	// SVN Value[4]: 2
+	// SVN Operator[5]: 2
+	// SVN Value[5]: 1
+	// SVN Operator[6]: 2
+	// SVN Value[6]: 4
+	// SVN Operator[7]: 2
+	// SVN Value[7]: 0
+	// SVN Operator[8]: 2
+	// SVN Value[8]: 0
+	// SVN Operator[9]: 2
+	// SVN Value[9]: 0
+	// SVN Operator[10]: 2
+	// SVN Value[10]: 0
+	// SVN Operator[11]: 2
+	// SVN Value[11]: 0
+	// SVN Operator[12]: 2
+	// SVN Value[12]: 0
+	// SVN Operator[13]: 2
+	// SVN Value[13]: 0
+	// SVN Operator[14]: 2
+	// SVN Value[14]: 0
+	// SVN Operator[15]: 2
+	// SVN Value[15]: 0
 	// CryptoKey Type: pkix-base64-key
 	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
@@ -298,13 +346,11 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	json, err := m.ToJSON()
 	if err == nil {
 		fmt.Printf("%s\n", string(json))
-	} else {
-		fmt.Printf("\n To JSON Failed \n")
 	}
 
 	// Output:
-	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e026b544458205043452054434281a101a3384c182d384f685043454944303031387c900102030405060708090a0b0c0d0e0f10
-	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDX PCE TCB"}},"measurements":[{"value":{"instanceid":{"type":"uint","value":45},"pceid":"PCEID001","tcbcompsvn":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}}]}]}}
+	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e026b544458205043452054434281a101a3384c182d384f685043454944303031387c90d9ea6a820201d9ea6a820202d9ea6a820203d9ea6a820204d9ea6a820205d9ea6a820206d9ea6a820207d9ea6a820208d9ea6a820209d9ea6a82020ad9ea6a82020bd9ea6a82020cd9ea6a82020dd9ea6a82020ed9ea6a82020fd9ea6a820210
+	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDX PCE TCB"}},"measurements":[{"value":{"instanceid":{"type":"uint","value":45},"pceid":"PCEID001","tcbcompsvn":[{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":1}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":2}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":3}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":4}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":5}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":6}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":7}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":8}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":9}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":10}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":11}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":12}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":13}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":14}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":15}}},{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":16}}}]}}]}]}}
 }
 
 func setTDXPCEMvalExtension(val *comid.Mval) error {
@@ -326,14 +372,15 @@ func setTDXPCEMvalExtension(val *comid.Mval) error {
 		return fmt.Errorf("unable to set teepceID %w", err)
 	}
 
-	c, err := NewTeeTcbCompSVN(TestCompSVN)
+	c, err := NewTeeTcbCompSvnNumeric(TestCompSvn)
 	if err != nil {
-		return fmt.Errorf("failed to get TeeTcbCompSVN %w", err)
+		return fmt.Errorf("failed to get TeeTcbCompSvn %w", err)
 	}
 
 	err = val.Extensions.Set("tcbcompsvn", c)
 	if err != nil {
 		return fmt.Errorf("unable to set teetcbcompsvn: %w", err)
 	}
+
 	return nil
 }
