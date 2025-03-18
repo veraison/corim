@@ -768,7 +768,6 @@ func (o *Measurement) SetName(name string) *Measurement {
 	return o
 }
 
-
 // nolint:gocritic
 func (o Measurement) Valid() error {
 	if o.Key != nil && o.Key.IsSet() {
