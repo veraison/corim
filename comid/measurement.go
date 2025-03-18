@@ -353,6 +353,7 @@ type Mval struct {
 	SerialNumber       *string             `cbor:"8,keyasint,omitempty" json:"serial-number,omitempty"`
 	UEID               *eat.UEID           `cbor:"9,keyasint,omitempty" json:"ueid,omitempty"`
 	UUID               *UUID               `cbor:"10,keyasint,omitempty" json:"uuid,omitempty"`
+	Name               *string             `cbor:"11,keyasint,omitempty" json:"name,omitempty"`
 	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
 	Extensions
 }
@@ -439,8 +440,10 @@ func (o Mval) Valid() error {
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
 		o.UUID == nil &&
+		o.Name == nil &&
 		o.IntegrityRegisters == nil &&
 		o.Extensions.IsEmpty() {
+
 		return fmt.Errorf("no measurement value set")
 	}
 
@@ -752,6 +755,15 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 			return nil
 		}
 		o.Val.UUID = &u
+	}
+	return o
+}
+
+// SetName sets the supplied name string in the measurement-values-map of the
+// target measurement
+func (o *Measurement) SetName(name string) *Measurement {
+	if o != nil {
+		o.Val.Name = &name
 	}
 	return o
 }
