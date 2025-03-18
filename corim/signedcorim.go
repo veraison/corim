@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/rand"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"strings"
@@ -24,9 +25,11 @@ var (
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
 // with signature and verification methods
 type SignedCorim struct {
-	UnsignedCorim UnsignedCorim
-	Meta          Meta
-	message       *cose.Sign1Message
+	UnsignedCorim     UnsignedCorim
+	Meta              Meta
+	SigningCert       *x509.Certificate
+	IntermediateCerts []*x509.Certificate
+	message           *cose.Sign1Message
 }
 
 // NewSignedCorim instantiates an empty SignedCorim
@@ -59,24 +62,37 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory protected header")
 	}
 
-	v, ok := hdr.Protected[cose.HeaderLabelContentType]
-	if !ok {
+	if v, ok := hdr.Protected[cose.HeaderLabelContentType]; ok {
+		if v != ContentType {
+			return fmt.Errorf("expecting content type %q, got %q instead", ContentType, v)
+		}
+	} else {
 		return errors.New("missing mandatory content type")
-	}
-
-	if v != ContentType {
-		return fmt.Errorf("expecting content type %q, got %q instead", ContentType, v)
 	}
 
 	// TODO(tho) key id is apparently mandatory, which doesn't look right.
 	// TODO(tho) Check with the CoRIM design team.
-	// See https://github.com/veraison/corim/issues/14
+	// See https://github.com/ietf-rats-wg/draft-ietf-rats-corim/issues/363
 
-	v, ok = hdr.Protected[HeaderLabelCorimMeta]
-	if !ok {
+	if v, ok := hdr.Protected[HeaderLabelCorimMeta]; ok {
+		if err := o.extractMeta(v); err != nil {
+			return err
+		}
+	} else {
 		return errors.New("missing mandatory corim.meta")
 	}
 
+	// Process optional x5chain
+	if v, ok := hdr.Protected[cose.HeaderLabelX5Chain]; ok {
+		if err := o.extractX5Chain(v); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *SignedCorim) extractMeta(v interface{}) error {
 	metaCBOR, ok := v.([]byte)
 	if !ok {
 		return fmt.Errorf("expecting CBOR-encoded CoRIM Meta, got %T instead", v)
@@ -90,6 +106,43 @@ func (o *SignedCorim) processHdrs() error {
 	}
 
 	o.Meta = meta
+
+	return nil
+}
+
+func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
+	var buf bytes.Buffer
+
+	switch t := x5chain.(type) {
+	case []interface{}:
+		for i, elem := range t {
+			cert, ok := elem.([]byte)
+			if !ok {
+				return fmt.Errorf("accessing x5chain[%d]: got %T, want []byte", i, elem)
+			}
+
+			switch i {
+			case 0:
+				if err := o.AddSigningCert(cert); err != nil {
+					return fmt.Errorf("decoding x5chain: %w", err)
+				}
+			default:
+				buf.Write(cert)
+			}
+		}
+
+		if buf.Len() > 0 {
+			if err := o.AddIntermediateCerts(buf.Bytes()); err != nil {
+				return fmt.Errorf("decoding x5chain: %w", err)
+			}
+		}
+	case []byte:
+		if err := o.AddSigningCert(t); err != nil {
+			return fmt.Errorf("decoding x5chain: %w", err)
+		}
+	default:
+		return fmt.Errorf("decoding x5chain: got %T, want []interface{} or []byte", t)
+	}
 
 	return nil
 }
@@ -126,9 +179,45 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 	return nil
 }
 
+// AddSigningCert adds a DER-encoded X.509 certificate to be included in the
+// protected header of the COSE Sign1 message as the leaf certificate in X5Chain.
+func (o *SignedCorim) AddSigningCert(der []byte) error {
+	if der == nil {
+		return errors.New("nil signing cert")
+	}
+
+	cert, err := x509.ParseCertificate(der)
+	if err != nil {
+		return fmt.Errorf("invalid signing certificate: %w", err)
+	}
+
+	o.SigningCert = cert
+	return nil
+}
+
+// AddIntermediateCerts adds DER-encoded X.509 certificates to be included in the protected
+// header of the COSE Sign1 message as part of the X5Chain.
+// The certificates must be concatenated with no intermediate padding, as per X.509 convention.
+func (o *SignedCorim) AddIntermediateCerts(der []byte) error {
+	if len(der) == 0 {
+		return errors.New("nil or empty intermediate certs")
+	}
+
+	certs, err := x509.ParseCertificates(der)
+	if err != nil {
+		return fmt.Errorf("invalid intermediate certificates: %w", err)
+	}
+
+	if len(certs) == 0 {
+		return errors.New("no certificates found in intermediate cert data")
+	}
+
+	o.IntermediateCerts = certs
+	return nil
+}
+
 // Sign returns the serialized signed-corim, signed by the supplied cose Signer.
-// The target SignedCorim must have its UnsignedCorim field correctly
-// populated.
+// The target SignedCorim must have its UnsignedCorim field correctly populated.
 func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	if signer == nil {
 		return nil, errors.New("nil signer")
@@ -160,6 +249,23 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected.SetAlgorithm(alg)
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
+
+	if o.SigningCert != nil {
+		// COSE_X509 = bstr / [ 2*certs: bstr ]
+		//
+		// handle alt (1): bstr
+		if len(o.IntermediateCerts) == 0 {
+			o.message.Headers.Protected[cose.HeaderLabelX5Chain] = o.SigningCert.Raw
+		} else { // handle alt (2): [ 2*certs: bstr ]
+			certChain := [][]byte{o.SigningCert.Raw}
+			for _, cert := range o.IntermediateCerts {
+				certChain = append(certChain, cert.Raw)
+			}
+			o.message.Headers.Protected[cose.HeaderLabelX5Chain] = certChain
+		}
+	} else if o.IntermediateCerts != nil {
+		return nil, errors.New("intermediate certificates supplied but no signing certificate")
+	}
 
 	err = o.message.Sign(rand.Reader, NoExternalData, signer)
 	if err != nil {

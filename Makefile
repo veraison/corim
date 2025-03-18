@@ -12,16 +12,10 @@ GOPKG += github.com/veraison/corim/extensions
 
 GOLINT ?= golangci-lint
 
-ifeq ($(MAKECMDGOALS),lint)
-GOLINT_ARGS ?= run --timeout=3m
-else
-  ifeq ($(MAKECMDGOALS),lint-extra)
-  GOLINT_ARGS ?= run --timeout=3m --issues-exit-code=0 -E dupl -E gocritic -E gosimple -E lll -E prealloc
-  endif
-endif
+GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E gosimple -E lll -E prealloc
 
-.PHONY: lint lint-extra
-lint lint-extra:
+.PHONY: lint
+lint:
 	$(GOLINT) $(GOLINT_ARGS)
 
 ifeq ($(MAKECMDGOALS),test)
@@ -50,18 +44,23 @@ presubmit:
 	@echo
 	@echo ">>> Fix any lint error"
 	@echo
-	$(MAKE) lint-extra
+	$(MAKE) lint
 
 .PHONY: licenses
 licenses: ; @./scripts/licenses.sh
+
+.PHONY: test-certs
+test-certs:
+	@echo "Regenerating certificate chain..."
+	@$(SHELL) scripts/gen-certs.sh create
 
 .PHONY: help
 help:
 	@echo "Available targets:"
 	@echo "  * test:       run unit tests for $(GOPKG)"
 	@echo "  * test-cover: run unit tests and measure coverage for $(GOPKG)"
-	@echo "  * lint:       lint sources using default configuration"
-	@echo "  * lint-extra: lint sources using default configuration and some extra checkers"
+	@echo "  * lint:       lint sources using default configuration and some extra checkers"
 	@echo "  * presubmit:  check you are ready to push your local branch to remote"
 	@echo "  * help:       print this menu"
 	@echo "  * licenses:   check licenses of dependent packages"
+	@echo "  * test-certs: regenerate the certificate chain"

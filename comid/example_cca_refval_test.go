@@ -58,7 +58,8 @@ func extractCCARefVal(rv ValueTriple) error {
 		return fmt.Errorf("extracting impl-id: %w", err)
 	}
 
-	for i, m := range rv.Measurements.Values {
+	for i := range rv.Measurements.Values {
+		m := &rv.Measurements.Values[i]
 		if m.Key == nil {
 			return fmt.Errorf("missing mKey at index %d", i)
 		}
@@ -75,10 +76,10 @@ func extractCCARefVal(rv ValueTriple) error {
 				return fmt.Errorf("extracting cca-refval-id: %w", err)
 			}
 			if err := extractRawValue(m.Val.RawValue); err != nil {
-				return fmt.Errorf("extracting raw vlue: %w", err)
+				return fmt.Errorf("extracting raw value: %w", err)
 			}
 		default:
-			return fmt.Errorf("unexpected  Mkey type: %T", t)
+			return fmt.Errorf("unexpected Mkey type: %T", t)
 		}
 	}
 

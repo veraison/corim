@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -299,4 +299,91 @@ func TestIntegrityRegisters_UnmarshalJSON_NOK(t *testing.T) {
 			assert.EqualError(t, err, tv.Err)
 		})
 	}
+}
+
+func TestIntegrityRegisters_Equal_True(t *testing.T) {
+	claim := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	ref := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	assert.True(t, claim.Equal(ref))
+}
+
+func TestIntegrityRegisters_Equal_False(t *testing.T) {
+	claim := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	ref := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	assert.False(t, claim.Equal(ref))
+}
+
+func TestIntegrityRegisters_Compare_True(t *testing.T) {
+	claim := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "34b3bd704b13febb14eca0a3174114cea735e0c92e70c3d0f5cd78d653e5678b")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "58af0069d43712309b37d645e6729eca3e5aee9d22bdb595c31b59ee6e2d3750")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "408d1344f60ec4a06a610406c84cee1d9a5c524b0ddd1264719cc347f4b15a08")}},
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "9aca8354b65a9b4815cf471a6fe9ca9629389691c4183831e63c37a744b2d8ec")}},
+	}}
+
+	ref := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "58af0069d43712309b37d645e6729eca3e5aee9d22bdb595c31b59ee6e2d3750")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "408d1344f60ec4a06a610406c84cee1d9a5c524b0ddd1264719cc347f4b15a08")}},
+	}}
+
+	assert.True(t, claim.CompareAgainstReference(ref))
+}
+
+func TestIntegrityRegisters_Compare_False(t *testing.T) {
+	claim := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "34b3bd704b13febb14eca0a3174114cea735e0c92e70c3d0f5cd78d653e5678b")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "58af0069d43712309b37d645e6729eca3e5aee9d22bdb595c31b59ee6e2d3750")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "408d1344f60ec4a06a610406c84cee1d9a5c524b0ddd1264719cc347f4b15a08")}},
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "9aca8354b65a9b4815cf471a6fe9ca9629389691c4183831e63c37a744b2d8ec")}},
+	}}
+
+	ref := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	assert.False(t, claim.CompareAgainstReference(ref))
+}
+
+func TestIntegrityRegisters_Compare_False_MissingEntry(t *testing.T) {
+	claim := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(0): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+		uint64(1): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "34b3bd704b13febb14eca0a3174114cea735e0c92e70c3d0f5cd78d653e5678b")}},
+		uint64(2): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "58af0069d43712309b37d645e6729eca3e5aee9d22bdb595c31b59ee6e2d3750")}},
+		uint64(3): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "408d1344f60ec4a06a610406c84cee1d9a5c524b0ddd1264719cc347f4b15a08")}},
+	}}
+
+	ref := IntegrityRegisters{map[IRegisterIndex]Digests{
+		uint64(4): []swid.HashEntry{{HashAlgID: swid.Sha256, HashValue: MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75")}},
+	}}
+
+	assert.False(t, claim.CompareAgainstReference(ref))
 }

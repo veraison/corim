@@ -16,6 +16,7 @@ import (
 	"github.com/veraison/swid"
 )
 
+//nolint:lll
 var (
 	TestUUIDString = "31fb5abf-023e-4992-aa4e-95f9c1503bfa"
 	TestUUID       = UUID(uuid.Must(uuid.Parse(TestUUIDString)))
@@ -36,6 +37,7 @@ var (
 	TestMKey       uint64 = 700
 	TestCCALabel          = "cca-platform-config"
 
+	//nolint:gosec
 	TestECPrivKey = `-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEICAm3+mCCDTMuzKqfZso9NT8ur9U9GjuUQ/lNEJvwRFMoAoGCCqGSM49
 AwEHoUQDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8BlLT4MFHOaO+ICTtIvrEeEpr/
@@ -207,6 +209,7 @@ func b64TestImplID() string {
 	return base64.StdEncoding.EncodeToString(implID)
 }
 
+//nolint:lll
 var (
 	PSARefValJSONTemplate = `{
 	"lang": "en-GB",

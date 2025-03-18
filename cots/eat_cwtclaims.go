@@ -33,22 +33,24 @@ type EatCWTClaim struct {
 	SoftwareVersionScheme *HardwareVersionType `cbor:"999,keyasint,omitempty" json:"swversion,omitempty"`
 }
 
-// ToCBOR serializes the target EatCWTClaim to CBOR
+// ToCBOR serializes the target EatCWTClaim to CBOR.
+// nolint:gocritic
 func (o EatCWTClaim) ToCBOR() ([]byte, error) {
 	return em.Marshal(o)
 }
 
-// FromCBOR deserializes a CBOR-encoded data into the target EatCWTClaim
+// FromCBOR deserializes a CBOR-encoded data into the target EatCWTClaim.
 func (o *EatCWTClaim) FromCBOR(data []byte) error {
 	return dm.Unmarshal(data, o)
 }
 
-// ToJSON serializes the target EatCWTClaim to JSON
+// ToJSON serializes the target EatCWTClaim to JSON.
+// nolint:gocritic
 func (o EatCWTClaim) ToJSON() ([]byte, error) {
 	return json.Marshal(o)
 }
 
-// FromJSON deserializes a JSON-encoded data into the target EatCWTClaim
+// FromJSON deserializes a JSON-encoded data into the target EatCWTClaim.
 func (o *EatCWTClaim) FromJSON(data []byte) error {
 	return json.Unmarshal(data, o)
 }

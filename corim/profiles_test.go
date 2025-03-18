@@ -12,7 +12,7 @@ import (
 	"github.com/veraison/eat"
 )
 
-func TestProfile_registration(t *testing.T) {
+func TestProfileManifest_registration(t *testing.T) {
 	exts := extensions.NewMap()
 
 	err := RegisterProfile(&eat.Profile{}, exts)
@@ -40,11 +40,11 @@ func TestProfile_registration(t *testing.T) {
 	err = RegisterProfile(p2, exts)
 	assert.NoError(t, err)
 
-	prof, ok := GetProfile(p1)
+	prof, ok := GetProfileManifest(p1)
 	assert.True(t, ok)
 	assert.Equal(t, exts, prof.MapExtensions)
 
-	_, ok = GetProfile(&eat.Profile{})
+	_, ok = GetProfileManifest(&eat.Profile{})
 	assert.False(t, ok)
 
 	p3, err := eat.NewProfile("2.3.4")
@@ -61,11 +61,11 @@ func TestProfile_registration(t *testing.T) {
 	UnregisterProfile(p1)
 }
 
-func TestProfile_getters(t *testing.T) {
+func TestProfileManifest_getters(t *testing.T) {
 	id, err := eat.NewProfile("1.2.3")
 	require.NoError(t, err)
 
-	profile := Profile{
+	profileManifest := ProfileManifest{
 		ID: id,
 		MapExtensions: extensions.NewMap().
 			Add(comid.ExtComid, &struct{}{}).
@@ -73,18 +73,18 @@ func TestProfile_getters(t *testing.T) {
 			Add(ExtSigner, &struct{}{}),
 	}
 
-	c := profile.GetComid()
+	c := profileManifest.GetComid()
 	assert.NotNil(t, c.Extensions.IMapValue)
 
-	u := profile.GetUnsignedCorim()
+	u := profileManifest.GetUnsignedCorim()
 	assert.NotNil(t, u.Extensions.IMapValue)
 
-	s := profile.GetSignedCorim()
+	s := profileManifest.GetSignedCorim()
 	assert.NotNil(t, s.UnsignedCorim.Extensions.IMapValue)
 	assert.NotNil(t, s.Meta.Signer.Extensions.IMapValue)
 }
 
-func TestProfile_marshaling(t *testing.T) {
+func TestProfileManifest_marshaling(t *testing.T) {
 	type corimExtensions struct {
 		Extension1 *string `cbor:"-1,keyasint,omitempty" json:"ext1,omitempty"`
 	}
@@ -117,7 +117,7 @@ func TestProfile_marshaling(t *testing.T) {
 	assert.Equal(t, profID, c.Profile)
 	assert.Equal(t, "foo", c.Extensions.MustGetString("Extension1"))
 
-	profile, ok := GetProfile(c.Profile)
+	profileManifest, ok := GetProfileManifest(c.Profile)
 	assert.True(t, ok)
 
 	cmd, err := UnmarshalComidFromCBOR(c.Tags[0], c.Profile)
@@ -158,11 +158,11 @@ func TestProfile_marshaling(t *testing.T) {
 	assert.Equal(t, profID, c.Profile)
 	assert.Equal(t, "foo", c.Extensions.MustGetString("Extension1"))
 
-	cmd = profile.GetComid()
+	cmd = profileManifest.GetComid()
 	err = cmd.FromJSON(testComidJSON)
 	assert.NoError(t, err)
 
-	cmd = profile.GetComid()
+	cmd = profileManifest.GetComid()
 	err = cmd.FromJSON(testComidWithExtensionsJSON)
 	assert.NoError(t, err)
 

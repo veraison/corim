@@ -82,6 +82,8 @@ func (o *Instance) UnmarshalCBOR(data []byte) error {
 //	ueid: base64-encoded bytes, e.g. "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 //	uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
 //	bytes: a variable-length opaque byte string, example {0x07, 0x12, 0x34}
+
+//nolint:dupl
 func (o *Instance) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 

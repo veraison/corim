@@ -145,7 +145,7 @@ func TestTrustAnchor_JSON_Roundtrip(t *testing.T) {
 	err := tv2.FromJSON(j)
 	assert.Nil(t, err)
 
-	assert.True(t, len(tv2.Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Data), "Compare TA value")
+	assert.True(t, len(tv2.Data) == len(ta) && bytes.Equal(ta, tv2.Data), "Compare TA value")
 	assert.True(t, TaFormatCertificate == tv2.Format, "Compare TA format")
 
 }
@@ -166,7 +166,7 @@ func TestTrustAnchor_CBOR_Roundtrip(t *testing.T) {
 	err := tv2.FromCBOR(c)
 	assert.Nil(t, err)
 
-	assert.True(t, len(tv2.Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Data), "Compare TA value")
+	assert.True(t, len(tv2.Data) == len(ta) && bytes.Equal(ta, tv2.Data), "Compare TA value")
 	assert.True(t, TaFormatCertificate == tv2.Format, "Compare TA format")
 
 }
@@ -203,9 +203,9 @@ func TestTasAndCas_JSON_full_Roundtrip(t *testing.T) {
 	err := tv2.FromJSON(j)
 	assert.Nil(t, err)
 
-	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
+	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && bytes.Equal(ta, tv2.Tas[0].Data), "Compare TA value")
 	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
-	assert.True(t, len(tv2.Cas[0]) == len(ca) && 0 == bytes.Compare(ca, tv2.Cas[0]), "Compare CA")
+	assert.True(t, len(tv2.Cas[0]) == len(ca) && bytes.Equal(ca, tv2.Cas[0]), "Compare CA")
 }
 
 func TestTasAndCas_CBOR_full_Roundtrip(t *testing.T) {
@@ -221,7 +221,7 @@ func TestTasAndCas_CBOR_full_Roundtrip(t *testing.T) {
 	err := tv2.FromCBOR(c)
 	assert.Nil(t, err)
 
-	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && 0 == bytes.Compare(ta, tv2.Tas[0].Data), "Compare TA value")
+	assert.True(t, len(tv2.Tas[0].Data) == len(ta) && bytes.Equal(ta, tv2.Tas[0].Data), "Compare TA value")
 	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
 	assert.True(t, TaFormatCertificate == tv2.Tas[0].Format, "Compare TA format")
 }

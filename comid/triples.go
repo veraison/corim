@@ -11,11 +11,11 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues *ValueTriples `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues  *ValueTriples `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
-	DevIdentityKeys *KeyTriples   `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
-	AttestVerifKeys *KeyTriples   `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
-
+	ReferenceValues   *ValueTriples             `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues    *ValueTriples             `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	DevIdentityKeys   *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+	AttestVerifKeys   *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
+	CondEndorseSeries *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
 	Extensions
 }
 
@@ -23,6 +23,7 @@ type Triples struct {
 func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 	refValExts := extensions.NewMap()
 	endValExts := extensions.NewMap()
+	conSeriesExts := extensions.NewMap()
 
 	for p, v := range exts {
 		switch p {
@@ -36,6 +37,10 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 			endValExts[ExtMval] = v
 		case ExtEndorsedValueFlags:
 			endValExts[ExtFlags] = v
+		case ExtCondEndorseSeriesValue:
+			conSeriesExts[ExtMval] = v
+		case ExtCondEndorseSeriesValueFlags:
+			conSeriesExts[ExtFlags] = v
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -56,7 +61,17 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 			o.EndorsedValues = NewValueTriples()
 		}
 
-		if err := o.EndorsedValues.RegisterExtensions(refValExts); err != nil {
+		if err := o.EndorsedValues.RegisterExtensions(endValExts); err != nil {
+			return err
+		}
+	}
+
+	if len(conSeriesExts) != 0 {
+		if o.CondEndorseSeries == nil {
+			o.CondEndorseSeries = NewCondEndorseSeriesTriples()
+		}
+
+		if err := o.CondEndorseSeries.RegisterExtensions(conSeriesExts); err != nil {
 			return err
 		}
 	}
@@ -64,7 +79,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 	return nil
 }
 
-// GetExtensions returns pervisouosly registered extension
+// GetExtensions returns previously registered extension
 func (o *Triples) GetExtensions() extensions.IMapValue {
 	return o.Extensions.IMapValue
 }
@@ -88,6 +103,10 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 
 	if o.EndorsedValues != nil && o.EndorsedValues.IsEmpty() {
 		o.EndorsedValues = nil
+	}
+
+	if o.CondEndorseSeries != nil && o.CondEndorseSeries.IsEmpty() {
+		o.CondEndorseSeries = nil
 	}
 
 	return encoding.SerializeStructToCBOR(em, o)
@@ -114,6 +133,10 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 		o.EndorsedValues = nil
 	}
 
+	if o.CondEndorseSeries != nil && o.CondEndorseSeries.IsEmpty() {
+		o.CondEndorseSeries = nil
+	}
+
 	return encoding.SerializeStructToJSON(o)
 }
 
@@ -123,7 +146,8 @@ func (o Triples) Valid() error {
 	if (o.ReferenceValues == nil || o.ReferenceValues.IsEmpty()) &&
 		(o.EndorsedValues == nil || o.EndorsedValues.IsEmpty()) &&
 		(o.AttestVerifKeys == nil || len(*o.AttestVerifKeys) == 0) &&
-		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) {
+		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) &&
+		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) {
 		return fmt.Errorf("triples struct must not be empty")
 	}
 
@@ -155,44 +179,63 @@ func (o Triples) Valid() error {
 		}
 	}
 
+	if o.CondEndorseSeries != nil {
+		if err := o.CondEndorseSeries.Valid(); err != nil {
+			return fmt.Errorf("conditional series: %w", err)
+		}
+	}
+
 	return o.Extensions.validTriples(&o)
 }
 
-func (o *Triples) AddReferenceValue(val ValueTriple) *Triples {
+func (o *Triples) AddReferenceValue(val *ValueTriple) *Triples {
 	if o != nil {
 		if o.ReferenceValues == nil {
 			o.ReferenceValues = new(ValueTriples)
 		}
 
-		o.ReferenceValues.Add(&val)
+		o.ReferenceValues.Add(val)
 	}
 
 	return o
 }
 
-func (o *Triples) AddEndorsedValue(val ValueTriple) *Triples {
+func (o *Triples) AddEndorsedValue(val *ValueTriple) *Triples {
 	if o != nil {
 		if o.EndorsedValues == nil {
 			o.EndorsedValues = new(ValueTriples)
 		}
 
-		o.EndorsedValues.Add(&val)
+		o.EndorsedValues.Add(val)
 	}
 
 	return o
 }
 
-func (o *Triples) AddAttestVerifKey(val KeyTriple) *Triples {
+func (o *Triples) AddAttestVerifKey(val *KeyTriple) *Triples {
 	if o != nil {
-		*o.AttestVerifKeys = append(*o.AttestVerifKeys, val)
+		*o.AttestVerifKeys = append(*o.AttestVerifKeys, *val)
 	}
 
 	return o
 }
 
-func (o *Triples) AddDevIdentityKey(val KeyTriple) *Triples {
+func (o *Triples) AddDevIdentityKey(val *KeyTriple) *Triples {
 	if o != nil {
-		*o.DevIdentityKeys = append(*o.DevIdentityKeys, val)
+		*o.DevIdentityKeys = append(*o.DevIdentityKeys, *val)
+	}
+
+	return o
+}
+
+// nolint:gocritic
+func (o *Triples) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Triples {
+	if o != nil {
+		if o.CondEndorseSeries == nil {
+			o.CondEndorseSeries = new(CondEndorseSeriesTriples)
+		}
+
+		o.CondEndorseSeries.Add(val)
 	}
 
 	return o

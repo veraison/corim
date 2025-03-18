@@ -84,6 +84,8 @@ func (o *Group) UnmarshalCBOR(data []byte) error {
 //	  "type": "bytes",
 //	  "value": "MTIzNDU2Nzg5"
 //	}
+
+//nolint:dupl
 func (o *Group) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 

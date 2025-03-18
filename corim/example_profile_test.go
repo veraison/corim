@@ -104,7 +104,8 @@ func Example_profile_unmarshal() {
 		Extensions.MustGetString("Address"))
 
 	fmt.Printf("Measurements:\n")
-	for _, m := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
+	for i := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
+		m := &extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values[i]
 
 		val := hex.EncodeToString((*m.Val.Digests)[0].HashValue)
 		tsInt := m.Val.Extensions.MustGetInt64("timestamp")
@@ -133,13 +134,13 @@ func Example_profile_marshal() {
 		panic(err)
 	}
 
-	profile, ok := GetProfile(profileID)
+	profileManifest, ok := GetProfileManifest(profileID)
 	if !ok {
 		log.Fatalf("profile %v not found", profileID)
 	}
 
-	myCorim := profile.GetUnsignedCorim()
-	myComid := profile.GetComid().
+	myCorim := profileManifest.GetUnsignedCorim()
+	myComid := profileManifest.GetComid().
 		SetLanguage("en-GB").
 		SetTagIdentity("example", 0).
 		// Adding an entity to the Entities collection also registers
@@ -178,14 +179,14 @@ func Example_profile_marshal() {
 	}
 
 	refVal.Measurements.Add(measurement)
-	myComid.Triples.AddReferenceValue(refVal)
+	myComid.Triples.AddReferenceValue(&refVal)
 
 	err = myComid.Valid()
 	if err != nil {
 		log.Fatalf("comid validity: %v", err)
 	}
 
-	myCorim.AddComid(*myComid)
+	myCorim.AddComid(myComid)
 
 	buf, err := myCorim.ToCBOR()
 	if err != nil {

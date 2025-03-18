@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -6,6 +6,7 @@ package comid
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/veraison/corim/encoding"
@@ -113,34 +114,11 @@ func NewTaggedSVN(val any) (*SVN, error) {
 		return &SVN{&ret}, nil
 	}
 
-	switch t := val.(type) {
-	case string:
-		u, err := strconv.ParseUint(t, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedSVN(u)
-	case TaggedSVN:
-		ret = t
-	case *TaggedSVN:
-		ret = *t
-	case uint64:
-		ret = TaggedSVN(t)
-	case uint:
-		ret = TaggedSVN(t)
-	case int:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedSVN(t)
-	case int64:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedSVN(t)
-	default:
-		return nil, fmt.Errorf("unexpected type for SVN exact-value: %T", t)
+	u, err := convertToSVNUint64(val)
+	if err != nil {
+		return nil, err
 	}
+	ret = TaggedSVN(u)
 
 	return &SVN{&ret}, nil
 }
@@ -166,6 +144,30 @@ func (o TaggedSVN) Valid() error {
 	return nil
 }
 
+func (o TaggedSVN) Equal(r TaggedSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedSVN:Equal: %v", err)
+		return false
+	}
+
+	return ret == 0
+}
+
+func (o TaggedSVN) CompareAgainstRefSVN(r TaggedSVN) bool {
+	return o.Equal(r)
+}
+
+func (o TaggedSVN) CompareAgainstRefMinSVN(r TaggedMinSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedSVN:CompareAgainstRefMinSVN: %v", err)
+		return false
+	}
+
+	return ret >= 0
+}
+
 type TaggedMinSVN uint64
 
 func NewTaggedMinSVN(val any) (*SVN, error) {
@@ -175,34 +177,11 @@ func NewTaggedMinSVN(val any) (*SVN, error) {
 		return &SVN{&ret}, nil
 	}
 
-	switch t := val.(type) {
-	case string:
-		u, err := strconv.ParseUint(t, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedMinSVN(u)
-	case TaggedMinSVN:
-		ret = t
-	case *TaggedMinSVN:
-		ret = *t
-	case uint64:
-		ret = TaggedMinSVN(t)
-	case uint:
-		ret = TaggedMinSVN(t)
-	case int:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedMinSVN(t)
-	case int64:
-		if t < 0 {
-			return nil, fmt.Errorf("SVN cannot be negative: %d", t)
-		}
-		ret = TaggedMinSVN(t)
-	default:
-		return nil, fmt.Errorf("unexpected type for SVN min-value: %T", t)
+	u, err := convertToSVNUint64(val)
+	if err != nil {
+		return nil, err
 	}
+	ret = TaggedMinSVN(u)
 
 	return &SVN{&ret}, nil
 }
@@ -226,6 +205,78 @@ func (o TaggedMinSVN) Type() string {
 
 func (o TaggedMinSVN) Valid() error {
 	return nil
+}
+
+func (o TaggedMinSVN) Equal(r TaggedMinSVN) bool {
+	ret, err := compare(o, r)
+	if err != nil {
+		log.Printf("TaggedMinSVN:Equal: %v", err)
+		return false
+	}
+
+	return ret == 0
+}
+
+// compare is a helper function to compare two SVNs, object and reference
+//
+// returns:
+// 0 if they are equal; no error
+// 1 if object is newer than the reference; no error
+// -1 if object is older than reference or if the function encounters an error
+func compare(o any, r any) (int, error) {
+	obj, err := convertToSVNUint64(o)
+	if err != nil {
+		return -1, fmt.Errorf("object Error: %v", err)
+	}
+
+	ref, err := convertToSVNUint64(r)
+	if err != nil {
+		return -1, fmt.Errorf("reference Error: %v", err)
+	}
+
+	if obj < ref {
+		return -1, nil
+	} else if obj > ref {
+		return 1, nil
+	}
+
+	return 0, nil
+}
+
+// convertToSVNUint64 converts various SVN types to uint64.
+func convertToSVNUint64(val any) (uint64, error) {
+	switch t := val.(type) {
+	case string:
+		u, err := strconv.ParseUint(t, 10, 64)
+		if err != nil {
+			return 0, err
+		}
+		return u, nil
+	case uint64:
+		return t, nil
+	case uint:
+		return uint64(t), nil
+	case int:
+		if t < 0 {
+			return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+		}
+		return uint64(t), nil
+	case int64:
+		if t < 0 {
+			return 0, fmt.Errorf("SVN cannot be negative: %d", t)
+		}
+		return uint64(t), nil
+	case TaggedSVN:
+		return uint64(t), nil
+	case *TaggedSVN:
+		return uint64(*t), nil
+	case TaggedMinSVN:
+		return uint64(t), nil
+	case *TaggedMinSVN:
+		return uint64(*t), nil
+	default:
+		return 0, fmt.Errorf("unexpected type for SVN: %T", t)
+	}
 }
 
 // ISVNFactory defines the signature for the factory functions that may be

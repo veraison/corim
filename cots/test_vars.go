@@ -3,6 +3,7 @@
 
 package cots
 
+//nolint:lll
 var (
 	ConciseTaStoreTemplateSingleOrg = `{
 		"tag-identity": {

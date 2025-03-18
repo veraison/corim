@@ -1,0 +1,119 @@
+/ concise-mid-tag / {
+  / tag-identity / 1 : {
+    / tag-id / 0 : "Sample Quoting Enclave RIM"
+  },
+    / entity / 2 : [ {
+    / entity-name / 0 : "Acme",
+    / reg-id / 1 : 32("https://Acme.com"),
+    / role / 2 : [ 1,0,2 ] / creator, tag-creator, maintainer /
+  } ],
+  / triples / 4 : {
+    / reference-triples / 0 : [
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D0102030404'), / 2.16.840.1.113741.1.2.3.4.4 /
+            / vendor / 1 : "Acme Inc",
+            / model / 2 : "0123456789ABCDEF" 
+          }
+        },
+        [
+          / measurement-map / {
+            / mval / 1 : {
+              / version-map / 0 : {
+                / version / 0 : "2"
+              }
+            }
+          }
+        ]
+      ]
+    ],
+    / conditional-endorsement-series-triples / 8 : [
+      [
+        / stateful-environment-record / [ 
+            / environment-map / {
+              / class / 0 : {
+                / class-id / 0 :
+                / tagged-oid-type / 111(h'6086480186F84D0102030401'), / 2.16.840.1.113741.1.2.3.4.1 /
+              / vendor / 1 : "ACME Inc",
+              / model / 2 : "0123456789ABCDEF" 
+            }
+          },
+          [
+            / measurement-map / {
+              / mval / 1 : / measurement-values-map / {
+				 / comid.digests / 2 : [ [
+					/ hash-alg-id / 1, / sha256 /
+					/ hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+				] ]
+              },
+              / authorized-by / 2 : [
+                / tagged-pkix-base64-key-type / 554("base64_key_for-RIM-creator")
+              ]
+            }
+          ]
+        ],
+        [  / *** series records *** /
+          [ / *** record 1 *** /
+            [ / selection /
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+                  / comid.svn / 1 : 552(1)
+                }
+              }
+            ],
+            [ / addition /
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+					/ comid.ver / 0 : {
+						/ comid.version / 0 : "1.0.0",
+						/ comid.version-scheme / 1 : 16384 / semver /
+					}
+                }
+              }
+            ]
+          ],
+          [ / *** record 2 *** /
+            [ / selection / 
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+                  / comid.svn / 1 : 552(2)
+                }
+              }
+            ],
+            [ / addition /
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+					/ comid.ver / 0 : {
+						/ comid.version / 0 : "2.0.0",
+						/ comid.version-scheme / 1 : 16384 / semver /
+					}
+                }
+              }
+            ]
+          ],
+          [ / *** record 3 *** /
+            [ / selection / 
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+                   / comid.svn / 1 : 552(3)
+                }
+              }
+            ],
+            [ / addition /
+              / measurement-map / {
+                / measurement-values-map / 1 : {
+				/ comid.ver / 0 : {
+						/ comid.version / 0 : "3.0.0",
+						/ comid.version-scheme / 1 : 16384 / semver /
+				    }
+                }
+              }
+            ]
+          ]
+        ]
+      ]
+    ]
+  }
+}

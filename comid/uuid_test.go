@@ -12,7 +12,7 @@ import (
 
 func TestUUID_JSON(t *testing.T) {
 	val := TaggedUUID(TestUUID)
-	expected := fmt.Sprintf(`"%s"`, val.String())
+	expected := fmt.Sprintf("%q", val.String())
 
 	out, err := val.MarshalJSON()
 	require.NoError(t, err)

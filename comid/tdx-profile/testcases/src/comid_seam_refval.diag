@@ -1,0 +1,51 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'3f06af63a93c11e4979700505690773f'
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "INTEL",
+    / comid.reg-id / 1 : 32("https://intel.com"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+    / comid.reference-triples / 0 : [ [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-oid-type / 111(
+              h'6086480186F84D0102030403'
+            ),
+          / comid.vendor / 1 : "Intel Corporation",
+          / comid.model / 2 : "TDX SEAM"
+        }
+      },
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+              / comid.attributes / -82 :[ 1, 2],
+              / comid.isvprodid / -85 : h'ABCD',
+              / comid.isvsvn / -73 : 6,
+              / comid.mrtee / -83 : [
+                [
+                / alg-id / 1, / sha256 /
+                / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
+                ]
+              ],
+              / comid.mrsigner / -84 : [ 
+                [
+                / alg-id / 1, / sha256 /
+                / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
+                ],
+                [
+                / alg-id / 8, / sha384 /
+                / digest / h'a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a'
+                ]
+              ],
+              /comid.tcbevalnum / -86 : 11
+          },
+          2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
+        }
+      ]
+    ] ]
+  }
+}

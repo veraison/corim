@@ -58,6 +58,13 @@ func TestEnvironment_Valid_ok_with_class(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestEnvironment_ToCBOR_empty(t *testing.T) {
+	var actual Environment
+	_, err := actual.ToCBOR()
+
+	assert.EqualError(t, err, "environment must not be empty")
+}
+
 func TestEnvironment_ToCBOR_class_only(t *testing.T) {
 	tv := Environment{
 		Class: NewClassUUID(TestUUID),
@@ -66,25 +73,6 @@ func TestEnvironment_ToCBOR_class_only(t *testing.T) {
 
 	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}}
 	expected := MustHexDecode(t, "a100a100d8255031fb5abf023e4992aa4e95f9c1503bfa")
-
-	actual, err := tv.ToCBOR()
-
-	fmt.Printf("CBOR: %x\n", actual)
-
-	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
-}
-
-func TestEnvironment_ToCBOR_class_and_instance(t *testing.T) {
-	tv := Environment{
-		Class:    NewClassUUID(TestUUID),
-		Instance: MustNewUEIDInstance(TestUEID),
-	}
-	require.NotNil(t, tv.Class)
-	require.NotNil(t, tv.Instance)
-
-	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD')}
-	expected := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead")
 
 	actual, err := tv.ToCBOR()
 
@@ -128,20 +116,82 @@ func TestEnvironment_ToCBOR_group_only(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestEnvironment_FromCBOR_empty(t *testing.T) {
-	tv := MustHexDecode(t, "a0")
+func TestEnvironment_ToCBOR_class_and_instance(t *testing.T) {
+	tv := Environment{
+		Class:    NewClassUUID(TestUUID),
+		Instance: MustNewUEIDInstance(TestUEID),
+	}
+	require.NotNil(t, tv.Class)
+	require.NotNil(t, tv.Instance)
 
-	var actual Environment
-	err := actual.FromCBOR(tv)
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD')}
+	expected := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead")
 
-	assert.EqualError(t, err, "environment must not be empty")
+	actual, err := tv.ToCBOR()
+
+	fmt.Printf("CBOR: %x\n", actual)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
 }
 
-func TestEnvironment_ToCBOR_empty(t *testing.T) {
-	var actual Environment
-	_, err := actual.ToCBOR()
+func TestEnvironment_ToCBOR_class_and_group(t *testing.T) {
+	tv := Environment{
+		Class: NewClassUUID(TestUUID),
+		Group: MustNewUUIDGroup(TestUUID),
+	}
+	require.NotNil(t, tv.Class)
+	require.NotNil(t, tv.Group)
 
-	assert.EqualError(t, err, "environment must not be empty")
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	expected := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	actual, err := tv.ToCBOR()
+
+	fmt.Printf("CBOR: %x\n", actual)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestEnvironment_ToCBOR_instance_and_group(t *testing.T) {
+	tv := Environment{
+		Instance: MustNewUEIDInstance(TestUEID),
+		Group:    MustNewUUIDGroup(TestUUID),
+	}
+	require.NotNil(t, tv.Instance)
+	require.NotNil(t, tv.Group)
+
+	// {1: 550(h'02DEADBEEFDEAD'), 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	expected := MustHexDecode(t, "a201d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	actual, err := tv.ToCBOR()
+
+	fmt.Printf("CBOR: %x\n", actual)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+}
+
+func TestEnvironment_ToCBOR_class_and_instance_and_group(t *testing.T) {
+	tv := Environment{
+		Class:    NewClassUUID(TestUUID),
+		Instance: MustNewUEIDInstance(TestUEID),
+		Group:    MustNewUUIDGroup(TestUUID),
+	}
+	require.NotNil(t, tv.Class)
+	require.NotNil(t, tv.Instance)
+	require.NotNil(t, tv.Group)
+
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD'), 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	expected := MustHexDecode(t, "a300a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	actual, err := tv.ToCBOR()
+
+	fmt.Printf("CBOR: %x\n", actual)
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
 }
 
 func TestEnvironment_FromCBOR_unknown_map_entry(t *testing.T) {
@@ -152,6 +202,15 @@ func TestEnvironment_FromCBOR_unknown_map_entry(t *testing.T) {
 	err := actual.FromCBOR(tv)
 
 	// since the unknown map entry is ignored, the resulting Environment is empty
+	assert.EqualError(t, err, "environment must not be empty")
+}
+
+func TestEnvironment_FromCBOR_empty(t *testing.T) {
+	tv := MustHexDecode(t, "a0")
+
+	var actual Environment
+	err := actual.FromCBOR(tv)
+
 	assert.EqualError(t, err, "environment must not be empty")
 }
 
@@ -169,16 +228,15 @@ func TestEnvironment_FromCBOR_class_only(t *testing.T) {
 	assert.Nil(t, actual.Group)
 }
 
-func TestEnvironment_FromCBOR_class_and_instance(t *testing.T) {
-	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD')}
-	tv := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead")
+func TestEnvironment_FromCBOR_instance_only(t *testing.T) {
+	// {1: 550(h'02DEADBEEFDEAD')}
+	tv := MustHexDecode(t, "a101d902264702deadbeefdead")
 
 	var actual Environment
 	err := actual.FromCBOR(tv)
 
 	assert.Nil(t, err)
-	assert.NotNil(t, actual.Class)
-	assert.Equal(t, TestUUIDString, actual.Class.ClassID.String())
+	assert.Nil(t, actual.Class)
 	assert.NotNil(t, actual.Instance)
 	assert.Equal(t, []byte(TestUEID), actual.Instance.Bytes())
 	assert.Nil(t, actual.Group)
@@ -194,6 +252,67 @@ func TestEnvironment_FromCBOR_group_only(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, actual.Class)
 	assert.Nil(t, actual.Instance)
+	assert.NotNil(t, actual.Group)
+	assert.Equal(t, TestUUIDString, actual.Group.String())
+}
+
+func TestEnvironment_FromCBOR_class_and_instance(t *testing.T) {
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD')}
+	tv := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead")
+
+	var actual Environment
+	err := actual.FromCBOR(tv)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, actual.Class)
+	assert.Equal(t, TestUUIDString, actual.Class.ClassID.String())
+	assert.NotNil(t, actual.Instance)
+	assert.Equal(t, []byte(TestUEID), actual.Instance.Bytes())
+	assert.Nil(t, actual.Group)
+}
+
+func TestEnvironment_FromCBOR_class_and_group(t *testing.T) {
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	tv := MustHexDecode(t, "a200a100d8255031fb5abf023e4992aa4e95f9c1503bfa02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	var actual Environment
+	err := actual.FromCBOR(tv)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, actual.Class)
+	assert.Equal(t, TestUUIDString, actual.Class.ClassID.String())
+	assert.Nil(t, actual.Instance)
+	assert.NotNil(t, actual.Group)
+	assert.Equal(t, TestUUIDString, actual.Group.String())
+}
+
+func TestEnvironment_FromCBOR_instance_and_group(t *testing.T) {
+	// {1: 550(h'02DEADBEEFDEAD'), 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	tv := MustHexDecode(t, "a201d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	var actual Environment
+	err := actual.FromCBOR(tv)
+
+	assert.Nil(t, err)
+	assert.Nil(t, actual.Class)
+	assert.NotNil(t, actual.Instance)
+	assert.Equal(t, []byte(TestUEID), actual.Instance.Bytes())
+	assert.NotNil(t, actual.Group)
+	assert.Equal(t, TestUUIDString, actual.Group.String())
+}
+
+func TestEnvironment_FromCBOR_class_and_instance_and_group(t *testing.T) {
+	// {0: {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}, 1: 550(h'02DEADBEEFDEAD'), 2: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA')}
+	tv := MustHexDecode(t, "a300a100d8255031fb5abf023e4992aa4e95f9c1503bfa01d902264702deadbeefdead02d8255031fb5abf023e4992aa4e95f9c1503bfa")
+
+	var actual Environment
+	err := actual.FromCBOR(tv)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, actual.Class)
+	assert.Equal(t, TestUUIDString, actual.Class.ClassID.String())
+	assert.NotNil(t, actual.Instance)
+	assert.Equal(t, []byte(TestUEID), actual.Instance.Bytes())
 	assert.NotNil(t, actual.Group)
 	assert.Equal(t, TestUUIDString, actual.Group.String())
 }

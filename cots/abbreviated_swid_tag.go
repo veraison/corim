@@ -158,6 +158,7 @@ func NewTag(tagID interface{}, softwareName, softwareVersion string) (*Abbreviat
 	return &t, nil
 }
 
+// nolint:gocritic
 func (t AbbreviatedSwidTag) Valid() error {
 	if len(t.Entities) == 0 || t.Entities == nil {
 		return fmt.Errorf("no entities present, must have at least 1 entity")
@@ -166,17 +167,20 @@ func (t AbbreviatedSwidTag) Valid() error {
 }
 
 // ToXML serializes the receiver AbbreviatedSwidTag to SWID
+// nolint:gocritic
 func (t AbbreviatedSwidTag) ToXML() ([]byte, error) {
 	return xml.Marshal(t)
 }
 
 // ToJSON serializes the receiver AbbreviatedSwidTag to CoSWID using the JSON
-// formatter
+// formatter.
+// nolint:gocritic
 func (t AbbreviatedSwidTag) ToJSON() ([]byte, error) {
 	return json.Marshal(t)
 }
 
 // ToCBOR serializes the receiver AbbreviatedSwidTag to CoSWID
+// nolint:gocritic
 func (t AbbreviatedSwidTag) ToCBOR() ([]byte, error) {
 	return em.Marshal(t)
 }
@@ -211,31 +215,31 @@ func (t *AbbreviatedSwidTag) setTagID(v interface{}) error {
 }
 
 // AddEntity adds the supplied Entity to the receiver AbbreviatedSwidTag
-func (t *AbbreviatedSwidTag) AddEntity(e swid.Entity) error {
-	t.Entities = append(t.Entities, e)
+func (t *AbbreviatedSwidTag) AddEntity(e *swid.Entity) error {
+	t.Entities = append(t.Entities, *e)
 
 	return nil
 }
 
 // AddLink adds the supplied Link to the receiver AbbreviatedSwidTag
-func (t *AbbreviatedSwidTag) AddLink(l swid.Link) error {
+func (t *AbbreviatedSwidTag) AddLink(l *swid.Link) error {
 	if t.Links == nil {
 		t.Links = new(swid.Links)
 	}
 
-	*t.Links = append(*t.Links, l)
+	*t.Links = append(*t.Links, *l)
 
 	return nil
 }
 
 // AddSoftwareMeta adds the supplied SoftwareMeta to the receiver
 // AbbreviatedSwidTag
-func (t *AbbreviatedSwidTag) AddSoftwareMeta(m swid.SoftwareMeta) error {
+func (t *AbbreviatedSwidTag) AddSoftwareMeta(m *swid.SoftwareMeta) error {
 	if t.SoftwareMetas == nil {
 		t.SoftwareMetas = new(swid.SoftwareMetas)
 	}
 
-	*t.SoftwareMetas = append(*t.SoftwareMetas, m)
+	*t.SoftwareMetas = append(*t.SoftwareMetas, *m)
 
 	return nil
 }

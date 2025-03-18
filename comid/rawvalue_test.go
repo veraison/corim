@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
@@ -55,4 +55,39 @@ func TestRawValue_Marshal_UnMarshal_CBOR_ok(t *testing.T) {
 	err = sv.UnmarshalCBOR(bytes)
 	assert.NoError(t, err)
 	assert.Equal(t, *rv, sv)
+}
+
+func TestRawValue_Equal_True(t *testing.T) {
+	claim := RawValue{}
+	claim.SetBytes([]byte{0x01, 0x02, 0x03})
+	ref := RawValue{}
+	ref.SetBytes([]byte{0x01, 0x02, 0x03})
+
+	assert.True(t, claim.Equal(ref))
+}
+
+func TestRawValue_Equal_False(t *testing.T) {
+	claim := RawValue{}
+	claim.SetBytes([]byte{0x01, 0x02, 0x03})
+	ref := RawValue{}
+	ref.SetBytes([]byte{0x01, 0x02, 0x04})
+
+	assert.False(t, claim.Equal(ref))
+}
+
+func TestRawValue_Compare_True(t *testing.T) {
+	claim := RawValue{}
+	claim.SetBytes([]byte{0x01, 0x02, 0x03})
+	ref := []byte{0x01, 0x00, 0x03}
+	mask := []byte{0xff, 0x00, 0xff}
+
+	assert.True(t, claim.CompareAgainstReference(ref, &mask))
+}
+
+func TestRawValue_Compare_False(t *testing.T) {
+	claim := RawValue{}
+	claim.SetBytes([]byte{0x01, 0x02, 0x03})
+	ref := []byte{0x04, 0x05, 0x06}
+
+	assert.False(t, claim.CompareAgainstReference(ref, nil))
 }

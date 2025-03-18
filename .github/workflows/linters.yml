@@ -22,5 +22,3 @@ jobs:
         go install github.com/golang/mock/mockgen@v1.5.0
     - name: Run required linters in .golangci.yml plus hard-coded ones here
       run: make lint
-    - name: Run optional linters (not required to pass)
-      run: make lint-extra

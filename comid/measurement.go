@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -13,7 +13,6 @@ import (
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
-	"github.com/veraison/swid"
 )
 
 const MaxUint64 = ^uint64(0)
@@ -390,6 +389,7 @@ func (o *Mval) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
+// nolint:gocritic
 func (o Mval) MarshalCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -410,6 +410,7 @@ func (o *Mval) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
+// nolint:gocritic
 func (o Mval) MarshalJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
@@ -424,7 +425,10 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
+// Valid returns an error if none of the measurement values are set and the Extensions are empty.
+// nolint:gocritic
 func (o Mval) Valid() error {
+	// Check if no measurement values are set
 	if o.Ver == nil &&
 		o.SVN == nil &&
 		o.Digests == nil &&
@@ -436,67 +440,55 @@ func (o Mval) Valid() error {
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
 		o.UUID == nil &&
-		o.Name == nil &&
-		o.IntegrityRegisters == nil {
+    o.Name == nil &&
+		o.IntegrityRegisters == nil &&
+		o.Extensions.IsEmpty() {
+
 		return fmt.Errorf("no measurement value set")
 	}
 
+	// Validate Version
 	if o.Ver != nil {
 		if err := o.Ver.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Digests
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
 			return err
 		}
 	}
 
+	// Validate Flags
 	if o.Flags != nil {
 		if err := o.Flags.Valid(); err != nil {
 			return err
 		}
 	}
 
-	// raw value and mask have no specific semantics
-
-	// TODO(tho) MAC addr & friends (see https://github.com/veraison/corim/issues/18)
-
-	return o.Extensions.validMval(&o)
-}
-
-// Version stores a version-map with JSON and CBOR serializations.
-type Version struct {
-	Version string             `cbor:"0,keyasint" json:"value"`
-	Scheme  swid.VersionScheme `cbor:"1,keyasint" json:"scheme"`
-}
-
-func NewVersion() *Version {
-	return &Version{}
-}
-
-func (o *Version) SetVersion(v string) *Version {
-	if o != nil {
-		o.Version = v
-	}
-	return o
-}
-
-func (o *Version) SetScheme(v int64) *Version {
-	if o != nil {
-		if o.Scheme.SetCode(v) != nil {
-			return nil
+	// Validate MAC Address
+	if o.MACAddr != nil {
+		macLen := len(*o.MACAddr)
+		if macLen != 6 && macLen != 8 { // MAC address must be either 6 or 8 bytes
+			return fmt.Errorf("invalid MAC address length: expected 6 or 8 bytes, got %d", macLen)
 		}
 	}
-	return o
-}
 
-func (o Version) Valid() error {
-	if o.Version == "" {
-		return fmt.Errorf("empty version")
+	// Validate IP Address
+	if o.IPAddr != nil {
+		ip := *o.IPAddr
+		// Must be valid IPv4 or IPv6 (i.e., .To4() != nil or .To16() != nil)
+		if ip.To4() == nil && ip.To16() == nil {
+			return fmt.Errorf("invalid IP address: %s", ip.String())
+		}
 	}
-	return nil
+
+	// raw value and raw-value-mask have no specific semantics here
+
+	// Validate extensions (custom logic implemented in validMval())
+	return o.Extensions.validMval(&o)
 }
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.
@@ -611,6 +603,7 @@ func (o *Measurement) RegisterExtensions(exts extensions.Map) error {
 	return o.Val.RegisterExtensions(exts)
 }
 
+// nolint:gocritic
 func (o Measurement) GetExtensions() extensions.IMapValue {
 	return o.Val.GetExtensions()
 }
@@ -766,6 +759,7 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 	return o
 }
 
+
 // SetName sets the supplied name string in the measurement-values-map of the
 // target measurement
 func (o *Measurement) SetName(name string) *Measurement {
@@ -775,6 +769,8 @@ func (o *Measurement) SetName(name string) *Measurement {
 	return o
 }
 
+
+// nolint:gocritic
 func (o Measurement) Valid() error {
 	if o.Key != nil && o.Key.IsSet() {
 		if err := o.Key.Valid(); err != nil {
