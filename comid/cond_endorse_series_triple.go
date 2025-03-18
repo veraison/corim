@@ -23,7 +23,7 @@ type CondEndorseSeriesRecord struct {
 
 func (o CondEndorseSeriesRecord) Valid() error {
 	if err := o.Selection.Valid(); err != nil {
-		return fmt.Errorf("conditional series record selection validation failed: %w", err)
+		return fmt.Errorf("selection validation failed: %w", err)
 	}
 
 	if err := o.Addition.Valid(); err != nil {
