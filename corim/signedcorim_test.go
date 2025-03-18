@@ -721,3 +721,24 @@ func TestSignedCorim_SignVerify_with_single_cert_x5chain_ok(t *testing.T) {
 	assert.Equal(t, signedCorimIn.SigningCert, signedCorimOut.SigningCert)
 	assert.Equal(t, signedCorimIn.IntermediateCerts, signedCorimOut.IntermediateCerts)
 }
+
+func TestSignedCorim_Sign_with_x5chain_fail_missing_ee_cert(t *testing.T) {
+	signer, err := NewSignerFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	var signedCorimIn SignedCorim
+
+	signedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
+	signedCorimIn.Meta = *metaGood(t)
+
+	certChain, err := concatFiles(
+		filepath.Join("..", "misc", "intermediateCA.der"),
+		filepath.Join("..", "misc", "rootCA.der"))
+	require.NoError(t, err, "Failed to read certificate chain")
+
+	err = signedCorimIn.AddIntermediateCerts(certChain)
+	require.NoError(t, err, "Failed to add cert chain")
+
+	_, err = signedCorimIn.Sign(signer)
+	assert.EqualError(t, err, "intermediate certificates supplied but no signing certificate")
+}

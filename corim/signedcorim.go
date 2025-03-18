@@ -263,6 +263,8 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 			}
 			o.message.Headers.Protected[cose.HeaderLabelX5Chain] = certChain
 		}
+	} else if o.IntermediateCerts != nil {
+		return nil, errors.New("intermediate certificates supplied but no signing certificate")
 	}
 
 	err = o.message.Sign(rand.Reader, NoExternalData, signer)
