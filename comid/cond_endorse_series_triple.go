@@ -27,7 +27,7 @@ func (o CondEndorseSeriesRecord) Valid() error {
 	}
 
 	if err := o.Addition.Valid(); err != nil {
-		return fmt.Errorf("conditional series record addition validation failed: %w", err)
+		return fmt.Errorf("addition validation failed: %w", err)
 	}
 	return nil
 }
