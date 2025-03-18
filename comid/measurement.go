@@ -440,7 +440,7 @@ func (o Mval) Valid() error {
 		o.SerialNumber == nil &&
 		o.UEID == nil &&
 		o.UUID == nil &&
-    o.Name == nil &&
+		o.Name == nil &&
 		o.IntegrityRegisters == nil &&
 		o.Extensions.IsEmpty() {
 
