@@ -759,7 +759,6 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 	return o
 }
 
-
 // SetName sets the supplied name string in the measurement-values-map of the
 // target measurement
 func (o *Measurement) SetName(name string) *Measurement {
