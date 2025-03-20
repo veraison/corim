@@ -4,9 +4,11 @@
 package tdx
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/fxamacker/cbor/v2"
+	"github.com/veraison/corim/encoding"
 )
 
 // NumericType represents the abstraction of a numeric type, allowed values are int/uint/float
@@ -95,4 +97,86 @@ func (o NumericType) MarshalCBOR() ([]byte, error) {
 // UnmarshalCBOR UnMarshals supplied CBOR bytes to NumericType
 func (o *NumericType) UnmarshalCBOR(data []byte) error {
 	return cbor.Unmarshal(data, &o.val)
+}
+
+// Valid checks for validity of NumericType and returns an error if Invalid
+func (o NumericType) Valid() error {
+	if o.val == nil {
+		return fmt.Errorf("empty NumericType")
+	}
+	switch t := o.val.(type) {
+	case uint, uint64, float64, int:
+		return nil
+	default:
+		return fmt.Errorf("unsupported NumericType type: %T", t)
+	}
+}
+
+// MarshalJSON Marshals NumericType to JSON
+func (o NumericType) MarshalJSON() ([]byte, error) {
+	if o.Valid() != nil {
+		return nil, fmt.Errorf("invalid NumericType")
+	}
+	var (
+		v   encoding.TypeAndValue
+		b   []byte
+		err error
+	)
+	switch t := o.val.(type) {
+	case uint, uint64:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = encoding.TypeAndValue{Type: "uint", Value: b}
+	case int:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = encoding.TypeAndValue{Type: "int", Value: b}
+	case float64:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = encoding.TypeAndValue{Type: "float", Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for NumericType", t)
+	}
+	return json.Marshal(v)
+}
+
+// UnmarshalJSON UnMarshals supplied JSON buffer to NumericType
+func (o *NumericType) UnmarshalJSON(data []byte) error {
+	var v encoding.TypeAndValue
+
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	switch v.Type {
+	case "uint":
+		var x uint
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal NumericType of type uint: %w", err)
+		}
+		o.val = x
+	case "int":
+		var x int
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal NumericType of type int: %w", err)
+		}
+		o.val = x
+	case "float":
+		var x float64
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal NumericType of type float: %w", err)
+		}
+		o.val = x
+	}
+	return nil
 }
