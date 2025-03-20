@@ -34,7 +34,7 @@ func TestPSARefValID_Valid_SignerID_range(t *testing.T) {
 	}
 }
 
-func TestPSARefValID_Streing(t *testing.T) {
+func TestPSARefValID_String(t *testing.T) {
 	signerID := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
 	refvalID, err := NewTaggedPSARefValID(signerID)
 	require.NoError(t, err)

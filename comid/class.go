@@ -52,6 +52,17 @@ func NewClassOID(oid string) *Class {
 	return &Class{ClassID: classID}
 }
 
+// NewClassBytes instantiates a new Class object with tagged-bytes ID
+
+func NewClassBytes(b any) *Class {
+	classID, err := NewBytesClassID(b)
+	if err != nil {
+		return nil
+	}
+
+	return &Class{ClassID: classID}
+}
+
 // SetVendor sets the vendor metadata to the supplied string
 func (o *Class) SetVendor(vendor string) *Class {
 	if o != nil {
