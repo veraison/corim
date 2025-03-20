@@ -3,10 +3,13 @@
 
 package tdx
 
-// Define a structure for NumericExpression
-type NumericExpression struct {
-	Operator NumericOperator
-	Type     NumericType
-}
+type NumericExpression []interface{}
 
-type NumericExpressions []NumericExpression
+func NewExpression(a NumericOperator, b NumericType) (*NumericExpression, error) {
+	// check for validity of a
+	// check for validity of b
+	expression := NumericExpression{
+		a, b,
+	}
+	return &expression, nil
+}
