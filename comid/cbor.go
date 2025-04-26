@@ -31,6 +31,7 @@ var (
 		559: TaggedCertThumbprint{},
 		560: TaggedBytes{},
 		561: TaggedCertPathThumbprint{},
+		564: TaggedRawIntRange{},
 		// PSA profile tags
 		600: TaggedImplID{},
 		601: TaggedPSARefValID{},
