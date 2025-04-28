@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -164,7 +165,7 @@ func NewRawIntInteger(val any) (*RawIntInteger, error) {
 func (o RawIntInteger) Valid() error { return nil }
 
 // String converts RawIntInteger into a string
-func (o RawIntInteger) String() string { return fmt.Sprint(int64(o)) }
+func (o RawIntInteger) String() string { return strconv.FormatInt(int64(o), 10) }
 
 // Type returns the name/type of RawIntInteger
 func (o RawIntInteger) Type() string {
