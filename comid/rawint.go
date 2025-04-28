@@ -14,6 +14,11 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
+var (
+	ErrRawIntUnsetRawInt = errors.New("RawInt value unset")
+	ErrRawIntEmpryInput  = errors.New("Empry input")
+)
+
 // RawInt describes an integer value that can be compared with linear order in
 // the target environment. It follows the type-choice pattern  widely
 // used in CoRIM and implements the extensions.ITypeChoiceValue interface
@@ -47,7 +52,7 @@ func (o RawInt) Type() string {
 // Valid checks if the RawInt is valid
 func (o RawInt) Valid() error {
 	if !o.IsSet() {
-		return errors.New("RawInt value unset")
+		return ErrRawIntUnsetRawInt
 	}
 
 	return o.Value.Valid()
@@ -108,7 +113,7 @@ func (o RawInt) MarshalCBOR() ([]byte, error) {
 // UnmarshalCBOR de-serializes input CBOR into RawInt
 func (o *RawInt) UnmarshalCBOR(data []byte) error {
 	if len(data) == 0 {
-		return errors.New("empty input")
+		return ErrRawIntEmpryInput
 	}
 
 	majorType := (data[0] & 0xe0) >> 5
@@ -126,7 +131,7 @@ func (o *RawInt) UnmarshalCBOR(data []byte) error {
 		}
 		o.Value = rawIntRange
 	default:
-		return fmt.Errorf("RawInt: Error: unknown major type: %d", majorType)
+		return fmt.Errorf("RawInt: unknown major type: %d", majorType)
 	}
 
 	return nil
@@ -172,12 +177,16 @@ func (o RawIntInteger) Type() string {
 	return RawIntIntegerType
 }
 
-// CompareAgainstRefInteger compares RawIntInteger against another RawIntInteger reference value
+// CompareAgainstRefInteger compares RawIntInteger against another RawIntInteger
+// reference value. The receiver is the claim and the input parameter is the
+// reference value. Returns true if the claim is equal to the reference; false otherwise.
 func (o RawIntInteger) CompareAgainstRefInteger(ref RawIntInteger) bool {
 	return o == ref
 }
 
-// CompareAgainstRefRange compares RawIntInteger against a TaggedRawIntRange
+// CompareAgainstRefRange compares RawIntInteger against a TaggedRawIntRange.
+// The receiver is the claim and the input parameter is the reference value.
+// Returns true if the claim is within the reference range; false otherwise.
 func (o RawIntInteger) CompareAgainstRefRange(ref TaggedRawIntRange) bool {
 	obj, err := convertRawIntIntegerToInt64(o)
 	if err != nil {
@@ -273,7 +282,9 @@ func (o TaggedRawIntRange) Type() string {
 }
 
 // CompareAgainstRefInteger compares TaggedRawIntRange against a given
-// RawIntInteger reference
+// RawIntInteger reference. The receiver is the claim and the input
+// parameter is the reference value. Returns true if and only if the
+// claim is equal to both reference min & max values; false otherwise.
 func (o TaggedRawIntRange) CompareAgainstRefInteger(ref RawIntInteger) bool {
 	refVal, err := convertRawIntIntegerToInt64(ref)
 	if err != nil {
@@ -289,7 +300,9 @@ func (o TaggedRawIntRange) CompareAgainstRefInteger(ref RawIntInteger) bool {
 }
 
 // CompareAgainstRefRange compares TaggedRawIntRange against another
-// TaggedRawIntRange reference
+// TaggedRawIntRange reference. The receiver is the claim and the input
+// parameter is the reference value. Returns true if the range claim is a
+// subset-range of the reference range; false otherwise.
 func (o TaggedRawIntRange) CompareAgainstRefRange(ref TaggedRawIntRange) bool {
 	if o.Min != nil && ref.Min != nil && *o.Min < *ref.Min {
 		return false
@@ -309,7 +322,7 @@ func NewRawIntIntegerType(val any) (*RawInt, error) {
 		return nil, err
 	}
 
-	return &RawInt{ret}, nil
+	return &RawInt{Value: ret}, nil
 }
 
 // NewRawIntRangeType returns a new TaggedRawIntRange from given value
@@ -319,7 +332,7 @@ func NewRawIntRangeType(val any) (*RawInt, error) {
 		return nil, err
 	}
 
-	return &RawInt{ret}, nil
+	return &RawInt{Value: ret}, nil
 }
 
 // IRawIntFactory type defines a factory pattern for RawInt
