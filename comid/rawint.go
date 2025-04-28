@@ -15,8 +15,11 @@ import (
 )
 
 var (
+	// ErrRawIntUnsetRawInt is the error returned when a RawInt value isn't set
 	ErrRawIntUnsetRawInt = errors.New("RawInt value unset")
-	ErrRawIntEmpryInput  = errors.New("Empry input")
+
+	// ErrRawIntEmpryInput is the error returned when the input to a function is empty
+	ErrRawIntEmpryInput = errors.New("Empry input")
 )
 
 // RawInt describes an integer value that can be compared with linear order in
