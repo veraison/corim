@@ -18,8 +18,8 @@ var (
 	// ErrRawIntUnsetRawInt is the error returned when a RawInt value isn't set
 	ErrRawIntUnsetRawInt = errors.New("RawInt value unset")
 
-	// ErrRawIntEmpryInput is the error returned when the input to a function is empty
-	ErrRawIntEmpryInput = errors.New("Empry input")
+	// ErrRawIntEmptyInput is the error returned when the input to a function is empty
+	ErrRawIntEmptyInput = errors.New("Empty input")
 )
 
 // RawInt describes an integer value that can be compared with linear order in
@@ -116,7 +116,7 @@ func (o RawInt) MarshalCBOR() ([]byte, error) {
 // UnmarshalCBOR de-serializes input CBOR into RawInt
 func (o *RawInt) UnmarshalCBOR(data []byte) error {
 	if len(data) == 0 {
-		return ErrRawIntEmpryInput
+		return ErrRawIntEmptyInput
 	}
 
 	majorType := (data[0] & 0xe0) >> 5
