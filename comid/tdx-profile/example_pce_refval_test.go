@@ -200,7 +200,8 @@ func extractCompSvn(s *TeeTcbCompSvn) error {
 	}
 
 	for i, teesvn := range *s {
-		if err := extractTeeSvn(&teesvn); err != nil {
+		svn := teesvn // Avoid gosec: Implicit memory aliasing in for loop
+		if err := extractTeeSvn(&svn); err != nil {
 			return fmt.Errorf("unable to extract SVN at index: %d %w", i, err)
 		}
 	}
