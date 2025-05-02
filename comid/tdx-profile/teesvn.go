@@ -15,8 +15,8 @@ type TeeSVN struct {
 	val interface{}
 }
 
-// NewSvnNumeric creates a new TeeSVN which contains an SVN of type Numeric Expression
-func NewSvnNumeric(val uint) (*TeeSVN, error) {
+// NewSvnExpression creates a new TeeSVN which contains an SVN of type Numeric Expression
+func NewSvnExpression(val uint) (*TeeSVN, error) {
 	tnum, err := NewTaggedNumericExpression(GE, val)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (o TeeSVN) Valid() error {
 	}
 }
 
-func (o TeeSVN) IsNumeric() bool {
+func (o TeeSVN) IsExpression() bool {
 	return isType[TaggedNumericExpression](o.val)
 }
 

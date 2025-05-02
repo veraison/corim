@@ -65,7 +65,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -75,7 +75,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -85,7 +85,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 2
@@ -95,7 +95,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -105,7 +105,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -115,7 +115,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -125,7 +125,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -135,7 +135,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -145,7 +145,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -155,7 +155,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -165,7 +165,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -175,7 +175,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -185,7 +185,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -195,7 +195,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -205,7 +205,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -215,7 +215,7 @@ var (
                                 {
                                     "type": "numeric-expression",
                                     "value": {
-                                        "numeric-operator": 2,
+                                        "numeric-operator": "greater_or_equal",
                                         "numeric-type": {
                                             "type": "uint",
                                             "value": 10
@@ -273,7 +273,7 @@ var (
                             "tcbevalnum": {
                                 "type": "numeric-expression",
                                 "value": {
-                                    "numeric-operator": 2,
+                                    "numeric-operator": "greater_or_equal",
                                     "numeric-type": {
                                         "type": "uint",
                                         "value": 11
@@ -283,7 +283,7 @@ var (
                             "mrsigner": {
                                 "type": "digest-expression",
                                 "value": {
-                                    "set-operator": 6,
+                                    "set-operator": "member",
                                     "set-digest": [
                                         "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=",
                                         "sha-512:oxT8LcZjrnpra8Z4dZQFc5bms/VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag=="
@@ -346,7 +346,7 @@ var (
                             "isvsvn": {
                                 "type": "numeric-expression",
                                 "value": {
-                                    "numeric-operator": 2,
+                                    "numeric-operator": "greater_or_equal",
                                     "numeric-type": {
                                       "type": "uint",
                                       "value": 10
@@ -357,7 +357,7 @@ var (
                             "tcbevalnum": {
                                 "type": "numeric-expression",
                                 "value": {
-                                    "numeric-operator": 2,
+                                    "numeric-operator": "greater_or_equal",
                                     "numeric-type": {
                                       "type": "uint", 
                                       "value": 11
@@ -367,7 +367,7 @@ var (
                             "mrtee": {
                                 "type": "digest-expression",
                                 "value": {
-                                    "set-operator": 6,
+                                    "set-operator": "member",
                                     "set-digest": [
                                         "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
                                     ]
@@ -376,7 +376,7 @@ var (
                             "mrsigner": {
                                 "type": "digest-expression",
                                 "value": {
-                                    "set-operator": 6,
+                                    "set-operator": "member",
                                     "set-digest": [
                                         "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=",
                                         "sha-512:oxT8LcZjrnpra8Z4dZQFc5bms/VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag=="

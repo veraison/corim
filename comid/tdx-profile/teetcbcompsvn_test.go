@@ -26,24 +26,24 @@ func TestTeeTcbCompSvn_NewTeeTcbCompSvnUint_NOK(t *testing.T) {
 	assert.EqualError(t, err, expectedErr)
 }
 
-func TestTeeTcbCompSvn_NewTeeTcbCompSvnNumeric_OK(t *testing.T) {
-	_, err := NewTeeTcbCompSvnNumeric(TestCompSvn)
+func TestTeeTcbCompSvn_NewTeeTcbCompSvnExpression_OK(t *testing.T) {
+	_, err := NewTeeTcbCompSvnExpression(TestCompSvn)
 	require.NoError(t, err)
 }
 
-func TestTeeTcbCompSvn_NewTeeTcbCompSvnNumeric_NOK(t *testing.T) {
+func TestTeeTcbCompSvn_NewTeeTcbCompSvnExpression_NOK(t *testing.T) {
 	expectedErr := "no value supplied for TeeTcbCompSVN"
 	var val []uint
-	_, err := NewTeeTcbCompSvnNumeric(val)
+	_, err := NewTeeTcbCompSvnExpression(val)
 	assert.EqualError(t, err, expectedErr)
 	expectedErr = "invalid length 18 for TeeTcbCompSVN"
 	v := make([]uint, 18)
-	_, err = NewTeeTcbCompSvnNumeric(v)
+	_, err = NewTeeTcbCompSvnExpression(v)
 	assert.EqualError(t, err, expectedErr)
 }
 
 func TestTeeTcbCompSvn_Valid_OK(t *testing.T) {
-	tc, err := NewTeeTcbCompSvnNumeric(TestCompSvn)
+	tc, err := NewTeeTcbCompSvnExpression(TestCompSvn)
 	require.NoError(t, err)
 	err = tc.Valid()
 	require.NoError(t, err)

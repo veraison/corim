@@ -67,7 +67,7 @@ func TestTeeTcbEvalNumber_JSON(t *testing.T) {
 
 		{
 			input:         TaggedNumericExpression{NumericOperator: GE, NumericType: NumericType{val: uint(100)}},
-			ExpectedBytes: []byte(`{"type":"numeric-expression","value":{"numeric-operator":2,"numeric-type":{"type":"uint","value":100}}}`),
+			ExpectedBytes: []byte(`{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":100}}}`),
 		},
 	} {
 

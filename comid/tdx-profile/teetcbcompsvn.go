@@ -12,9 +12,9 @@ const MaxSVNCount = 16
 
 type TeeTcbCompSvn [MaxSVNCount]TeeSVN
 
-// NewTeeTcbSVNnumeric creates a new TeeTcbCompSvn with an array of SVN as Numeric Expression
+// NewTeeTcbCompSvnExpression creates a new TeeTcbCompSvn with an array of SVN as Numeric Expression
 // from the supplied array of integers
-func NewTeeTcbCompSvnNumeric(val []uint) (*TeeTcbCompSvn, error) {
+func NewTeeTcbCompSvnExpression(val []uint) (*TeeTcbCompSvn, error) {
 	if len(val) > MaxSVNCount {
 		return nil, fmt.Errorf("invalid length %d for TeeTcbCompSVN", len(val))
 	} else if len(val) == 0 {
@@ -23,7 +23,7 @@ func NewTeeTcbCompSvnNumeric(val []uint) (*TeeTcbCompSvn, error) {
 
 	TeeTcbCompSVN := make([]TeeSVN, MaxSVNCount)
 	for i, value := range val {
-		svn, err := NewSvnNumeric(value)
+		svn, err := NewSvnExpression(value)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get New SVN Numeric: %w", err)
 		}
@@ -32,7 +32,7 @@ func NewTeeTcbCompSvnNumeric(val []uint) (*TeeTcbCompSvn, error) {
 	return (*TeeTcbCompSvn)(TeeTcbCompSVN), nil
 }
 
-// NewTeeTcbSVNUint creates a new TeeTcbCompSvn with an array of SVN of type integers
+// NewTeeTcbSVNUint creates a new TeeTcbCompSvn with an array of SVN of type unsigned integers
 func NewTeeTcbCompSvnUint(val []uint) (*TeeTcbCompSvn, error) {
 	if len(val) > MaxSVNCount {
 		return nil, fmt.Errorf("invalid length %d for TeeTcbCompSVN", len(val))

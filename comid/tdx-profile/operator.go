@@ -3,6 +3,11 @@
 
 package tdx
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type Operator uint
 
 const (
@@ -47,3 +52,17 @@ var (
 		DIS:  "dis_joint",
 	}
 )
+
+func (o Operator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(NumericOperatorToString[o])
+}
+
+func (o *Operator) UnmarshalJSON(data []byte) error {
+	var str string
+	err := json.Unmarshal(data, &str)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal operator: %w", err)
+	}
+	*o = StringToNumericOperator[str]
+	return nil
+}

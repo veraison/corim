@@ -42,7 +42,7 @@ func (o TeeTcbEvalNumber) Valid() error {
 	}
 }
 
-func (o TeeTcbEvalNumber) IsNumeric() bool {
+func (o TeeTcbEvalNumber) IsExpression() bool {
 	return isType[TaggedNumericExpression](o.val)
 }
 
