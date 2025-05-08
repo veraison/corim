@@ -9,7 +9,7 @@ import (
 	"github.com/veraison/corim/comid"
 )
 
-func extractClassElements(c *comid.Class) error {
+func TestextractClassElements(c *comid.Class) error {
 	if c == nil {
 		return fmt.Errorf("no class")
 	}
@@ -39,7 +39,7 @@ func extractClassElements(c *comid.Class) error {
 	return nil
 }
 
-func extractDigest(typ string, d *Digests) error {
+func TestextractDigest(typ string, d *Digests) error {
 	if d == nil {
 		return fmt.Errorf("no digest")
 	}
@@ -52,7 +52,7 @@ func extractDigest(typ string, d *Digests) error {
 	return nil
 }
 
-func extractTeeDigest(typ string, d *TeeDigest) error {
+func TestextractTeeDigest(typ string, d *TeeDigest) error {
 	if d == nil {
 		return fmt.Errorf("no TEE digest")
 	}
@@ -66,7 +66,7 @@ func extractTeeDigest(typ string, d *TeeDigest) error {
 		if err != nil {
 			return fmt.Errorf("unable to extract TEE Digest: %w", err)
 		}
-		err = extractDigest(typ, &dg)
+		err = TestextractDigest(typ, &dg)
 		if err != nil {
 			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
 		}
@@ -77,7 +77,7 @@ func extractTeeDigest(typ string, d *TeeDigest) error {
 		}
 		fmt.Printf("\n%s Digest Operator: %s", typ, NumericOperatorToString[de.SetOperator])
 		dg := comid.Digests(de.SetDigest)
-		err = extractDigest(typ, &dg)
+		err = TestextractDigest(typ, &dg)
 		if err != nil {
 			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
 		}
@@ -85,7 +85,7 @@ func extractTeeDigest(typ string, d *TeeDigest) error {
 	return nil
 }
 
-func extractTeeSvn(teesvn *TeeSVN) error {
+func TestextractTeeSvn(teesvn *TeeSVN) error {
 	if teesvn == nil {
 		return fmt.Errorf("teesvn is nil")
 	}
@@ -108,7 +108,7 @@ func extractTeeSvn(teesvn *TeeSVN) error {
 	return nil
 }
 
-func extractTeeISVProdID(isvprodID *TeeISVProdID) error {
+func TestextractTeeISVProdID(isvprodID *TeeISVProdID) error {
 	if isvprodID == nil {
 		return fmt.Errorf("isvprodID is nil")
 	}
@@ -131,7 +131,7 @@ func extractTeeISVProdID(isvprodID *TeeISVProdID) error {
 	return nil
 }
 
-func extractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
+func TestextractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
 	if tcbEvalNum == nil {
 		return fmt.Errorf("tcbevalnum is nil")
 	}
@@ -152,7 +152,7 @@ func extractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
 	return nil
 }
 
-func decodeAuthorisedBy(m *comid.Measurement) error {
+func TestdecodeAuthorisedBy(m *comid.Measurement) error {
 	if err := m.AuthorizedBy.Valid(); err != nil {
 		return fmt.Errorf("invalid cryptokey: %w", err)
 	}

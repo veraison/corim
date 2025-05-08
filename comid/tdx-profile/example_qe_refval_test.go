@@ -76,7 +76,7 @@ func extractQERefVals(c *comid.Comid) error {
 func extractQERefVal(rv comid.ValueTriple) error {
 	class := rv.Environment.Class
 
-	if err := extractClassElements(class); err != nil {
+	if err := TestextractClassElements(class); err != nil {
 		return fmt.Errorf("extracting class: %w", err)
 	}
 
@@ -99,7 +99,7 @@ func extractQEMeasurements(meas *comid.Measurements) error {
 		}
 
 		if m.AuthorizedBy != nil {
-			err := decodeAuthorisedBy(m)
+			err := TestdecodeAuthorisedBy(m)
 			if err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 			}
@@ -129,7 +129,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 		return errors.New("val was not pointer to TeeTcbEvalNum")
 	}
 	tcbValNum := *t
-	if err = extractTeeTcbEvalNum(&tcbValNum); err != nil {
+	if err = TestextractTeeTcbEvalNum(&tcbValNum); err != nil {
 		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
 	}
 
@@ -142,7 +142,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 		return errors.New("val was not pointer to IsvProdID")
 	}
 
-	if err = extractTeeISVProdID(tS); err != nil {
+	if err = TestextractTeeISVProdID(tS); err != nil {
 		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
 	}
 
@@ -156,7 +156,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 		return errors.New("val was not pointer to TeeDigest")
 	}
 
-	if err = extractTeeDigest("mrsigner", tD); err != nil {
+	if err = TestextractTeeDigest("mrsigner", tD); err != nil {
 		return fmt.Errorf("failed to extract tee mrsigner digest: %w", err)
 	}
 

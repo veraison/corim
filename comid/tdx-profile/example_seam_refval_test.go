@@ -299,7 +299,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		fmt.Printf("val was not pointer to TeeTcbEvalNum")
 	}
 	tcbValNum := *f
-	if err = extractTeeTcbEvalNum(&tcbValNum); err != nil {
+	if err = TestextractTeeTcbEvalNum(&tcbValNum); err != nil {
 		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
 	}
 
@@ -311,7 +311,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 	if !ok {
 		fmt.Printf("val was not pointer to IsvProdID")
 	}
-	if err = extractTeeISVProdID(tS); err != nil {
+	if err = TestextractTeeISVProdID(tS); err != nil {
 		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
 	}
 
@@ -328,7 +328,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("invalid tee svn: %w", err)
 	}
 
-	err = extractTeeSvn(teesvn)
+	err = TestextractTeeSvn(teesvn)
 	if err != nil {
 		return fmt.Errorf("unable to extract tee svn: %w", err)
 	}
@@ -353,7 +353,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		fmt.Printf("val was not pointer to TeeDigest")
 	}
 
-	if err = extractTeeDigest("mrtee", tD); err != nil {
+	if err = TestextractTeeDigest("mrtee", tD); err != nil {
 		return fmt.Errorf("failed to decode mrtee from digest: %w", err)
 	}
 
@@ -367,7 +367,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		return errors.New("val was not pointer to TeeDigest")
 	}
 
-	if err := extractTeeDigest("mrsigner", tD); err != nil {
+	if err := TestextractTeeDigest("mrsigner", tD); err != nil {
 		return fmt.Errorf("failed to extarct mrsigner digest: %w", err)
 	}
 	return nil
@@ -446,7 +446,7 @@ func extractRefVals(c *comid.Comid) error {
 func extractSeamRefVal(rv comid.ValueTriple) error {
 	class := rv.Environment.Class
 
-	if err := extractClassElements(class); err != nil {
+	if err := TestextractClassElements(class); err != nil {
 		return fmt.Errorf("extracting class: %w", err)
 	}
 
@@ -469,7 +469,7 @@ func extractSeamMeasurements(meas *comid.Measurements) error {
 		}
 
 		if m.AuthorizedBy != nil {
-			err := decodeAuthorisedBy(m)
+			err := TestdecodeAuthorisedBy(m)
 			if err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 			}
