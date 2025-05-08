@@ -34,9 +34,9 @@ var (
 		"nop":              NOP,
 		"member":           MEM,
 		"non_member":       NMEM,
-		"sub_set":          SUB,
-		"super_set":        SUP,
-		"dis_joint":        DIS,
+		"subset":           SUB,
+		"superset":         SUP,
+		"disjoint":         DIS,
 	}
 	NumericOperatorToString = map[Operator]string{
 		EQ:   "equal",
@@ -47,9 +47,9 @@ var (
 		NOP:  "nop",
 		MEM:  "member",
 		NMEM: "non_member",
-		SUB:  "sub_set",
-		SUP:  "super_set",
-		DIS:  "dis_joint",
+		SUB:  "subset",
+		SUP:  "superset",
+		DIS:  "disjoint",
 	}
 )
 

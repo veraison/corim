@@ -83,14 +83,14 @@ func extractSwMeasurement(m *Measurement) error {
 		return fmt.Errorf("extracting PSA refval id: %w", err)
 	}
 
-	if err := TestextractDigest(m.Val.Digests); err != nil {
+	if err := testextractDigest(m.Val.Digests); err != nil {
 		return fmt.Errorf("extracting digest: %w", err)
 	}
 
 	return nil
 }
 
-func TestextractDigest(d *Digests) error {
+func testextractDigest(d *Digests) error {
 	if d == nil {
 		return fmt.Errorf("no digest")
 	}

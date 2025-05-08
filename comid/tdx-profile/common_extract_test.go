@@ -9,7 +9,7 @@ import (
 	"github.com/veraison/corim/comid"
 )
 
-func TestextractClassElements(c *comid.Class) error {
+func testextractClassElements(c *comid.Class) error {
 	if c == nil {
 		return fmt.Errorf("no class")
 	}
@@ -39,7 +39,7 @@ func TestextractClassElements(c *comid.Class) error {
 	return nil
 }
 
-func TestextractDigest(typ string, d *Digests) error {
+func testextractDigest(typ string, d *Digests) error {
 	if d == nil {
 		return fmt.Errorf("no digest")
 	}
@@ -52,7 +52,7 @@ func TestextractDigest(typ string, d *Digests) error {
 	return nil
 }
 
-func TestextractTeeDigest(typ string, d *TeeDigest) error {
+func testextractTeeDigest(typ string, d *TeeDigest) error {
 	if d == nil {
 		return fmt.Errorf("no TEE digest")
 	}
@@ -66,7 +66,7 @@ func TestextractTeeDigest(typ string, d *TeeDigest) error {
 		if err != nil {
 			return fmt.Errorf("unable to extract TEE Digest: %w", err)
 		}
-		err = TestextractDigest(typ, &dg)
+		err = testextractDigest(typ, &dg)
 		if err != nil {
 			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
 		}
@@ -77,7 +77,7 @@ func TestextractTeeDigest(typ string, d *TeeDigest) error {
 		}
 		fmt.Printf("\n%s Digest Operator: %s", typ, NumericOperatorToString[de.SetOperator])
 		dg := comid.Digests(de.SetDigest)
-		err = TestextractDigest(typ, &dg)
+		err = testextractDigest(typ, &dg)
 		if err != nil {
 			return fmt.Errorf("unable to extract %s Digest: %w", typ, err)
 		}
@@ -85,7 +85,7 @@ func TestextractTeeDigest(typ string, d *TeeDigest) error {
 	return nil
 }
 
-func TestextractTeeSvn(teesvn *TeeSVN) error {
+func testextractTeeSvn(teesvn *TeeSVN) error {
 	if teesvn == nil {
 		return fmt.Errorf("teesvn is nil")
 	}
@@ -108,7 +108,7 @@ func TestextractTeeSvn(teesvn *TeeSVN) error {
 	return nil
 }
 
-func TestextractTeeISVProdID(isvprodID *TeeISVProdID) error {
+func testextractTeeISVProdID(isvprodID *TeeISVProdID) error {
 	if isvprodID == nil {
 		return fmt.Errorf("isvprodID is nil")
 	}
@@ -131,7 +131,7 @@ func TestextractTeeISVProdID(isvprodID *TeeISVProdID) error {
 	return nil
 }
 
-func TestextractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
+func testextractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
 	if tcbEvalNum == nil {
 		return fmt.Errorf("tcbevalnum is nil")
 	}

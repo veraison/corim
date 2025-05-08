@@ -99,7 +99,7 @@ func extractPCERefVals(c *comid.Comid) error {
 func extractPCERefVal(rv comid.ValueTriple) error {
 	class := rv.Environment.Class
 
-	if err := TestextractClassElements(class); err != nil {
+	if err := testextractClassElements(class); err != nil {
 		return fmt.Errorf("extracting class: %w", err)
 	}
 
@@ -202,7 +202,7 @@ func extractCompSvn(s *TeeTcbCompSvn) error {
 
 	for i, teesvn := range *s {
 		svn := teesvn // Avoid gosec: Implicit memory aliasing in for loop
-		if err := TestextractTeeSvn(&svn); err != nil {
+		if err := testextractTeeSvn(&svn); err != nil {
 			return fmt.Errorf("unable to extract SVN at index %d: %w", i, err)
 		}
 	}
