@@ -87,7 +87,7 @@ func (o TeeTcbStatus) Valid() error {
 	return nil
 }
 
-// MarshalJSON Marshals the TeeTcbStatus to JSON
+// MarshalJSON marshals the TeeTcbStatus to JSON
 func (o TeeTcbStatus) MarshalJSON() ([]byte, error) {
 	var (
 		v   encoding.TypeAndValue
@@ -113,7 +113,7 @@ func (o TeeTcbStatus) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v)
 }
 
-// UnmarshalJSON UnMarshals supplied JSON bytes to TeeTcbStatus
+// UnmarshalJSON Unmarshals supplied JSON bytes to TeeTcbStatus
 func (o *TeeTcbStatus) UnmarshalJSON(data []byte) error {
 	var v encoding.TypeAndValue
 
@@ -142,12 +142,12 @@ func (o *TeeTcbStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalCBOR Marshals TeeTcbStatus to CBOR
+// MarshalCBOR marshals TeeTcbStatus to CBOR
 func (o TeeTcbStatus) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.val)
 }
 
-// UnmarshalCBOR UnMarshals supplied CBOR bytes to TeeTcbStatus
+// UnmarshalCBOR Unmarshals supplied CBOR bytes to TeeTcbStatus
 func (o *TeeTcbStatus) UnmarshalCBOR(data []byte) error {
 	return dm.Unmarshal(data, &o.val)
 }

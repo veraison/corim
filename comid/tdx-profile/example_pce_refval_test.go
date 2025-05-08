@@ -5,6 +5,7 @@ package tdx
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/veraison/corim/comid"
@@ -83,7 +84,7 @@ func Example_decode_PCE_JSON() {
 
 func extractPCERefVals(c *comid.Comid) error {
 	if c.Triples.ReferenceValues == nil {
-		return fmt.Errorf("no reference values triples")
+		return errors.New("no reference values triples")
 	}
 
 	for i, rv := range c.Triples.ReferenceValues.Values {
@@ -112,7 +113,7 @@ func extractPCERefVal(rv comid.ValueTriple) error {
 
 func extractPCEMeasurements(meas *comid.Measurements) error {
 	if len(meas.Values) == 0 {
-		return fmt.Errorf("no measurements")
+		return errors.New("no measurements")
 	}
 	for i := range meas.Values {
 		m := &meas.Values[0]
@@ -133,11 +134,11 @@ func extractPCEMeasurements(meas *comid.Measurements) error {
 func decodePCEMValExtensions(m *comid.Measurement) error {
 	val, err := m.Val.Extensions.Get("instanceid")
 	if err != nil {
-		return fmt.Errorf("failed to decode instanceid from measurement extensions")
+		return errors.New("failed to decode instanceid from measurement extensions")
 	}
 	i, ok := val.(*TeeInstanceID)
 	if !ok {
-		fmt.Printf("val was not pointer to teeInstanceID")
+		return errors.New("val was not pointer to teeInstanceID")
 	}
 
 	if i.IsBytes() {
@@ -153,17 +154,17 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 		}
 		fmt.Printf("\nInstanceID: %d", val)
 	} else {
-		return fmt.Errorf("teeinstanceid is neither integer or byte string")
+		return errors.New("teeinstanceid is neither integer or byte string")
 	}
 
 	val, err = m.Val.Extensions.Get("tcbcompsvn")
 	if err != nil {
-		return fmt.Errorf("failed to decode teetcbcompsvn from measurement extensions")
+		return errors.New("failed to decode teetcbcompsvn from measurement extensions")
 	}
 
 	tcs, ok := val.(*TeeTcbCompSvn)
 	if !ok {
-		fmt.Printf("val was not pointer to teetcbcompsvn")
+		return errors.New("val was not pointer to teetcbcompsvn")
 	}
 	if err = tcs.Valid(); err != nil {
 		return fmt.Errorf("invalid computed SVN: %w", err)
@@ -171,7 +172,7 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 
 	val, err = m.Val.Extensions.Get("pceid")
 	if err != nil {
-		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions")
+		return errors.New("failed to decode tcbevalnum from measurement extensions")
 	}
 	t, ok := val.(*TeePCEID)
 	if !ok {
@@ -192,17 +193,17 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 
 func extractCompSvn(s *TeeTcbCompSvn) error {
 	if s == nil {
-		return fmt.Errorf("no TEE TCB Comp SVN")
+		return errors.New("no TEE TCB Comp SVN")
 	}
 
 	if len(*s) > 16 {
-		return fmt.Errorf("computed SVN cannot be greater than 16")
+		return errors.New("computed SVN cannot be greater than 16")
 	}
 
 	for i, teesvn := range *s {
 		svn := teesvn // Avoid gosec: Implicit memory aliasing in for loop
 		if err := extractTeeSvn(&svn); err != nil {
-			return fmt.Errorf("unable to extract SVN at index: %d %w", i, err)
+			return fmt.Errorf("unable to extract SVN at index %d: %w", i, err)
 		}
 	}
 
@@ -344,25 +345,25 @@ func Example_encode_tdx_pce_refval_with_profile() {
 func setTDXPCEMvalExtension(val *comid.Mval) error {
 	instanceID, err := NewTeeInstanceID(TestUIntInstance)
 	if err != nil {
-		return fmt.Errorf("unable to get teeinstanceID %w", err)
+		return fmt.Errorf("unable to get teeinstanceID: %w", err)
 	}
 	err = val.Extensions.Set("instanceid", instanceID)
 	if err != nil {
-		return fmt.Errorf("unable to set teeinstanceID %w", err)
+		return fmt.Errorf("unable to set teeinstanceID: %w", err)
 	}
 
 	p, err := NewTeePCEID(TestPCEID)
 	if err != nil {
-		return fmt.Errorf("unable to get NewTeepceID %w", err)
+		return fmt.Errorf("unable to get NewTeepceID: %w", err)
 	}
 	err = val.Extensions.Set("pceid", p)
 	if err != nil {
-		return fmt.Errorf("unable to set teepceID %w", err)
+		return fmt.Errorf("unable to set teepceID: %w", err)
 	}
 
 	c, err := NewTeeTcbCompSvnExpression(TestCompSvn)
 	if err != nil {
-		return fmt.Errorf("failed to get TeeTcbCompSvn %w", err)
+		return fmt.Errorf("failed to get TeeTcbCompSvn: %w", err)
 	}
 
 	err = val.Extensions.Set("tcbcompsvn", c)
