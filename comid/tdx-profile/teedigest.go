@@ -145,7 +145,6 @@ func (o TeeDigest) MarshalJSON() ([]byte, error) {
 		}
 		v = encoding.TypeAndValue{Type: DigestExprType, Value: b}
 	default:
-		fmt.Printf("YOGESH CAME HERE")
 		return nil, fmt.Errorf("unknown type %T for TeeDigest", t)
 	}
 	return json.Marshal(v)
