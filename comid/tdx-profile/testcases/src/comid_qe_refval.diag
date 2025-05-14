@@ -24,17 +24,21 @@
           / comid.mval / 1 : {
               / comid.miscselect / -81 :h'A0B0C0D000000000',
               / comid.isvprodid / -85 : 1,
-              / comid.mrsigner / -84 : [ 
-                [
-                / alg-id / 1, / sha256 /
-                / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
-                ],
-                [
-                / alg-id / 8, / sha384 /
-                / digest / h'a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a'
-                ]
-              ],
-              /comid.tcbevalnum / -86 : 11
+/ mrsigner / -84 : 60020([ / op.member / 6, 
+                  / digests-type / [
+                    [
+                      / alg-id / 1, / sha256 /
+                      / digest / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
+                    ],
+                    [
+				              / alg-id / 8, / sha384 /
+                     / digest / h'a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a'
+                    ]
+                  ]
+                ]),
+              / tcb-eval-num / -86 : 60010([ / op.ge / 2, 11 ]),
+              / advisory-ids /  -89 : 60021([ /member/ 6, [ "INTEL-SA-00078", "INTEL-SA-00079"  ]]),
+              / tcbstatus /  -88 : 60021([ /member/ 6, [ "UpToDate"  ]])
           },
           / authorized-by / 2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
         }

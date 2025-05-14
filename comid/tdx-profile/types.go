@@ -3,12 +3,16 @@
 
 package tdx
 
-import "github.com/veraison/corim/comid"
-
-type setType []any
+const (
+	UintType        = "uint"
+	IntType         = "int"
+	FloatType       = "float"
+	StringType      = "string"
+	StringExprType  = "string-expression"
+	NumericExprType = "numeric-expression"
+	BytesType       = "bytes"
+	DigestType      = "digest"
+	DigestExprType  = "digest-expression"
+)
 
 type maskType []byte
-type TeeSVN uint
-type TeeDigest comid.Digests
-
-type TeeTcbEvalNum uint

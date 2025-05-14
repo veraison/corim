@@ -4,51 +4,150 @@
 // nolint:dupl
 package tdx
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
 
-type TeeTcbStatus setType
+	"github.com/veraison/corim/encoding"
+)
 
-func NewTeeTcbStatus(val []any) (*TeeTcbStatus, error) {
-	var ts TeeTcbStatus
+// TeeTcbStatus, holds the TCB Status. Allowed values are an array of strings OR
+// An array of strings expressed in an expression
+type TeeTcbStatus struct {
+	val interface{}
+}
+
+// NewTcbStatusExpr creates a new TeeTcbStatus from the supplied operator and
+// an array of strings
+func NewTcbStatusExpr(op Operator, val []string) (*TeeTcbStatus, error) {
 	if len(val) == 0 {
-		return nil, fmt.Errorf("nil value argument")
+		return nil, fmt.Errorf("zero len value for TeeTcbStatus")
+	}
+	switch op {
+	case MEM, NMEM:
+		set := SetStringExpression{SetOperator: op, SetString: val}
+		return &TeeTcbStatus{val: TaggedSetStringExpression(set)}, nil
+	default:
+		return nil, fmt.Errorf("invalid operator : %d", op)
 	}
 
-	for i, v := range val {
-		switch t := v.(type) {
-		case string:
-			ts = append(ts, t)
-		default:
-			return nil, fmt.Errorf("invalid type: %T for tcb status at index: %d", t, i)
-		}
-	}
-	return &ts, nil
 }
 
-func (o *TeeTcbStatus) AddTeeTcbStatus(val []any) error {
-	for i, v := range val {
-		switch t := v.(type) {
-		case string:
-			*o = append(*o, t)
-		default:
-			return fmt.Errorf("invalid type: %T for tcb status at index: %d", t, i)
-		}
+// NewTeeTcbStatusString creates a new TeeTcbStatus from the
+// supplied array of strings
+func NewTeeTcbStatusString(val []string) (*TeeTcbStatus, error) {
+	if len(val) == 0 {
+		return nil, fmt.Errorf("zero len value for TeeTcbStatus")
 	}
-	return nil
+	return &TeeTcbStatus{val: val}, nil
 }
 
+// AddTeeTcbStatus add supplied TeeTcbStatus to existing TeeTcbStatus
+func (o *TeeTcbStatus) AddTeeTcbStatus(op Operator, val []string) (*TeeTcbStatus, error) {
+	if len(val) == 0 {
+		return nil, fmt.Errorf("zero len value for TeeTcbStatus")
+	}
+	switch t := o.val.(type) {
+	case []string:
+		t = append(t, val...)
+		o.val = t
+	case TaggedSetStringExpression:
+		if t.SetOperator != op {
+			return nil, fmt.Errorf("operator mis-match TeeTcbStatus Op: %d, Input Op: %d", t.SetOperator, op)
+		}
+		for _, value := range val {
+			t.SetString = append(t.SetString, value)
+		}
+		o.val = t
+	}
+	return o, nil
+}
+
+// Valid checks for validity of TeeTcbStatus and
+// returns an error, if invalid
 func (o TeeTcbStatus) Valid() error {
-	if len(o) == 0 {
-		return fmt.Errorf("empty tcb status")
+	if o.val == nil {
+		return fmt.Errorf("TeeTcbStatus not set")
 	}
-
-	for i, v := range o {
-		switch t := v.(type) {
-		case string:
-			continue
-		default:
-			return fmt.Errorf("invalid type: %T for tcb status at index: %d", t, i)
+	switch t := o.val.(type) {
+	case []string:
+		if len(t) == 0 {
+			return fmt.Errorf("TeeTcbStatus not set")
 		}
+	case TaggedSetStringExpression:
+		if t.SetOperator != MEM && t.SetOperator != NMEM {
+			return fmt.Errorf("invalid operator in a TeeTcbStatus: %d", t.SetOperator)
+		}
+		if len(t.SetString) == 0 {
+			return fmt.Errorf("TeeTcbStatus not set")
+		}
+	default:
+		return fmt.Errorf("unknown type %T for TeeTcbStatus", t)
 	}
 	return nil
+}
+
+// MarshalJSON marshals the TeeTcbStatus to JSON
+func (o TeeTcbStatus) MarshalJSON() ([]byte, error) {
+	var (
+		v   encoding.TypeAndValue
+		b   []byte
+		err error
+	)
+	switch t := o.val.(type) {
+	case []string:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = encoding.TypeAndValue{Type: StringType, Value: b}
+	case TaggedSetStringExpression:
+		b, err = json.Marshal(t)
+		if err != nil {
+			return nil, err
+		}
+		v = encoding.TypeAndValue{Type: StringExprType, Value: b}
+	default:
+		return nil, fmt.Errorf("unknown type %T for TeeTcbStatus", t)
+	}
+	return json.Marshal(v)
+}
+
+// UnmarshalJSON Unmarshals supplied JSON bytes to TeeTcbStatus
+func (o *TeeTcbStatus) UnmarshalJSON(data []byte) error {
+	var v encoding.TypeAndValue
+
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	switch v.Type {
+	case StringType:
+		var x uint
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal TeeTcbStatus of type string: %w", err)
+		}
+		o.val = x
+	case StringExprType:
+		var x SetStringExpression
+		if err := json.Unmarshal(v.Value, &x); err != nil {
+			return fmt.Errorf(
+				"cannot unmarshal TeeTcbStatus of type set expression: %w", err)
+		}
+		o.val = TaggedSetStringExpression(x)
+	default:
+		return fmt.Errorf("unknown type %s for TeeTcbStatus", v.Type)
+	}
+	return nil
+}
+
+// MarshalCBOR marshals TeeTcbStatus to CBOR
+func (o TeeTcbStatus) MarshalCBOR() ([]byte, error) {
+	return em.Marshal(o.val)
+}
+
+// UnmarshalCBOR Unmarshals supplied CBOR bytes to TeeTcbStatus
+func (o *TeeTcbStatus) UnmarshalCBOR(data []byte) error {
+	return dm.Unmarshal(data, &o.val)
 }

@@ -5,6 +5,7 @@ package tdx
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/veraison/corim/comid"
@@ -44,8 +45,10 @@ func Example_decode_QE_JSON() {
 	// Vendor: Intel Corporation
 	// Model: TDX QE TCB
 	// miscselect: c0000000fbff0000
-	// tcbEvalNum: 11
+	// tcbEvalNum Operator: greater_or_equal
+	// tcbEvalNum Value: 11
 	// IsvProdID: 0303
+	// mrsigner Digest Operator: member
 	// mrsigner Digest Alg: 1
 	// mrsigner Digest Value: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
 	// mrsigner Digest Alg: 8
@@ -58,7 +61,7 @@ func Example_decode_QE_JSON() {
 
 func extractQERefVals(c *comid.Comid) error {
 	if c.Triples.ReferenceValues == nil {
-		return fmt.Errorf("no reference values triples")
+		return errors.New("no reference values triples")
 	}
 
 	for i, rv := range c.Triples.ReferenceValues.Values {
@@ -73,7 +76,7 @@ func extractQERefVals(c *comid.Comid) error {
 func extractQERefVal(rv comid.ValueTriple) error {
 	class := rv.Environment.Class
 
-	if err := extractClassElements(class); err != nil {
+	if err := testextractClassElements(class); err != nil {
 		return fmt.Errorf("extracting class: %w", err)
 	}
 
@@ -87,7 +90,7 @@ func extractQERefVal(rv comid.ValueTriple) error {
 
 func extractQEMeasurements(meas *comid.Measurements) error {
 	if len(meas.Values) == 0 {
-		return fmt.Errorf("no measurements")
+		return errors.New("no measurements")
 	}
 	for i := range meas.Values {
 		m := &meas.Values[0]
@@ -96,7 +99,7 @@ func extractQEMeasurements(meas *comid.Measurements) error {
 		}
 
 		if m.AuthorizedBy != nil {
-			err := decodeAuthorisedBy(m)
+			err := TestdecodeAuthorisedBy(m)
 			if err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 			}
@@ -108,65 +111,55 @@ func extractQEMeasurements(meas *comid.Measurements) error {
 func decodeQEMValExtensions(m *comid.Measurement) error {
 	val, err := m.Val.Extensions.Get("miscselect")
 	if err != nil {
-		return fmt.Errorf("failed to decode miscselect from measurement extensions")
+		return errors.New("failed to decode miscselect from measurement extensions")
 	}
 	f, ok := val.(*TeeMiscSelect)
 	if !ok {
-		fmt.Printf("val was not pointer to TeeMiscSelect")
+		return errors.New("val was not pointer to TeeMiscSelect")
 	}
 	miscselect := *f
 	fmt.Printf("\nmiscselect: %x", miscselect)
 
 	val, err = m.Val.Extensions.Get("tcbevalnum")
 	if err != nil {
-		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions")
+		return errors.New("failed to decode tcbevalnum from measurement extensions")
 	}
-	t, ok := val.(*TeeTcbEvalNum)
+	t, ok := val.(*TeeTcbEvalNumber)
 	if !ok {
-		fmt.Printf("val was not pointer to TeeTcbEvalNum")
+		return errors.New("val was not pointer to TeeTcbEvalNum")
 	}
 	tcbValNum := *t
-	fmt.Printf("\ntcbEvalNum: %d", tcbValNum)
+	if err = testextractTeeTcbEvalNum(&tcbValNum); err != nil {
+		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
+	}
 
 	val, err = m.Val.Extensions.Get("isvprodid")
 	if err != nil {
-		return fmt.Errorf("failed to decode isvprodid from measurement extensions")
+		return errors.New("failed to decode isvprodid from measurement extensions")
 	}
 	tS, ok := val.(*TeeISVProdID)
 	if !ok {
-		fmt.Printf("val was not pointer to IsvProdID")
+		return errors.New("val was not pointer to IsvProdID")
 	}
 
-	if tS.IsBytes() {
-		val, err = tS.GetBytes()
-		if err != nil {
-			return fmt.Errorf("failed to decode isvprodid: %w", err)
-		}
-		fmt.Printf("\nIsvProdID: %x", val)
-	} else if tS.IsUint() {
-		val, err = tS.GetUint()
-		if err != nil {
-			return fmt.Errorf("failed to decode isvprodid: %w", err)
-		}
-		fmt.Printf("\nIsvProdID: %d", val)
-	} else {
-		return fmt.Errorf("isvprodid is neither integer or byte string")
+	if err = testextractTeeISVProdID(tS); err != nil {
+		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
 	}
 
 	val, err = m.Val.Extensions.Get("mrsigner")
 	if err != nil {
-		return fmt.Errorf("failed to decode mrsigner from measurement extensions")
+		return errors.New("failed to decode mrsigner from measurement extensions")
 	}
 
 	tD, ok := val.(*TeeDigest)
 	if !ok {
-		fmt.Printf("val was not pointer to TeeDigest")
+		return errors.New("val was not pointer to TeeDigest")
 	}
 
-	err = extractDigest("mrsigner", tD)
-	if err != nil {
-		return fmt.Errorf("unable to extract TEE Digest: %w", err)
+	if err = testextractTeeDigest("mrsigner", tD); err != nil {
+		return fmt.Errorf("failed to extract tee mrsigner digest: %w", err)
 	}
+
 	return nil
 }
 
@@ -209,50 +202,61 @@ func Example_encode_tdx_QE_refval_without_profile() {
 	json, err := m.ToJSON()
 	if err == nil {
 		fmt.Printf("%s\n", string(json))
-	} else {
-		fmt.Printf("To JSON failed \n")
 	}
 
-	// Output:
-	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02703031323334353637383941424344454681a101a538480a385046c000fbff000038538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638540138550b
-	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":10,"miscselect":"wAD7/wAA","mrsigner":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"],"isvprodid":{"type":"uint","value":1},"tcbevalnum":11}}]}]}}
+	// output:
+	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02703031323334353637383941424344454681a101a53848d9ea6a82020a385046c000fbff00003853d9ea7482068282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f363854013855d9ea6a82020b
+	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":10}}},"miscselect":"wAD7/wAA","mrsigner":{"type":"digest-expression","value":{"set-operator":"member","set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]}},"isvprodid":{"type":"uint","value":1},"tcbevalnum":{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":11}}}}}]}]}}
 }
 
 func setTDXQEMvalExtensions(val *comid.Mval) error {
-	svn := TeeSVN(10)
-	teeTcbEvNum := TeeTcbEvalNum(11)
+	svn, err := NewSvnExpression(TestISVSVN)
+	if err != nil {
+		return fmt.Errorf("unable to get isvsvn numeric: %w", err)
+	}
+
+	teeTcbEvNum, err := NewTeeTcbEvalNumberNumeric(TestTCBEvalNum)
+	if err != nil {
+		return fmt.Errorf("unable to get tcbevalnum numeric: %w", err)
+	}
+
 	teeMiscSel := TeeMiscSelect([]byte{0xC0, 0x00, 0xFB, 0xFF, 0x00, 0x00}) // Taken from irim-qe-ref.diag
 	// Taken below from irim-qe-ref.diag
 	r := 1
 	isvProdID, err := NewTeeISVProdID(r)
 	if err != nil {
-		return fmt.Errorf("unable to get isvprodid %w", err)
+		return fmt.Errorf("unable to get isvprodid: %w", err)
 	}
 
 	err = val.Extensions.Set("isvprodid", isvProdID)
 	if err != nil {
-		return fmt.Errorf("unable to set isvprodid %w", err)
+		return fmt.Errorf("unable to set isvprodid: %w", err)
 	}
-	err = val.Extensions.Set("isvsvn", &svn)
+	err = val.Extensions.Set("isvsvn", svn)
 	if err != nil {
-		return fmt.Errorf("unable to set isvsvn %w", err)
+		return fmt.Errorf("unable to set isvsvn: %w", err)
 	}
-	err = val.Extensions.Set("tcbevalnum", &teeTcbEvNum)
+	err = val.Extensions.Set("tcbevalnum", teeTcbEvNum)
 	if err != nil {
-		return fmt.Errorf("unable to set tcbevalnum %w", err)
+		return fmt.Errorf("unable to set tcbevalnum: %w", err)
 	}
 	err = val.Extensions.Set("miscselect", &teeMiscSel)
 	if err != nil {
-		return fmt.Errorf("unable to set miscselect %w", err)
+		return fmt.Errorf("unable to set miscselect: %w", err)
 	}
 
 	d := comid.NewDigests()
 	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
 	d.AddDigest(swid.Sha384, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
 
-	err = val.Extensions.Set("mrsigner", d)
+	td, err := NewTeeDigestExpr(MEM, *d)
 	if err != nil {
-		return fmt.Errorf("unable to set mrsigner %w", err)
+		return fmt.Errorf("unable to get TeeDigest: %w", err)
+	}
+
+	err = val.Extensions.Set("mrsigner", td)
+	if err != nil {
+		return fmt.Errorf("unable to set mrsigner: %w", err)
 	}
 	return nil
 }
@@ -294,8 +298,10 @@ func Example_decode_QE_CBOR() {
 	// Vendor: Intel Corporation
 	// Model: SGX QE TCB
 	// miscselect: a0b0c0d000000000
-	// tcbEvalNum: 11
+	// tcbEvalNum Operator: greater_or_equal
+	// tcbEvalNum Value: 11
 	// IsvProdID: 1
+	// mrsigner Digest Operator: member
 	// mrsigner Digest Alg: 1
 	// mrsigner Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
 	// mrsigner Digest Alg: 8

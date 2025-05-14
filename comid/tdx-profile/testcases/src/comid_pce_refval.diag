@@ -23,7 +23,24 @@
         / measurement-map / {
           / comid.mval / 1 : {
               / comid.instanceid / -77 : h'00112233445566778899aabbccddeeff',
-              / tcb-comp-svn / -125 : [ 10, 10, 2, 2, 2, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+              / tcb-comp-svn / -125 : [ 
+                    60010([2,10]), 
+                    60010([2,10]), 
+                    60010([2,2]), 
+                    60010([2,2]), 
+                    60010([2,2]),
+                    60010([2,1]),
+                    60010([2,4]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0]), 
+                    60010([2,0])    
+               ],
               / pceid / -80 : "0000"
           },
           / authorized-by / 2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")

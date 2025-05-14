@@ -4,75 +4,98 @@
 package tdx
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func initAdvisoryIDs() []any {
-	s := make([]any, len(TestAdvisoryIDs))
-	for i := range TestAdvisoryIDs {
-		s[i] = TestAdvisoryIDs[i]
-	}
-	return s
-}
-
-func TestAdvisoryIDs_NewTeeAvisoryIDs_OK(t *testing.T) {
-	a := initAdvisoryIDs()
-	_, err := NewTeeAvisoryIDs(a)
+func TestAdvisoryIDs_NewTeeAvisoryIDsExpr_OK(t *testing.T) {
+	a := TestAdvisoryIDs
+	_, err := NewTeeAdvisoryIDsExpr(MEM, a)
 	require.Nil(t, err)
 }
 
-func TestAdvisoryIDs_NewTeeAvisoryIDs_NOK(t *testing.T) {
-	expectedErr := "invalid type: int for AdvisoryIDs at index: 0"
-	a := make([]any, len(TestAdvisoryIDs))
-	for i := range TestAdvisoryIDs {
-		a[i] = i
-	}
-	_, err := NewTeeAvisoryIDs(a)
+func TestAdvisoryIDs_NewTeeAvisoryIDsString_OK(t *testing.T) {
+	a := TestAdvisoryIDs
+	_, err := NewTeeAdvisoryIDsString(a)
+	require.Nil(t, err)
+}
+
+func TestAdvisoryIDs_NewTeeAvisoryIDsExpr_NOK(t *testing.T) {
+	expectedErr := "invalid operator : 5"
+	a := make([]string, len(TestAdvisoryIDs))
+	_, err := NewTeeAdvisoryIDsExpr(NOP, a)
 	assert.EqualError(t, err, expectedErr)
 }
 
-func TestAdvisoryIDs_AddAdvisoryIDs_OK(t *testing.T) {
-	a := initAdvisoryIDs()
-	adv := TeeAdvisoryIDs{}
-	err := adv.AddTeeAdvisoryIDs(a)
+func TestAdvisoryIDs_AddAdvisoryIDsString_OK(t *testing.T) {
+	a := TestAdvisoryIDs
+	adv := &TeeAdvisoryIDs{val: a}
+	_, err := adv.AddTeeAdvisoryIDs(NOP, []string{"abcd"})
 	require.NoError(t, err)
 }
 
-func TestAdvisoryIDs_AddAdvisoryIDs_NOK(t *testing.T) {
-	expectedErr := "invalid type: float64 for AdvisoryIDs at index: 0"
-	s := make([]any, len(TestInvalidAdvisoryIDs))
-	for i := range TestInvalidAdvisoryIDs {
-		s[i] = TestInvalidAdvisoryIDs[i]
-	}
-	adv := TeeAdvisoryIDs{}
-	err := adv.AddTeeAdvisoryIDs(s)
-	assert.EqualError(t, err, expectedErr)
+func TestAdvisoryIDs_AddAdvisoryIDsExpr_OK(t *testing.T) {
+	a := TestAdvisoryIDs
+	adv := TeeAdvisoryIDs{val: TaggedSetStringExpression{SetOperator: MEM, SetString: a}}
+	_, err := adv.AddTeeAdvisoryIDs(MEM, []string{"abcd"})
+	require.NoError(t, err)
 }
 
 func TestAdvisoryIDs_Valid_OK(t *testing.T) {
-	a := initAdvisoryIDs()
-	adv, err := NewTeeAvisoryIDs(a)
+	a := TestAdvisoryIDs
+	ta := TeeAdvisoryIDs{val: a}
+	err := ta.Valid()
 	require.NoError(t, err)
-	err = adv.Valid()
+	ta = TeeAdvisoryIDs{val: TaggedSetStringExpression{SetOperator: MEM, SetString: a}}
+	err = ta.Valid()
 	require.NoError(t, err)
 }
 
 func TestAdvisoryIDs_Valid_NOK(t *testing.T) {
-	expectedErr := "empty AdvisoryIDs"
-	adv := TeeAdvisoryIDs{}
-	err := adv.Valid()
+	expectedErr := "TeeAdvisoryID not set"
+	a := []string{}
+	ta := TeeAdvisoryIDs{val: a}
+	err := ta.Valid()
 	assert.EqualError(t, err, expectedErr)
+	expectedErr = "unknown type tdx.SetStringExpression for TeeAdvisoryIDs"
+	ta = TeeAdvisoryIDs{val: SetStringExpression{SetOperator: NOP, SetString: []string{"abc"}}}
+	err = ta.Valid()
+	assert.EqualError(t, err, expectedErr)
+}
 
-	expectedErr = "invalid type: float64 for AdvisoryIDs at index: 0"
-	s := make([]any, len(TestInvalidAdvisoryIDs))
-	for i := range TestInvalidAdvisoryIDs {
-		s[i] = TestInvalidAdvisoryIDs[i]
+func TestAdvisoryIDs_JSON(t *testing.T) {
+	a := TestAdvisoryIDs
+
+	for _, tv := range []struct {
+		input         []string
+		ExpectedBytes []byte
+	}{
+		{
+			input:         []string{"SA-123"},
+			ExpectedBytes: []byte(`{"type":"string","value":["SA-123"]}`),
+		},
+		{
+			input:         a,
+			ExpectedBytes: []byte(`{"type":"string","value":["SA-00078","SA-00077","SA-00079"]}`),
+		},
+	} {
+
+		t.Run("test", func(t *testing.T) {
+			ta, err := NewTeeAdvisoryIDsString(tv.input)
+			require.NoError(t, err)
+
+			data, err := ta.MarshalJSON()
+			require.NoError(t, err)
+			fmt.Printf("received string %s", string(data))
+			assert.Equal(t, tv.ExpectedBytes, data)
+
+			out := &TeeAdvisoryIDs{}
+			err = out.UnmarshalJSON(data)
+			require.NoError(t, err)
+			assert.Equal(t, tv.input, out.val)
+		})
 	}
-	adv = TeeAdvisoryIDs(s)
-	err = adv.Valid()
-	assert.EqualError(t, err, expectedErr)
-
 }
