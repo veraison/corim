@@ -20,8 +20,7 @@ type SVN struct {
 }
 
 // NewSVN creates a new SVN of the specified and value. The type must be one of
-// the strings defined by the spec ("exact-value", "min-value"), or has been
-// registered with RegisterSVNType().
+// the strings defined by the spec ("exact-value", "min-value").
 func NewSVN(val any, typ string) (*SVN, error) {
 	factory, ok := svnValueRegister[typ]
 	if !ok {
@@ -279,9 +278,8 @@ func convertToSVNUint64(val any) (uint64, error) {
 	}
 }
 
-// ISVNFactory defines the signature for the factory functions that may be
-// registred using RegisterSVNType to provide a new implementation of the
-// corresponding type choice. The factory function should create a new *SVN
+// ISVNFactory defines the signature for factory functions to create SVN types
+// supported by svn-type-choice. The factory function should create a new *SVN
 // with the underlying value created based on the provided input. The range of
 // valid inputs is up to the specific type choice implementation, however it
 // _must_ accept nil as one of the inputs, and return the Zero value for
@@ -292,27 +290,4 @@ type ISVNFactory func(any) (*SVN, error)
 var svnValueRegister = map[string]ISVNFactory{
 	ExactValueType: NewTaggedSVN,
 	MinValueType:   NewTaggedMinSVN,
-}
-
-// RegisterSVNType registers a new ISVNValue implementation
-// (created by the provided ISVNFactory) under the specified CBOR tag.
-func RegisterSVNType(tag uint64, factory ISVNFactory) error {
-
-	nilVal, err := factory(nil)
-	if err != nil {
-		return err
-	}
-
-	typ := nilVal.Value.Type()
-	if _, exists := svnValueRegister[typ]; exists {
-		return fmt.Errorf("SVN type with name %q already exists", typ)
-	}
-
-	if err := registerCOMIDTag(tag, nilVal.Value); err != nil {
-		return err
-	}
-
-	svnValueRegister[typ] = factory
-
-	return nil
 }
