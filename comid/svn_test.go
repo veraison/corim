@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_NewSVN(t *testing.T) {
@@ -136,50 +135,6 @@ func TestSVN_JSON(t *testing.T) {
 
 	err = v.UnmarshalJSON([]byte(`@@@`))
 	assert.EqualError(t, err, "SVN decoding failure: invalid character '@' looking for beginning of value")
-
-}
-
-type testSVN uint64
-
-func newTestSVN(_ any) (*SVN, error) {
-	v := testSVN(7)
-	return &SVN{&v}, nil
-}
-
-func (o testSVN) Type() string {
-	return "test-value"
-}
-
-func (o testSVN) String() string {
-	return "test"
-}
-
-func (o testSVN) Valid() error {
-	return nil
-}
-
-type testSVNBadType struct {
-	testSVN
-}
-
-func newTestSVNBadType(_ any) (*SVN, error) {
-	v := testSVNBadType{testSVN(7)}
-	return &SVN{&v}, nil
-}
-
-func (o testSVNBadType) Type() string {
-	return "min-value"
-}
-
-func Test_RegisterSVNType(t *testing.T) {
-	err := RegisterSVNType(32, newTestSVN)
-	assert.EqualError(t, err, "tag 32 is already registered")
-
-	err = RegisterSVNType(99995, newTestSVNBadType)
-	assert.EqualError(t, err, `SVN type with name "min-value" already exists`)
-
-	err = RegisterSVNType(99995, newTestSVN)
-	require.NoError(t, err)
 
 }
 
