@@ -82,8 +82,8 @@ func Test_NewSVN(t *testing.T) {
 			}
 
 			retMin, err := NewSVN(tv.Input, "min-value")
-			min := TaggedMinSVN(tv.Expected)
-			expected = SVN{&min}
+			minSVN := TaggedMinSVN(tv.Expected)
+			expected = SVN{&minSVN}
 
 			if tv.Err != "" {
 				assert.EqualError(t, err, tv.Err)
