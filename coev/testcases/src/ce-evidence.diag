@@ -1,0 +1,23 @@
+   / tagged-concise-evidence / 571( {
+      / ce.ev-triples / 0 : {
+        / ce.evidence-triples / 0 : [
+          [
+            / environment-map / {
+              / comid.class / 0 : {
+                / comid.class-id / 0 :
+                  / tagged-oid-type / 111(h'6086480186F84D010F046301'), / 2.16.840.1.113741.1.15.4.99.1 /
+                  / comid.vendor / 1 : "xyzinc.example"
+              }
+            },
+            [
+              / measurement-map / {
+                / comid.mval / 1 : {
+                  / digests / 2 : [ [ 1, h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'] ]
+                },
+                2: 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
+              }
+            ]
+          ]
+        ]
+      }
+    } )
