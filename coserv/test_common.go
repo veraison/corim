@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	testExpiry, _ = time.Parse("2006-01-02T15:04:05Z", "2030-12-13T18:30:02Z")
+	testExpiry, _    = time.Parse("2006-01-02T15:04:05Z", "2030-12-13T18:30:02Z")
+	testTimestamp, _ = time.Parse("2006-01-02T15:04:05Z", "2025-12-13T18:30:02Z")
 )
 
 func exampleClassSelector(t *testing.T) *EnvironmentSelector {
