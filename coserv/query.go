@@ -12,9 +12,10 @@ import (
 
 // Query is the internal representation of a Query data item
 type Query struct {
-	ArtifactType        ArtifactType        `cbor:"0,keyasint"`
-	EnvironmentSelector EnvironmentSelector `cbor:"1,keyasint"`
-	Timestamp           time.Time           `cbor:"2,keyasint"`
+	ArtifactType          ArtifactType        `cbor:"0,keyasint"`
+	EnvironmentSelector   EnvironmentSelector `cbor:"1,keyasint"`
+	Timestamp             time.Time           `cbor:"2,keyasint"`
+	IncludeSourceMaterial *bool               `cbor:"3,keyasint,omitempty"`
 }
 
 // NewQuery creates a new Query instance with the timestamp set to instantiation time.
@@ -29,6 +30,7 @@ func NewQuery(artifactType ArtifactType, envSelector EnvironmentSelector) (*Quer
 		ArtifactType:        artifactType,
 		EnvironmentSelector: envSelector,
 		Timestamp:           time.Now(),
+		// Do not set the include-source-material flag (if unset, the default is false)
 	}, nil
 }
 
@@ -36,6 +38,21 @@ func NewQuery(artifactType ArtifactType, envSelector EnvironmentSelector) (*Quer
 func (o *Query) SetTimestamp(ts time.Time) *Query {
 	o.Timestamp = ts
 	return o
+}
+
+// SetIncludeSourceMaterial sets the include-source-material flag to true
+func (o *Query) SetIncludeSourceMaterial() *Query {
+	t := true
+	o.IncludeSourceMaterial = &t
+	return o
+}
+
+// GetIncludeSourceMaterial retrieves the value of the include-source-material flag
+func (o Query) GetIncludeSourceMaterial() bool {
+	if o.IncludeSourceMaterial == nil {
+		return false
+	}
+	return *o.IncludeSourceMaterial
 }
 
 // Valid ensures that the Query target is correctly populated

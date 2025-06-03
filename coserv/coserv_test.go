@@ -128,6 +128,7 @@ func TestCoserv_FromBase64Url_ok_class(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
+	assert.False(t, actual.Query.GetIncludeSourceMaterial())
 	assert.Equal(t, *exampleClassSelector(t), actual.Query.EnvironmentSelector)
 }
 
@@ -144,6 +145,7 @@ func TestCoserv_FromBase64Url_ok_instance(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
+	assert.False(t, actual.Query.GetIncludeSourceMaterial())
 	assert.Equal(t, *exampleInstanceSelector(t), actual.Query.EnvironmentSelector)
 }
 
@@ -160,7 +162,19 @@ func TestCoserv_FromBase64Url_ok_group(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
+	assert.False(t, actual.Query.GetIncludeSourceMaterial())
 	assert.Equal(t, *exampleGroupSelector(t), actual.Query.EnvironmentSelector)
+}
+
+func TestCoserv_FromBase64Url_ok_include_source_material(t *testing.T) {
+	tv := "ogB4JnRhZzpleGFtcGxlLmNvbSwyMDI1OmNjLXBsYXRmb3JtIzEuMC4wAaQAAgGhAIKjANkCMEWJmXhlVgFuRXhhbXBsZSBWZW5kb3ICbUV4YW1wbGUgTW9kZWyhANglUDH7Wr8CPkmSqk6V-cFQO_oCwHQyMDI1LTEyLTEzVDE4OjMwOjAyWgP1"
+
+	var actual Coserv
+
+	err := actual.FromBase64Url(tv)
+	require.NoError(t, err)
+
+	assert.True(t, actual.Query.GetIncludeSourceMaterial())
 }
 
 func TestCoserv_FromBase64Url_fail(t *testing.T) {
@@ -241,12 +255,15 @@ func TestCoserv_ToBase64Url_ok_group(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func Test_ToEDN_ok(t *testing.T) {
+func TestCoserv_ToEDN_ok(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t))
 	require.NoError(t, err)
 
 	// overwrite the default query timestamp
 	query.SetTimestamp(testTimestamp)
+
+	// Set the include-source-material flag
+	query.SetIncludeSourceMaterial()
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
@@ -257,7 +274,7 @@ func Test_ToEDN_ok(t *testing.T) {
 	actual, err := tv.ToEDN()
 	require.NoError(t, err)
 
-	expected := `{0: "tag:example.com,2025:cc-platform#1.0.0", 1: {0: 2, 1: {0: [{0: 560(h'8999786556'), 1: "Example Vendor", 2: "Example Model"}, {0: 37(h'31fb5abf023e4992aa4e95f9c1503bfa')}]}, 2: 0("2025-12-13T18:30:02Z")}}`
+	expected := `{0: "tag:example.com,2025:cc-platform#1.0.0", 1: {0: 2, 1: {0: [{0: 560(h'8999786556'), 1: "Example Vendor", 2: "Example Model"}, {0: 37(h'31fb5abf023e4992aa4e95f9c1503bfa')}]}, 2: 0("2025-12-13T18:30:02Z"), 3: true}}`
 
 	assert.Equal(t, expected, actual)
 }
