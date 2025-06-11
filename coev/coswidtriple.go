@@ -4,15 +4,14 @@
 package coev
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/veraison/corim/comid"
 )
 
-// CoSWIDTriple stores a cryptographic key triple record (identity-triple-record
-// or attest-key-triple-record) with CBOR and JSON serializations.  Note that
-// the CBOR serialization packs the structure into an array.  Instead, when
-// serializing to JSON, the structure is converted into an object.
+// CoSWIDTriple stores a either a CoSWID Reference Value or a CoSWID Evidence
+// pertaining to an Environment
 type CoSWIDTriple struct {
 	_           struct{}          `cbor:",toarray"`
 	Environment comid.Environment `json:"environment"`
@@ -24,11 +23,9 @@ func (o CoSWIDTriple) Valid() error {
 		return fmt.Errorf("environment validation failed: %w", err)
 	}
 
-	/*
-		if err := o.Evidence.Valid(); err != nil {
-			return fmt.Errorf("verification keys validation failed: %w", err)
-		}
-	*/
+	if len(o.Evidence) == 0 {
+		return errors.New("no evidence entry in the CoSWIDTriple")
+	}
 	return nil
 }
 
