@@ -4,6 +4,7 @@
 package corim
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"time"
@@ -37,8 +38,6 @@ type UnsignedCorim struct {
 
 	Extensions
 }
-
-type TaggedUnsignedCorim UnsignedCorim
 
 // NewUnsignedCorim instantiates an empty UnsignedCorim
 func NewUnsignedCorim() *UnsignedCorim {
@@ -293,12 +292,21 @@ func (o UnsignedCorim) ToCBOR() ([]byte, error) {
 		o.Entities = nil
 	}
 
-	return encoding.SerializeStructToCBOR(em, o)
+	data, err := encoding.SerializeStructToCBOR(em, o)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(UnsignedCorimTag, data...), nil
 }
 
 // FromCBOR deserializes a CBOR-encoded unsigned CoRIM into the target UnsignedCorim
 func (o *UnsignedCorim) FromCBOR(data []byte) error {
-	return encoding.PopulateStructFromCBOR(dm, data, o)
+	if !bytes.Equal(data[:3], UnsignedCorimTag) {
+		return errors.New("did not see unsigned CoRIM tag")
+	}
+
+	return encoding.PopulateStructFromCBOR(dm, data[3:], o)
 }
 
 // ToJSON serializes the target unsigned CoRIM to JSON

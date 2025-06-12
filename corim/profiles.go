@@ -3,7 +3,9 @@
 package corim
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -74,11 +76,15 @@ func UnmarshalSignedCorimFromCBOR(buf []byte) (*SignedCorim, error) {
 // the data, they will be registered with the UnsignedCorim before it is
 // unmarshaled.
 func UnmarshalUnsignedCorimFromCBOR(buf []byte) (*UnsignedCorim, error) {
+	if !bytes.Equal(buf[:3], UnsignedCorimTag) {
+		return nil, errors.New("did not see unsigned CoRIM tag")
+	}
+
 	profiled := struct {
 		Profile *eat.Profile `cbor:"3,keyasint,omitempty"`
 	}{}
 
-	if err := dm.Unmarshal(buf, &profiled); err != nil {
+	if err := dm.Unmarshal(buf[3:], &profiled); err != nil {
 		return nil, err
 	}
 
