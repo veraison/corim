@@ -12,7 +12,7 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
-type CoEvTriples struct {
+type EvTriples struct {
 	EvidenceTriples   *comid.ValueTriples `cbor:"0,keyasint,omitempty" json:"evidence-triples,omitempty"`
 	IdentityTriples   *comid.KeyTriples   `cbor:"1,keyasint,omitempty" json:"identity-triples,omitempty"`
 	CoSWIDTriples     *CoSWIDTriples      `cbor:"4,keyasint,omitempty" json:"coswid-triples,omitempty"`
@@ -20,14 +20,14 @@ type CoEvTriples struct {
 	Extensions
 }
 
-func (o CoEvTriples) Valid() error {
+func (o EvTriples) Valid() error {
 
 	// Check if triples are set ?
 	if o.EvidenceTriples == nil &&
 		o.IdentityTriples == nil &&
 		o.CoSWIDTriples == nil &&
 		o.AttestKeysTriples == nil {
-		return errors.New("no Triples set inside CoEvTriples")
+		return errors.New("no Triples set inside EvTriples")
 	}
 
 	if o.EvidenceTriples != nil {
@@ -65,7 +65,7 @@ func (o CoEvTriples) Valid() error {
 	return nil
 }
 
-func (o *CoEvTriples) AddEvidenceTriple(val *comid.ValueTriple) *CoEvTriples {
+func (o *EvTriples) AddEvidenceTriple(val *comid.ValueTriple) *EvTriples {
 	if o != nil {
 		if o.EvidenceTriples == nil {
 			o.EvidenceTriples = comid.NewValueTriples()
@@ -76,7 +76,7 @@ func (o *CoEvTriples) AddEvidenceTriple(val *comid.ValueTriple) *CoEvTriples {
 	return o
 }
 
-func (o *CoEvTriples) AddCoSWIDTriple(val *CoSWIDTriple) *CoEvTriples {
+func (o *EvTriples) AddCoSWIDTriple(val *CoSWIDTriple) *EvTriples {
 	if o != nil {
 		if o.CoSWIDTriples == nil {
 			o.CoSWIDTriples = NewCoSWIDTriples()
@@ -86,7 +86,7 @@ func (o *CoEvTriples) AddCoSWIDTriple(val *CoSWIDTriple) *CoEvTriples {
 	return o
 }
 
-func (o *CoEvTriples) AddIdentityTriple(val *comid.KeyTriple) *CoEvTriples {
+func (o *EvTriples) AddIdentityTriple(val *comid.KeyTriple) *EvTriples {
 	if o != nil {
 		if o.IdentityTriples == nil {
 			o.IdentityTriples = comid.NewKeyTriples()
@@ -97,7 +97,7 @@ func (o *CoEvTriples) AddIdentityTriple(val *comid.KeyTriple) *CoEvTriples {
 	return o
 }
 
-func (o *CoEvTriples) AddAttestKeyTriple(val *comid.KeyTriple) *CoEvTriples {
+func (o *EvTriples) AddAttestKeyTriple(val *comid.KeyTriple) *EvTriples {
 	if o != nil {
 		if o.AttestKeysTriples == nil {
 			o.AttestKeysTriples = comid.NewKeyTriples()
@@ -108,11 +108,11 @@ func (o *CoEvTriples) AddAttestKeyTriple(val *comid.KeyTriple) *CoEvTriples {
 	return o
 }
 
-func (o *CoEvTriples) RegisterExtensions(exts extensions.Map) error {
+func (o *EvTriples) RegisterExtensions(exts extensions.Map) error {
 	EvTriplesExts := extensions.NewMap()
 	for p, v := range exts {
 		switch p {
-		case ExtCoEvTriples:
+		case ExtEvTriples:
 			o.Extensions.Register(v)
 		case ExtEvidenceTriples:
 			if o.EvidenceTriples == nil {
@@ -132,17 +132,17 @@ func (o *CoEvTriples) RegisterExtensions(exts extensions.Map) error {
 }
 
 // GetExtensions returns previously registered extension
-func (o *CoEvTriples) GetExtensions() extensions.IMapValue {
+func (o *EvTriples) GetExtensions() extensions.IMapValue {
 	return o.Extensions.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
-func (o *CoEvTriples) UnmarshalCBOR(data []byte) error {
+func (o *EvTriples) UnmarshalCBOR(data []byte) error {
 	return encoding.PopulateStructFromCBOR(dm, data, o)
 }
 
 // MarshalCBOR serializes to CBOR
-func (o CoEvTriples) MarshalCBOR() ([]byte, error) {
+func (o EvTriples) MarshalCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
 	// marshaling an empty list (and let the marshaller omit the claim
@@ -157,12 +157,12 @@ func (o CoEvTriples) MarshalCBOR() ([]byte, error) {
 }
 
 // UnmarshalJSON deserializes from JSON
-func (o *CoEvTriples) UnmarshalJSON(data []byte) error {
+func (o *EvTriples) UnmarshalJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
 }
 
 // MarshalJSON serializes to JSON
-func (o CoEvTriples) MarshalJSON() ([]byte, error) {
+func (o EvTriples) MarshalJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
 	// marshaling an empty list (and let the marshaller omit the claim

@@ -7,7 +7,7 @@ import "github.com/veraison/corim/extensions"
 
 const (
 	ExtConciseEvidence      extensions.Point = "ConciseEvidence"
-	ExtCoEvTriples          extensions.Point = "CoEvTriples"
+	ExtEvTriples            extensions.Point = "EvTriples"
 	ExtEvidenceTriples      extensions.Point = "EvidenceTriples"
 	ExtEvidenceTriplesFlags extensions.Point = "EvidenceTriplesFlags"
 )

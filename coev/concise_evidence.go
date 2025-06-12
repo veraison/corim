@@ -14,9 +14,9 @@ import (
 )
 
 type ConciseEvidence struct {
-	CoEvTriples CoEvTriples  `cbor:"0,keyasint" json:"coev-triples"`
-	EvidenceID  *EvidenceID  `cbor:"1,keyasint,omitempty" json:"ev-identity,omitempty"`
-	Profile     *eat.Profile `cbor:"2,keyasint,omitempty" json:"profile,omitempty"`
+	EvTriples  EvTriples    `cbor:"0,keyasint" json:"ev-triples"`
+	EvidenceID *EvidenceID  `cbor:"1,keyasint,omitempty" json:"ev-identity,omitempty"`
+	Profile    *eat.Profile `cbor:"2,keyasint,omitempty" json:"profile,omitempty"`
 	Extensions
 }
 
@@ -25,15 +25,15 @@ func NewConciseEvidence() *ConciseEvidence {
 	return &ConciseEvidence{}
 }
 
-func (o *ConciseEvidence) AddEvidenceTriples(coEvTriples *CoEvTriples) error {
-	if coEvTriples == nil {
+func (o *ConciseEvidence) AddEvidenceTriples(EvTriples *EvTriples) error {
+	if EvTriples == nil {
 		return errors.New("no evidence triples")
 	}
 
-	if err := coEvTriples.Valid(); err != nil {
+	if err := EvTriples.Valid(); err != nil {
 		return fmt.Errorf("invalid evidence triples: %w", err)
 	}
-	o.CoEvTriples = *coEvTriples
+	o.EvTriples = *EvTriples
 
 	return nil
 }
@@ -60,9 +60,10 @@ func (o *ConciseEvidence) AddProfile(profile *eat.Profile) error {
 	return nil
 }
 
+// nolint:gocritic
 func (o ConciseEvidence) Valid() error {
-	if err := o.CoEvTriples.Valid(); err != nil {
-		return fmt.Errorf("invalid CoEvTriples: %w", err)
+	if err := o.EvTriples.Valid(); err != nil {
+		return fmt.Errorf("invalid EvTriples: %w", err)
 	}
 	if o.EvidenceID != nil {
 		if err := o.EvidenceID.Valid(); err != nil {
@@ -89,7 +90,7 @@ func (o *ConciseEvidence) RegisterExtensions(exts extensions.Map) error {
 			coEvMap.Add(p, v)
 		}
 	}
-	return o.CoEvTriples.RegisterExtensions(coEvMap)
+	return o.EvTriples.RegisterExtensions(coEvMap)
 }
 
 // ToCBOR serializes the target ConciseEvidence to CBOR
