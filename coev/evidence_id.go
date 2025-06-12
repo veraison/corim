@@ -23,22 +23,26 @@ type EvidenceID struct {
 func NewEvidenceID(val any, typ string) (*EvidenceID, error) {
 	factory, ok := evidenceIDValueRegister[typ]
 	if !ok {
-		return nil, fmt.Errorf("unknown instance type: %s", typ)
+		return nil, fmt.Errorf("unknown EvidenceID type: %s", typ)
 	}
 
 	return factory(val)
 }
 
-// Valid checks for the validity of given instance
+// Valid checks for the validity of given EvidenceID
 func (o EvidenceID) Valid() error {
 	if o.String() == "" {
-		return fmt.Errorf("invalid instance id")
+		return errors.New("no EvidenceID id")
+	}
+	_, err := o.GetUUID
+	if err != nil{
+		return fmt.Errorf("unable to fetch valid UUID: %w", err)
 	}
 	return nil
 }
 
-// String returns a printable string of the Instance value.  UUIDs use the
-// canonical 8-4-4-4-12 format, UEIDs are hex encoded.
+// String returns a printable string of the EvidenceID value.  UUIDs use the
+// canonical 8-4-4-4-12 format.
 func (o EvidenceID) String() string {
 	if o.Value == nil {
 		return ""
@@ -47,18 +51,18 @@ func (o EvidenceID) String() string {
 	return o.Value.String()
 }
 
-// Type returns a string naming the type of the underlying Instance value.
+// Type returns a string naming the type of the underlying EvidenceID value.
 func (o EvidenceID) Type() string {
 	return o.Value.Type()
 }
 
-// Bytes returns a []byte containing the bytes of the underlying Instance
+// Bytes returns a []byte containing the bytes of the underlying EvidenceID
 // value.
 func (o EvidenceID) Bytes() []byte {
 	return o.Value.Bytes()
 }
 
-// MarshalCBOR serializes the target instance to CBOR
+// MarshalCBOR serializes the target EvidenceID to CBOR
 func (o EvidenceID) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(o.Value)
 }
@@ -87,7 +91,7 @@ func (o *EvidenceID) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 
 	if err := json.Unmarshal(data, &tnv); err != nil {
-		return fmt.Errorf("instance decoding failure: %w", err)
+		return fmt.Errorf("EvidenceID decoding failure: %w", err)
 	}
 
 	decoded, err := NewEvidenceID(nil, tnv.Type)
@@ -97,7 +101,7 @@ func (o *EvidenceID) UnmarshalJSON(data []byte) error {
 
 	if err := json.Unmarshal(tnv.Value, &decoded.Value); err != nil {
 		return fmt.Errorf(
-			"cannot unmarshal instance: %w",
+			"cannot unmarshal EvidenceID: %w",
 			err,
 		)
 	}
@@ -145,7 +149,7 @@ func (o EvidenceID) GetUUID() (comid.UUID, error) {
 	}
 }
 
-// IEvidenceValue is the interface implemented by all Instance value
+// IEvidenceValue is the interface implemented by all EvidenceID value
 // implementations.
 type IEvidenceValue interface {
 	extensions.ITypeChoiceValue
@@ -167,7 +171,7 @@ func NewUUIDEvidenceID(val any) (*EvidenceID, error) {
 	return &EvidenceID{ret}, nil
 }
 
-// MustNewUUIDInstance is like NewUUIDInstance execept it does not return an
+// MustNewUUIDEvidenceID is like NewUUIDEvidenceID execept it does not return an
 // error, assuming that the provided value is valid. It panics if that isn't
 // the case.
 func MustNewUUIDEvidenceID(val any) *EvidenceID {

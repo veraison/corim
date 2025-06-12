@@ -20,6 +20,46 @@ type ConciseEvidence struct {
 	Extensions
 }
 
+// NewConciseEvidence instantiates an empty ConciseEvidence
+func NewConciseEvidence() *ConciseEvidence {
+	return &ConciseEvidence{}
+}
+
+func (o *ConciseEvidence) AddEvidenceTriples(coEvTriples *CoEvTriples) error {
+	if coEvTriples == nil {
+		return errors.New("no evidence triples")
+	}
+
+	if err := coEvTriples.Valid(); err != nil {
+		return fmt.Errorf("invalid evidence triples: %w", err)
+	}
+	o.CoEvTriples = *CoEvTriples
+
+	return nil
+}
+
+func (o *ConciseEvidence) AddEvidenceID(evidenceID  *EvidenceID) error {
+	if evidenceID == nil {
+		return errors.New("no evidence id supplied")
+	}
+	if err := evidenceID.Valid(); err != nil {
+		return fmt.Errorf("invalid evidenceID: %w", err)
+	}
+	o.EvidenceID = evidenceID
+	return nil
+}
+
+func (o *ConciseEvidence) AddProfile(profile *eat.Profile) error {
+	if profile == nil || profile.IsEmpty {
+		return errors.New("no profile supplied")
+	}
+	if !p.IsOID() && !p.IsURI() {
+		return errors.New("profile should be OID or URI")
+	}
+	o.Profile = profile
+	return nil
+}
+
 func (o ConciseEvidence) Valid() error {
 	if err := o.CoEvTriples.Valid(); err != nil {
 		return fmt.Errorf("invalid CoEvTriples: %w", err)
@@ -90,3 +130,4 @@ func (o ConciseEvidence) ToJSONPretty(indent string) ([]byte, error) {
 
 	return json.MarshalIndent(&o, "", indent)
 }
+
