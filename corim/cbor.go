@@ -22,8 +22,7 @@ var (
 	ComidTag         = []byte{0xd9, 0x01, 0xfa} // 506()
 
 	corimTagsMap = map[uint64]interface{}{
-		32:  comid.TaggedURI(""),
-		501: TaggedUnsignedCorim(UnsignedCorim{}),
+		32: comid.TaggedURI(""),
 	}
 )
 
