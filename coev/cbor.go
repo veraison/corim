@@ -53,7 +53,7 @@ func initCBORDecMode() (dm cbor.DecMode, err error) {
 	return decOpt.DecModeWithTags(coevTags())
 }
 
-func registerCOMIDTag(tag uint64, t interface{}) error {
+func registerCoEvTag(tag uint64, t interface{}) error {
 	if _, exists := coevTagMap[tag]; exists {
 		return fmt.Errorf("tag %d is already registered", tag)
 	}

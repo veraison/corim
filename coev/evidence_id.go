@@ -197,3 +197,25 @@ type IEvidenceFactory func(any) (*EvidenceID, error)
 var evidenceIDValueRegister = map[string]IEvidenceFactory{
 	comid.UUIDType: NewUUIDEvidenceID,
 }
+
+// RegisterEvidenceType registers a new IEvidenceValue implementation (created
+// by the provided IEvidenceFactory) under the specified CBOR tag.
+func RegisterEvidenceType(tag uint64, factory IEvidenceFactory) error {
+	nilVal, err := factory(nil)
+	if err != nil {
+		return err
+	}
+
+	typ := nilVal.Type()
+	if _, exists := evidenceIDValueRegister[typ]; exists {
+		return fmt.Errorf("evidence ID type with name %q already exists", typ)
+	}
+
+	if err := registerCoEvTag(tag, nilVal.Value); err != nil {
+		return err
+	}
+
+	evidenceIDValueRegister[typ] = factory
+
+	return nil
+}

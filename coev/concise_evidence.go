@@ -25,15 +25,15 @@ func NewConciseEvidence() *ConciseEvidence {
 	return &ConciseEvidence{}
 }
 
-func (o *ConciseEvidence) AddEvidenceTriples(EvTriples *EvTriples) error {
-	if EvTriples == nil {
+func (o *ConciseEvidence) AddEvidenceTriples(evTriples *EvTriples) error {
+	if evTriples == nil {
 		return errors.New("no evidence triples")
 	}
 
-	if err := EvTriples.Valid(); err != nil {
+	if err := evTriples.Valid(); err != nil {
 		return fmt.Errorf("invalid evidence triples: %w", err)
 	}
-	o.EvTriples = *EvTriples
+	o.EvTriples = *evTriples
 
 	return nil
 }
