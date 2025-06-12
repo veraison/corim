@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	em, emError = initCBOREncMode()
-	dm, dmError = initCBORDecMode()
-
-	coevTagMap = map[uint64]interface{}{
+	em, emError        = initCBOREncMode()
+	dm, dmError        = initCBORDecMode()
+	ConciseEvidenceTag = []byte{0xd9, 0x02, 0x3B}
+	coevTagMap         = map[uint64]interface{}{
 		37: comid.TaggedUUID{},
 	}
 )

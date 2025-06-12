@@ -4,6 +4,7 @@
 package coev
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -130,4 +131,36 @@ func (o ConciseEvidence) ToJSONPretty(indent string) ([]byte, error) {
 	}
 
 	return json.MarshalIndent(&o, "", indent)
+}
+
+type TaggedConciseEvidence ConciseEvidence
+
+// New Tagged Concise Evidence creates a Tagged Concise Evidence from a supplied Concise Evidence
+func NewTaggedConciseEvidence(ev *ConciseEvidence) (*TaggedConciseEvidence, error) {
+	var tce TaggedConciseEvidence
+	if ev == nil {
+		return nil, errors.New("non existent concise evidence")
+	}
+	if err := ev.Valid(); err != nil {
+		return nil, fmt.Errorf("concise Evidence is not valid: %w", err)
+	}
+
+	tce = TaggedConciseEvidence(*ev)
+	return &tce, nil
+}
+
+func (o TaggedConciseEvidence) ToCBOR() ([]byte, error) {
+	ce := ConciseEvidence(o)
+	data, err := ce.ToCBOR()
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize the data: %w", err)
+	}
+	return append(ConciseEvidenceTag, data...), nil
+}
+
+func (o *TaggedConciseEvidence) FromCBOR(data []byte) error {
+	if !bytes.Equal(data[:3], ConciseEvidenceTag) {
+		return errors.New("did not see concise evidence tag")
+	}
+	return encoding.PopulateStructFromCBOR(dm, data[3:], o)
 }
