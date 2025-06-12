@@ -33,12 +33,12 @@ func (o *ConciseEvidence) AddEvidenceTriples(coEvTriples *CoEvTriples) error {
 	if err := coEvTriples.Valid(); err != nil {
 		return fmt.Errorf("invalid evidence triples: %w", err)
 	}
-	o.CoEvTriples = *CoEvTriples
+	o.CoEvTriples = *coEvTriples
 
 	return nil
 }
 
-func (o *ConciseEvidence) AddEvidenceID(evidenceID  *EvidenceID) error {
+func (o *ConciseEvidence) AddEvidenceID(evidenceID *EvidenceID) error {
 	if evidenceID == nil {
 		return errors.New("no evidence id supplied")
 	}
@@ -50,10 +50,10 @@ func (o *ConciseEvidence) AddEvidenceID(evidenceID  *EvidenceID) error {
 }
 
 func (o *ConciseEvidence) AddProfile(profile *eat.Profile) error {
-	if profile == nil || profile.IsEmpty {
+	if profile == nil {
 		return errors.New("no profile supplied")
 	}
-	if !p.IsOID() && !p.IsURI() {
+	if !profile.IsOID() && !profile.IsURI() {
 		return errors.New("profile should be OID or URI")
 	}
 	o.Profile = profile
@@ -130,4 +130,3 @@ func (o ConciseEvidence) ToJSONPretty(indent string) ([]byte, error) {
 
 	return json.MarshalIndent(&o, "", indent)
 }
-

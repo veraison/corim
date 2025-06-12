@@ -5,6 +5,7 @@ package coev
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -34,8 +35,8 @@ func (o EvidenceID) Valid() error {
 	if o.String() == "" {
 		return errors.New("no EvidenceID id")
 	}
-	_, err := o.GetUUID
-	if err != nil{
+	_, err := o.GetUUID()
+	if err != nil {
 		return fmt.Errorf("unable to fetch valid UUID: %w", err)
 	}
 	return nil
