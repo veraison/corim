@@ -12,7 +12,7 @@ import (
 
 	semver "github.com/Masterminds/semver/v3"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/lestrrat-go/jwx/v2/jwk"
+	"github.com/lestrrat-go/jwx/v3/jwk"
 	cose "github.com/veraison/go-cose"
 	"github.com/yosida95/uritemplate/v3"
 )
