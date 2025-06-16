@@ -404,6 +404,12 @@ func TestUnsignedCorim_extensions(t *testing.T) {
 	assert.EqualError(t, err, `unexpected extension point: "test"`)
 }
 
+func TestUnsignedCorim_truncated(t *testing.T) {
+	c := NewUnsignedCorim()
+	err := c.FromCBOR([]byte{0x01, 0x02})
+	assert.EqualError(t, err, "input too short")
+}
+
 func TestLocator_Valid(t *testing.T) {
 	l := Locator{}
 	assert.EqualError(t, l.Valid(), "empty href")
