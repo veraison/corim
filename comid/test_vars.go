@@ -186,6 +186,8 @@ rpT6kiSnAzk+2zgSiA4=
 		HashAlgID: 1,
 		HashValue: MustHexDecode(nil, `68e656b251e67e8358bef8483ab0d51c6619f3e7a1a9f0e75838d41ff368f728`),
 	}
+
+	TestTaggedBytes = []byte("taggedbytes")
 )
 
 func MustHexDecode(t *testing.T, s string) []byte {
