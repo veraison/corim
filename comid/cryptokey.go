@@ -393,11 +393,7 @@ func (o TaggedPKIXBase64CertPath) certPath() ([]*x509.Certificate, error) {
 	var rest []byte
 	rest = []byte(o)
 	i := 0
-	for {
-		if len(rest) == 0 {
-			break
-		}
-
+	for len(rest) != 0 {
 		block, rest = pem.Decode(rest)
 		if block == nil {
 			return nil, fmt.Errorf("could not decode PEM block %d", i)
