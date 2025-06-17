@@ -26,6 +26,11 @@ linters:
     - staticcheck # metalinter
     - unconvert # style
     - unused # unused
+  exclusions:
+    rules:
+      - path: '(.+)_test\.go'
+        linters:
+          - funlen
   settings:
     dupl:
       threshold: 100
