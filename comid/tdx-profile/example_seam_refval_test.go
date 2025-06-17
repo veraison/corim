@@ -222,7 +222,7 @@ func Example_encode_tdx_seam_refval_direct() {
 
 func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	tcbDate, _ := time.Parse(time.RFC3339, "2025-01-27T00:00:00Z")
-	err := val.Extensions.Set("tcbdate", &tcbDate)
+	err := val.Set("tcbdate", &tcbDate)
 	if err != nil {
 		return fmt.Errorf("unable to set tcbDate: %w", err)
 	}
@@ -231,7 +231,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get isvprodid: %w", err)
 	}
-	err = val.Extensions.Set("isvprodid", isvProdID)
+	err = val.Set("isvprodid", isvProdID)
 	if err != nil {
 		return fmt.Errorf("unable to set isvprodid: %w", err)
 	}
@@ -239,7 +239,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get isvsvn numeric: %w", err)
 	}
-	err = val.Extensions.Set("isvsvn", svn)
+	err = val.Set("isvsvn", svn)
 	if err != nil {
 		return fmt.Errorf("unable to set isvsvn: %w", err)
 	}
@@ -247,7 +247,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get tcbevalnum numeric: %w", err)
 	}
-	err = val.Extensions.Set("tcbevalnum", teeTcbEvNum)
+	err = val.Set("tcbevalnum", teeTcbEvNum)
 	if err != nil {
 		return fmt.Errorf("unable to set tcbevalnum: %w", err)
 	}
@@ -256,7 +256,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get teeAttributes: %w", err)
 	}
-	err = val.Extensions.Set("attributes", teeAttr)
+	err = val.Set("attributes", teeAttr)
 	if err != nil {
 		return fmt.Errorf("unable to set attributes: %w", err)
 	}
@@ -268,7 +268,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 		return fmt.Errorf("unable to get TeeDigest: %w", err)
 	}
 
-	err = val.Extensions.Set("mrtee", td)
+	err = val.Set("mrtee", td)
 	if err != nil {
 		return fmt.Errorf("unable to set mrtee: %w", err)
 	}
@@ -282,7 +282,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 		return fmt.Errorf("unable to get TeeDigest: %w", err)
 	}
 
-	err = val.Extensions.Set("mrsigner", td)
+	err = val.Set("mrsigner", td)
 	if err != nil {
 		return fmt.Errorf("unable to set mrsigner %w", err)
 	}
@@ -290,7 +290,7 @@ func setTDXSeamMvalExtensions(val *comid.Mval) error {
 }
 
 func decodeMValExtensions(m *comid.Measurement) error {
-	val, err := m.Val.Extensions.Get("tcbevalnum")
+	val, err := m.Val.Get("tcbevalnum")
 	if err != nil {
 		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions: %w", err)
 	}
@@ -303,7 +303,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("isvprodid")
+	val, err = m.Val.Get("isvprodid")
 	if err != nil {
 		return errors.New("failed to decode isvprodid from measurement extensions")
 	}
@@ -315,7 +315,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("isvsvn")
+	val, err = m.Val.Get("isvsvn")
 	if err != nil {
 		return errors.New("failed to decode isvsvn from measurement extensions")
 	}
@@ -332,7 +332,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 	if err != nil {
 		return fmt.Errorf("unable to extract tee svn: %w", err)
 	}
-	val, err = m.Val.Extensions.Get("attributes")
+	val, err = m.Val.Get("attributes")
 	if err != nil {
 		return errors.New("failed to decode attributes from measurement extensions")
 	}
@@ -343,7 +343,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 	}
 	fmt.Printf("\nAttributes: %x", *tA)
 
-	val, err = m.Val.Extensions.Get("mrtee")
+	val, err = m.Val.Get("mrtee")
 	if err != nil {
 		return errors.New("failed to decode mrtee from measurement extensions")
 	}
@@ -357,7 +357,7 @@ func decodeMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to decode mrtee from digest: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("mrsigner")
+	val, err = m.Val.Get("mrsigner")
 	if err != nil {
 		return fmt.Errorf("failed to decode mrsigner from measurement extensions: %w", err)
 	}

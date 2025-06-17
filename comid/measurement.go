@@ -363,13 +363,13 @@ func (o *Mval) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtMval:
-			o.Extensions.Register(v)
+			o.Register(v)
 		case ExtFlags:
 			if o.Flags == nil {
 				o.Flags = new(FlagsMap)
 			}
 
-			o.Flags.Extensions.Register(v)
+			o.Flags.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -380,7 +380,7 @@ func (o *Mval) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns pervisouosly registered extension
 func (o *Mval) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
@@ -442,7 +442,7 @@ func (o Mval) Valid() error {
 		o.UUID == nil &&
 		o.Name == nil &&
 		o.IntegrityRegisters == nil &&
-		o.Extensions.IsEmpty() {
+		o.IsEmpty() {
 
 		return fmt.Errorf("no measurement value set")
 	}
@@ -488,7 +488,7 @@ func (o Mval) Valid() error {
 	// raw value and raw-value-mask have no specific semantics here
 
 	// Validate extensions (custom logic implemented in validMval())
-	return o.Extensions.validMval(&o)
+	return o.validMval(&o)
 }
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.

@@ -16,14 +16,14 @@ type signerExtensions struct {
 
 func TestSigner_RegisterExtensions(t *testing.T) {
 	signer := NewSigner()
-	assert.False(t, signer.Extensions.HaveExtensions())
+	assert.False(t, signer.HaveExtensions())
 
 	exts := &signerExtensions{}
 	extMap := extensions.NewMap().Add(ExtSigner, exts)
 
 	err := signer.RegisterExtensions(extMap)
 	assert.NoError(t, err)
-	assert.True(t, signer.Extensions.HaveExtensions())
+	assert.True(t, signer.HaveExtensions())
 	assert.Equal(t, exts, signer.GetExtensions())
 
 	badMap := extensions.NewMap().Add(extensions.Point("test"), exts)

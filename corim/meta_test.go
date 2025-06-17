@@ -193,7 +193,7 @@ func Test_Meata_extensions(t *testing.T) {
 
 	err := meta.RegisterExtensions(extMap)
 	assert.NoError(t, err)
-	assert.True(t, meta.Signer.Extensions.HaveExtensions())
+	assert.True(t, meta.Signer.HaveExtensions())
 	assert.Equal(t, exts, meta.Signer.GetExtensions())
 
 	badMap := extensions.NewMap().Add(extensions.Point("test"), exts)

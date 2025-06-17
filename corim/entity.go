@@ -32,7 +32,7 @@ func (o *Entity) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtEntity:
-			o.Extensions.Register(v)
+			o.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -43,7 +43,7 @@ func (o *Entity) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns pervisouosly registered extension
 func (o *Entity) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // SetName is used to set the EntityName field of Entity using supplied name
@@ -103,7 +103,7 @@ func (o Entity) Valid() error {
 		return fmt.Errorf("invalid entity: %w", err)
 	}
 
-	return o.Extensions.validEntity(&o)
+	return o.validEntity(&o)
 }
 
 // UnmarshalCBOR deserializes from CBOR

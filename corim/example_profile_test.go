@@ -100,15 +100,14 @@ func Example_profile_unmarshal() {
 
 	fmt.Printf("Language: %s\n", *extractedComid.Language)
 	fmt.Printf("Entity: %s\n", *extractedComid.Entities.Values[0].Name)
-	fmt.Printf("        %s\n", extractedComid.Entities.Values[0].
-		Extensions.MustGetString("Address"))
+	fmt.Printf("        %s\n", extractedComid.Entities.Values[0].MustGetString("Address"))
 
 	fmt.Printf("Measurements:\n")
 	for i := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
 		m := &extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values[i]
 
 		val := hex.EncodeToString((*m.Val.Digests)[0].HashValue)
-		tsInt := m.Val.Extensions.MustGetInt64("timestamp")
+		tsInt := m.Val.MustGetInt64("timestamp")
 		ts := time.Unix(tsInt, 0).UTC()
 
 		fmt.Printf("    %v taken at %s\n", val, ts.Format("2006-01-02T15:04:05"))
@@ -148,7 +147,7 @@ func Example_profile_marshal() {
 		AddEntity("ACME Ltd.", &comid.TestRegID, comid.RoleCreator)
 
 	address := "123 Fake Street"
-	err = myComid.Entities.Values[0].Extensions.Set("Address", &address)
+	err = myComid.Entities.Values[0].Set("Address", &address)
 	if err != nil {
 		log.Fatalf("could not set entity Address: %v", err)
 	}

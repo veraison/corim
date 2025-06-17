@@ -28,7 +28,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtTriples:
-			o.Extensions.Register(v)
+			o.Register(v)
 		case ExtReferenceValue:
 			refValExts[ExtMval] = v
 		case ExtReferenceValueFlags:
@@ -81,7 +81,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns previously registered extension
 func (o *Triples) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
@@ -185,7 +185,7 @@ func (o Triples) Valid() error {
 		}
 	}
 
-	return o.Extensions.validTriples(&o)
+	return o.validTriples(&o)
 }
 
 func (o *Triples) AddReferenceValue(val *ValueTriple) *Triples {

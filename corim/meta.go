@@ -28,7 +28,7 @@ func (o *Meta) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtSigner:
-			o.Signer.Extensions.Register(v)
+			o.Signer.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}

@@ -27,7 +27,7 @@ func (o *testExtensible) RegisterExtensions(exts Map) error {
 	for p, v := range exts {
 		switch p {
 		case testPoint:
-			o.Extensions.Register(v)
+			o.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", ErrUnexpectedPoint, p)
 		}
@@ -37,7 +37,7 @@ func (o *testExtensible) RegisterExtensions(exts Map) error {
 }
 
 func (o testExtensible) GetExtensions() IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 func (o testExtensible) Valid() error {
@@ -83,7 +83,7 @@ func Test_Collection_JSON(t *testing.T) {
 	require.NoError(t, err)
 
 	// as we've not registred the extensions, the unknown field will be ignored.
-	decoded, err := c.Values[0].Extensions.GetString("field-two")
+	decoded, err := c.Values[0].GetString("field-two")
 	assert.Equal(t, "", decoded)
 	assert.EqualError(t, err, "extension not found: field-two")
 
@@ -94,7 +94,7 @@ func Test_Collection_JSON(t *testing.T) {
 	err = json.Unmarshal(testData, c)
 	require.NoError(t, err)
 
-	decoded, err = c.Values[0].Extensions.GetString("field-two")
+	decoded, err = c.Values[0].GetString("field-two")
 	require.NoError(t, err)
 	assert.Equal(t, "bar", decoded)
 
@@ -115,7 +115,7 @@ func Test_Collection_CBOR(t *testing.T) {
 	require.NoError(t, err)
 
 	// as we've not registred the extensions, the unknown field will be ignored.
-	decoded, err := c.Values[0].Extensions.GetString("field-two")
+	decoded, err := c.Values[0].GetString("field-two")
 	assert.Equal(t, "", decoded)
 	assert.EqualError(t, err, "extension not found: field-two")
 
@@ -126,7 +126,7 @@ func Test_Collection_CBOR(t *testing.T) {
 	err = dm.Unmarshal(testData, c)
 	require.NoError(t, err)
 
-	decoded, err = c.Values[0].Extensions.GetString("field-two")
+	decoded, err = c.Values[0].GetString("field-two")
 	require.NoError(t, err)
 	assert.Equal(t, "bar", decoded)
 

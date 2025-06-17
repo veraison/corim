@@ -132,7 +132,7 @@ func extractPCEMeasurements(meas *comid.Measurements) error {
 }
 
 func decodePCEMValExtensions(m *comid.Measurement) error {
-	val, err := m.Val.Extensions.Get("instanceid")
+	val, err := m.Val.Get("instanceid")
 	if err != nil {
 		return errors.New("failed to decode instanceid from measurement extensions")
 	}
@@ -157,7 +157,7 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 		return errors.New("teeinstanceid is neither integer or byte string")
 	}
 
-	val, err = m.Val.Extensions.Get("tcbcompsvn")
+	val, err = m.Val.Get("tcbcompsvn")
 	if err != nil {
 		return errors.New("failed to decode teetcbcompsvn from measurement extensions")
 	}
@@ -170,7 +170,7 @@ func decodePCEMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("invalid computed SVN: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("pceid")
+	val, err = m.Val.Get("pceid")
 	if err != nil {
 		return errors.New("failed to decode tcbevalnum from measurement extensions")
 	}
@@ -347,7 +347,7 @@ func setTDXPCEMvalExtension(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get teeinstanceID: %w", err)
 	}
-	err = val.Extensions.Set("instanceid", instanceID)
+	err = val.Set("instanceid", instanceID)
 	if err != nil {
 		return fmt.Errorf("unable to set teeinstanceID: %w", err)
 	}
@@ -356,7 +356,7 @@ func setTDXPCEMvalExtension(val *comid.Mval) error {
 	if err != nil {
 		return fmt.Errorf("unable to get NewTeepceID: %w", err)
 	}
-	err = val.Extensions.Set("pceid", p)
+	err = val.Set("pceid", p)
 	if err != nil {
 		return fmt.Errorf("unable to set teepceID: %w", err)
 	}
@@ -366,7 +366,7 @@ func setTDXPCEMvalExtension(val *comid.Mval) error {
 		return fmt.Errorf("failed to get TeeTcbCompSvn: %w", err)
 	}
 
-	err = val.Extensions.Set("tcbcompsvn", c)
+	err = val.Set("tcbcompsvn", c)
 	if err != nil {
 		return fmt.Errorf("unable to set teetcbcompsvn: %w", err)
 	}

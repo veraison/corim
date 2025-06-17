@@ -109,7 +109,7 @@ func extractQEMeasurements(meas *comid.Measurements) error {
 }
 
 func decodeQEMValExtensions(m *comid.Measurement) error {
-	val, err := m.Val.Extensions.Get("miscselect")
+	val, err := m.Val.Get("miscselect")
 	if err != nil {
 		return errors.New("failed to decode miscselect from measurement extensions")
 	}
@@ -120,7 +120,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 	miscselect := *f
 	fmt.Printf("\nmiscselect: %x", miscselect)
 
-	val, err = m.Val.Extensions.Get("tcbevalnum")
+	val, err = m.Val.Get("tcbevalnum")
 	if err != nil {
 		return errors.New("failed to decode tcbevalnum from measurement extensions")
 	}
@@ -133,7 +133,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("isvprodid")
+	val, err = m.Val.Get("isvprodid")
 	if err != nil {
 		return errors.New("failed to decode isvprodid from measurement extensions")
 	}
@@ -146,7 +146,7 @@ func decodeQEMValExtensions(m *comid.Measurement) error {
 		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
 	}
 
-	val, err = m.Val.Extensions.Get("mrsigner")
+	val, err = m.Val.Get("mrsigner")
 	if err != nil {
 		return errors.New("failed to decode mrsigner from measurement extensions")
 	}
@@ -228,19 +228,19 @@ func setTDXQEMvalExtensions(val *comid.Mval) error {
 		return fmt.Errorf("unable to get isvprodid: %w", err)
 	}
 
-	err = val.Extensions.Set("isvprodid", isvProdID)
+	err = val.Set("isvprodid", isvProdID)
 	if err != nil {
 		return fmt.Errorf("unable to set isvprodid: %w", err)
 	}
-	err = val.Extensions.Set("isvsvn", svn)
+	err = val.Set("isvsvn", svn)
 	if err != nil {
 		return fmt.Errorf("unable to set isvsvn: %w", err)
 	}
-	err = val.Extensions.Set("tcbevalnum", teeTcbEvNum)
+	err = val.Set("tcbevalnum", teeTcbEvNum)
 	if err != nil {
 		return fmt.Errorf("unable to set tcbevalnum: %w", err)
 	}
-	err = val.Extensions.Set("miscselect", &teeMiscSel)
+	err = val.Set("miscselect", &teeMiscSel)
 	if err != nil {
 		return fmt.Errorf("unable to set miscselect: %w", err)
 	}
@@ -254,7 +254,7 @@ func setTDXQEMvalExtensions(val *comid.Mval) error {
 		return fmt.Errorf("unable to get TeeDigest: %w", err)
 	}
 
-	err = val.Extensions.Set("mrsigner", td)
+	err = val.Set("mrsigner", td)
 	if err != nil {
 		return fmt.Errorf("unable to set mrsigner: %w", err)
 	}
