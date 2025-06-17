@@ -152,10 +152,10 @@ func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, any, error) {
 		}
 		return alg, key, nil
 	}
+	// Private and public need to be in separate switches due to tooling failure when
+	// a private key type extends the public key type.
 	switch v := key.(type) {
 	case *ecdsa.PrivateKey:
-		return fromCurve(v.Curve)
-	case *ecdsa.PublicKey:
 		return fromCurve(v.Curve)
 	case ed25519.PrivateKey:
 		return cose.AlgorithmEdDSA, key, nil
@@ -163,10 +163,20 @@ func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, any, error) {
 		return cose.AlgorithmEdDSA, key, nil
 	case *rsa.PrivateKey:
 		return isRsa()
+	default:
+		err = fmt.Errorf("unknown private key type %v", reflect.TypeOf(key))
+		alg = noAlg
+	}
+	switch v := key.(type) {
+	case *ecdsa.PublicKey:
+		return fromCurve(v.Curve)
+	case ed25519.PublicKey:
+		return cose.AlgorithmEdDSA, key, nil
 	case *rsa.PublicKey:
 		return isRsa()
 	default:
-		return noAlg, nil, fmt.Errorf("unknown private key type %v", reflect.TypeOf(key))
+		err = errors.Join(err, fmt.Errorf("unknown public key type %v", reflect.TypeOf(key)))
+		return noAlg, nil, err
 	}
 }
 
