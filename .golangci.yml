@@ -30,6 +30,7 @@ linters:
       - path: '(.+)_test\.go'
         linters:
           - funlen
+          - lll
   settings:
     dupl:
       threshold: 100
