@@ -4,27 +4,17 @@
 package tdx
 
 //nolint:lll
-var (
-	TestRegID              = "https://intel.com"
-	TestOID                = "2.16.840.1.113741.1.2.3.4.5"
-	TestUIntInstance       = 45
-	TestByteInstance       = []byte{0x45, 0x46, 0x47}
-	TestInvalidProdID      = -23
-	TestUIntISVProdID      = 23
-	TestBytesISVProdID     = []byte{0x01, 0x02, 0x03}
-	TestInvalidInstance    = -1
-	TestTeeAttributes      = []byte{0x01, 0x01}
-	TestTeeMiscSelect      = []byte{0x0B, 0x0C, 0x0D}
-	TestPCEID              = "PCEID001"
-	TestCompSvn            = []uint{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
-	TestTCBStatus          = []string{"OutOfDate", "ConfigurationNeeded", "UpToDate"}
-	TestInvalidTCBStatus   = []int{1, 2, 3}
-	TestAdvisoryIDs        = []string{"SA-00078", "SA-00077", "SA-00079"}
-	TestInvalidAdvisoryIDs = []float64{1.234, 2.567}
-	TestISVSVN             = uint(10)
-	TestTCBEvalNum         = uint(11)
-	TestTime               = "2025-01-29T00:00:00Z"
-	TDXPCERefValTemplate   = `{
+const (
+	TestUIntInstance     = 45
+	TestInvalidProdID    = -23
+	TestUIntISVProdID    = 23
+	TestInvalidInstance  = -1
+	TestPCEID            = "PCEID001"
+	TestISVSVN           = uint(10)
+	TestTCBEvalNum       = uint(11)
+	TestTime             = "2025-01-29T00:00:00Z"
+	TestOID              = "2.16.840.1.113741.1.2.3.4.5"
+	TDXPCERefValTemplate = `{
     "lang": "en-GB",
     "tag-identity": {
         "id": "43BBE37F-2E61-4B33-AED3-53CFF1428B17",
@@ -395,4 +385,17 @@ var (
     }
 }
 `
+)
+
+var (
+	TestByteInstance       = []byte{0x45, 0x46, 0x47}
+	TestBytesISVProdID     = []byte{0x01, 0x02, 0x03}
+	TestTeeAttributes      = []byte{0x01, 0x01}
+	TestTeeMiscSelect      = []byte{0x0B, 0x0C, 0x0D}
+	TestCompSvn            = []uint{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
+	TestRegID              = "https://intel.com"
+	TestTCBStatus          = []string{"OutOfDate", "ConfigurationNeeded", "UpToDate"}
+	TestInvalidTCBStatus   = []int{1, 2, 3}
+	TestAdvisoryIDs        = []string{"SA-00078", "SA-00077", "SA-00079"}
+	TestInvalidAdvisoryIDs = []float64{1.234, 2.567}
 )

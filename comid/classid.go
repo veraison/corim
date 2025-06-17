@@ -378,7 +378,11 @@ func NewIntClassID(val any) (*ClassID, error) {
 		if len(t) != 8 {
 			return nil, fmt.Errorf("bad int: want 8 bytes, got %d bytes", len(t))
 		}
-		ret = TaggedInt(binary.BigEndian.Uint64(t))
+		ti, err := safecast.Convert[int, uint64](binary.BigEndian.Uint64(t))
+		if err != nil {
+			return nil, err
+		}
+		ret = TaggedInt(ti)
 	case int:
 		ret = TaggedInt(t)
 	case *int:

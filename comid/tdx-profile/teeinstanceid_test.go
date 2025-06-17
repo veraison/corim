@@ -15,7 +15,7 @@ import (
 func TestTeeInstanceID_NewTeeInstanceID_OK(t *testing.T) {
 	tvs := []struct {
 		desc  string
-		input interface{}
+		input any
 	}{
 		{
 			desc:  "integer",
