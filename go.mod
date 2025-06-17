@@ -5,6 +5,7 @@ go 1.23.0
 toolchain go1.24.2
 
 require (
+	fortio.org/safecast v1.0.0
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
