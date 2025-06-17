@@ -51,7 +51,6 @@ linters:
     - misspell
     - revive
     - staticcheck
-    - typecheck
     - unconvert
     - unused
 

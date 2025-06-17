@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/lestrrat-go/jwx/v2/jwk"
+	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -114,7 +114,7 @@ func (o Signer) MarshalJSON() ([]byte, error) {
 
 const noAlg = cose.Algorithm(-65537)
 
-func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, crypto.Signer, error) {
+func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, any, error) {
 	var (
 		err error
 		k   jwk.Key
@@ -127,31 +127,55 @@ func getAlgAndKeyFromJWK(j []byte) (cose.Algorithm, crypto.Signer, error) {
 		return noAlg, nil, err
 	}
 
-	var key crypto.Signer
+	var key any
 
-	err = k.Raw(&key)
+	err = jwk.Export(k, &key)
 	if err != nil {
 		return noAlg, nil, err
 	}
 
-	switch v := key.(type) {
-	case *ecdsa.PrivateKey:
-		alg = ellipticCurveToAlg(v.Curve)
+	fromCurve := func(c elliptic.Curve) (cose.Algorithm, any, error) {
+		alg = ellipticCurveToAlg(c)
 		if alg == noAlg {
 			return noAlg, nil, fmt.Errorf("unknown elliptic curve %v", crv)
 		}
-	case ed25519.PrivateKey:
-		alg = cose.AlgorithmEd25519
-	case *rsa.PrivateKey:
+		return alg, key, nil
+	}
+	isRsa := func() (cose.Algorithm, any, error) {
 		alg = rsaJWKToAlg(k)
 		if alg == noAlg {
-			return noAlg, nil, fmt.Errorf("unknown RSA algorithm %q", k.Algorithm().String())
+			name := "unnamed"
+			if jalg, ok := k.Algorithm(); ok {
+				name = jalg.String()
+			}
+			return noAlg, nil, fmt.Errorf("unknown RSA algorithm %q", name)
 		}
-	default:
-		return noAlg, nil, fmt.Errorf("unknown private key type %v", reflect.TypeOf(key))
+		return alg, key, nil
 	}
-
-	return alg, key, nil
+	// Private and public need to be in separate switches due to tooling failure when
+	// a private key type extends the public key type.
+	switch v := key.(type) {
+	case *ecdsa.PrivateKey:
+		return fromCurve(v.Curve)
+	case ed25519.PrivateKey:
+		return cose.AlgorithmEd25519, key, nil
+	case *rsa.PrivateKey:
+		return isRsa()
+	default:
+		err = fmt.Errorf("unknown private key type %v", reflect.TypeOf(key))
+		alg = noAlg
+	}
+	switch v := key.(type) {
+	case *ecdsa.PublicKey:
+		return fromCurve(v.Curve)
+	case ed25519.PublicKey:
+		return cose.AlgorithmEd25519, key, nil
+	case *rsa.PublicKey:
+		return isRsa()
+	default:
+		err = errors.Join(err, fmt.Errorf("unknown public key type %v", reflect.TypeOf(key)))
+		return noAlg, nil, err
+	}
 }
 
 func ellipticCurveToAlg(c elliptic.Curve) cose.Algorithm {
@@ -168,7 +192,11 @@ func ellipticCurveToAlg(c elliptic.Curve) cose.Algorithm {
 }
 
 func rsaJWKToAlg(k jwk.Key) cose.Algorithm {
-	switch k.Algorithm().String() {
+	alg, ok := k.Algorithm()
+	if !ok {
+		return noAlg
+	}
+	switch alg.String() {
 	case "PS256":
 		return cose.AlgorithmPS256
 	case "PS384":
@@ -185,8 +213,12 @@ func NewSignerFromJWK(j []byte) (cose.Signer, error) {
 	if err != nil {
 		return nil, err
 	}
+	signer, isSigner := key.(crypto.Signer)
+	if !isSigner {
+		return nil, fmt.Errorf("jwk did not contain a private key")
+	}
 
-	return cose.NewSigner(alg, key)
+	return cose.NewSigner(alg, signer)
 }
 
 func NewPublicKeyFromJWK(j []byte) (crypto.PublicKey, error) {
@@ -194,6 +226,9 @@ func NewPublicKeyFromJWK(j []byte) (crypto.PublicKey, error) {
 	if err != nil {
 		return nil, err
 	}
+	if signer, isSigner := key.(crypto.Signer); isSigner {
+		return signer.Public(), nil
+	}
 
-	return key.Public(), nil
+	return key, nil
 }
