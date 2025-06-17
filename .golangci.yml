@@ -22,7 +22,6 @@ linters:
     - ineffassign
     - lll  # style
     - misspell # comment
-    - revive # metalinter
     - staticcheck # metalinter
     - unconvert # style
     - unused # unused
