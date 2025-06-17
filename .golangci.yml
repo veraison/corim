@@ -31,6 +31,7 @@ linters:
         linters:
           - funlen
           - lll
+          - goconst
   settings:
     dupl:
       threshold: 100
