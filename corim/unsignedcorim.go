@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	cbor "github.com/fxamacker/cbor/v2"
+
 	"github.com/veraison/corim/cots"
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -30,11 +32,11 @@ type UnsignedCorim struct {
 	// if a field is optional, so we use it during unmarshaling as well as
 	// marshaling. Hence omitempty is present for the json tag, but not
 	// cbor.
-	Tags          []Tag        `cbor:"1,keyasint" json:"tags,omitempty"`
-	DependentRims *[]Locator   `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
-	Profile       *eat.Profile `cbor:"3,keyasint,omitempty" json:"profile,omitempty"`
-	RimValidity   *Validity    `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
-	Entities      *Entities    `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
+	Tags          []cbor.RawMessage `cbor:"1,keyasint" json:"tags,omitempty"`
+	DependentRims *[]Locator        `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
+	Profile       *eat.Profile      `cbor:"3,keyasint,omitempty" json:"profile,omitempty"`
+	RimValidity   *Validity         `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
+	Entities      *Entities         `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
 
 	Extensions
 }
@@ -243,8 +245,8 @@ func (o UnsignedCorim) Valid() error {
 	}
 
 	for i, t := range o.Tags {
-		if err := t.Valid(); err != nil {
-			return fmt.Errorf("tag validation failed at pos %d: %w", i, err)
+		if len(t) == 0 {
+			return fmt.Errorf("tag validation failed at pos %d: empty tag", i)
 		}
 	}
 
@@ -332,18 +334,6 @@ func (o UnsignedCorim) ToJSON() ([]byte, error) {
 // FromJSON deserializes a JSON-encoded unsigned CoRIM into the target UnsignedCorim
 func (o *UnsignedCorim) FromJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
-}
-
-// Tag is either a CBOR-encoded CoMID, CoSWID or CoTS
-type Tag []byte
-
-func (o Tag) Valid() error {
-	// there is no much we can check here, except making sure that the tag is
-	// not zero-length
-	if len(o) == 0 {
-		return errors.New("empty tag")
-	}
-	return nil
 }
 
 // Locator is the internal representation of the corim-locator-map with CBOR and

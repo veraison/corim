@@ -9,9 +9,8 @@ value:
   3: http://example.com/test-profile
   -1: foo
   1:
-  - encodedCBOR:
-      tag: 506
-      value:
+  - tag: 506
+    value:
         0: en-GB
         1:
           0: !!binary |-

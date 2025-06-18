@@ -4,9 +4,8 @@ tag: 501
 value:
   0: test corim id
   1:
-  - encodedCBOR:
-      tag: 506
-      value:
+  - tag: 506
+    value:
         0: en-GB
         1:
           0: !!binary |-
