@@ -773,12 +773,3 @@ func NewCryptoKeyTaggedBytes(val any) (*CryptoKey, error) {
 
 	return &CryptoKey{tb}, nil
 }
-
-func MustNewCryptoKeyTaggedBytes(val any) *CryptoKey {
-	key, err := NewCryptoKeyTaggedBytes(val)
-	if err != nil {
-		panic(err)
-	}
-
-	return key
-}
