@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	CotsTag = []byte{0xd9, 0x01, 0xfb} // 507()
+	CotsTag uint64 = 507
 )
 
 func cotsTags() cbor.TagSet {

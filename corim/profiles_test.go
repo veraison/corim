@@ -120,7 +120,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	profileManifest, ok := GetProfileManifest(c.Profile)
 	assert.True(t, ok)
 
-	cmd, err := UnmarshalComidFromCBOR(c.Tags[0], c.Profile)
+	cmd, err := UnmarshalComidFromCBOR(c.Tags[0].Content, c.Profile)
 	assert.NoError(t, err)
 
 	address := cmd.Entities.Values[0].MustGetString("Address")
@@ -133,7 +133,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	unregProfID, err := eat.NewProfile("http://example.com")
 	require.NoError(t, err)
 
-	cmdNoExt, err := UnmarshalComidFromCBOR(c.Tags[0], unregProfID)
+	cmdNoExt, err := UnmarshalComidFromCBOR(c.Tags[0].Content, unregProfID)
 	assert.NoError(t, err)
 
 	address = cmdNoExt.Entities.Values[0].MustGetString("Address")
@@ -145,8 +145,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 
 	out, err = cmd.ToCBOR()
 	assert.NoError(t, err)
-	// the first 3 bytes in Tags[0] is the tag indicating CoRIM
-	assertCBOREq(t, c.Tags[0][3:], out)
+	assertCBOREq(t, c.Tags[0].Content, out)
 
 	c, err = UnmarshalUnsignedCorimFromJSON(testUnsignedCorimJSON)
 	assert.NoError(t, err)
