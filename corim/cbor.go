@@ -17,9 +17,9 @@ var (
 )
 
 var (
-	UnsignedCorimTag = []byte{0xd9, 0x01, 0xf5} // 501()
-	CoswidTag        = []byte{0xd9, 0x01, 0xf9} // 505()
-	ComidTag         = []byte{0xd9, 0x01, 0xfa} // 506()
+	UnsignedCorimTag        = []byte{0xd9, 0x01, 0xf5} // 501()
+	CoswidTag        uint64 = 505
+	ComidTag         uint64 = 506
 
 	corimTagsMap = map[uint64]interface{}{
 		32: comid.TaggedURI(""),

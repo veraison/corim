@@ -12,9 +12,9 @@ value:
   3: http://example.com/example-profile
   -1: foo
   1:
-  - encodedCBOR:
-      tag: 506
-      value:
+  - tag: 506
+    value:
+      encodedCBOR:
         0: en-GB
         1:
           0: !!binary |-

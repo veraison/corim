@@ -5,9 +5,13 @@ package corim
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	cbor "github.com/fxamacker/cbor/v2"
 
 	"github.com/veraison/corim/cots"
 	"github.com/veraison/corim/encoding"
@@ -105,9 +109,7 @@ func (o *UnsignedCorim) AddComid(c *comid.Comid) *UnsignedCorim {
 			return nil
 		}
 
-		taggedComid := append(ComidTag, comidCBOR...) //nolint:gocritic
-
-		o.Tags = append(o.Tags, taggedComid)
+		o.Tags = append(o.Tags, Tag{Number: ComidTag, Content: comidCBOR})
 	}
 	return o
 }
@@ -125,9 +127,7 @@ func (o *UnsignedCorim) AddCots(c *cots.ConciseTaStore) *UnsignedCorim {
 			return nil
 		}
 
-		taggedCots := append(cots.CotsTag, cotsCBOR...) //nolint:gocritic
-
-		o.Tags = append(o.Tags, taggedCots)
+		o.Tags = append(o.Tags, Tag{Number: cots.CotsTag, Content: cotsCBOR})
 	}
 	return o
 }
@@ -146,9 +146,7 @@ func (o *UnsignedCorim) AddCoswid(c *swid.SoftwareIdentity) *UnsignedCorim {
 			return nil
 		}
 
-		taggedCoswid := append(CoswidTag, coswidCBOR...) //nolint:gocritic
-
-		o.Tags = append(o.Tags, taggedCoswid)
+		o.Tags = append(o.Tags, Tag{Number: CoswidTag, Content: coswidCBOR})
 	}
 	return o
 }
@@ -334,16 +332,64 @@ func (o *UnsignedCorim) FromJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
 }
 
-// Tag is either a CBOR-encoded CoMID, CoSWID or CoTS
-type Tag []byte
+// Tag represents a CoRIM tag. This a []byte array associated with a tag number
+type Tag struct {
+	Number  uint64
+	Content []byte
+}
 
 func (o Tag) Valid() error {
 	// there is no much we can check here, except making sure that the tag is
 	// not zero-length
-	if len(o) == 0 {
+	if len(o.Content) == 0 {
 		return errors.New("empty tag")
 	}
 	return nil
+}
+
+func (o Tag) MarshalCBOR() ([]byte, error) {
+	return em.Marshal(cbor.Tag{Number: o.Number, Content: o.Content})
+}
+
+func (o *Tag) UnmarshalCBOR(data []byte) error {
+	var tag cbor.Tag
+	var ok bool
+
+	if err := dm.Unmarshal(data, &tag); err != nil {
+		return err
+	}
+
+	o.Content, ok = tag.Content.([]byte)
+	if !ok {
+		return fmt.Errorf("expected []byte, got %T", tag.Content)
+
+	}
+	o.Number = tag.Number
+
+	return nil
+}
+
+func (o Tag) MarshalJSON() ([]byte, error) {
+	buf, err := o.MarshalCBOR()
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(base64.StdEncoding.EncodeToString(buf))
+}
+
+func (o *Tag) UnmarshalJSON(data []byte) error {
+	var encoded string
+	if err := json.Unmarshal(data, &encoded); err != nil {
+		return err
+	}
+
+	buf, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return err
+	}
+
+	return o.UnmarshalCBOR(buf)
 }
 
 // Locator is the internal representation of the corim-locator-map with CBOR and

@@ -88,7 +88,7 @@ func assertCoRIMEq(t *testing.T, expected []byte, actual []byte, msgAndArgs ...i
 	for i, expectedTag := range expectedCoRIM.Tags {
 		actualTag := actualCoRIM.Tags[i]
 
-		if !assertCBOREq(t, expectedTag, actualTag, msgAndArgs...) {
+		if !assertCBOREq(t, expectedTag.Content, actualTag.Content, msgAndArgs...) {
 			return false
 		}
 	}
