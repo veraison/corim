@@ -12,7 +12,7 @@ GOPKG += github.com/veraison/corim/extensions
 
 GOLINT ?= golangci-lint
 
-GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E gosimple -E lll -E prealloc
+GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E staticcheck -E lll -E prealloc
 
 .PHONY: lint
 lint:

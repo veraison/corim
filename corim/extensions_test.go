@@ -52,8 +52,8 @@ func TestEntityExtensions_Valid(t *testing.T) {
 	err = ent.Valid()
 	assert.NoError(t, err)
 
-	assert.EqualError(t, ent.Extensions.validCorim(nil), "invalid")
-	assert.EqualError(t, ent.Extensions.validSigner(nil), "invalid")
+	assert.EqualError(t, ent.validCorim(nil), "invalid")
+	assert.EqualError(t, ent.validSigner(nil), "invalid")
 }
 
 func TestEntityExtensions_CBOR(t *testing.T) {

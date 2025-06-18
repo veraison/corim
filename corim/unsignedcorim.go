@@ -49,7 +49,7 @@ func (o *UnsignedCorim) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtUnsignedCorim:
-			o.Extensions.Register(v)
+			o.Register(v)
 		case ExtEntity:
 			if o.Entities == nil {
 				o.Entities = NewEntities()
@@ -69,7 +69,7 @@ func (o *UnsignedCorim) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns pervisouosly registered extension
 func (o *UnsignedCorim) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // SetID sets the corim-id in the unsigned-corim-map to the supplied value.  The
@@ -276,7 +276,7 @@ func (o UnsignedCorim) Valid() error {
 		}
 	}
 
-	return o.Extensions.validCorim(&o)
+	return o.validCorim(&o)
 }
 
 // ToCBOR serializes the target unsigned CoRIM to CBOR
