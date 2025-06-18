@@ -9,6 +9,7 @@ GOPKG += github.com/veraison/corim/comid
 GOPKG += github.com/veraison/corim/cots
 GOPKG += github.com/veraison/corim/encoding
 GOPKG += github.com/veraison/corim/extensions
+GOPKG += github.com/veraison/corim/coserv
 
 GOLINT ?= golangci-lint
 
