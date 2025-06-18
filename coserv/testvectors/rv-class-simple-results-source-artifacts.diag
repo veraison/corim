@@ -1,0 +1,25 @@
+{
+  / profile / 0: "tag:example.com,2025:cc-platform#1.0.0",
+  / query /   1: {
+    / artifact-type /         0: 2, / reference-values /
+    / environment-selector /  1: {
+      / class / 0: [
+        {
+          / class-id /  0: 560(h'00112233'),  / tagged-bytes /
+          / vendor /    1: "Example Vendor",
+          / model /     2: "Example Model"
+        }
+      ]
+    },
+    / timestamp /   2: 0("2030-12-01T18:30:01Z"),
+    / result-type / 3: 1 / source-artifacts /
+  },
+  / results / 2: {
+    / rvq / 0: [ ],
+    / expiry / 10: 0("2030-12-13T18:30:02Z"),
+    / source artifacts / 11: [
+      [ "application/vnd.example.refvals", h'afaeadac' ],
+      [ "application/vnd.example.refvals", h'adacabaa' ]
+    ]
+  }
+}
