@@ -17,6 +17,7 @@ min_cover = float(re.findall(r'\d*\.\d+|\d+', os.environ['GITHUB_WORKFLOW'])[0])
 for l in cover_report_lines.splitlines():
     cover = float(re.findall(r'\d*\.\d+|\d+', l)[0])
     if cover < min_cover:
+        print("want", min_cover, "got", cover)
         sys.exit(1)
 
 sys.exit(0)
