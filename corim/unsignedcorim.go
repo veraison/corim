@@ -280,6 +280,10 @@ func (o UnsignedCorim) Valid() error {
 // ToCBOR serializes the target unsigned CoRIM to CBOR
 // nolint:gocritic
 func (o UnsignedCorim) ToCBOR() ([]byte, error) {
+	if err := o.Valid(); err != nil {
+		return nil, err
+	}
+
 	// If extensions have been registered, the collection will exist, but
 	// might be empty. If that is the case, set it to nil to avoid
 	// marshaling an empty list (and let the marshaller omit the claim
