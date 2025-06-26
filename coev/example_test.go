@@ -115,7 +115,7 @@ func Example_encode_CoSWIDTriples() {
 			Environment: comid.Environment{
 				Instance: comid.MustNewUEIDInstance(comid.TestUEID),
 			},
-			Evidences: *NewCoSWIDEvidences().AddCoSWIDEvidence(
+			Evidence: *NewCoSWIDEvidence().AddCoSWIDEvidence(
 				&CoSWIDEvidenceMap{
 					TagID:    swid.NewTagID(TestTag),
 					Evidence: swid.Evidence{Date: Testdate, DeviceID: TestDeviceID},
@@ -140,7 +140,7 @@ func Example_encode_CoSWIDTriples() {
 
 	// Output:
 	// a100a1048182a101d902264702deadbeefdead81a200500001000100010001000100010001000101a21823c1001824782442414438303942312d373033322d343344392d384639342d424631323845354430363144
-	// {"ev-triples":{"coswid-triples":[{"environment":{"instance":{"type":"ueid","value":"At6tvu/erQ=="}},"coswid-evidences":[{"tagId":"00010001-0001-0001-0001-000100010001","evidence":{"date":"1970-01-01T00:00:00Z","device-id":"BAD809B1-7032-43D9-8F94-BF128E5D061D"}}]}]}}
+	// {"ev-triples":{"coswid-triples":[{"environment":{"instance":{"type":"ueid","value":"At6tvu/erQ=="}},"coswid-evidence":[{"tagId":"00010001-0001-0001-0001-000100010001","evidence":{"date":"1970-01-01T00:00:00Z","device-id":"BAD809B1-7032-43D9-8F94-BF128E5D061D"}}]}]}}
 }
 
 func Example_encode_AttestKeyTriples() {
@@ -343,7 +343,7 @@ func Example_decode_JSON() {
                         "value": "At6tvu/erQ=="
                     }
                 },
-                "coswid-evidences": [
+                "coswid-evidence": [
                     {
                         "tagId": "00010001-0001-0001-0001-000100010001",
                         "evidence": {

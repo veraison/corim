@@ -15,7 +15,7 @@ import (
 type CoSWIDTriple struct {
 	_           struct{}          `cbor:",toarray"`
 	Environment comid.Environment `json:"environment"`
-	Evidences   CoSWIDEvidences   `json:"coswid-evidences"`
+	Evidence    CoSWIDEvidence    `json:"coswid-evidence"`
 }
 
 func NewCoSWIDTriple() *CoSWIDTriple {
@@ -35,13 +35,13 @@ func (o *CoSWIDTriple) AddEnvironment(e *comid.Environment) (*CoSWIDTriple, erro
 }
 
 func (o *CoSWIDTriple) AddEvidence(e *CoSWIDEvidenceMap) (*CoSWIDTriple, error) {
-	if len(o.Evidences) == 0 {
-		o.Evidences = *NewCoSWIDEvidences()
+	if len(o.Evidence) == 0 {
+		o.Evidence = *NewCoSWIDEvidence()
 	}
 	if e == nil {
-		return nil, errors.New("no evidencemap to add")
+		return nil, errors.New("no evidence map to add")
 	}
-	o.Evidences = append(o.Evidences, *e)
+	o.Evidence = append(o.Evidence, *e)
 	return o, nil
 }
 
@@ -50,7 +50,7 @@ func (o CoSWIDTriple) Valid() error {
 		return fmt.Errorf("environment validation failed: %w", err)
 	}
 
-	if len(o.Evidences) == 0 {
+	if len(o.Evidence) == 0 {
 		return errors.New("no evidence entry in the CoSWIDTriple")
 	}
 	return nil

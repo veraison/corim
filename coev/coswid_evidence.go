@@ -15,15 +15,15 @@ type CoSWIDEvidenceMap struct {
 	AuthorizedBy *comid.CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
 }
 
-type CoSWIDEvidences []CoSWIDEvidenceMap
+type CoSWIDEvidence []CoSWIDEvidenceMap
 
-func NewCoSWIDEvidences() *CoSWIDEvidences {
-	return &CoSWIDEvidences{}
+func NewCoSWIDEvidence() *CoSWIDEvidence {
+	return &CoSWIDEvidence{}
 }
 
-func (o *CoSWIDEvidences) AddCoSWIDEvidence(e *CoSWIDEvidenceMap) *CoSWIDEvidences {
+func (o *CoSWIDEvidence) AddCoSWIDEvidence(e *CoSWIDEvidenceMap) *CoSWIDEvidence {
 	if o == nil {
-		o = NewCoSWIDEvidences()
+		o = NewCoSWIDEvidence()
 	}
 	*o = append(*o, *e)
 	return o
