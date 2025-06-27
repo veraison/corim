@@ -74,12 +74,7 @@ func (o ConciseEvidence) Valid() error {
 			return fmt.Errorf("invalid EvidenceID: %w", err)
 		}
 	}
-	if o.Profile != nil {
-		p := o.Profile
-		if !p.IsOID() && !p.IsURI() {
-			return errors.New("profile should be OID or URI")
-		}
-	}
+
 	return nil
 }
 
