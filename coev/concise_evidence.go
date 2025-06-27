@@ -36,7 +36,6 @@ func (o *ConciseEvidence) AddTriples(evTriples *EvTriples) error {
 			return fmt.Errorf("invalid evidence triples: %w", err)
 		}
 		o.EvTriples = *evTriples
-
 	}
 	return nil
 }
@@ -191,7 +190,7 @@ func (o *TaggedConciseEvidence) FromCBOR(data []byte) error {
 
 }
 
-// FromJSON deserializes a JSON-encoded TaggedConciseEvidence into the target ConciseEvidence
+// FromJSON deserializes a JSON-encoded TaggedConciseEvidence into the target TaggedConciseEvidence
 func (o *TaggedConciseEvidence) FromJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
 }

@@ -113,7 +113,7 @@ func Example_encode_CoSWIDTriples() {
 			Environment: comid.Environment{
 				Instance: comid.MustNewUEIDInstance(comid.TestUEID),
 			},
-			Evidence: *NewCoSWIDEvidence().AddCoSWIDEvidence(
+			Evidence: *NewCoSWIDEvidence().AddCoSWIDEvidenceMap(
 				&CoSWIDEvidenceMap{
 					TagID:    swid.NewTagID(TestTag),
 					Evidence: swid.Evidence{Date: Testdate, DeviceID: TestDeviceID},

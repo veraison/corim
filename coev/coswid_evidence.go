@@ -21,7 +21,7 @@ func NewCoSWIDEvidence() *CoSWIDEvidence {
 	return &CoSWIDEvidence{}
 }
 
-func (o *CoSWIDEvidence) AddCoSWIDEvidence(e *CoSWIDEvidenceMap) *CoSWIDEvidence {
+func (o *CoSWIDEvidence) AddCoSWIDEvidenceMap(e *CoSWIDEvidenceMap) *CoSWIDEvidence {
 	if o == nil {
 		o = NewCoSWIDEvidence()
 	}
