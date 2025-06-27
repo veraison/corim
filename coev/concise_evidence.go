@@ -26,47 +26,47 @@ func NewConciseEvidence() *ConciseEvidence {
 }
 
 // AddTriples adds Evidence Triples to Concise Evidence
-func (o *ConciseEvidence) AddTriples(evTriples *EvTriples) (*ConciseEvidence, error) {
+func (o *ConciseEvidence) AddTriples(evTriples *EvTriples) error {
 	if o != nil {
 		if evTriples == nil {
-			return nil, errors.New("no evidence triples")
+			return errors.New("no evidence triples")
 		}
 
 		if err := evTriples.Valid(); err != nil {
-			return nil, fmt.Errorf("invalid evidence triples: %w", err)
+			return fmt.Errorf("invalid evidence triples: %w", err)
 		}
 		o.EvTriples = *evTriples
 
 	}
-	return o, nil
+	return nil
 }
 
 // AddEvidenceID adds EvidenceID to ConciseEvidence
-func (o *ConciseEvidence) AddEvidenceID(evidenceID *EvidenceID) (*ConciseEvidence, error) {
+func (o *ConciseEvidence) AddEvidenceID(evidenceID *EvidenceID) error {
 	if o != nil {
 		if evidenceID == nil {
-			return nil, errors.New("no evidence id supplied")
+			return errors.New("no evidence id supplied")
 		}
 		if err := evidenceID.Valid(); err != nil {
-			return nil, fmt.Errorf("invalid EvidenceID: %w", err)
+			return fmt.Errorf("invalid EvidenceID: %w", err)
 		}
 		o.EvidenceID = evidenceID
 	}
-	return o, nil
+	return nil
 }
 
 // AddProfile adds a chosen profile to ConciseEvidence
-func (o *ConciseEvidence) AddProfile(profile *eat.Profile) (*ConciseEvidence, error) {
+func (o *ConciseEvidence) AddProfile(profile *eat.Profile) error {
 	if o != nil {
 		if profile == nil {
-			return nil, errors.New("no profile supplied")
+			return errors.New("no profile supplied")
 		}
 		if !profile.IsOID() && !profile.IsURI() {
-			return nil, errors.New("profile should be OID or URI")
+			return errors.New("profile should be OID or URI")
 		}
 		o.Profile = profile
 	}
-	return o, nil
+	return nil
 }
 
 // nolint:gocritic

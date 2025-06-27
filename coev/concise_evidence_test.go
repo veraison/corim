@@ -21,11 +21,11 @@ func TestConciseEvidence_AddTriples_NOK(t *testing.T) {
 	expectedErr := "no evidence triples"
 	var ev *EvTriples
 	coev := &ConciseEvidence{}
-	_, err := coev.AddTriples(ev)
+	err := coev.AddTriples(ev)
 	assert.EqualError(t, err, expectedErr)
 	expectedErr = "invalid evidence triples: no Triples set inside EvTriples"
 	ev = &EvTriples{}
-	_, err = coev.AddTriples(ev)
+	err = coev.AddTriples(ev)
 	assert.EqualError(t, err, expectedErr)
 }
 
@@ -33,7 +33,7 @@ func TestConciseEvidence_AddEvidenceID(t *testing.T) {
 	coev := &ConciseEvidence{}
 	ev := MustNewUUIDEvidenceID(TestUUID)
 	require.NotNil(t, ev)
-	_, err := coev.AddEvidenceID(ev)
+	err := coev.AddEvidenceID(ev)
 	require.NoError(t, err)
 }
 
@@ -41,7 +41,7 @@ func TestConciseEvidence_AddEvidenceID_NOK(t *testing.T) {
 	coev := &ConciseEvidence{}
 	expectedErr := "invalid EvidenceID: no EvidenceID"
 	var e EvidenceID
-	_, err := coev.AddEvidenceID(&e)
+	err := coev.AddEvidenceID(&e)
 	assert.EqualError(t, err, expectedErr)
 }
 
@@ -50,7 +50,7 @@ func TestConciseEvidence_AddProfile(t *testing.T) {
 	p := &eat.Profile{}
 	err := p.Set(TestProfile)
 	require.NoError(t, err)
-	_, err = coev.AddProfile(p)
+	err = coev.AddProfile(p)
 	require.NoError(t, err)
 
 }
@@ -59,11 +59,11 @@ func TestConciseEvidence_AddProfile_NOK(t *testing.T) {
 	coev := &ConciseEvidence{}
 	expectedErr := "no profile supplied"
 	var p *eat.Profile
-	_, err := coev.AddProfile(p)
+	err := coev.AddProfile(p)
 	assert.EqualError(t, err, expectedErr)
 	expectedErr = "profile should be OID or URI"
 	p = &eat.Profile{}
-	_, err = coev.AddProfile(p)
+	err = coev.AddProfile(p)
 	assert.EqualError(t, err, expectedErr)
 }
 

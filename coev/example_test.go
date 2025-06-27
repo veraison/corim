@@ -15,7 +15,8 @@ import (
 )
 
 func Example_encode_EvidenceTriples() {
-	coev, err := NewConciseEvidence().AddTriples(NewEvTriples().AddEvidenceTriple(
+	coev := NewConciseEvidence()
+	err := coev.AddTriples(NewEvTriples().AddEvidenceTriple(
 		&comid.ValueTriple{
 			Environment: comid.Environment{
 				Class: comid.NewClassOID(comid.TestOID).
@@ -45,7 +46,7 @@ func Example_encode_EvidenceTriples() {
 	if err != nil {
 		log.Fatalf("could not get new concise evidence: %v", err)
 	}
-	_, err = coev.AddEvidenceID(MustNewUUIDEvidenceID(TestUUID))
+	err = coev.AddEvidenceID(MustNewUUIDEvidenceID(TestUUID))
 	if err != nil {
 		log.Fatalf("could not add EvidenceID: %v", err)
 	}
@@ -53,7 +54,7 @@ func Example_encode_EvidenceTriples() {
 	if err != nil {
 		log.Fatalf("could not get new profile: %v", err)
 	}
-	_, err = coev.AddProfile(p)
+	err = coev.AddProfile(p)
 	if err != nil {
 		log.Fatalf("could not add profile: %v", err)
 	}
@@ -74,7 +75,8 @@ func Example_encode_EvidenceTriples() {
 }
 
 func Example_encode_IdentityTriples() {
-	coev, err := NewConciseEvidence().AddTriples(NewEvTriples().AddIdentityTriple(
+	coev := NewConciseEvidence()
+	err := coev.AddTriples(NewEvTriples().AddIdentityTriple(
 		&comid.KeyTriple{
 			Environment: comid.Environment{
 				Class: comid.NewClassUUID(TestUUID).
@@ -110,7 +112,8 @@ func Example_encode_IdentityTriples() {
 }
 
 func Example_encode_CoSWIDTriples() {
-	coev, err := NewConciseEvidence().AddTriples(NewEvTriples().AddCoSWIDTriple(
+	coev := NewConciseEvidence()
+	err := coev.AddTriples(NewEvTriples().AddCoSWIDTriple(
 		&CoSWIDTriple{
 			Environment: comid.Environment{
 				Instance: comid.MustNewUEIDInstance(comid.TestUEID),
@@ -144,7 +147,8 @@ func Example_encode_CoSWIDTriples() {
 }
 
 func Example_encode_AttestKeyTriples() {
-	coev, err := NewConciseEvidence().AddTriples(NewEvTriples().AddAttestKeyTriple(
+	coev := NewConciseEvidence()
+	err := coev.AddTriples(NewEvTriples().AddAttestKeyTriple(
 		&comid.KeyTriple{
 			Environment: comid.Environment{
 				Instance: comid.MustNewUEIDInstance(comid.TestUEID),
@@ -177,7 +181,8 @@ func Example_encode_AttestKeyTriples() {
 }
 
 func Example_encode_TaggedConciseEvidence() {
-	coev, err := NewConciseEvidence().AddTriples(NewEvTriples().AddAttestKeyTriple(
+	coev := NewConciseEvidence()
+	err := coev.AddTriples(NewEvTriples().AddAttestKeyTriple(
 		&comid.KeyTriple{
 			Environment: comid.Environment{
 				Instance: comid.MustNewUEIDInstance(comid.TestUEID),

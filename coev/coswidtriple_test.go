@@ -23,7 +23,7 @@ func TestCoSWIDTriple_AddEnvironment(t *testing.T) {
 		Class: comid.NewClassUUID(TestUUID),
 	}
 
-	_, err := s.AddEnvironment(tv)
+	err := s.AddEnvironment(tv)
 	require.Nil(t, err)
 }
 
@@ -31,11 +31,11 @@ func TestCoSWIDTriple_AddEnvironment_NOK(t *testing.T) {
 	expectedErr := "no environment to add"
 	s := &CoSWIDTriple{}
 	var tv *comid.Environment
-	_, err := s.AddEnvironment(tv)
+	err := s.AddEnvironment(tv)
 	assert.EqualError(t, err, expectedErr)
 	expectedErr = "environment is not valid: environment must not be empty"
 	tv = &comid.Environment{}
-	_, err = s.AddEnvironment(tv)
+	err = s.AddEnvironment(tv)
 	assert.EqualError(t, err, expectedErr)
 }
 
@@ -45,14 +45,14 @@ func TestCoSWIDTriple_AddEvidence(t *testing.T) {
 		TagID:    swid.NewTagID(TestTag),
 		Evidence: swid.Evidence{Date: Testdate, DeviceID: TestDeviceID},
 	}
-	_, err := s.AddEvidence(tv)
+	err := s.AddEvidence(tv)
 	require.Nil(t, err)
 }
 
 func TestCoSWIDTriple_AddEvidence_NOK(t *testing.T) {
-	expectedErr := "no evidencemap to add"
+	expectedErr := "no evidence map to add"
 	s := &CoSWIDTriple{}
 	var tv *CoSWIDEvidenceMap
-	_, err := s.AddEvidence(tv)
+	err := s.AddEvidence(tv)
 	assert.EqualError(t, err, expectedErr)
 }

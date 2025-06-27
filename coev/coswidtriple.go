@@ -22,27 +22,27 @@ func NewCoSWIDTriple() *CoSWIDTriple {
 	return &CoSWIDTriple{}
 }
 
-func (o *CoSWIDTriple) AddEnvironment(e *comid.Environment) (*CoSWIDTriple, error) {
+func (o *CoSWIDTriple) AddEnvironment(e *comid.Environment) error {
 	if e == nil {
-		return nil, errors.New("no environment to add")
+		return errors.New("no environment to add")
 	}
 	if err := e.Valid(); err != nil {
-		return nil, fmt.Errorf("environment is not valid: %w", err)
+		return fmt.Errorf("environment is not valid: %w", err)
 	}
 
 	o.Environment = *e
-	return o, nil
+	return nil
 }
 
-func (o *CoSWIDTriple) AddEvidence(e *CoSWIDEvidenceMap) (*CoSWIDTriple, error) {
+func (o *CoSWIDTriple) AddEvidence(e *CoSWIDEvidenceMap) error {
 	if len(o.Evidence) == 0 {
 		o.Evidence = *NewCoSWIDEvidence()
 	}
 	if e == nil {
-		return nil, errors.New("no evidence map to add")
+		return errors.New("no evidence map to add")
 	}
 	o.Evidence = append(o.Evidence, *e)
-	return o, nil
+	return nil
 }
 
 func (o CoSWIDTriple) Valid() error {
