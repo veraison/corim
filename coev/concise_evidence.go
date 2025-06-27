@@ -56,16 +56,12 @@ func (o *ConciseEvidence) AddEvidenceID(evidenceID *EvidenceID) error {
 }
 
 // AddProfile adds a chosen profile to ConciseEvidence
-func (o *ConciseEvidence) AddProfile(profile *eat.Profile) error {
-	if o != nil {
-		if profile == nil {
-			return errors.New("no profile supplied")
-		}
-		if !profile.IsOID() && !profile.IsURI() {
-			return errors.New("profile should be OID or URI")
-		}
-		o.Profile = profile
+func (o *ConciseEvidence) AddProfile(urlOrOID string) error {
+	p, err := eat.NewProfile(urlOrOID)
+	if err != nil {
+		return err
 	}
+	o.Profile = p
 	return nil
 }
 

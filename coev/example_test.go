@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/eat"
 	"github.com/veraison/swid"
 )
 
@@ -50,11 +49,7 @@ func Example_encode_EvidenceTriples() {
 	if err != nil {
 		log.Fatalf("could not add EvidenceID: %v", err)
 	}
-	p, err := eat.NewProfile(TestProfile)
-	if err != nil {
-		log.Fatalf("could not get new profile: %v", err)
-	}
-	err = coev.AddProfile(p)
+	err = coev.AddProfile(TestProfile)
 	if err != nil {
 		log.Fatalf("could not add profile: %v", err)
 	}

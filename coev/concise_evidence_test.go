@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 func TestConciseEvidence_NewConciseEvidence(t *testing.T) {
@@ -47,22 +46,19 @@ func TestConciseEvidence_AddEvidenceID_NOK(t *testing.T) {
 
 func TestConciseEvidence_AddProfile(t *testing.T) {
 	coev := &ConciseEvidence{}
-	p := &eat.Profile{}
-	err := p.Set(TestProfile)
-	require.NoError(t, err)
-	err = coev.AddProfile(p)
+	err := coev.AddProfile(TestProfile)
 	require.NoError(t, err)
 
 }
 
 func TestConciseEvidence_AddProfile_NOK(t *testing.T) {
 	coev := &ConciseEvidence{}
-	expectedErr := "no profile supplied"
-	var p *eat.Profile
+	expectedErr := "profile string must be an absolute URL or an ASN.1 OID: no valid OID"
+	var p string
 	err := coev.AddProfile(p)
 	assert.EqualError(t, err, expectedErr)
-	expectedErr = "profile should be OID or URI"
-	p = &eat.Profile{}
+	expectedErr = `profile string must be an absolute URL or an ASN.1 OID: failed to extract OID from string: strconv.Atoi: parsing "not": invalid syntax`
+	p = "not"
 	err = coev.AddProfile(p)
 	assert.EqualError(t, err, expectedErr)
 }
