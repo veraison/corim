@@ -25,6 +25,8 @@ make presubmit
 ```
 and check its output to make sure your code coverage figures are in line with the set target and that there are no newly introduced lint problems.
 
+Note: You will need mockgen for testing: `go install github.com/golang/mock/mockgen@v1.5.0`, and the usual `go mod tidy` to fetch dependencies.
+
 ## Extending CoRIM/CoMID
 
 The CoRIM specification provides a mechanism for adding extensions to the base
