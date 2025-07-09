@@ -77,6 +77,21 @@ func (o *CondEndorseSeriesRecords) Valid() error {
 	return (*extensions.Collection[CondEndorseSeriesRecord, *CondEndorseSeriesRecord])(o).Valid()
 }
 
+func (o CondEndorseSeriesRecords) MarshalCBOR() ([]byte, error) {
+	return (extensions.Collection[CondEndorseSeriesRecord, *CondEndorseSeriesRecord])(o).MarshalCBOR()
+}
+
+func (o *CondEndorseSeriesRecords) UnmarshalCBOR(data []byte) error {
+	return (*extensions.Collection[CondEndorseSeriesRecord, *CondEndorseSeriesRecord])(o).UnmarshalCBOR(data)
+}
+func (o CondEndorseSeriesRecords) MarshalJSON() ([]byte, error) {
+	return (extensions.Collection[CondEndorseSeriesRecord, *CondEndorseSeriesRecord])(o).MarshalJSON()
+}
+
+func (o *CondEndorseSeriesRecords) UnmarshalJSON(data []byte) error {
+	return (*extensions.Collection[CondEndorseSeriesRecord, *CondEndorseSeriesRecord])(o).UnmarshalJSON(data)
+}
+
 // The Conditional Endorsement Series Triple is used to assert endorsed values based
 // on an initial condition match (specified by Condition StatefulEnv) followed by a series
 // condition match (specified in selection: inside conditional-series-record).
