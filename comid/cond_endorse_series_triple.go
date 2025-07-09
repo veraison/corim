@@ -17,6 +17,7 @@ type StatefulEnv = ValueTriple
 // First successful match terminates matching and corresponding addition are added
 // as Endorsements
 type CondEndorseSeriesRecord struct {
+	_         struct{}     `cbor:",toarray"`
 	Selection Measurements `json:"selection"`
 	Addition  Measurements `json:"addition"`
 }
