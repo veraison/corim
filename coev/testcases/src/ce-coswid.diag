@@ -1,0 +1,39 @@
+/ tagged-concise-evidence / 571({
+  / ce.ev-triples / 0 : {
+    / ce.coswid-triples / 4 : [
+      [ /** ev-coswid-triple-record **/
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'0607517B010F046308'), / 2.1.123.1.15.4.99.8 /
+              / comid.vendor / 1 : "xyzinc.example"
+          }
+        },
+        [
+          / ev-coswid-evidence-map / { 
+            / ce.coswid-tag-id / 0 : "com.acme.rrd2013-ce-sp1-v4-1-5-0",
+            / ce.coswid-evidence / 1 : { / *** evidence-entry in coswid ** /
+              / directory / 16: {
+                / fs-name / 24: "rrdetector", 
+                / root / 25: "%programdata%", 
+                / path-elements / 26: {
+                  / file / 17: {
+                    / fs-name / 24: "rrdetector.exe", 
+                    / size / 20: 532712, 
+                    / hash / 7: [
+                        / hash-alg-id / 1, 
+                        / hash-value / h'A314FC2DC663AE7A6B6BC6787594057396E6B3F569CD50FD5DDB4D1BBAFD2B6A'
+                    ]
+                  }
+                }
+              }
+            },
+            / ce.authorized-by / 2 : [
+              / tagged-pkix-base64-key-type / 554("base64_key_X")
+            ]
+          }
+        ]
+      ]
+    ]
+  }
+})
