@@ -35,7 +35,7 @@ func (o *Signer) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtSigner:
-			o.Extensions.Register(v)
+			o.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -46,7 +46,7 @@ func (o *Signer) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns previously registered extension
 func (o *Signer) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // SetName sets the target Signer's name to the supplied value
@@ -89,7 +89,7 @@ func (o Signer) Valid() error {
 		}
 	}
 
-	return o.Extensions.validSigner(&o)
+	return o.validSigner(&o)
 }
 
 // UnmarshalCBOR deserializes from CBOR

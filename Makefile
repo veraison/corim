@@ -9,10 +9,11 @@ GOPKG += github.com/veraison/corim/comid
 GOPKG += github.com/veraison/corim/cots
 GOPKG += github.com/veraison/corim/encoding
 GOPKG += github.com/veraison/corim/extensions
+GOPKG += github.com/veraison/corim/coserv
 
 GOLINT ?= golangci-lint
 
-GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E gosimple -E lll -E prealloc
+GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E staticcheck -E lll -E prealloc
 
 .PHONY: lint
 lint:

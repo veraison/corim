@@ -8,7 +8,7 @@ INTERMEDIATE_CERT_NAME=intermediateCA
 END_ENTITY_CERT_NAME=endEntity
 
 THIS_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-MISC_DIR="$THIS_DIR/../misc"
+MISC_DIR="$THIS_DIR/../testdata"
 
 mkdir -p "$MISC_DIR"
 

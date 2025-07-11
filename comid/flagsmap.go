@@ -76,7 +76,7 @@ func (o FlagsMap) IsEmpty() bool {
 		return false
 	}
 
-	return o.Extensions.IsEmpty()
+	return o.IsEmpty()
 }
 
 func (o *FlagsMap) AnySet() bool {
@@ -86,7 +86,7 @@ func (o *FlagsMap) AnySet() bool {
 		return true
 	}
 
-	return o.Extensions.anySet()
+	return o.anySet()
 }
 
 func (o *FlagsMap) setFlag(value *bool, flags ...Flag) {
@@ -112,9 +112,9 @@ func (o *FlagsMap) setFlag(value *bool, flags ...Flag) {
 			o.IsTcb = value
 		default:
 			if value == &True {
-				o.Extensions.setTrue(flag)
+				o.setTrue(flag)
 			} else {
-				o.Extensions.setFalse(flag)
+				o.setFalse(flag)
 			}
 		}
 	}
@@ -150,7 +150,7 @@ func (o *FlagsMap) Clear(flags ...Flag) {
 		case FlagIsTcb:
 			o.IsTcb = nil
 		default:
-			o.Extensions.clear(flag)
+			o.clear(flag)
 		}
 	}
 }
@@ -176,7 +176,7 @@ func (o *FlagsMap) Get(flag Flag) *bool {
 	case FlagIsTcb:
 		return o.IsTcb
 	default:
-		return o.Extensions.get(flag)
+		return o.get(flag)
 	}
 }
 
@@ -193,7 +193,7 @@ func (o *FlagsMap) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtFlags:
-			o.Extensions.Register(v)
+			o.Register(v)
 		default:
 			return fmt.Errorf("%w: %q", extensions.ErrUnexpectedPoint, p)
 		}
@@ -204,7 +204,7 @@ func (o *FlagsMap) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns previously registered extension
 func (o *FlagsMap) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // UnmarshalCBOR deserializes from CBOR
@@ -232,5 +232,5 @@ func (o FlagsMap) MarshalJSON() ([]byte, error) {
 // Valid returns an error if the FlagsMap is invalid.
 // nolint:gocritic
 func (o FlagsMap) Valid() error {
-	return o.Extensions.validFlagsMap(&o)
+	return o.validFlagsMap(&o)
 }

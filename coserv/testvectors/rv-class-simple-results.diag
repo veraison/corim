@@ -1,0 +1,54 @@
+{
+  / profile / 0: "tag:example.com,2025:cc-platform#1.0.0",
+  / query /   1: {
+    / artifact-type /         0: 2, / reference-values /
+    / environment-selector /  1: {
+      / class / 0: [ [
+        {
+          / class-id /  0: 560(h'00112233'),  / tagged-bytes /
+          / vendor /    1: "Example Vendor",
+          / model /     2: "Example Model"
+        }
+      ] ]
+    },
+    / timestamp /   2: 0("2030-12-01T18:30:01Z"),
+    / result-type / 3: 0 / collected-material /
+  },
+  / results / 2: {
+    / rvq / 0: [
+      {
+        / authorities / 1: [ 560(h'abcdef') ],
+        / reference-triple / 2: [
+          / environment-map / {
+            / class / 0: {
+              / class-id /  0: 560(h'00112233'),
+              / vendor /    1: "Example Vendor",
+              / model /     2: "Example Model"
+            }
+          },
+          [
+            / measurement-map / {
+              / mval / 1: {
+                / name / 11: "Component A",
+                / digests / 2: [
+                  [ 1, h'aa' ],
+                  [ 2, h'bb' ]
+                ]
+              }
+            },
+            / measurement-map / {
+              / mval / 1: {
+                / name / 11: "Component B",
+                / digests / 2: [
+                  [ 1, h'cc' ],
+                  [ 2, h'dd' ]
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    ],
+    / expiry / 10: 0("2030-12-13T18:30:02Z")
+  }
+}

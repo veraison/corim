@@ -47,6 +47,8 @@ const (
 	// The digest value may be used to find the certificate path if
 	// contained in a lookup table.
 	CertPathThumbprintType = "cert-path-thumbprint"
+
+	// Note: the tagged-bytes type name is already defined in bytes.go as BytesType
 )
 
 // CryptoKey is the struct implementing CoRIM crypto-key-type-choice. See
@@ -391,11 +393,7 @@ func (o TaggedPKIXBase64CertPath) certPath() ([]*x509.Certificate, error) {
 	var rest []byte
 	rest = []byte(o)
 	i := 0
-	for {
-		if len(rest) == 0 {
-			break
-		}
-
+	for len(rest) != 0 {
 		block, rest = pem.Decode(rest)
 		if block == nil {
 			return nil, fmt.Errorf("could not decode PEM block %d", i)
@@ -736,6 +734,7 @@ var cryptoKeyValueRegister = map[string]ICryptoKeyFactory{
 	ThumbprintType:         NewThumbprint,
 	CertThumbprintType:     NewCertThumbprint,
 	CertPathThumbprintType: NewCertPathThumbprint,
+	BytesType:              NewCryptoKeyTaggedBytes,
 }
 
 // RegisterCryptoKeyType registers a new ICryptoKeyValue implementation
@@ -760,4 +759,17 @@ func RegisterCryptoKeyType(tag uint64, factory ICryptoKeyFactory) error {
 	cryptoKeyValueRegister[typ] = factory
 
 	return nil
+}
+
+func (o TaggedBytes) PublicKey() (crypto.PublicKey, error) {
+	return nil, errors.New("cannot get PublicKey from bytes")
+}
+
+func NewCryptoKeyTaggedBytes(val any) (*CryptoKey, error) {
+	tb, err := NewBytes(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CryptoKey{tb}, nil
 }

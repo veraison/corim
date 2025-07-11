@@ -261,13 +261,13 @@ func (o *structFieldsCBOR) ToCBOR(em cbor.EncMode) ([]byte, error) {
 		header |= byte(25)
 		out = append(out, header)
 		out = binary.BigEndian.AppendUint16(out, uint16(mapLen))
-	} else {
+	} else if mapLen <= math.MaxUint32 {
 		header |= byte(26)
 		out = append(out, header)
 		out = binary.BigEndian.AppendUint32(out, uint32(mapLen))
+	} else {
+		return nil, errors.New("mapLen cannot exceed math.MaxUint32")
 	}
-	// Since len() returns an int, the value cannot exceed MaxUint32, so
-	// the 8-byte length variant cannot occur.
 
 	for _, key := range o.Keys {
 		marshalledKey, err := em.Marshal(key)

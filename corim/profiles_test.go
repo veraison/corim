@@ -74,14 +74,14 @@ func TestProfileManifest_getters(t *testing.T) {
 	}
 
 	c := profileManifest.GetComid()
-	assert.NotNil(t, c.Extensions.IMapValue)
+	assert.NotNil(t, c.IMapValue)
 
 	u := profileManifest.GetUnsignedCorim()
-	assert.NotNil(t, u.Extensions.IMapValue)
+	assert.NotNil(t, u.IMapValue)
 
 	s := profileManifest.GetSignedCorim()
-	assert.NotNil(t, s.UnsignedCorim.Extensions.IMapValue)
-	assert.NotNil(t, s.Meta.Signer.Extensions.IMapValue)
+	assert.NotNil(t, s.UnsignedCorim.IMapValue)
+	assert.NotNil(t, s.Meta.Signer.IMapValue)
 }
 
 func TestProfileManifest_marshaling(t *testing.T) {
@@ -115,28 +115,28 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, profID, c.Profile)
-	assert.Equal(t, "foo", c.Extensions.MustGetString("Extension1"))
+	assert.Equal(t, "foo", c.MustGetString("Extension1"))
 
 	profileManifest, ok := GetProfileManifest(c.Profile)
 	assert.True(t, ok)
 
-	cmd, err := UnmarshalComidFromCBOR(c.Tags[0], c.Profile)
+	cmd, err := UnmarshalComidFromCBOR(c.Tags[0].Content, c.Profile)
 	assert.NoError(t, err)
 
-	address := cmd.Entities.Values[0].Extensions.MustGetString("Address")
+	address := cmd.Entities.Values[0].MustGetString("Address")
 	assert.Equal(t, "123 Fake Street", address)
 
 	ts := cmd.Triples.ReferenceValues.Values[0].Measurements.Values[0].
-		Val.Extensions.MustGetInt("timestamp")
+		Val.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
 	unregProfID, err := eat.NewProfile("http://example.com")
 	require.NoError(t, err)
 
-	cmdNoExt, err := UnmarshalComidFromCBOR(c.Tags[0], unregProfID)
+	cmdNoExt, err := UnmarshalComidFromCBOR(c.Tags[0].Content, unregProfID)
 	assert.NoError(t, err)
 
-	address = cmdNoExt.Entities.Values[0].Extensions.MustGetString("Address")
+	address = cmdNoExt.Entities.Values[0].MustGetString("Address")
 	assert.Equal(t, "", address)
 
 	out, err := c.ToCBOR()
@@ -145,8 +145,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 
 	out, err = cmd.ToCBOR()
 	assert.NoError(t, err)
-	// the first 3 bytes in Tags[0] is the tag indicating CoRIM
-	assertCBOREq(t, c.Tags[0][3:], out)
+	assertCBOREq(t, c.Tags[0].Content, out)
 
 	c, err = UnmarshalUnsignedCorimFromJSON(testUnsignedCorimJSON)
 	assert.NoError(t, err)
@@ -156,7 +155,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, profID, c.Profile)
-	assert.Equal(t, "foo", c.Extensions.MustGetString("Extension1"))
+	assert.Equal(t, "foo", c.MustGetString("Extension1"))
 
 	cmd = profileManifest.GetComid()
 	err = cmd.FromJSON(testComidJSON)
@@ -166,11 +165,11 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	err = cmd.FromJSON(testComidWithExtensionsJSON)
 	assert.NoError(t, err)
 
-	address = cmd.Entities.Values[0].Extensions.MustGetString("Address")
+	address = cmd.Entities.Values[0].MustGetString("Address")
 	assert.Equal(t, "123 Fake Street", address)
 
 	ts = cmd.Triples.ReferenceValues.Values[0].Measurements.Values[0].
-		Val.Extensions.MustGetInt("timestamp")
+		Val.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
 	s, err := UnmarshalSignedCorimFromCBOR(testGoodSignedCorimCBOR)
@@ -181,7 +180,7 @@ func TestProfileManifest_marshaling(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, profID, s.UnsignedCorim.Profile)
-	assert.Equal(t, "foo", s.UnsignedCorim.Extensions.MustGetString("Extension1"))
+	assert.Equal(t, "foo", s.UnsignedCorim.MustGetString("Extension1"))
 
 	UnregisterProfile(profID)
 }

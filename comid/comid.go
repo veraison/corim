@@ -37,7 +37,7 @@ func (o *Comid) RegisterExtensions(exts extensions.Map) error {
 	for p, v := range exts {
 		switch p {
 		case ExtComid:
-			o.Extensions.Register(v)
+			o.Register(v)
 		case ExtEntity:
 			if o.Entities == nil {
 				o.Entities = NewEntities()
@@ -57,7 +57,7 @@ func (o *Comid) RegisterExtensions(exts extensions.Map) error {
 
 // GetExtensions returns previously registered extension
 func (o *Comid) GetExtensions() extensions.IMapValue {
-	return o.Extensions.IMapValue
+	return o.IMapValue
 }
 
 // SetLanguage sets the language used in the target Comid to the supplied
@@ -279,7 +279,7 @@ func (o Comid) Valid() error {
 		return fmt.Errorf("triples validation failed: %w", err)
 	}
 
-	return o.Extensions.validComid(&o)
+	return o.validComid(&o)
 }
 
 // ToCBOR serializes the target Comid to CBOR

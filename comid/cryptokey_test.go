@@ -194,12 +194,25 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 	}
 }
 
+func Test_CryptoKey_NewTaggedBytes(t *testing.T) {
+	key, err := NewCryptoKeyTaggedBytes(TestTaggedBytes)
+	require.NoError(t, err)
+	assert.Equal(t, string(TestTaggedBytes), key.String())
+	_, err = key.PublicKey()
+	assert.EqualError(t, err, "cannot get PublicKey from bytes")
+}
+
 func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 	for _, tv := range []struct {
 		Type string
 		In   any
 		Out  string
 	}{
+		{
+			Type: BytesType,
+			In:   TestTaggedBytes,
+			Out:  string(TestTaggedBytes),
+		},
 		{
 			Type: PKIXBase64KeyType,
 			In:   TestECPubKey,
@@ -267,6 +280,10 @@ func Test_CryptoKey_UnmarshalJSON_negative(t *testing.T) {
 		ErrMsg string
 	}{
 		{
+			Val:    `{"type": "bytes", "value": 1}`,
+			ErrMsg: "json: cannot unmarshal",
+		},
+		{
 			Val:    `@@`,
 			ErrMsg: "invalid character",
 		},
@@ -298,6 +315,11 @@ func Test_CryptoKey_CBOR_roundtrip(t *testing.T) {
 		In   any
 		Out  string
 	}{
+		{
+			Type: BytesType,
+			In:   TestTaggedBytes,
+			Out:  "d902304b7461676765646279746573",
+		},
 		{
 			Type: PKIXBase64KeyType,
 			In:   TestECPubKey,
@@ -355,6 +377,11 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 		ErrMsg string
 	}{
 		{
+			Type:   BytesType,
+			In:     7,
+			ErrMsg: "unexpected type for bytes: int",
+		},
+		{
 			Type:   PKIXBase64KeyType,
 			In:     7,
 			ErrMsg: "value must be a string; found int",
@@ -395,7 +422,6 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 			ErrMsg: "unexpected CryptoKey type: random-key",
 		},
 	} {
-
 		_, err := NewCryptoKey(tv.In, tv.Type)
 		assert.ErrorContains(t, err, tv.ErrMsg)
 	}

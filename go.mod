@@ -1,13 +1,17 @@
 module github.com/veraison/corim
 
-go 1.22.0
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
-	github.com/fxamacker/cbor/v2 v2.5.0
+	fortio.org/safecast v1.0.0
+	github.com/fxamacker/cbor/v2 v2.8.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/spf13/cast v1.4.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
+	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.2.1
 	github.com/veraison/swid v1.1.1-0.20230911094910-8ffdd07a22ca
