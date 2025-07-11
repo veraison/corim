@@ -35,12 +35,15 @@ func (o *CoSWIDTriple) AddEnvironment(e *comid.Environment) error {
 }
 
 func (o *CoSWIDTriple) AddEvidence(e *CoSWIDEvidenceMap) error {
-	if len(o.Evidence) == 0 {
-		o.Evidence = *NewCoSWIDEvidence()
-	}
+
 	if e == nil {
 		return errors.New("no evidence map to add")
 	}
+
+	if len(o.Evidence) == 0 {
+		o.Evidence = *NewCoSWIDEvidence()
+	}
+
 	o.Evidence = append(o.Evidence, *e)
 	return nil
 }

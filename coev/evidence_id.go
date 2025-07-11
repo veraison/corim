@@ -14,7 +14,7 @@ import (
 	"github.com/veraison/corim/extensions"
 )
 
-// EvidenceID stores an evidence identity. The supported formats as of now are UUID.
+// EvidenceID stores evidence identities. The currently supported format is UUID.
 type EvidenceID struct {
 	Value IEvidenceValue
 }
@@ -139,6 +139,8 @@ func (o *EvidenceID) SetUUID(val uuid.UUID) *EvidenceID {
 	return o
 }
 
+// GetUUID returns a UUID, i.e. 128 bit (16 byte) Universal Unique IDentifier as defined
+// in RFC4122, from the target Evidence
 func (o EvidenceID) GetUUID() (comid.UUID, error) {
 	switch t := o.Value.(type) {
 	case *comid.TaggedUUID:
@@ -158,7 +160,8 @@ type IEvidenceValue interface {
 	Bytes() []byte
 }
 
-// NewUUIDEvidenceID instantiates a new EvidenceID with the supplied UUID identity
+// NewUUIDEvidenceID instantiates a new EvidenceID from the
+// supplied val, which is a UUID in a string format or a byte slice
 func NewUUIDEvidenceID(val any) (*EvidenceID, error) {
 	if val == nil {
 		return &EvidenceID{&comid.TaggedUUID{}}, nil
@@ -172,7 +175,7 @@ func NewUUIDEvidenceID(val any) (*EvidenceID, error) {
 	return &EvidenceID{ret}, nil
 }
 
-// MustNewUUIDEvidenceID is like NewUUIDEvidenceID execept it does not return an
+// MustNewUUIDEvidenceID is like NewUUIDEvidenceID except it does not return an
 // error, assuming that the provided value is valid. It panics if that isn't
 // the case.
 func MustNewUUIDEvidenceID(val any) *EvidenceID {

@@ -116,7 +116,7 @@ func Example_encode_CoSWIDTriples() {
 			Evidence: *NewCoSWIDEvidence().AddCoSWIDEvidenceMap(
 				&CoSWIDEvidenceMap{
 					TagID:    swid.NewTagID(TestTag),
-					Evidence: swid.Evidence{Date: Testdate, DeviceID: TestDeviceID},
+					Evidence: swid.Evidence{Date: TestDate, DeviceID: TestDeviceID},
 				},
 			),
 		},

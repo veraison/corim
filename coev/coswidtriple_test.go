@@ -43,7 +43,7 @@ func TestCoSWIDTriple_AddEvidence(t *testing.T) {
 	s := &CoSWIDTriple{}
 	tv := &CoSWIDEvidenceMap{
 		TagID:    swid.NewTagID(TestTag),
-		Evidence: swid.Evidence{Date: Testdate, DeviceID: TestDeviceID},
+		Evidence: swid.Evidence{Date: TestDate, DeviceID: TestDeviceID},
 	}
 	err := s.AddEvidence(tv)
 	require.Nil(t, err)

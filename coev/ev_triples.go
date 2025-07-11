@@ -25,7 +25,6 @@ func NewEvTriples() *EvTriples {
 }
 
 func (o EvTriples) Valid() error {
-
 	// Check if triples are set ?
 	if o.EvidenceTriples == nil &&
 		o.IdentityTriples == nil &&
@@ -43,18 +42,16 @@ func (o EvTriples) Valid() error {
 	if o.IdentityTriples != nil {
 		for i, identity := range *o.IdentityTriples {
 			if err := identity.Valid(); err != nil {
-				return fmt.Errorf("invalid IdentityTriples at index: %d, %w", i, err)
+				return fmt.Errorf("invalid IdentityTriple at index: %d, %w", i, err)
 			}
-
 		}
 	}
 
 	if o.CoSWIDTriples != nil {
 		for i, swid := range *o.CoSWIDTriples {
 			if err := swid.Valid(); err != nil {
-				return fmt.Errorf("invalid CoSWIDTriples at index: %d, %w", i, err)
+				return fmt.Errorf("invalid CoSWIDTriple at index: %d, %w", i, err)
 			}
-
 		}
 	}
 
