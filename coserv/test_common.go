@@ -43,8 +43,8 @@ func exampleClassSelector(t *testing.T) *EnvironmentSelector {
 	require.NotNil(t, class1)
 
 	selector := NewEnvironmentSelector().
-		AddClass(*class0).
-		AddClass(*class1)
+		AddClass(StatefulClass{Class: class0}).
+		AddClass(StatefulClass{Class: class1})
 	require.NotNil(t, selector)
 
 	return selector
@@ -57,7 +57,7 @@ func exampleClassSelector2(t *testing.T) *EnvironmentSelector {
 	require.NotNil(t, class0)
 
 	selector := NewEnvironmentSelector().
-		AddClass(*class0)
+		AddClass(StatefulClass{Class: class0})
 	require.NotNil(t, selector)
 
 	return selector
@@ -71,8 +71,8 @@ func exampleInstanceSelector(t *testing.T) *EnvironmentSelector {
 	require.NoError(t, err)
 
 	selector := NewEnvironmentSelector().
-		AddInstance(*instance0).
-		AddInstance(*instance1)
+		AddInstance(StatefulInstance{Instance: instance0}).
+		AddInstance(StatefulInstance{Instance: instance1})
 	require.NotNil(t, selector)
 
 	return selector
@@ -86,8 +86,8 @@ func exampleGroupSelector(t *testing.T) *EnvironmentSelector {
 	require.NoError(t, err)
 
 	selector := NewEnvironmentSelector().
-		AddGroup(*group0).
-		AddGroup(*group1)
+		AddGroup(StatefulGroup{Group: group0}).
+		AddGroup(StatefulGroup{Group: group1})
 	require.NotNil(t, selector)
 
 	return selector
@@ -104,9 +104,9 @@ func badExampleMixedSelector(t *testing.T) *EnvironmentSelector {
 	require.NotNil(t, class0)
 
 	selector := NewEnvironmentSelector().
-		AddGroup(*group0).
-		AddInstance(*instance0).
-		AddGroup(*group0)
+		AddGroup(StatefulGroup{Group: group0}).
+		AddInstance(StatefulInstance{Instance: instance0}).
+		AddGroup(StatefulGroup{Group: group0})
 	require.NotNil(t, selector)
 
 	return selector

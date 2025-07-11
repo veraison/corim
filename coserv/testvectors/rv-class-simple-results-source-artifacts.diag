@@ -3,13 +3,13 @@
   / query /   1: {
     / artifact-type /         0: 2, / reference-values /
     / environment-selector /  1: {
-      / class / 0: [
+      / class / 0: [ [
         {
           / class-id /  0: 560(h'00112233'),  / tagged-bytes /
           / vendor /    1: "Example Vendor",
           / model /     2: "Example Model"
         }
-      ]
+      ] ]
     },
     / timestamp /   2: 0("2030-12-01T18:30:01Z"),
     / result-type / 3: 1 / source-artifacts /

@@ -1,0 +1,27 @@
+/ tagged-concise-evidence / 571({
+  / ce.ev-triples / 0 : {
+    / ce.identity-triples / 1 : [
+     [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37(
+                h'67b28b6c34cc40a19117ab5b05911e37'
+              ),
+            / vendor / 1 : "ACME Inc.",
+            / model / 2 : "ACME RoadRunner",
+            / layer / 3 : 1
+          }
+        },
+        [
+          / tagged-pkix-base64-key-type / 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8B\nlLT4MFHOaO+ICTtIvrEeEpr/sfTAP66H2hCHdb5HEXKtRKod6QLcOLPA1Q==\n-----END PUBLIC KEY-----"),
+          / tagged-pkix-base64-cert-type / 555("-----BEGIN CERTIFICATE-----\nMIIB4TCCAYegAwIBAgIUGhrA9M3yQIFqckA2v6nQewmF30IwCgYIKoZIzj0EAwIw\nRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGElu\ndGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAgFw0yMzA5MDQxMTAxNDhaGA8yMDUxMDEx\nOTExMDE0OFowRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAf\nBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDBZMBMGByqGSM49AgEGCCqG\nSM49AwEHA0IABFtQb6hfv68vAVmu2RDFNcWGBxEPAZS0+DBRzmjviAk7SL6xHhKa\n/7H0wD+uh9oQh3W+RxFyrUSqHekC3DizwNWjUzBRMB0GA1UdDgQWBBQWpNPb6eWD\nSM/+jwpbzoO3iHg4LTAfBgNVHSMEGDAWgBQWpNPb6eWDSM/+jwpbzoO3iHg4LTAP\nBgNVHRMBAf8EBTADAQH/MAoGCCqGSM49BAMCA0gAMEUCIAayNIF0eCJDZmcrqRjH\nf9h8GxeIDUnLqldeIvNfa+9SAiEA9ULBTPjnTUhYle226OAjg2sdhkXtb3Mu0E0F\nnuUmsIQ=\n-----END CERTIFICATE-----"),
+          / tagged-thumbprint-type / 557([
+            / alg / 1, / sha256 /
+            / value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+          ])
+        ]
+      ]
+    ]
+  }
+})

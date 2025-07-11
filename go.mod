@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	fortio.org/safecast v1.0.0
-	github.com/fxamacker/cbor/v2 v2.7.0
+	github.com/fxamacker/cbor/v2 v2.8.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/spf13/cast v1.4.1

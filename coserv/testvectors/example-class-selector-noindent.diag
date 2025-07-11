@@ -1,1 +1,1 @@
-{0: "tag:example.com,2025:cc-platform#1.0.0", 1: {0: 2, 1: {0: [{0: 560(h'00112233'), 1: "Example Vendor", 2: "Example Model"}, {0: 37(h'31fb5abf023e4992aa4e95f9c1503bfa')}]}, 2: 0("2030-12-01T18:30:01Z"), 3: 0}}
+{0: "tag:example.com,2025:cc-platform#1.0.0", 1: {0: 2, 1: {0: [[{0: 560(h'00112233'), 1: "Example Vendor", 2: "Example Model"}], [{0: 37(h'31fb5abf023e4992aa4e95f9c1503bfa')}]]}, 2: 0("2030-12-01T18:30:01Z"), 3: 0}}

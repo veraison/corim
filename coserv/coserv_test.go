@@ -20,7 +20,7 @@ func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
 	require.NotNil(t, class)
 
 	envSelector := NewEnvironmentSelector().
-		AddClass(*class)
+		AddClass(StatefulClass{Class: class})
 	require.NotNil(t, envSelector)
 
 	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeSourceArtifacts)
@@ -265,6 +265,20 @@ func TestCoserv_ToEDN_ok(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestCoserv_FromCBOR_Stateful(t *testing.T) {
+	tv := readTestVectorSlice(t, "rv-class-stateful.cbor")
+
+	var actual Coserv
+
+	err := actual.FromCBOR(tv)
+	require.NoError(t, err)
+
+	// here we only care about the measurements
+
+	assert.Len(t, *actual.Query.EnvironmentSelector.Classes, 1)
+	assert.NotNil(t, (*actual.Query.EnvironmentSelector.Classes)[0].Measurements)
+}
+
 func TestCoserv_FromCBOR_Results(t *testing.T) {
 	tv := readTestVectorSlice(t, "rv-class-simple-results.cbor")
 
@@ -355,7 +369,7 @@ func TestCoserv_results_ToCBOR_ok(t *testing.T) {
 	require.NotNil(t, class)
 
 	envSelector := NewEnvironmentSelector().
-		AddClass(*class)
+		AddClass(StatefulClass{Class: class})
 	require.NotNil(t, envSelector)
 
 	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeCollectedArtifacts)
