@@ -33,7 +33,7 @@ func Test_CondEndorseSeriesTriple_Add_Valid(t *testing.T) {
 	}
 
 	c.Add(triple)
-	assert.True(t, c.IsEmpty() == false)
+	assert.False(t, c.IsEmpty())
 	err := c.Valid()
 	assert.Contains(t, err.Error(), "no measurement entries")
 }
@@ -67,7 +67,8 @@ func Test_CondEndorseSeriesTriple_Valid_InvalidCondition(t *testing.T) {
 	}
 	c.Add(series)
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement value set")
+	assert.ErrorContains(t, err, "no measurement value set")
+
 }
 
 func Test_CondEndorseSeriesTriple_Valid_InvalidMeasurements(t *testing.T) {
@@ -89,7 +90,8 @@ func Test_CondEndorseSeriesTriple_Valid_InvalidMeasurements(t *testing.T) {
 	}
 	c.Add(series)
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement value set")
+	assert.ErrorContains(t, err, "no measurement value set")
+
 }
 
 func Test_CondEndorseSeriesTriple_Valid_InvalidSeries(t *testing.T) {
@@ -116,7 +118,7 @@ func Test_CondEndorseSeriesTriple_Valid_InvalidSeries(t *testing.T) {
 	series.Series.Add(invalidRecord)
 	c.Add(series)
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement entries")
+	assert.ErrorContains(t, err, "no measurement entries")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_EmptySeries(t *testing.T) {
@@ -133,7 +135,7 @@ func Test_CondEndorseSeriesTriple_Valid_EmptySeries(t *testing.T) {
 	}
 	c.Add(series)
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement entries")
+	assert.ErrorContains(t, err, "no measurement entries")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_ValidSeries(t *testing.T) {
@@ -172,7 +174,7 @@ func Test_CondEndorseSeriesTriple_Valid_ValidSeries(t *testing.T) {
 	series.Series.Add(validRecord)
 	c.Add(series)
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement entries")
+	assert.ErrorContains(t, err, "no measurement entries")
 }
 
 type testExtensions struct {
@@ -244,7 +246,7 @@ func Test_CondEndorseSeriesTriple_RegisterExtensions_SeriesError(t *testing.T) {
 	series.Series.Add(record)
 
 	err := series.RegisterExtensions(extMap)
-	assert.Contains(t, err.Error(), "unexpected extension point")
+	assert.ErrorContains(t, err, "unexpected extension point")
 }
 
 func Test_CondEndorseSeriesTriple_GetExtensions(t *testing.T) {
@@ -293,8 +295,8 @@ func Test_CondEndorseSeriesTriple_UnmarshalJSON(t *testing.T) {
 	// Create JSON data for a valid triple
 	jsonData := `[{"statefulenv":{"environment":{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}},"measurements":[]},"series":[]}]`
 	err := c.UnmarshalJSON([]byte(jsonData))
-	assert.Contains(t, err.Error(), "cannot unmarshal array into Go struct field")
-	assert.True(t, c.IsEmpty() || !c.IsEmpty()) // dummy assertion to keep the test structure
+	assert.ErrorContains(t, err, "cannot unmarshal array into Go struct field")
+	assert.True(t, c.IsEmpty(), "collection should remain empty after failed unmarshaling")
 }
 
 func Test_CondEndorseSeriesTriple_MarshalCBOR(t *testing.T) {
@@ -338,10 +340,10 @@ func Test_CondEndorseSeriesTriple_UnmarshalCBOR(t *testing.T) {
 	require.NoError(t, err)
 
 	// Now unmarshal it
-	newC := NewCondEndorseSeriesTriples()
-	err = newC.UnmarshalCBOR(cborData)
+	c = NewCondEndorseSeriesTriples()
+	err = c.UnmarshalCBOR(cborData)
 	require.NoError(t, err)
-	assert.False(t, newC.IsEmpty())
+	assert.False(t, c.IsEmpty())
 }
 
 func Test_CondEndorseSeriesRecord_Valid_OK(t *testing.T) {
@@ -409,7 +411,8 @@ func Test_CondEndorseSeriesRecord_Valid_InvalidSelection(t *testing.T) {
 	}
 
 	err := record.Valid()
-	assert.Contains(t, err.Error(), "no measurement value set")
+	assert.ErrorContains(t, err, "no measurement value set")
+
 }
 
 func Test_CondEndorseSeriesRecord_Valid_InvalidAddition(t *testing.T) {
@@ -422,7 +425,8 @@ func Test_CondEndorseSeriesRecord_Valid_InvalidAddition(t *testing.T) {
 	}
 
 	err := record.Valid()
-	assert.Contains(t, err.Error(), "no measurement value set")
+	assert.ErrorContains(t, err, "no measurement value set")
+
 }
 
 func Test_CondEndorseSeriesRecord_RegisterExtensions_OK(t *testing.T) {
@@ -468,7 +472,7 @@ func Test_CondEndorseSeriesRecord_RegisterExtensions_SelectionError(t *testing.T
 	}
 
 	err := record.RegisterExtensions(extMap)
-	assert.Contains(t, err.Error(), "selection:")
+	assert.ErrorContains(t, err, "selection:")
 }
 
 func Test_CondEndorseSeriesRecord_RegisterExtensions_AdditionError(t *testing.T) {
@@ -487,7 +491,7 @@ func Test_CondEndorseSeriesRecord_RegisterExtensions_AdditionError(t *testing.T)
 	}
 
 	err := record.RegisterExtensions(extMap)
-	assert.Contains(t, err.Error(), "unexpected extension point")
+	assert.ErrorContains(t, err, "unexpected extension point")
 }
 
 func Test_CondEndorseSeriesRecord_GetExtensions(t *testing.T) {
@@ -568,7 +572,7 @@ func Test_CondEndorseSeriesRecords_Valid_InvalidRecord(t *testing.T) {
 
 	records.Add(invalidRecord)
 	err := records.Valid()
-	assert.Contains(t, err.Error(), "error at index 0:")
+	assert.ErrorContains(t, err, "error at index 0:")
 }
 
 func Test_CondEndorseSeriesRecords_RegisterExtensions_OK(t *testing.T) {
@@ -630,7 +634,7 @@ func Test_CondEndorseSeriesRecords_RegisterExtensions_Error(t *testing.T) {
 		Add(ExtReferenceValue, &testExtensions{})
 
 	err := records.RegisterExtensions(extMap)
-	assert.Contains(t, err.Error(), "unexpected extension point")
+	assert.ErrorContains(t, err, "unexpected extension point")
 }
 
 func Test_CondEndorseSeriesRecords_GetExtensions(t *testing.T) {
