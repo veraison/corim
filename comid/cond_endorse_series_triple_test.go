@@ -292,10 +292,10 @@ func Test_CondEndorseSeriesTriple_MarshalJSON(t *testing.T) {
 
 func Test_CondEndorseSeriesTriple_UnmarshalJSON(t *testing.T) {
 	c := NewCondEndorseSeriesTriples()
-	// Create JSON data for a valid triple
-	jsonData := `[{"statefulenv":{"environment":{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}},"measurements":[]},"series":[]}]`
+	// Create invalid JSON data that should cause an unmarshaling error
+	jsonData := `{"invalid": "json", "for": "collection"}`
 	err := c.UnmarshalJSON([]byte(jsonData))
-	assert.ErrorContains(t, err, "cannot unmarshal array into Go struct field")
+	assert.ErrorContains(t, err, "cannot unmarshal object into Go value of type []json.RawMessage")
 	assert.True(t, c.IsEmpty(), "collection should remain empty after failed unmarshaling")
 }
 
