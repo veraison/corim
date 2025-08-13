@@ -100,6 +100,28 @@ func (o TeeAdvisoryIDs) IsStringExpr() bool {
 	return isType[TaggedSetStringExpression](o.val)
 }
 
+// GetString returns a slice of TeeAdvisoryIDs as strings
+func (o TeeAdvisoryIDs) GetString() ([]string, error) {
+	switch t := o.val.(type) {
+	case []string:
+		return t, nil
+
+	default:
+		return nil, fmt.Errorf("unknown type %T for TeeAdvisoryIDs", t)
+	}
+}
+
+// GetStringExpression returns TaggedSetStringExpression from TeeAdvisoryIDs
+func (o TeeAdvisoryIDs) GetStringExpression() (TaggedSetStringExpression, error) {
+	switch t := o.val.(type) {
+	case TaggedSetStringExpression:
+		return t, nil
+
+	default:
+		return TaggedSetStringExpression{}, fmt.Errorf("unknown type %T for TeeAdvisoryIDs", t)
+	}
+}
+
 func (o TeeAdvisoryIDs) MarshalJSON() ([]byte, error) {
 	var (
 		v   encoding.TypeAndValue
@@ -161,5 +183,18 @@ func (o TeeAdvisoryIDs) MarshalCBOR() ([]byte, error) {
 
 // UnmarshalCBOR UnMarshals supplied CBOR bytes to TeeAdvisoryIDs
 func (o *TeeAdvisoryIDs) UnmarshalCBOR(data []byte) error {
-	return dm.Unmarshal(data, &o.val)
+	var x []string
+	err := dm.Unmarshal(data, &x)
+	if err == nil {
+		o.val = x
+	} else {
+		var x TaggedSetStringExpression
+		err = dm.Unmarshal(data, &x)
+		if err == nil {
+			o.val = x
+		} else {
+			return err
+		}
+	}
+	return nil
 }

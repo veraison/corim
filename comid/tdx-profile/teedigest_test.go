@@ -59,3 +59,15 @@ func TestTeeDigest_AddTeeDigest_NOK(t *testing.T) {
 	_, err := dg.AddTeeDigest(NOP, d)
 	assert.EqualError(t, err, expectedErr)
 }
+
+func TestTeeDigest_Marshal_UnMarshal_OK(t *testing.T) {
+	d := getNewDigests()
+	dg := TeeDigest{d}
+	b, err := dg.MarshalCBOR()
+	require.Nil(t, err)
+	x := &TeeDigest{}
+	err = x.UnmarshalCBOR(b)
+	require.Nil(t, err)
+	err = x.Valid()
+	require.Nil(t, err)
+}

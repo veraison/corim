@@ -8,13 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
-	"github.com/veraison/swid"
 )
 
 // Example_decode_JSON decodes the TDX Measurement Extensions from the given JSON Template
@@ -38,7 +36,7 @@ func Example_decode_JSON() {
 		panic(err)
 	}
 
-	if err := extractRefVals(m); err != nil {
+	if err := extractSeamRefVals(m); err != nil {
 		panic(err)
 	}
 
@@ -88,7 +86,7 @@ func Example_encode_tdx_seam_refval_without_profile() {
 		panic(err)
 	}
 
-	if err := setTDXSeamMvalExtensions(&m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val); err != nil {
+	if err := SetTDXSeamMvalExtensions(ReferenceValue, &m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val); err != nil {
 		panic(err)
 	}
 	if err := m.Valid(); err != nil {
@@ -142,7 +140,7 @@ func Example_encode_tdx_seam_refval_with_profile() {
 	refVal.Measurements.Add(measurement)
 	m.Triples.AddReferenceValue(refVal)
 
-	err = setTDXSeamMvalExtensions(&m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
+	err = SetTDXSeamMvalExtensions(ReferenceValue, &m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
 	if err != nil {
 		fmt.Printf("unable to set extensions :%s", err.Error())
 	}
@@ -189,7 +187,7 @@ func Example_encode_tdx_seam_refval_direct() {
 		log.Fatal("could not register mval extensions")
 	}
 
-	if err := setTDXSeamMvalExtensions(&measurement.Val); err != nil {
+	if err := SetTDXSeamMvalExtensions(ReferenceValue, &measurement.Val); err != nil {
 		log.Fatal("could not set mval extensions")
 	}
 
@@ -220,159 +218,6 @@ func Example_encode_tdx_seam_refval_direct() {
 	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDXSEAM"}},"measurements":[{"value":{"tcbdate":"2025-01-27T00:00:00Z","isvsvn":{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":10}}},"attributes":"AQE=","mrtee":{"type":"digest-expression","value":{"set-operator":"member","set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU="]}},"mrsigner":{"type":"digest-expression","value":{"set-operator":"member","set-digest":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]}},"isvprodid":{"type":"bytes","value":"AQE="},"tcbevalnum":{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":11}}}}}]}]}}
 }
 
-func setTDXSeamMvalExtensions(val *comid.Mval) error {
-	tcbDate, _ := time.Parse(time.RFC3339, "2025-01-27T00:00:00Z")
-	err := val.Set("tcbdate", &tcbDate)
-	if err != nil {
-		return fmt.Errorf("unable to set tcbDate: %w", err)
-	}
-	r := []byte{0x01, 0x01}
-	isvProdID, err := NewTeeISVProdID(r)
-	if err != nil {
-		return fmt.Errorf("unable to get isvprodid: %w", err)
-	}
-	err = val.Set("isvprodid", isvProdID)
-	if err != nil {
-		return fmt.Errorf("unable to set isvprodid: %w", err)
-	}
-	svn, err := NewSvnExpression(TestISVSVN)
-	if err != nil {
-		return fmt.Errorf("unable to get isvsvn numeric: %w", err)
-	}
-	err = val.Set("isvsvn", svn)
-	if err != nil {
-		return fmt.Errorf("unable to set isvsvn: %w", err)
-	}
-	teeTcbEvNum, err := NewTeeTcbEvalNumberNumeric(TestTCBEvalNum)
-	if err != nil {
-		return fmt.Errorf("unable to get tcbevalnum numeric: %w", err)
-	}
-	err = val.Set("tcbevalnum", teeTcbEvNum)
-	if err != nil {
-		return fmt.Errorf("unable to set tcbevalnum: %w", err)
-	}
-
-	teeAttr, err := NewTeeAttributes(TestTeeAttributes)
-	if err != nil {
-		return fmt.Errorf("unable to get teeAttributes: %w", err)
-	}
-	err = val.Set("attributes", teeAttr)
-	if err != nil {
-		return fmt.Errorf("unable to set attributes: %w", err)
-	}
-
-	d := comid.NewDigests()
-	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
-	td, err := NewTeeDigestExpr(MEM, *d)
-	if err != nil {
-		return fmt.Errorf("unable to get TeeDigest: %w", err)
-	}
-
-	err = val.Set("mrtee", td)
-	if err != nil {
-		return fmt.Errorf("unable to set mrtee: %w", err)
-	}
-
-	d = comid.NewDigests()
-	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
-	d.AddDigest(swid.Sha384, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
-
-	td, err = NewTeeDigestExpr(MEM, *d)
-	if err != nil {
-		return fmt.Errorf("unable to get TeeDigest: %w", err)
-	}
-
-	err = val.Set("mrsigner", td)
-	if err != nil {
-		return fmt.Errorf("unable to set mrsigner %w", err)
-	}
-	return nil
-}
-
-func decodeMValExtensions(m *comid.Measurement) error {
-	val, err := m.Val.Get("tcbevalnum")
-	if err != nil {
-		return fmt.Errorf("failed to decode tcbevalnum from measurement extensions: %w", err)
-	}
-	f, ok := val.(*TeeTcbEvalNumber)
-	if !ok {
-		fmt.Printf("val was not pointer to TeeTcbEvalNum")
-	}
-	tcbValNum := *f
-	if err = testextractTeeTcbEvalNum(&tcbValNum); err != nil {
-		return fmt.Errorf("failed to extract tcbevalnum: %w", err)
-	}
-
-	val, err = m.Val.Get("isvprodid")
-	if err != nil {
-		return errors.New("failed to decode isvprodid from measurement extensions")
-	}
-	tS, ok := val.(*TeeISVProdID)
-	if !ok {
-		fmt.Printf("val was not pointer to IsvProdID")
-	}
-	if err = testextractTeeISVProdID(tS); err != nil {
-		return fmt.Errorf("failed to decode teeISVProdID from measurement extensions: %w", err)
-	}
-
-	val, err = m.Val.Get("isvsvn")
-	if err != nil {
-		return errors.New("failed to decode isvsvn from measurement extensions")
-	}
-	teesvn, ok := val.(*TeeSVN)
-	if !ok {
-		return errors.New("val was not pointer to tee svn")
-	}
-	err = teesvn.Valid()
-	if err != nil {
-		return fmt.Errorf("invalid tee svn: %w", err)
-	}
-
-	err = testextractTeeSvn(teesvn)
-	if err != nil {
-		return fmt.Errorf("unable to extract tee svn: %w", err)
-	}
-	val, err = m.Val.Get("attributes")
-	if err != nil {
-		return errors.New("failed to decode attributes from measurement extensions")
-	}
-
-	tA, ok := val.(*TeeAttributes)
-	if !ok {
-		fmt.Printf("val was not pointer to teeAttributes")
-	}
-	fmt.Printf("\nAttributes: %x", *tA)
-
-	val, err = m.Val.Get("mrtee")
-	if err != nil {
-		return errors.New("failed to decode mrtee from measurement extensions")
-	}
-
-	tD, ok := val.(*TeeDigest)
-	if !ok {
-		fmt.Printf("val was not pointer to TeeDigest")
-	}
-
-	if err = testextractTeeDigest("mrtee", tD); err != nil {
-		return fmt.Errorf("failed to decode mrtee from digest: %w", err)
-	}
-
-	val, err = m.Val.Get("mrsigner")
-	if err != nil {
-		return fmt.Errorf("failed to decode mrsigner from measurement extensions: %w", err)
-	}
-
-	tD, ok = val.(*TeeDigest)
-	if !ok {
-		return errors.New("val was not pointer to TeeDigest")
-	}
-
-	if err := testextractTeeDigest("mrsigner", tD); err != nil {
-		return fmt.Errorf("failed to extarct mrsigner digest: %w", err)
-	}
-	return nil
-}
-
 var (
 	// test cases are based on diag files here:
 	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
@@ -401,7 +246,7 @@ func Example_decode_CBOR() {
 		panic(err)
 	}
 
-	if err := extractRefVals(m); err != nil {
+	if err := extractSeamRefVals(m); err != nil {
 		panic(err)
 	}
 
@@ -430,49 +275,14 @@ func Example_decode_CBOR() {
 
 }
 
-func extractRefVals(c *comid.Comid) error {
+func extractSeamRefVals(c *comid.Comid) error {
 	if c.Triples.ReferenceValues == nil {
 		return errors.New("no reference values triples")
 	}
 
 	for i, rv := range c.Triples.ReferenceValues.Values {
-		if err := extractSeamRefVal(rv); err != nil {
+		if err := ExtractSeamMeas(rv); err != nil {
 			return fmt.Errorf("bad reference value at index %d: %w", i, err)
-		}
-	}
-	return nil
-}
-
-func extractSeamRefVal(rv comid.ValueTriple) error {
-	class := rv.Environment.Class
-
-	if err := testextractClassElements(class); err != nil {
-		return fmt.Errorf("extracting class: %w", err)
-	}
-
-	measurements := rv.Measurements
-	if err := extractSeamMeasurements(&measurements); err != nil {
-		return fmt.Errorf("extracting measurements: %w", err)
-	}
-
-	return nil
-}
-
-func extractSeamMeasurements(meas *comid.Measurements) error {
-	if len(meas.Values) == 0 {
-		return errors.New("no measurements")
-	}
-	for i := range meas.Values {
-		m := &meas.Values[0]
-		if err := decodeMValExtensions(m); err != nil {
-			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
-		}
-
-		if m.AuthorizedBy != nil {
-			err := TestdecodeAuthorisedBy(m)
-			if err != nil {
-				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
-			}
 		}
 	}
 	return nil

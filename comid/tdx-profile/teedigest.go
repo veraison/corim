@@ -88,6 +88,8 @@ func (o TeeDigest) Valid() error {
 		if len(t.SetDigest) == 0 {
 			return fmt.Errorf("TeeDigest not set")
 		}
+	default:
+		return fmt.Errorf("invalid type: %T", t)
 	}
 	return nil
 }
@@ -132,7 +134,7 @@ func (o TeeDigest) MarshalJSON() ([]byte, error) {
 		err error
 	)
 	switch t := o.val.(type) {
-	case []string:
+	case Digests:
 		b, err = json.Marshal(t)
 		if err != nil {
 			return nil, err
@@ -179,10 +181,25 @@ func (o *TeeDigest) UnmarshalJSON(data []byte) error {
 
 // MarshalCBOR Marshals TeeDigest to CBOR
 func (o TeeDigest) MarshalCBOR() ([]byte, error) {
+
 	return em.Marshal(o.val)
 }
 
 // UnmarshalCBOR UnMarshals supplied CBOR bytes to TeeDigest
 func (o *TeeDigest) UnmarshalCBOR(data []byte) error {
-	return dm.Unmarshal(data, &o.val)
+	var x comid.Digests
+	err := dm.Unmarshal(data, &x)
+	if err == nil {
+		o.val = x
+		return nil
+	} else {
+		var y TaggedSetDigestExpression
+		err = dm.Unmarshal(data, &y)
+		if err == nil {
+			o.val = y
+			return nil
+		} else {
+			return err
+		}
+	}
 }
