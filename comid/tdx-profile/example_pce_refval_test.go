@@ -76,8 +76,8 @@ func Example_decode_PCE_JSON() {
 	// SVN Value: 10
 	// SVN Operator: greater_or_equal
 	// SVN Value: 10
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKey 0 Type: pkix-base64-key
+	// CryptoKey 0 Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
 	// -----END PUBLIC KEY-----
 }
@@ -121,7 +121,7 @@ func extractPCEMeasurements(meas *comid.Measurements) error {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
 
-		if m.AuthorizedBy != nil {
+		if len(m.AuthorizedBy) > 0 {
 			err := TestdecodeAuthorisedBy(m)
 			if err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
@@ -280,8 +280,8 @@ func Example_decode_PCE_CBOR() {
 	// SVN Value: 0
 	// SVN Operator: greater_or_equal
 	// SVN Value: 0
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKey 0 Type: pkix-base64-key
+	// CryptoKey 0 Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
 	// -----END PUBLIC KEY-----
 }

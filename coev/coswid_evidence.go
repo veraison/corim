@@ -10,9 +10,9 @@ import (
 
 // CoSWIDEvidenceMap is the Map to carry CoSWID Evidence
 type CoSWIDEvidenceMap struct {
-	TagID        *swid.TagID      `cbor:"0,keyasint,omitempty" json:"tagId,omitempty"`
-	Evidence     swid.Evidence    `cbor:"1,keyasint,omitempty" json:"evidence,omitempty"`
-	AuthorizedBy *comid.CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
+	TagID        *swid.TagID        `cbor:"0,keyasint,omitempty" json:"tagId,omitempty"`
+	Evidence     swid.Evidence      `cbor:"1,keyasint,omitempty" json:"evidence,omitempty"`
+	AuthorizedBy []*comid.CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
 }
 
 type CoSWIDEvidence []CoSWIDEvidenceMap
