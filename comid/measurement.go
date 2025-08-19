@@ -493,9 +493,9 @@ func (o Mval) Valid() error {
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.
 type Measurement struct {
-	Key          *Mkey      `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
-	Val          Mval       `cbor:"1,keyasint" json:"value"`
-	AuthorizedBy *CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
+	Key          *Mkey        `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
+	Val          Mval         `cbor:"1,keyasint" json:"value"`
+	AuthorizedBy []*CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
 }
 
 func NewMeasurement(val any, typ string) (*Measurement, error) {
@@ -764,6 +764,27 @@ func (o *Measurement) SetUUID(u UUID) *Measurement {
 func (o *Measurement) SetName(name string) *Measurement {
 	if o != nil {
 		o.Val.Name = &name
+	}
+	return o
+}
+
+// SetAuthorizedBy sets the supplied crypto keys in the AuthorizedBy field of the
+// target measurement
+func (o *Measurement) SetAuthorizedBy(keys []*CryptoKey) *Measurement {
+	if o != nil {
+		o.AuthorizedBy = keys
+	}
+	return o
+}
+
+// AddAuthorizedBy adds a crypto key to the AuthorizedBy field of the
+// target measurement
+func (o *Measurement) AddAuthorizedBy(key *CryptoKey) *Measurement {
+	if o != nil {
+		if o.AuthorizedBy == nil {
+			o.AuthorizedBy = make([]*CryptoKey, 0)
+		}
+		o.AuthorizedBy = append(o.AuthorizedBy, key)
 	}
 	return o
 }

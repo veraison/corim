@@ -298,10 +298,12 @@ func Example_decode_JSON() {
                             "raw-value-mask": "/////w==",
                             "mac-addr": "02:00:5e:10:00:00:00:02"
                         },
-                        "authorized-by": {
-                            "type": "pkix-base64-key",
-                            "value": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----"
-                        }
+                        "authorized-by": [
+                            {
+                                "type": "pkix-base64-key",
+                                "value": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----"
+                            }
+                        ]
                     }
                 ]
             }

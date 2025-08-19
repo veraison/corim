@@ -53,8 +53,8 @@ func Example_decode_QE_JSON() {
 	// mrsigner Digest Value: 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
 	// mrsigner Digest Alg: 8
 	// mrsigner Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKey 0 Type: pkix-base64-key
+	// CryptoKey 0 Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
 	// -----END PUBLIC KEY-----
 }
@@ -98,7 +98,7 @@ func extractQEMeasurements(meas *comid.Measurements) error {
 			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
 		}
 
-		if m.AuthorizedBy != nil {
+		if len(m.AuthorizedBy) > 0 {
 			err := TestdecodeAuthorisedBy(m)
 			if err != nil {
 				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
@@ -306,8 +306,8 @@ func Example_decode_QE_CBOR() {
 	// mrsigner Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
 	// mrsigner Digest Alg: 8
 	// mrsigner Digest Value: a314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6aa314fc2dc663ae7a6b6bc6787594057396e6b3f569cd50fd5ddb4d1bbafd2b6a
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKey 0 Type: pkix-base64-key
+	// CryptoKey 0 Value: -----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
 	// -----END PUBLIC KEY-----
 }
