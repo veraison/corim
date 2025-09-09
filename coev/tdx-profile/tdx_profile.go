@@ -20,7 +20,7 @@ import (
 // which is "joint-iso-itu-t.country.us.organization.intel.intel-comid.profile"
 
 func init() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
+	ProfileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
 	if err != nil {
 		panic(err) // will not error, as the hard-coded string above is valid
 	}
@@ -28,7 +28,7 @@ func init() {
 	extMap := extensions.NewMap().
 		Add(coev.ExtEvidenceTriples, &tdx.MValExtensions{})
 
-	if err := coev.RegisterProfile(profileID, extMap); err != nil {
+	if err := coev.RegisterProfile(ProfileID, extMap); err != nil {
 		// will not error, assuming our profile ID is unique, and we've
 		// correctly set up the extensions Map above
 		panic(err)
