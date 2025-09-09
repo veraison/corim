@@ -1,7 +1,7 @@
 // Copyright 2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
-package tdxev
+package tdx
 
 import (
 	_ "embed"
@@ -17,11 +17,7 @@ import (
 )
 
 func Example_decode_PCE_Evidence_JSON() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err)
-	}
-	manifest, found := coev.GetProfileManifest(profileID)
+	manifest, found := coev.GetProfileManifest(ProfileID)
 	if !found {
 		fmt.Printf("Evidence profile not found")
 		return

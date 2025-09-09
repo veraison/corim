@@ -1,7 +1,7 @@
 // Copyright 2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
-package tdxev
+package tdx
 
 import (
 	"github.com/veraison/corim/coev"
@@ -9,6 +9,8 @@ import (
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/eat"
 )
+
+var ProfileID *eat.Profile
 
 // Registering the profile inside init() in the same file where it is defined
 // ensures that the profile will always be available, and you don't need to
@@ -20,7 +22,8 @@ import (
 // which is "joint-iso-itu-t.country.us.organization.intel.intel-comid.profile"
 
 func init() {
-	ProfileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
+	var err error
+	ProfileID, err = eat.NewProfile("2.16.840.1.113741.1.16.1")
 	if err != nil {
 		panic(err) // will not error, as the hard-coded string above is valid
 	}
