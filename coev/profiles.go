@@ -27,6 +27,8 @@ var CoevMapExtensionPoints = []extensions.Point{
 	ExtEvidenceTriplesFlags,
 }
 
+var profilesRegister = make(map[string]ProfileManifest)
+
 // AllExtensionPoints is a list of all valid extension.Point's
 var AllExtensionPoints = make(map[extensions.Point]bool) // populated inside init() below
 
@@ -52,8 +54,6 @@ func (o *ProfileManifest) GetTaggedConciseEvidence() *TaggedConciseEvidence {
 	}
 	return ret
 }
-
-var profilesRegister = make(map[string]ProfileManifest)
 
 func (o *ProfileManifest) registerExtensions(e iextensible, points []extensions.Point) {
 	exts := extensions.NewMap()
@@ -102,24 +102,18 @@ func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
 // GetProfileManifest returns the ProfileManifest associated with the specified ID, or an empty
 // profileManifest if no ProfileManifest has been registered for the ID. The second return
 // value indicates whether a profileManifest for the ID has been found.
-func GetProfileManifest(id *eat.Profile) (ProfileManifest, bool) {
+func GetProfileManifest(id *eat.Profile) (*ProfileManifest, bool) {
 	if id == nil {
-		return ProfileManifest{}, false
+		return nil, false
 	}
 
 	strID, err := id.Get()
 	if err != nil {
-		return ProfileManifest{}, false
+		return nil, false
 	}
 
 	prof, ok := profilesRegister[strID]
-	return prof, ok
-}
-
-func init() {
-	for _, p := range CoevMapExtensionPoints {
-		AllExtensionPoints[p] = true
-	}
+	return &prof, ok
 }
 
 // UnregisterProfile ensures there are no extensions registered for the
@@ -190,4 +184,10 @@ func GetConciseEvidence(profileID *eat.Profile) *ConciseEvidence {
 	}
 
 	return ret
+}
+
+func init() {
+	for _, p := range CoevMapExtensionPoints {
+		AllExtensionPoints[p] = true
+	}
 }
