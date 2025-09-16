@@ -19,7 +19,7 @@ type ProfileManifest struct {
 	MapExtensions extensions.Map
 }
 
-// CoevMapExtensionPoints is a list of extension.Point's valid for a comid.Comid.
+// CoevMapExtensionPoints is a list of extensions.Point's valid for a coev.ConciseEvidence.
 var CoevMapExtensionPoints = []extensions.Point{
 	ExtConciseEvidence,
 	ExtEvTriples,
@@ -34,7 +34,7 @@ type iextensible interface {
 	RegisterExtensions(exts extensions.Map) error
 }
 
-// GetCoev returns a pointer to a new comid.Comid that had the ProfileManifest's
+// GetCoev returns a pointer to a new coev.ConciseEvidence that had the target ProfileManifest's
 // extensions (if any) registered.
 func (o *ProfileManifest) GetConciseEvidence() *ConciseEvidence {
 	ret := NewConciseEvidence()
@@ -42,7 +42,7 @@ func (o *ProfileManifest) GetConciseEvidence() *ConciseEvidence {
 	return ret
 }
 
-// GetTaggedConciseEvidence returns a pointer to a new aggedConciseEvidence that had the
+// GetTaggedConciseEvidence returns a pointer to a new TaggedConciseEvidence that had the target
 // ProfileManifest's extensions (if any) registered.
 func (o *ProfileManifest) GetTaggedConciseEvidence() *TaggedConciseEvidence {
 	r := o.GetConciseEvidence()
@@ -145,7 +145,7 @@ func UnregisterProfile(id *eat.Profile) bool {
 
 // UnmarshalConciseEvidenceFromCBOR unmarshals a ConciseEvidence from provided CBOR data. If
 // there are extensions associated with the profile specified by the data, they
-// will be registered with the comid.Comid before it is unmarshaled.
+// will be registered with the coev.ConciseEvidence before it is unmarshaled.
 func UnmarshalConciseEvidenceFromCBOR(buf []byte, profileID *eat.Profile) (*ConciseEvidence, error) {
 	var ret *ConciseEvidence
 
