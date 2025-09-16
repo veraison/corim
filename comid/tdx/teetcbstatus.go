@@ -87,6 +87,38 @@ func (o TeeTcbStatus) Valid() error {
 	return nil
 }
 
+// IsString returns true if TeeTcbStatus is slice of strings
+func (o TeeTcbStatus) IsString() bool {
+	return isType[[]string](o.val)
+}
+
+// IsStringExpr returns true if TeeTcbStatus is SetStringExpr
+func (o TeeTcbStatus) IsStringExpr() bool {
+	return isType[TaggedSetStringExpression](o.val)
+}
+
+// GetString returns a slice of TeeTcbStatus as strings
+func (o TeeTcbStatus) GetString() ([]string, error) {
+	switch t := o.val.(type) {
+	case []string:
+		return t, nil
+
+	default:
+		return nil, fmt.Errorf("unknown type %T for TeeAdvisoryIDs", t)
+	}
+}
+
+// GetStringExpression returns TaggedSetStringExpression from TeeTcbStatus
+func (o TeeTcbStatus) GetStringExpression() (TaggedSetStringExpression, error) {
+	switch t := o.val.(type) {
+	case TaggedSetStringExpression:
+		return t, nil
+
+	default:
+		return TaggedSetStringExpression{}, fmt.Errorf("unknown type %T for TeeAdvisoryIDs", t)
+	}
+}
+
 // MarshalJSON marshals the TeeTcbStatus to JSON
 func (o TeeTcbStatus) MarshalJSON() ([]byte, error) {
 	var (
@@ -123,7 +155,7 @@ func (o *TeeTcbStatus) UnmarshalJSON(data []byte) error {
 
 	switch v.Type {
 	case StringType:
-		var x uint
+		var x []string
 		if err := json.Unmarshal(v.Value, &x); err != nil {
 			return fmt.Errorf(
 				"cannot unmarshal TeeTcbStatus of type string: %w", err)
@@ -149,5 +181,18 @@ func (o TeeTcbStatus) MarshalCBOR() ([]byte, error) {
 
 // UnmarshalCBOR Unmarshals supplied CBOR bytes to TeeTcbStatus
 func (o *TeeTcbStatus) UnmarshalCBOR(data []byte) error {
-	return dm.Unmarshal(data, &o.val)
+	var x []string
+	err := dm.Unmarshal(data, &x)
+	if err == nil {
+		o.val = x
+	} else {
+		var x TaggedSetStringExpression
+		err = dm.Unmarshal(data, &x)
+		if err == nil {
+			o.val = x
+		} else {
+			return err
+		}
+	}
+	return nil
 }

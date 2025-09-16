@@ -88,122 +88,8 @@ func extractPCERefVals(c *comid.Comid) error {
 	}
 
 	for i, rv := range c.Triples.ReferenceValues.Values {
-		if err := extractPCERefVal(rv); err != nil {
-			return fmt.Errorf("bad PSA reference value at index %d: %w", i, err)
-		}
-	}
-
-	return nil
-}
-
-func extractPCERefVal(rv comid.ValueTriple) error {
-	class := rv.Environment.Class
-
-	if err := testextractClassElements(class); err != nil {
-		return fmt.Errorf("extracting class: %w", err)
-	}
-
-	measurements := rv.Measurements
-	if err := extractPCEMeasurements(&measurements); err != nil {
-		return fmt.Errorf("extracting measurements: %w", err)
-	}
-
-	return nil
-}
-
-func extractPCEMeasurements(meas *comid.Measurements) error {
-	if len(meas.Values) == 0 {
-		return errors.New("no measurements")
-	}
-	for i := range meas.Values {
-		m := &meas.Values[0]
-		if err := decodePCEMValExtensions(m); err != nil {
-			return fmt.Errorf("extracting measurement at index %d: %w", i, err)
-		}
-
-		if m.AuthorizedBy != nil {
-			err := TestdecodeAuthorisedBy(m)
-			if err != nil {
-				return fmt.Errorf("extracting measurement at index %d: %w", i, err)
-			}
-		}
-	}
-	return nil
-}
-
-func decodePCEMValExtensions(m *comid.Measurement) error {
-	val, err := m.Val.Get("instanceid")
-	if err != nil {
-		return errors.New("failed to decode instanceid from measurement extensions")
-	}
-	i, ok := val.(*TeeInstanceID)
-	if !ok {
-		return errors.New("val was not pointer to teeInstanceID")
-	}
-
-	if i.IsBytes() {
-		val, err = i.GetBytes()
-		if err != nil {
-			return fmt.Errorf("failed to decode teeinstanceid: %w", err)
-		}
-		fmt.Printf("\nInstanceID: %x", val)
-	} else if i.IsUint() {
-		val, err = i.GetUint()
-		if err != nil {
-			return fmt.Errorf("failed to decode teeinstanceid: %w", err)
-		}
-		fmt.Printf("\nInstanceID: %d", val)
-	} else {
-		return errors.New("teeinstanceid is neither integer or byte string")
-	}
-
-	val, err = m.Val.Get("tcbcompsvn")
-	if err != nil {
-		return errors.New("failed to decode teetcbcompsvn from measurement extensions")
-	}
-
-	tcs, ok := val.(*TeeTcbCompSvn)
-	if !ok {
-		return errors.New("val was not pointer to teetcbcompsvn")
-	}
-	if err = tcs.Valid(); err != nil {
-		return fmt.Errorf("invalid computed SVN: %w", err)
-	}
-
-	val, err = m.Val.Get("pceid")
-	if err != nil {
-		return errors.New("failed to decode tcbevalnum from measurement extensions")
-	}
-	t, ok := val.(*TeePCEID)
-	if !ok {
-		fmt.Printf("val was not pointer to TeeTcbEvalNum")
-	}
-	if err = t.Valid(); err != nil {
-		return fmt.Errorf("invalid PCEID: %w", err)
-	}
-	pceID := *t
-	fmt.Printf("\npceID: %s", pceID)
-
-	err = extractCompSvn(tcs)
-	if err != nil {
-		return fmt.Errorf("unable to extract TeeTcbCompSVN: %w", err)
-	}
-	return nil
-}
-
-func extractCompSvn(s *TeeTcbCompSvn) error {
-	if s == nil {
-		return errors.New("no TEE TCB Comp SVN")
-	}
-
-	if len(*s) > 16 {
-		return errors.New("computed SVN cannot be greater than 16")
-	}
-
-	for i, teesvn := range *s {
-		svn := teesvn // Avoid gosec: Implicit memory aliasing in for loop
-		if err := testextractTeeSvn(&svn); err != nil {
-			return fmt.Errorf("unable to extract SVN at index %d: %w", i, err)
+		if err := ExtractPceMeas(rv); err != nil {
+			return fmt.Errorf("bad PCE eference value at index %d: %w", i, err)
 		}
 	}
 
@@ -315,7 +201,7 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	refVal.Measurements.Add(measurement)
 	m.Triples.AddReferenceValue(refVal)
 
-	err = setTDXPCEMvalExtension(&m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
+	err = SetTdxPceMvalExtensions(ReferenceValue, &m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
 	if err != nil {
 		fmt.Printf("unable to set extensions :%s", err.Error())
 	}
@@ -340,36 +226,4 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	// Output:
 	// a301a1005043bbe37f2e614b33aed353cff1428b200281a30065494e54454c01d8207168747470733a2f2f696e74656c2e636f6d028301000204a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e026b544458205043452054434281a101a3384c182d384f685043454944303031387c90d9ea6a820201d9ea6a820202d9ea6a820203d9ea6a820204d9ea6a820205d9ea6a820206d9ea6a820207d9ea6a820208d9ea6a820209d9ea6a82020ad9ea6a82020bd9ea6a82020cd9ea6a82020dd9ea6a82020ed9ea6a82020fd9ea6a820210
 	// {"tag-identity":{"id":"43bbe37f-2e61-4b33-aed3-53cff1428b20"},"entities":[{"name":"INTEL","regid":"https://intel.com","roles":["creator","tagCreator","maintainer"]}],"triples":{"reference-values":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"TDX PCE TCB"}},"measurements":[{"value":{"instanceid":{"type":"uint","value":45},"pceid":"PCEID001","tcbcompsvn":[{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":1}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":2}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":3}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":4}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":5}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":6}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":7}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":8}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":9}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":10}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":11}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":12}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":13}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":14}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":15}}},{"type":"numeric-expression","value":{"numeric-operator":"greater_or_equal","numeric-type":{"type":"uint","value":16}}}]}}]}]}}
-}
-
-func setTDXPCEMvalExtension(val *comid.Mval) error {
-	instanceID, err := NewTeeInstanceID(TestUIntInstance)
-	if err != nil {
-		return fmt.Errorf("unable to get teeinstanceID: %w", err)
-	}
-	err = val.Set("instanceid", instanceID)
-	if err != nil {
-		return fmt.Errorf("unable to set teeinstanceID: %w", err)
-	}
-
-	p, err := NewTeePCEID(TestPCEID)
-	if err != nil {
-		return fmt.Errorf("unable to get NewTeepceID: %w", err)
-	}
-	err = val.Set("pceid", p)
-	if err != nil {
-		return fmt.Errorf("unable to set teepceID: %w", err)
-	}
-
-	c, err := NewTeeTcbCompSvnExpression(TestCompSvn)
-	if err != nil {
-		return fmt.Errorf("failed to get TeeTcbCompSvn: %w", err)
-	}
-
-	err = val.Set("tcbcompsvn", c)
-	if err != nil {
-		return fmt.Errorf("unable to set teetcbcompsvn: %w", err)
-	}
-
-	return nil
 }

@@ -1,0 +1,36 @@
+/ tagged-concise-evidence / 571( {
+  / ce.ev-triples / 0 : {
+    / ce.evidence-triples / 0 : [
+      [ /** uses reference-triple-record schema **/
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-oid-type / 111(
+                h'6086480186F84D010F046301'
+              ), / 2.16.840.1.113741.1.15.4.99.1 /
+            / comid.vendor / 1 : "Intel Corporation",
+            / comid.model  / 2 : "TDX Seam"
+          }
+        },
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.attributes / -82 : [1, 2],
+              / comid.isvprodid / -85 : h'ABCD',
+              / comid.isvsvn / -73 : 6,
+              / comid.mrtee / -83 : [
+                [1, h'E45B72F5C0C0B572DB4D8D3AB7E97F368FF74E62347A824DECB67A84E5224D75']
+              ],
+              / comid.mrsigner / -84 : [
+                [1, h'E45B72F5C0C0B572DB4D8D3AB7E97F368FF74E62347A824DECB67A84E5224D75'],
+                [7, h'E45B72F5C0C0B572DB4D8D3AB7E97F368FF74E62347A824DECB67A84E5224D75E45B72F5C0C0B572DB4D8D3AB7E97F36']
+              ],
+              / tcb-eval-num / -86 : 11
+            },
+            2 : 554("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==\n-----END PUBLIC KEY-----")
+          }
+        ]
+      ]
+    ]
+  }
+} )
