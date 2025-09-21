@@ -45,7 +45,7 @@ func corimTags() cbor.TagSet {
 
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 		TimeTag:     cbor.EncTagRequired,
 	}
 	return encOpt.EncModeWithTags(corimTags())
@@ -53,7 +53,7 @@ func initCBOREncMode() (en cbor.EncMode, err error) {
 
 func initCBORDecMode() (dm cbor.DecMode, err error) {
 	decOpt := cbor.DecOptions{
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 		TimeTag:     cbor.DecTagRequired,
 	}
 	return decOpt.DecModeWithTags(corimTags())

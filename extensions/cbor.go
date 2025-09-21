@@ -15,7 +15,7 @@ var (
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
 		Sort:        cbor.SortCoreDeterministic,
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 		TimeTag:     cbor.EncTagRequired,
 	}
 	return encOpt.EncMode()
@@ -23,7 +23,7 @@ func initCBOREncMode() (en cbor.EncMode, err error) {
 
 func initCBORDecMode() (dm cbor.DecMode, err error) {
 	decOpt := cbor.DecOptions{
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 	}
 	return decOpt.DecMode()
 }
