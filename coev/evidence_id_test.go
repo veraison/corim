@@ -19,9 +19,9 @@ func TestEvidenceID_NewEvidenceID(t *testing.T) {
 
 func TestEvidenceID_SetUUID_OK(t *testing.T) {
 	ev := &EvidenceID{}
-	testUUID, err := uuid.Parse(TestUUIDString)
+	TestUUID, err := uuid.Parse(TestUUIDString)
 	require.NoError(t, err)
-	i := ev.SetUUID(testUUID)
+	i := ev.SetUUID(TestUUID)
 	require.NotNil(t, i)
 }
 
