@@ -39,6 +39,8 @@ var ComidMapExtensionPoints = []extensions.Point{
 	comid.ExtReferenceValueFlags,
 	comid.ExtEndorsedValue,
 	comid.ExtEndorsedValueFlags,
+	comid.ExtMval,
+	comid.ExtPSASwRelTriples,
 }
 
 // AllExtensionPoints is a list of all valid extension.Point's
