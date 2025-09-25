@@ -14,7 +14,7 @@ require (
 	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.2.1
-	github.com/veraison/swid v1.1.1-0.20230911094910-8ffdd07a22ca
+	github.com/veraison/swid v1.1.0
 )
 
 require (
@@ -35,3 +35,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/veraison/swid => github.com/Sukuna0007Abhi/swid v0.0.0-20250925122336-8afdc02a02bd

@@ -163,6 +163,14 @@ func (t AbbreviatedSwidTag) Valid() error {
 	if len(t.Entities) == 0 || t.Entities == nil {
 		return fmt.Errorf("no entities present, must have at least 1 entity")
 	}
+
+	// Validate Evidence field if present
+	if t.Evidence != nil {
+		if err := t.Evidence.Valid(); err != nil {
+			return fmt.Errorf("evidence validation failed: %w", err)
+		}
+	}
+
 	return nil
 }
 
