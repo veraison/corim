@@ -145,7 +145,7 @@ func (o *Coserv) Sign(signer cose.Signer) ([]byte, error) {
 }
 
 // Verify verifies the signature of a signed Coserv object using the supplied go-cose Verifier
-func (o *Coserv) Verify(cbor []byte, verifier cose.Verifier) error {
+func (o *Coserv) Verify(verifier cose.Verifier, cbor []byte) error {
 	var msg cose.Sign1Message
 	if err := msg.UnmarshalCBOR(cbor); err != nil {
 		return fmt.Errorf("CBOR decoding signed-coserv: %w", err)
