@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/go-cose"
 	"github.com/veraison/swid"
 )
 
@@ -392,4 +393,24 @@ func TestCoserv_results_ToCBOR_ok(t *testing.T) {
 	actual, err := tv.ToCBOR()
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
+}
+
+func TestCoserv_signed_roundtrip(t *testing.T) {
+	signer, verifier, err := getCOSESignerAndVerifier(t, testES256Key, cose.AlgorithmES256)
+	require.NoError(t, err)
+
+	var c0 Coserv
+	err = c0.FromCBOR(readTestVectorSlice(t, "rv-results.cbor"))
+	require.NoError(t, err)
+
+	signed, err := c0.Sign(signer)
+	require.NoError(t, err)
+
+	fmt.Printf("%x\n", signed)
+
+	var c1 Coserv
+	err = c1.Verify(signed, verifier)
+	require.NoError(t, err)
+
+	assert.Equal(t, c0, c1)
 }

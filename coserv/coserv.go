@@ -5,11 +5,13 @@
 package coserv
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/veraison/eat"
+	"github.com/veraison/go-cose"
 )
 
 // Coserv is the internal representation of a CoSERV data item
@@ -125,4 +127,49 @@ func (o *Coserv) FromBase64Url(s string) error {
 	}
 
 	return o.FromCBOR(data)
+}
+
+// Sign signs and serializes the target Coserv using the supplied go-cose Signer
+func (o *Coserv) Sign(signer cose.Signer) ([]byte, error) {
+	msg := cose.NewSignMessage()
+
+	msg.Headers.Protected[cose.HeaderLabelAlgorithm] = signer.Algorithm()
+	msg.Headers.Protected[cose.HeaderLabelContentType] = "application/coserv+cbor"
+
+	payload, err := o.ToCBOR()
+	if err != nil {
+		return nil, err
+	}
+
+	return cose.Sign1(rand.Reader, signer, msg.Headers, payload, nil)
+}
+
+// Verify verifies the signature of a signed Coserv object using the supplied go-cose Verifier
+func (o *Coserv) Verify(cbor []byte, verifier cose.Verifier) error {
+	var msg cose.Sign1Message
+	if err := msg.UnmarshalCBOR(cbor); err != nil {
+		return fmt.Errorf("CBOR decoding signed-coserv: %w", err)
+	}
+
+	if v, ok := msg.Headers.Protected[cose.HeaderLabelContentType]; ok {
+		if v != "application/coserv+cbor" {
+			return fmt.Errorf("unexpected content type in signed-coserv: %v", v)
+		}
+	} else {
+		return fmt.Errorf("missing mandatory cty parameter in signed-coserv protected headers")
+	}
+
+	if _, ok := msg.Headers.Protected[cose.HeaderLabelAlgorithm]; !ok {
+		return fmt.Errorf("missing mandatory alg parameter in signed-coserv protected headers")
+	}
+
+	if err := msg.Verify(nil, verifier); err != nil {
+		return fmt.Errorf("signed-coserv signature verification failed: %w", err)
+	}
+
+	if err := o.FromCBOR(msg.Payload); err != nil {
+		return fmt.Errorf("CBOR decoding signed-coserv payload: %w", err)
+	}
+
+	return nil
 }

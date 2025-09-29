@@ -4,6 +4,13 @@
 package coserv
 
 import (
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"math/big"
 	"os"
 	"path"
 	"testing"
@@ -11,6 +18,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/go-cose"
 	"github.com/veraison/swid"
 )
 
@@ -19,6 +27,13 @@ var (
 	testTimestamp, _ = time.Parse("2006-01-02T15:04:05Z", "2030-12-01T18:30:01Z")
 	testAuthority    = []byte{0xab, 0xcd, 0xef}
 	testBytes        = []byte{0x00, 0x11, 0x22, 0x33}
+	testES256Key     = []byte(`{
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+    "y": "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+    "d": "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE"
+    }`)
 )
 
 func readTestVectorSlice(t *testing.T, fname string) []byte {
@@ -155,4 +170,65 @@ func exampleReferenceValuesResultSet(t *testing.T) *ResultSet {
 		AddReferenceValues(rvq)
 
 	return rset
+}
+
+func getCOSESignerAndVerifier(t *testing.T, keyBytes []byte, alg cose.Algorithm) (cose.Signer, cose.Verifier, error) {
+	var key map[string]string
+
+	err := json.Unmarshal(keyBytes, &key)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pkey, err := getKey(key)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	signer, err := cose.NewSigner(alg, pkey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	verifier, err := cose.NewVerifier(alg, pkey.Public())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return signer, verifier, nil
+}
+
+func getKey(key map[string]string) (crypto.Signer, error) {
+	switch key["kty"] {
+	case "EC":
+		var c elliptic.Curve
+		switch key["crv"] {
+		case "P-256":
+			c = elliptic.P256()
+		case "P-384":
+			c = elliptic.P384()
+		case "P-521":
+			c = elliptic.P521()
+		default:
+			return nil, errors.New("unsupported EC curve: " + key["crv"])
+		}
+		pkey := &ecdsa.PrivateKey{
+			PublicKey: ecdsa.PublicKey{
+				X:     mustBase64ToBigInt(key["x"]),
+				Y:     mustBase64ToBigInt(key["y"]),
+				Curve: c,
+			},
+			D: mustBase64ToBigInt(key["d"]),
+		}
+		return pkey, nil
+	}
+	return nil, errors.New("unsupported key type: " + key["kty"])
+}
+
+func mustBase64ToBigInt(s string) *big.Int {
+	val, err := base64.RawURLEncoding.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return new(big.Int).SetBytes(val)
 }
