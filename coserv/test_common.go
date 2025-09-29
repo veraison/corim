@@ -199,8 +199,7 @@ func getCOSESignerAndVerifier(t *testing.T, keyBytes []byte, alg cose.Algorithm)
 }
 
 func getKey(key map[string]string) (crypto.Signer, error) {
-	switch key["kty"] {
-	case "EC":
+	if key["kty"] == "EC" {
 		var c elliptic.Curve
 		switch key["crv"] {
 		case "P-256":
