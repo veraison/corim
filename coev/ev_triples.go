@@ -15,6 +15,8 @@ import (
 type EvTriples struct {
 	EvidenceTriples   *comid.ValueTriples `cbor:"0,keyasint,omitempty" json:"evidence-triples,omitempty"`
 	IdentityTriples   *comid.KeyTriples   `cbor:"1,keyasint,omitempty" json:"identity-triples,omitempty"`
+	DependencyTriples *DependencyTriples  `cbor:"2,keyasint,omitempty" json:"dependency-triples,omitempty"`
+	MembershipTriples *MembershipTriples  `cbor:"3,keyasint,omitempty" json:"membership-triples,omitempty"`
 	CoSWIDTriples     *CoSWIDTriples      `cbor:"4,keyasint,omitempty" json:"coswid-triples,omitempty"`
 	AttestKeysTriples *comid.KeyTriples   `cbor:"5,keyasint,omitempty" json:"attestkey-triples,omitempty"`
 	Extensions
@@ -28,6 +30,8 @@ func (o EvTriples) Valid() error {
 	// Check if triples are set ?
 	if o.EvidenceTriples == nil &&
 		o.IdentityTriples == nil &&
+		o.DependencyTriples == nil &&
+		o.MembershipTriples == nil &&
 		o.CoSWIDTriples == nil &&
 		o.AttestKeysTriples == nil {
 		return errors.New("no Triples set inside EvTriples")
@@ -44,6 +48,18 @@ func (o EvTriples) Valid() error {
 			if err := identity.Valid(); err != nil {
 				return fmt.Errorf("invalid IdentityTriple at index: %d, %w", i, err)
 			}
+		}
+	}
+
+	if o.DependencyTriples != nil {
+		if err := o.DependencyTriples.Valid(); err != nil {
+			return fmt.Errorf("invalid DependencyTriples: %w", err)
+		}
+	}
+
+	if o.MembershipTriples != nil {
+		if err := o.MembershipTriples.Valid(); err != nil {
+			return fmt.Errorf("invalid MembershipTriples: %w", err)
 		}
 	}
 
@@ -109,6 +125,28 @@ func (o *EvTriples) AddAttestKeyTriple(val *comid.KeyTriple) *EvTriples {
 	return o
 }
 
+func (o *EvTriples) AddDependencyTriple(val *DependencyTriple) *EvTriples {
+	if o != nil {
+		if o.DependencyTriples == nil {
+			o.DependencyTriples = NewDependencyTriples()
+		}
+		o.DependencyTriples.Add(val)
+	}
+
+	return o
+}
+
+func (o *EvTriples) AddMembershipTriple(val *MembershipTriple) *EvTriples {
+	if o != nil {
+		if o.MembershipTriples == nil {
+			o.MembershipTriples = NewMembershipTriples()
+		}
+		o.MembershipTriples.Add(val)
+	}
+
+	return o
+}
+
 func (o *EvTriples) RegisterExtensions(exts extensions.Map) error {
 	EvidenceTriplesExts := extensions.NewMap()
 	for p, v := range exts {
@@ -156,7 +194,12 @@ func (o EvTriples) MarshalCBOR() ([]byte, error) {
 	if o.EvidenceTriples != nil && o.EvidenceTriples.IsEmpty() {
 		o.EvidenceTriples = nil
 	}
-	// as of now there are no further extensions in EvTriples
+	if o.DependencyTriples != nil && len(*o.DependencyTriples) == 0 {
+		o.DependencyTriples = nil
+	}
+	if o.MembershipTriples != nil && len(*o.MembershipTriples) == 0 {
+		o.MembershipTriples = nil
+	}
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -175,6 +218,12 @@ func (o EvTriples) MarshalJSON() ([]byte, error) {
 	// nil.
 	if o.EvidenceTriples != nil && o.EvidenceTriples.IsEmpty() {
 		o.EvidenceTriples = nil
+	}
+	if o.DependencyTriples != nil && len(*o.DependencyTriples) == 0 {
+		o.DependencyTriples = nil
+	}
+	if o.MembershipTriples != nil && len(*o.MembershipTriples) == 0 {
+		o.MembershipTriples = nil
 	}
 
 	return encoding.SerializeStructToJSON(o)
