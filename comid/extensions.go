@@ -18,6 +18,7 @@ const (
 	ExtCondEndorseSeriesValueFlags extensions.Point = "CondEndorseSeriesValueFlags"
 	ExtMval                        extensions.Point = "Mval"
 	ExtFlags                       extensions.Point = "Flags"
+	ExtPSASwRelTriples             extensions.Point = "PSASwRelTriples"
 )
 
 type IComidConstrainer interface {
