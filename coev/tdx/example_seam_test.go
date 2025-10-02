@@ -196,10 +196,9 @@ func Example_decode_CBOR() {
 	// mrsigner Digest Value: e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75
 	// mrsigner Digest Alg: 7
 	// mrsigner Digest Value: e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func ExtractSeamEvidence(ce *coev.TaggedConciseEvidence) error {

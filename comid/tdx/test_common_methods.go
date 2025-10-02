@@ -136,11 +136,13 @@ func extractTeeTcbEvalNum(tcbEvalNum *TeeTcbEvalNumber) error {
 }
 
 func decodeAuthorisedBy(m *comid.Measurement) error {
-	if err := m.AuthorizedBy.Valid(); err != nil {
-		return fmt.Errorf("invalid cryptokey: %w", err)
+	if m.AuthorizedBy == nil {
+		return fmt.Errorf("no authorized-by keys")
 	}
-	fmt.Printf("\nCryptoKey Type: %s", m.AuthorizedBy.Type())
-	fmt.Printf("\nCryptoKey Value: %s", m.AuthorizedBy.String())
+	if err := m.AuthorizedBy.Valid(); err != nil {
+		return fmt.Errorf("invalid cryptokeys: %w", err)
+	}
+	fmt.Printf("\nCryptoKeys: %s", m.AuthorizedBy.String())
 	return nil
 }
 

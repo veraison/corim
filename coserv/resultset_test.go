@@ -17,7 +17,7 @@ func TestResultSet_AddAttestationKeys(t *testing.T) {
 	require.NoError(t, err)
 
 	akq := AKQuad{
-		Authorities: &[]comid.CryptoKey{*authority},
+		Authorities: comid.NewCryptoKeys().Add(authority),
 		AKTriple: &comid.KeyTriple{
 			Environment: comid.Environment{
 				Class: comid.NewClassBytes(testBytes),

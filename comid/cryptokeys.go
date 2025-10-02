@@ -35,3 +35,20 @@ func (o CryptoKeys) Valid() error {
 	}
 	return nil
 }
+
+// String returns a string representation of all CryptoKeys
+func (o CryptoKeys) String() string {
+	if len(o) == 0 {
+		return "[]"
+	}
+
+	result := "["
+	for i, key := range o {
+		if i > 0 {
+			result += ", "
+		}
+		result += key.String()
+	}
+	result += "]"
+	return result
+}

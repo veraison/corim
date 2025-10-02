@@ -58,10 +58,9 @@ func Example_decode_QE_JSON() {
 	// Tee AdvisoryID = SA-00078
 	// Tee AdvisoryID = SA-00077
 	// Tee AdvisoryID = SA-00079
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func extractQERefVals(c *comid.Comid) error {
@@ -174,8 +173,7 @@ func Example_decode_QE_CBOR() {
 	// TeeAdvisory Operator: member
 	// Tee AdvisoryID = INTEL-SA-00078
 	// Tee AdvisoryID = INTEL-SA-00079
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }

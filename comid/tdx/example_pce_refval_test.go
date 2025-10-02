@@ -76,10 +76,9 @@ func Example_decode_PCE_JSON() {
 	// SVN Value: 10
 	// SVN Operator: greater_or_equal
 	// SVN Value: 10
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func extractPCERefVals(c *comid.Comid) error {
@@ -166,10 +165,9 @@ func Example_decode_PCE_CBOR() {
 	// SVN Value: 0
 	// SVN Operator: greater_or_equal
 	// SVN Value: 0
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func Example_encode_tdx_pce_refval_with_profile() {

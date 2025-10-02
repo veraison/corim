@@ -213,10 +213,9 @@ func Example_decode_PCE_Evidence_CBOR() {
 	// ISVSVN: 0
 	// ISVSVN: 0
 	// ISVSVN: 0
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func ExtractPceEvidence(ce *coev.TaggedConciseEvidence) error {

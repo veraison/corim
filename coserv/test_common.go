@@ -161,7 +161,7 @@ func exampleReferenceValuesResultSet(t *testing.T) *ResultSet {
 	require.NoError(t, err)
 
 	rvq := RefValQuad{
-		Authorities: &[]comid.CryptoKey{*authority},
+		Authorities: comid.NewCryptoKeys().Add(authority),
 		RVTriple:    &refval,
 	}
 

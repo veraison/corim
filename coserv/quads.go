@@ -6,11 +6,11 @@ package coserv
 import "github.com/veraison/corim/comid"
 
 type RefValQuad struct {
-	Authorities *[]comid.CryptoKey `cbor:"1,keyasint"`
+	Authorities *comid.CryptoKeys  `cbor:"1,keyasint"`
 	RVTriple    *comid.ValueTriple `cbor:"2,keyasint"`
 }
 
 type AKQuad struct {
-	Authorities *[]comid.CryptoKey `cbor:"1,keyasint"`
-	AKTriple    *comid.KeyTriple   `cbor:"2,keyasint"`
+	Authorities *comid.CryptoKeys `cbor:"1,keyasint"`
+	AKTriple    *comid.KeyTriple  `cbor:"2,keyasint"`
 }

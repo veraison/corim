@@ -493,9 +493,9 @@ func (o Mval) Valid() error {
 
 // Measurement stores a measurement-map with CBOR and JSON serializations.
 type Measurement struct {
-	Key          *Mkey      `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
-	Val          Mval       `cbor:"1,keyasint" json:"value"`
-	AuthorizedBy *CryptoKey `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
+	Key          *Mkey       `cbor:"0,keyasint,omitempty" json:"key,omitempty"`
+	Val          Mval        `cbor:"1,keyasint" json:"value"`
+	AuthorizedBy *CryptoKeys `cbor:"2,keyasint,omitempty" json:"authorized-by,omitempty"`
 }
 
 func NewMeasurement(val any, typ string) (*Measurement, error) {
