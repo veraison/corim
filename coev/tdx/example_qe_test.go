@@ -48,10 +48,9 @@ func Example_decode_QE_Evidence_JSON() {
 	// TEE TCB Status = UpToDate
 	// Tee AdvisoryID = INTEL-SA-00078
 	// Tee AdvisoryID = INTEL-SA-00079
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func Example_encode_tdx_qe_evidence_without_profile() {
@@ -201,10 +200,9 @@ func Example_decode_QE_Evidence_CBOR() {
 	// TEE TCB Status = UpToDate
 	// Tee AdvisoryID = INTEL-SA-00078
 	// Tee AdvisoryID = INTEL-SA-00079
-	// CryptoKey Type: pkix-base64-key
-	// CryptoKey Value: -----BEGIN PUBLIC KEY-----
+	// CryptoKeys: [-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFn0taoAwR3PmrKkYLtAsD9o05KSM6mbgfNCgpuL0g6VpTHkZl73wk5BDxoV7n+Oeee0iIqkW3HMZT3ETiniJdg==
-	// -----END PUBLIC KEY-----
+	// -----END PUBLIC KEY-----]
 }
 
 func ExtractQeEvidence(ce *coev.TaggedConciseEvidence) error {
