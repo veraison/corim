@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/swid"
 )
 
 //nolint:lll
@@ -19,4 +20,5 @@ var (
 	TestDeviceID   = "BAD809B1-7032-43D9-8F94-BF128E5D061D"
 	TestKey        = true
 	TestDate, _    = time.Parse(time.RFC3339, "1970-01-01T00:00:00Z")
+	TestEvidence   = swid.Evidence{Date: TestDate, DeviceID: TestDeviceID}
 )
