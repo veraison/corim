@@ -41,7 +41,7 @@ func (o CryptoKeys) String() string {
 	if len(o) == 0 {
 		return "[]"
 	}
-	
+
 	result := "["
 	for i, key := range o {
 		if i > 0 {
