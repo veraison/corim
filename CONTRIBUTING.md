@@ -1,6 +1,9 @@
 ### Contributing
 
-Thank you for your interest in contributing to this project! We welcome and appreciate all forms of contribution—bug fixes, new features, documentation improvements, and tests. Following these guidelines helps ensure a smooth and efficient review process.
+Thank you for your interest in contributing to this project! We welcome and
+appreciate all forms of contribution—bug fixes, new features, documentation
+improvements, and tests. Following these guidelines helps ensure a smooth and
+efficient review process.
 
 ---
 
