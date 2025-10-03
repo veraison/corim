@@ -11,9 +11,9 @@ import (
 )
 
 type ResultSet struct {
-	RVQ *[]RefValQuad `cbor:"0,keyasint,omitempty"`
-	AKQ *[]AKQuad     `cbor:"3,keyasint,omitempty"`
-	// TODO(tho) add endorsed values
+	RVQ *[]RefValQuad      `cbor:"0,keyasint,omitempty"`
+	EVQ *[]EndorsedValQuad `cbor:"1,keyasint,omitempty"`
+	AKQ *[]AKQuad          `cbor:"3,keyasint,omitempty"`
 	// TODO(tho) add CoTS
 	Expiry          *time.Time `cbor:"10,keyasint"`
 	SourceArtifacts *[]cmw.CMW `cbor:"11,keyasint,omitempty"`
@@ -31,6 +31,17 @@ func (o *ResultSet) AddReferenceValues(v RefValQuad) *ResultSet {
 	}
 
 	*o.RVQ = append(*o.RVQ, v)
+
+	return o
+}
+
+// AddEndorsedValues adds the supplied endorsed-values quad to the target ResultSet
+func (o *ResultSet) AddEndorsedValues(v EndorsedValQuad) *ResultSet {
+	if o.EVQ == nil {
+		o.EVQ = new([]EndorsedValQuad)
+	}
+
+	*o.EVQ = append(*o.EVQ, v)
 
 	return o
 }
@@ -68,6 +79,7 @@ func (o ResultSet) Valid() error {
 	if o.Expiry == nil {
 		return errors.New("missing mandatory expiry")
 	}
+	// Nothing else to validate structurally here; combinations are checked at Coserv level
 	// The coherency between query and results must be checked by the Coserv's
 	// Valid()
 	return nil

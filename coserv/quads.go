@@ -10,6 +10,13 @@ type RefValQuad struct {
 	RVTriple    *comid.ValueTriple `cbor:"2,keyasint"`
 }
 
+// EndorsedValQuad represents an endorsed-values result quad as per CoSERV
+// It mirrors RefValQuad but carries endorsed values instead of reference values
+type EndorsedValQuad struct {
+	Authorities *[]comid.CryptoKey `cbor:"1,keyasint"`
+	EVTriple    *comid.ValueTriple `cbor:"2,keyasint"`
+}
+
 type AKQuad struct {
 	Authorities *[]comid.CryptoKey `cbor:"1,keyasint"`
 	AKTriple    *comid.KeyTriple   `cbor:"2,keyasint"`
