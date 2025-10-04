@@ -14,7 +14,7 @@ require (
 	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.2.1
-	github.com/veraison/swid v1.1.1-0.20230911094910-8ffdd07a22ca
+	github.com/veraison/swid v1.1.1-0.20251003121634-fd1f7f1e1897
 )
 
 require (
