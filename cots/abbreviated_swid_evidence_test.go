@@ -13,7 +13,7 @@ import (
 
 func TestAbbreviatedSwidTag_Valid_WithEvidence_Success(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
-	
+
 	tag, err := NewTag("test-tag-id", "Test Software", "1.0.0")
 	assert.NoError(t, err)
 
