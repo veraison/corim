@@ -13,7 +13,7 @@ import (
 
 func TestCoSWIDEvidenceMap_Valid_Success(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
-	
+
 	evidenceMap := CoSWIDEvidenceMap{
 		Evidence: swid.Evidence{
 			DeviceID: "test-device-123",
@@ -27,7 +27,7 @@ func TestCoSWIDEvidenceMap_Valid_Success(t *testing.T) {
 
 func TestCoSWIDEvidenceMap_Valid_WithTagID(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
-	
+
 	evidenceMap := CoSWIDEvidenceMap{
 		TagID: swid.NewTagID("test-tag-id"),
 		Evidence: swid.Evidence{
@@ -55,7 +55,7 @@ func TestCoSWIDEvidenceMap_Valid_InvalidEvidence(t *testing.T) {
 func TestCoSWIDEvidenceMap_Valid_InvalidTagID(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
 	emptyTagID := &swid.TagID{} // Empty TagID - should be invalid
-	
+
 	evidenceMap := CoSWIDEvidenceMap{
 		TagID: emptyTagID,
 		Evidence: swid.Evidence{
@@ -71,7 +71,7 @@ func TestCoSWIDEvidenceMap_Valid_InvalidTagID(t *testing.T) {
 
 func TestCoSWIDEvidence_Valid_Success(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
-	
+
 	evidence := CoSWIDEvidence{
 		CoSWIDEvidenceMap{
 			Evidence: swid.Evidence{
@@ -96,12 +96,12 @@ func TestCoSWIDEvidence_Valid_EmptySlice(t *testing.T) {
 
 	err := evidence.Valid()
 	assert.Error(t, err, "Empty evidence slice should fail validation")
-	assert.Contains(t, err.Error(), "no evidence entries to validate")
+	assert.Contains(t, err.Error(), "must contain at least one entry")
 }
 
 func TestCoSWIDEvidence_Valid_InvalidEntry(t *testing.T) {
 	validDate := time.Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
-	
+
 	evidence := CoSWIDEvidence{
 		CoSWIDEvidenceMap{
 			Evidence: swid.Evidence{
