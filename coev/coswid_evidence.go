@@ -5,6 +5,7 @@ package coev
 
 import (
 	"fmt"
+
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/swid"
 )
@@ -31,7 +32,7 @@ func (o *CoSWIDEvidence) AddCoSWIDEvidenceMap(e *CoSWIDEvidenceMap) *CoSWIDEvide
 }
 
 // Valid validates the CoSWIDEvidenceMap structure
-func (o CoSWIDEvidenceMap) Valid() error {
+func (o *CoSWIDEvidenceMap) Valid() error {
 	// Validate TagID if present
 	if o.TagID != nil {
 		if err := o.TagID.Valid(); err != nil {
@@ -53,8 +54,8 @@ func (o CoSWIDEvidence) Valid() error {
 		return fmt.Errorf("must contain at least one entry")
 	}
 
-	for i, evidenceMap := range o {
-		if err := evidenceMap.Valid(); err != nil {
+	for i := range o {
+		if err := o[i].Valid(); err != nil {
 			return fmt.Errorf("evidence[%d] validation failed: %w", i, err)
 		}
 	}
