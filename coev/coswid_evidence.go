@@ -50,7 +50,7 @@ func (o CoSWIDEvidenceMap) Valid() error {
 // Valid validates all CoSWIDEvidenceMap entries in the CoSWIDEvidence slice
 func (o CoSWIDEvidence) Valid() error {
 	if len(o) == 0 {
-		return fmt.Errorf("no evidence entries to validate")
+		return fmt.Errorf("must contain at least one entry")
 	}
 
 	for i, evidenceMap := range o {
