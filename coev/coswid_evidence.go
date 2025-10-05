@@ -5,6 +5,7 @@ package coev
 
 import (
 	"fmt"
+	"errors"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/swid"
@@ -40,7 +41,7 @@ func (o *CoSWIDEvidenceMap) Valid() error {
 		}
 	}
 
-	// Validate Evidence using the swid.Evidence.Valid() method
+	// Validate Evidence
 	if err := o.Evidence.Valid(); err != nil {
 		return fmt.Errorf("evidence validation failed: %w", err)
 	}
@@ -48,10 +49,10 @@ func (o *CoSWIDEvidenceMap) Valid() error {
 	return nil
 }
 
-// Valid validates all CoSWIDEvidenceMap entries in the CoSWIDEvidence slice
+// Valid validates all CoSWIDEvidence entries  
 func (o CoSWIDEvidence) Valid() error {
 	if len(o) == 0 {
-		return fmt.Errorf("must contain at least one entry")
+		return errors.New("must contain at least one entry")
 	}
 
 	for i := range o {
