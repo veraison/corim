@@ -57,7 +57,7 @@ func (o CoSWIDTriple) Valid() error {
 		return errors.New("no evidence entry in the CoSWIDTriple")
 	}
 
-	// Validate Evidence entries using the new Valid() method
+	// Validate Evidence entries
 	if err := o.Evidence.Valid(); err != nil {
 		return fmt.Errorf("evidence validation failed: %w", err)
 	}
