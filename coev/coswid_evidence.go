@@ -4,8 +4,9 @@
 package coev
 
 import (
-  "fmt"
-  "errors"
+	"errors"
+	"fmt"
+
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/swid"
 )
@@ -48,7 +49,7 @@ func (o *CoSWIDEvidenceMap) Valid() error {
 	return nil
 }
 
-// Valid validates all CoSWIDEvidence entries  
+// Valid validates all CoSWIDEvidence entries
 func (o CoSWIDEvidence) Valid() error {
 	if len(o) == 0 {
 		return errors.New("must contain at least one entry")
