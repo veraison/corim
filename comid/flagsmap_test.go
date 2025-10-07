@@ -22,6 +22,7 @@ func Test_FlagsMap(t *testing.T) {
 		FlagIsRuntimeMeasured,
 		FlagIsImmutable,
 		FlagIsTcb,
+		FlagIsConfidentialityProtected,
 	} {
 		fm.SetTrue(flag)
 		assert.True(t, fm.AnySet())
