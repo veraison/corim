@@ -15,15 +15,15 @@ import (
 // It contains various types of membership information that can be associated
 // with an environment.
 type MemberVal struct {
-	GroupID        *string     `cbor:"0,keyasint,omitempty" json:"group-id,omitempty"`
-	GroupName      *string     `cbor:"1,keyasint,omitempty" json:"group-name,omitempty"`
-	Role           *string     `cbor:"2,keyasint,omitempty" json:"role,omitempty"`
-	Status         *string     `cbor:"3,keyasint,omitempty" json:"status,omitempty"`
-	Permissions    *[]string   `cbor:"4,keyasint,omitempty" json:"permissions,omitempty"`
-	OrganizationID *string     `cbor:"5,keyasint,omitempty" json:"organization-id,omitempty"`
-	UEID           *eat.UEID   `cbor:"6,keyasint,omitempty" json:"ueid,omitempty"`
-	UUID           *UUID       `cbor:"7,keyasint,omitempty" json:"uuid,omitempty"`
-	Name           *string     `cbor:"8,keyasint,omitempty" json:"name,omitempty"`
+	GroupID        *string   `cbor:"0,keyasint,omitempty" json:"group-id,omitempty"`
+	GroupName      *string   `cbor:"1,keyasint,omitempty" json:"group-name,omitempty"`
+	Role           *string   `cbor:"2,keyasint,omitempty" json:"role,omitempty"`
+	Status         *string   `cbor:"3,keyasint,omitempty" json:"status,omitempty"`
+	Permissions    *[]string `cbor:"4,keyasint,omitempty" json:"permissions,omitempty"`
+	OrganizationID *string   `cbor:"5,keyasint,omitempty" json:"organization-id,omitempty"`
+	UEID           *eat.UEID `cbor:"6,keyasint,omitempty" json:"ueid,omitempty"`
+	UUID           *UUID     `cbor:"7,keyasint,omitempty" json:"uuid,omitempty"`
+	Name           *string   `cbor:"8,keyasint,omitempty" json:"name,omitempty"`
 	Extensions
 }
 
@@ -52,7 +52,7 @@ func (o *MemberVal) UnmarshalCBOR(data []byte) error {
 }
 
 // MarshalCBOR serializes to CBOR
-func (o MemberVal) MarshalCBOR() ([]byte, error) {
+func (o *MemberVal) MarshalCBOR() ([]byte, error) {
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -62,7 +62,7 @@ func (o *MemberVal) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON serializes to JSON
-func (o MemberVal) MarshalJSON() ([]byte, error) {
+func (o *MemberVal) MarshalJSON() ([]byte, error) {
 	return encoding.SerializeStructToJSON(o)
 }
 
@@ -139,7 +139,7 @@ func (o *MemberVal) SetName(name string) *MemberVal {
 }
 
 // Valid returns an error if none of the membership values are set and the Extensions are empty.
-func (o MemberVal) Valid() error {
+func (o *MemberVal) Valid() error {
 	// Check if no membership values are set
 	if o.GroupID == nil &&
 		o.GroupName == nil &&

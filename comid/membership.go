@@ -69,12 +69,12 @@ func (o *Membership) RegisterExtensions(exts extensions.Map) error {
 	return o.Val.RegisterExtensions(exts)
 }
 
-func (o Membership) GetExtensions() extensions.IMapValue {
+func (o *Membership) GetExtensions() extensions.IMapValue {
 	return o.Val.GetExtensions()
 }
 
 // Valid validates the Membership.
-func (o Membership) Valid() error {
+func (o *Membership) Valid() error {
 	if o.Key != nil {
 		if err := o.Key.Valid(); err != nil {
 			return fmt.Errorf("invalid measurement key: %w", err)
@@ -113,16 +113,16 @@ func (o *Memberships) Add(val *Membership) *Memberships {
 	return (*Memberships)(ret)
 }
 
-func (o Memberships) MarshalCBOR() ([]byte, error) {
-	return (extensions.Collection[Membership, *Membership])(o).MarshalCBOR()
+func (o *Memberships) MarshalCBOR() ([]byte, error) {
+	return (*extensions.Collection[Membership, *Membership])(o).MarshalCBOR()
 }
 
 func (o *Memberships) UnmarshalCBOR(data []byte) error {
 	return (*extensions.Collection[Membership, *Membership])(o).UnmarshalCBOR(data)
 }
 
-func (o Memberships) MarshalJSON() ([]byte, error) {
-	return (extensions.Collection[Membership, *Membership])(o).MarshalJSON()
+func (o *Memberships) MarshalJSON() ([]byte, error) {
+	return (*extensions.Collection[Membership, *Membership])(o).MarshalJSON()
 }
 
 func (o *Memberships) UnmarshalJSON(data []byte) error {

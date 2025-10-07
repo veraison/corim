@@ -227,6 +227,6 @@ func Test_membershipTriple_RealWorldScenario(t *testing.T) {
 	assert.Contains(t, string(jsonData), "security-officer")
 	assert.Contains(t, string(jsonData), "Enterprise Corp")
 
-	fmt.Printf("Enterprise membership scenario: %d bytes CBOR, %d bytes JSON\n", 
+	fmt.Printf("Enterprise membership scenario: %d bytes CBOR, %d bytes JSON\n",
 		len(cborData), len(jsonData))
 }

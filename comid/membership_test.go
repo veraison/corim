@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 func TestMemberVal_SettersAndGetters(t *testing.T) {
@@ -42,9 +41,8 @@ func TestMemberVal_SettersAndGetters(t *testing.T) {
 	assert.Equal(t, "org-123", *memberVal.OrganizationID)
 
 	// Test SetUEID
-	testUEID := eat.UEID(TestUEID)
-	memberVal.SetUEID(testUEID)
-	assert.Equal(t, testUEID, *memberVal.UEID)
+	memberVal.SetUEID(TestUEID)
+	assert.Equal(t, TestUEID, *memberVal.UEID)
 
 	// Test SetUUID
 	memberVal.SetUUID(TestUUID)
@@ -73,8 +71,7 @@ func TestMemberVal_Valid_EmptyValues(t *testing.T) {
 
 func TestMemberVal_Valid_WithValidUEID(t *testing.T) {
 	memberVal := MemberVal{}
-	testUEID := eat.UEID(TestUEID)
-	memberVal.SetUEID(testUEID)
+	memberVal.SetUEID(TestUEID)
 
 	err := memberVal.Valid()
 	assert.NoError(t, err)

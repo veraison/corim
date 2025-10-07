@@ -28,7 +28,7 @@ func (o *MembershipTriple) GetExtensions() extensions.IMapValue {
 	return o.Memberships.GetExtensions()
 }
 
-func (o MembershipTriple) Valid() error {
+func (o *MembershipTriple) Valid() error {
 	if err := o.Environment.Valid(); err != nil {
 		return fmt.Errorf("environment validation failed: %w", err)
 	}
@@ -60,8 +60,8 @@ func (o *MembershipTriples) GetExtensions() extensions.IMapValue {
 	return (*extensions.Collection[MembershipTriple, *MembershipTriple])(o).GetExtensions()
 }
 
-func (o MembershipTriples) Valid() error {
-	return (extensions.Collection[MembershipTriple, *MembershipTriple])(o).Valid()
+func (o *MembershipTriples) Valid() error {
+	return (*extensions.Collection[MembershipTriple, *MembershipTriple])(o).Valid()
 }
 
 func (o *MembershipTriples) IsEmpty() bool {
@@ -73,16 +73,16 @@ func (o *MembershipTriples) Add(val *MembershipTriple) *MembershipTriples {
 	return (*MembershipTriples)(ret)
 }
 
-func (o MembershipTriples) MarshalCBOR() ([]byte, error) {
-	return (extensions.Collection[MembershipTriple, *MembershipTriple])(o).MarshalCBOR()
+func (o *MembershipTriples) MarshalCBOR() ([]byte, error) {
+	return (*extensions.Collection[MembershipTriple, *MembershipTriple])(o).MarshalCBOR()
 }
 
 func (o *MembershipTriples) UnmarshalCBOR(data []byte) error {
 	return (*extensions.Collection[MembershipTriple, *MembershipTriple])(o).UnmarshalCBOR(data)
 }
 
-func (o MembershipTriples) MarshalJSON() ([]byte, error) {
-	return (extensions.Collection[MembershipTriple, *MembershipTriple])(o).MarshalJSON()
+func (o *MembershipTriples) MarshalJSON() ([]byte, error) {
+	return (*extensions.Collection[MembershipTriple, *MembershipTriple])(o).MarshalJSON()
 }
 
 func (o *MembershipTriples) UnmarshalJSON(data []byte) error {
