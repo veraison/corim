@@ -11,7 +11,7 @@ import (
 var PSARefValIDType = "psa.refval-id"
 
 // PSARefValID stores a PSA refval-id with CBOR and JSON serializations
-// (See https://datatracker.ietf.org/doc/html/draft-xyz-rats-psa-endorsements)
+// (See https://datatracker.ietf.org/doc/html/draft-fdb-rats-psa-endorsements-08)
 type PSARefValID struct {
 	Label    *string `cbor:"1,keyasint,omitempty" json:"label,omitempty"`
 	Version  *string `cbor:"4,keyasint,omitempty" json:"version,omitempty"`
