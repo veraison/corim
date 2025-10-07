@@ -39,7 +39,7 @@ func TestResultSet_AddCoTS(t *testing.T) {
 
 	// Create a simple CoTS structure for testing
 	cotsStore := cots.NewConciseTaStore()
-	
+
 	// Add a basic environment group with a class
 	class := comid.NewClassBytes(testBytes)
 	env := comid.Environment{
@@ -48,7 +48,7 @@ func TestResultSet_AddCoTS(t *testing.T) {
 	eg := cots.EnvironmentGroup{}
 	eg.SetEnvironment(env)
 	cotsStore.AddEnvironmentGroup(eg)
-	
+
 	// Add trust anchor keys
 	testCert := []byte{0x30, 0x82, 0x01, 0x00} // Simple test cert bytes
 	tas := cots.NewTasAndCas()

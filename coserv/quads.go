@@ -19,6 +19,6 @@ type AKQuad struct {
 }
 
 type CoTSStmt struct {
-	Authorities *comid.CryptoKeys      `cbor:"1,keyasint"`
-	CoTS        *cots.ConciseTaStore   `cbor:"2,keyasint"`
+	Authorities *comid.CryptoKeys    `cbor:"1,keyasint"`
+	CoTS        *cots.ConciseTaStore `cbor:"2,keyasint"`
 }
