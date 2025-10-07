@@ -13,8 +13,8 @@ import (
 type ResultSet struct {
 	RVQ *[]RefValQuad `cbor:"0,keyasint,omitempty"`
 	AKQ *[]AKQuad     `cbor:"3,keyasint,omitempty"`
+	TAS *[]CoTSStmt   `cbor:"4,keyasint,omitempty"`
 	// TODO(tho) add endorsed values
-	// TODO(tho) add CoTS
 	Expiry          *time.Time `cbor:"10,keyasint"`
 	SourceArtifacts *[]cmw.CMW `cbor:"11,keyasint,omitempty"`
 }
@@ -42,6 +42,17 @@ func (o *ResultSet) AddAttestationKeys(v AKQuad) *ResultSet {
 	}
 
 	*o.AKQ = append(*o.AKQ, v)
+
+	return o
+}
+
+// AddCoTS adds the supplied CoTS statement to the target ResultSet
+func (o *ResultSet) AddCoTS(v CoTSStmt) *ResultSet {
+	if o.TAS == nil {
+		o.TAS = new([]CoTSStmt)
+	}
+
+	*o.TAS = append(*o.TAS, v)
 
 	return o
 }
