@@ -18,7 +18,7 @@ func TestComid_AddMembershipTriple_Success(t *testing.T) {
 	memberVal.SetGroupID("group-1").SetRole("admin").SetStatus("active")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{
@@ -43,7 +43,7 @@ func TestComid_AddMembershipTriple_Validation(t *testing.T) {
 	memberVal.SetGroupID("group-1").SetRole("admin")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{
@@ -67,7 +67,7 @@ func TestTriples_AddMembershipTriple_Success(t *testing.T) {
 	memberVal.SetGroupID("group-1").SetRole("admin")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{
@@ -91,7 +91,7 @@ func TestTriples_Valid_WithMembershipTriples(t *testing.T) {
 	memberVal.SetGroupID("group-1").SetRole("admin")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{
@@ -115,7 +115,7 @@ func TestTriples_CBOR_RoundTrip_WithMembershipTriples(t *testing.T) {
 	memberVal.SetGroupID("group-1").SetRole("admin")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{
@@ -160,7 +160,7 @@ func TestComid_Full_Example_WithMembershipTriple(t *testing.T) {
 		SetOrganizationID("test-corp")
 
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	triple := &MembershipTriple{
 		Environment: Environment{

@@ -58,9 +58,9 @@ func MustNewUintMembership(u uint64) *Membership {
 }
 
 // SetValue sets the membership value.
-func (o *Membership) SetValue(val MemberVal) *Membership {
+func (o *Membership) SetValue(val *MemberVal) *Membership {
 	if o != nil {
-		o.Val = val
+		o.Val = *val
 	}
 	return o
 }

@@ -167,7 +167,7 @@ func TestMembership_SetValue(t *testing.T) {
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1")
 
-	result := membership.SetValue(memberVal)
+	result := membership.SetValue(&memberVal)
 	assert.Equal(t, membership, result)
 	assert.Equal(t, memberVal, membership.Val)
 }
@@ -177,7 +177,7 @@ func TestMembership_Valid_Success(t *testing.T) {
 
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1")
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	err := membership.Valid()
 	assert.NoError(t, err)
@@ -188,7 +188,7 @@ func TestMembership_Valid_InvalidValue(t *testing.T) {
 
 	// Empty MemberVal should be invalid
 	memberVal := MemberVal{}
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	err := membership.Valid()
 	assert.Error(t, err)
@@ -206,7 +206,7 @@ func TestMemberships_Add_Success(t *testing.T) {
 	membership := MustNewUUIDMembership(TestUUID)
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1")
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	result := memberships.Add(membership)
 	assert.Equal(t, memberships, result)
@@ -219,7 +219,7 @@ func TestMemberships_Valid_Success(t *testing.T) {
 	membership := MustNewUUIDMembership(TestUUID)
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1")
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	memberships.Add(membership)
 
@@ -240,7 +240,7 @@ func TestMemberships_Valid_InvalidMembership(t *testing.T) {
 	membership := MustNewUUIDMembership(TestUUID)
 	// Add membership with empty value (invalid)
 	memberVal := MemberVal{}
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	memberships.Add(membership)
 
@@ -265,7 +265,7 @@ func TestMemberships_CBOR_RoundTrip(t *testing.T) {
 	membership := MustNewUUIDMembership(TestUUID)
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1").SetRole("admin")
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	original.Add(membership)
 
@@ -287,7 +287,7 @@ func TestMemberships_JSON_RoundTrip(t *testing.T) {
 	membership := MustNewUUIDMembership(TestUUID)
 	memberVal := MemberVal{}
 	memberVal.SetGroupID("group-1").SetRole("admin")
-	membership.SetValue(memberVal)
+	membership.SetValue(&memberVal)
 
 	original.Add(membership)
 

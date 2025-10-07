@@ -29,7 +29,7 @@ func Example_membershipTriple() {
 
 	// Create a membership keyed by UUID
 	membership := MustNewUUIDMembership(TestUUID)
-	membership.SetValue(adminMember)
+	membership.SetValue(&adminMember)
 
 	// Create a membership triple that associates an environment with memberships
 	triple := &MembershipTriple{
@@ -94,10 +94,10 @@ func Example_membershipTriple_multipleMembers() {
 
 	// Create memberships with different key types
 	adminMembership := MustNewUUIDMembership(TestUUID)
-	adminMembership.SetValue(adminMember)
+	adminMembership.SetValue(&adminMember)
 
 	userMembership := MustNewUUIDMembership(TestUUID)
-	userMembership.SetValue(userMember)
+	userMembership.SetValue(&userMember)
 
 	// Create membership collection
 	memberships := NewMemberships().
@@ -179,13 +179,13 @@ func Test_membershipTriple_RealWorldScenario(t *testing.T) {
 
 	// Create memberships
 	adminMembership := MustNewUUIDMembership(TestUUID)
-	adminMembership.SetValue(deviceAdmin)
+	adminMembership.SetValue(&deviceAdmin)
 
 	securityMembership := MustNewUintMembership(12345)
-	securityMembership.SetValue(securityOfficer)
+	securityMembership.SetValue(&securityOfficer)
 
 	userMembership := MustNewUintMembership(67890)
-	userMembership.SetValue(regularUser)
+	userMembership.SetValue(&regularUser)
 
 	// Create the environment (enterprise device)
 	environment := Environment{
