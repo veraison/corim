@@ -28,6 +28,7 @@ const (
 	FlagIsRuntimeMeasured
 	FlagIsImmutable
 	FlagIsTcb
+	FlagIsConfidentialityProtected
 )
 
 // FlagsMap describes a number of boolean operational modes. If a value is nil,
@@ -60,6 +61,10 @@ type FlagsMap struct {
 	// IsTcb indicates whether the measured environment is a trusted
 	// computing base.
 	IsTcb *bool `cbor:"8,keyasint,omitempty" json:"is-tcb,omitempty"`
+	// IsConfidentialityProtected indicates whether the measured environment
+	// is confidentiality protected. For example, if the measured environment consists of memory,
+	// the sensitive values in memory are encrypted.
+	IsConfidentialityProtected *bool `cbor:"9,keyasint,omitempty" json:"is-confidentiality-protected,omitempty"`
 
 	Extensions
 }
@@ -72,7 +77,8 @@ func NewFlagsMap() *FlagsMap {
 func (o FlagsMap) IsEmpty() bool {
 	if o.IsConfigured != nil || o.IsSecure != nil || o.IsRecovery != nil ||
 		o.IsDebug != nil || o.IsReplayProtected != nil || o.IsIntegrityProtected != nil ||
-		o.IsRuntimeMeasured != nil || o.IsImmutable != nil || o.IsTcb != nil {
+		o.IsRuntimeMeasured != nil || o.IsImmutable != nil || o.IsTcb != nil ||
+		o.IsConfidentialityProtected != nil {
 		return false
 	}
 
@@ -82,7 +88,8 @@ func (o FlagsMap) IsEmpty() bool {
 func (o *FlagsMap) AnySet() bool {
 	if o.IsConfigured != nil || o.IsSecure != nil || o.IsRecovery != nil || o.IsDebug != nil ||
 		o.IsReplayProtected != nil || o.IsIntegrityProtected != nil ||
-		o.IsRuntimeMeasured != nil || o.IsImmutable != nil || o.IsTcb != nil {
+		o.IsRuntimeMeasured != nil || o.IsImmutable != nil || o.IsTcb != nil ||
+		o.IsConfidentialityProtected != nil {
 		return true
 	}
 
@@ -110,6 +117,8 @@ func (o *FlagsMap) setFlag(value *bool, flags ...Flag) {
 			o.IsImmutable = value
 		case FlagIsTcb:
 			o.IsTcb = value
+		case FlagIsConfidentialityProtected:
+			o.IsConfidentialityProtected = value
 		default:
 			if value == &True {
 				o.setTrue(flag)
@@ -149,6 +158,8 @@ func (o *FlagsMap) Clear(flags ...Flag) {
 			o.IsImmutable = nil
 		case FlagIsTcb:
 			o.IsTcb = nil
+		case FlagIsConfidentialityProtected:
+			o.IsConfidentialityProtected = nil
 		default:
 			o.clear(flag)
 		}
@@ -175,6 +186,8 @@ func (o *FlagsMap) Get(flag Flag) *bool {
 		return o.IsImmutable
 	case FlagIsTcb:
 		return o.IsTcb
+	case FlagIsConfidentialityProtected:
+		return o.IsConfidentialityProtected
 	default:
 		return o.get(flag)
 	}
