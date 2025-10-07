@@ -315,6 +315,7 @@ var mkeyValueRegister = map[string]IMkeyFactory{
 	UintType:                NewMkeyUint,
 	PSARefValIDType:         NewMkeyPSARefvalID,
 	CCAPlatformConfigIDType: NewMkeyCCAPlatformConfigID,
+	CCARefValIDType:         NewMkeyCCARefValID,
 }
 
 // RegisterMkeyType registers a new IMKeyValue implementation
@@ -542,6 +543,27 @@ func MustNewPSAMeasurement(key any) *Measurement {
 		panic(err)
 	}
 
+	return ret
+}
+
+func NewCCAMeasurement(key any) (*Measurement, error) {
+	m, err := NewMeasurement(key, CCARefValIDType)
+	if err != nil {
+		return nil, err
+	}
+
+	if m.Val.Digests == nil {
+		m.Val.Digests = NewDigests()
+	}
+
+	return m, nil
+}
+
+func MustNewCCAMeasurement(key any) *Measurement {
+	ret, err := NewCCAMeasurement(key)
+	if err != nil {
+		panic(err)
+	}
 	return ret
 }
 
