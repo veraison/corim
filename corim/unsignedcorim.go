@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	cbor "github.com/fxamacker/cbor/v2"
@@ -412,6 +413,65 @@ func (o Locator) Valid() error {
 		if err := swid.ValidHashEntry(tp.HashAlgID, tp.HashValue); err != nil {
 			return fmt.Errorf("invalid locator thumbprint: %w", err)
 		}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements custom JSON marshaling for Locator to maintain
+// backward compatibility by using colon separator in thumbprint format
+// (e.g., "sha-256:hash" instead of "sha-256;hash")
+func (o Locator) MarshalJSON() ([]byte, error) {
+	type locatorAlias Locator
+
+	if o.Thumbprint == nil {
+		// No thumbprint, use default marshaling
+		return json.Marshal(locatorAlias(o))
+	}
+
+	// Create a temporary struct for JSON marshaling with string thumbprint
+	temp := struct {
+		Href       comid.TaggedURI `json:"href"`
+		Thumbprint string          `json:"thumbprint,omitempty"`
+	}{
+		Href: o.Href,
+	}
+
+	// Convert thumbprint format from semicolon to colon for backward compatibility
+	thumbprintStr := o.Thumbprint.String()
+	temp.Thumbprint = strings.Replace(thumbprintStr, ";", ":", 1)
+
+	return json.Marshal(temp)
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling for Locator to handle
+// both old format (colon) and new format (semicolon) thumbprints
+func (o *Locator) UnmarshalJSON(data []byte) error {
+	// Try to unmarshal into a temporary struct with string thumbprint
+	temp := struct {
+		Href       comid.TaggedURI `json:"href"`
+		Thumbprint string          `json:"thumbprint,omitempty"`
+	}{}
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	o.Href = temp.Href
+
+	if temp.Thumbprint != "" {
+		// Convert colon format to semicolon format for parsing
+		thumbprintStr := temp.Thumbprint
+		if strings.Contains(thumbprintStr, ":") && !strings.Contains(thumbprintStr, ";") {
+			thumbprintStr = strings.Replace(thumbprintStr, ":", ";", 1)
+		}
+
+		// Parse the (possibly converted) thumbprint string
+		he, err := swid.ParseHashEntry(thumbprintStr)
+		if err != nil {
+			return fmt.Errorf("invalid thumbprint format: %w", err)
+		}
+		o.Thumbprint = &he
 	}
 
 	return nil
