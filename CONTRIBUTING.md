@@ -111,3 +111,14 @@ the rationale behind them, and any relevant issue numbers (e.g., Closes #101).
 
 **Checklist:** Consider including a small checklist in your PR description
 (e.g., tests added/updated, documentation updated, code style checked).
+
+### 10. Prior to Merge
+
+Ensure all CI tests pass 
+
+Ensure the Pull Request is reviewed by at least two maintainers of the project.
+
+Incorporate all the review comments. In case of conflicting comments, 
+please schedule a meeting and coordinate among all reviewers to reach a consensus.
+
+Then only request maintainers to Merge the Pull Request
