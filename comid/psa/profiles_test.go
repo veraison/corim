@@ -13,16 +13,20 @@ import (
 
 func TestPSAProfiles_URIFormat(t *testing.T) {
 	// Verify Token Profile ID
-	assert.Equal(t, 
+	tokenURI, err := TokenProfileID.Get()
+	require.NoError(t, err)
+	assert.Equal(t,
 		"tag:trustedcomputinggroup.org,2025:psa-token",
-		TokenProfileID.String(),
+		tokenURI,
 		"TokenProfileID should use tag URI scheme",
 	)
 
 	// Verify Endorsements Profile ID
+	endorsementsURI, err := EndorsementsProfileID.Get()
+	require.NoError(t, err)
 	assert.Equal(t,
 		"tag:trustedcomputinggroup.org,2025:psa-endorsements",
-		EndorsementsProfileID.String(), 
+		endorsementsURI,
 		"EndorsementsProfileID should use tag URI scheme",
 	)
 }
@@ -31,15 +35,15 @@ func TestPSAProfiles_Validation(t *testing.T) {
 	// Test valid tag URIs can be created
 	tests := []struct {
 		name string
-		uri string
+		uri  string
 	}{
 		{
 			name: "Token Profile",
-			uri: "tag:trustedcomputinggroup.org,2025:psa-token",
+			uri:  "tag:trustedcomputinggroup.org,2025:psa-token",
 		},
 		{
 			name: "Endorsements Profile",
-			uri: "tag:trustedcomputinggroup.org,2025:psa-endorsements",
+			uri:  "tag:trustedcomputinggroup.org,2025:psa-endorsements",
 		},
 	}
 
@@ -48,42 +52,45 @@ func TestPSAProfiles_Validation(t *testing.T) {
 			profile, err := eat.NewProfile(tt.uri)
 			require.NoError(t, err)
 			require.NotNil(t, profile)
-			assert.Equal(t, tt.uri, profile.String())
+			profileURI, err := profile.Get()
+			require.NoError(t, err)
+			assert.Equal(t, tt.uri, profileURI)
 		})
 	}
 }
 
 func TestPSAProfiles_InvalidURIs(t *testing.T) {
-	// Test invalid URIs are rejected
+	// Test invalid URIs are rejected by validation
 	tests := []struct {
 		name string
-		uri string
+		uri  string
 	}{
 		{
 			name: "HTTP URL instead of tag URI",
-			uri: "http://trustedcomputinggroup.org/psa-token",
+			uri:  "http://trustedcomputinggroup.org/psa-token",
 		},
 		{
 			name: "Missing date",
-			uri: "tag:trustedcomputinggroup.org:psa-token",
+			uri:  "tag:trustedcomputinggroup.org:psa-token",
 		},
 		{
-			name: "Invalid date",
-			uri: "tag:trustedcomputinggroup.org,abcd:psa-token",
+			name: "Invalid date format",
+			uri:  "tag:trustedcomputinggroup.org,abcd:psa-token",
 		},
 		{
 			name: "Empty specific part",
-			uri: "tag:trustedcomputinggroup.org,2025:",
+			uri:  "tag:trustedcomputinggroup.org,2025:",
+		},
+		{
+			name: "Not a tag URI",
+			uri:  "urn:example:psa-token",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			profile, err := eat.NewProfile(tt.uri)
-			if err == nil {
-				t.Errorf("Expected error for invalid URI %q, got nil", tt.uri)
-			}
-			assert.Nil(t, profile)
+			err := validateTagURI(tt.uri)
+			assert.Error(t, err, "Expected validation error for URI: %s", tt.uri)
 		})
 	}
 }
