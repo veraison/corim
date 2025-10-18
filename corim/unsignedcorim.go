@@ -352,7 +352,7 @@ func (o Tag) Valid() error {
 	switch o.Number {
 	case ComidTag: // 506 - CoMID tag
 		return o.validateComidTag()
-	case CoswidTag: // 505 - CoSWID tag  
+	case CoswidTag: // 505 - CoSWID tag
 		return o.validateCoswidTag()
 	default:
 		// For unknown tags, just ensure the content is valid CBOR
@@ -366,11 +366,11 @@ func (o Tag) validateComidTag() error {
 	if err := dm.Unmarshal(o.Content, &c); err != nil {
 		return fmt.Errorf("invalid CoMID content: %w", err)
 	}
-	
+
 	if err := c.Valid(); err != nil {
 		return fmt.Errorf("CoMID validation failed: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -380,7 +380,7 @@ func (o Tag) validateCoswidTag() error {
 	if err := dm.Unmarshal(o.Content, &s); err != nil {
 		return fmt.Errorf("invalid CoSWID content: %w", err)
 	}
-	
+
 	// Basic validation - if unmarshaling succeeded, the structure is valid
 	// Additional validation could be added here if needed
 	return nil
