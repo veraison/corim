@@ -116,6 +116,10 @@ func Test_CryptoKey_NewCOSEKey(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, pub)
 
+	key, err = NewCOSEKey(nil)
+	assert.NoError(t, err)
+	assert.NotNil(t, key)
+
 	_, err = NewCOSEKey([]byte{})
 	assert.EqualError(t, err, "empty COSE_Key bytes")
 
