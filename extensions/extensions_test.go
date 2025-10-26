@@ -149,3 +149,22 @@ func Test_Extensions_IsEmpty(t *testing.T) {
 	exts.Register(&TestExtensions{Address: "123 Fake Street"})
 	assert.False(t, exts.IsEmpty())
 }
+
+func Test_Extensions_Values(t *testing.T) {
+	extStruct := struct {
+		Foo string `cbor:"0,keyasint,omitempty" json:"foo,omitempty"`
+		Bar int    `cbor:"1,keyasint,omitempty" json:"bar,omitempty"`
+	}{"baz", 42}
+
+	exts := Extensions{}
+	exts.Register(&extStruct)
+
+	vals := exts.Values()
+	assert.Len(t, vals, 2)
+	assert.Equal(t, ExtensionValue{CBORTag: "0", JSONTag: "foo", FieldName: "Foo", Value: "baz"}, vals[0])
+	assert.Equal(t, ExtensionValue{CBORTag: "1", JSONTag: "bar", FieldName: "Bar", Value: 42}, vals[1])
+
+	exts = Extensions{}
+	vals = exts.Values()
+	assert.Len(t, vals, 0)
+}

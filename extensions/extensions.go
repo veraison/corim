@@ -15,6 +15,13 @@ var ErrExtensionNotFound = errors.New("extension not found")
 
 type IMapValue any
 
+type ExtensionValue struct {
+	CBORTag   string
+	JSONTag   string
+	FieldName string
+	Value     any
+}
+
 type Extensions struct {
 	IMapValue `json:"extensions,omitempty"`
 }
@@ -87,6 +94,44 @@ func (o *Extensions) IsEmpty() bool {
 	}
 
 	return true
+}
+
+func (o *Extensions) Values() []ExtensionValue {
+	var ret []ExtensionValue
+	if o.IMapValue == nil {
+		return ret
+	}
+
+	extType := reflect.TypeOf(o.IMapValue)
+	extVal := reflect.ValueOf(o.IMapValue)
+	if extType.Kind() == reflect.Pointer {
+		extType = extType.Elem()
+		extVal = extVal.Elem()
+	}
+
+	var fieldJSONTag, fieldCBORTag string
+	for i := 0; i < extVal.NumField(); i++ {
+		typeField := extType.Field(i)
+
+		tag, ok := typeField.Tag.Lookup("json")
+		if ok {
+			fieldJSONTag = strings.Split(tag, ",")[0]
+		}
+
+		tag, ok = typeField.Tag.Lookup("cbor")
+		if ok {
+			fieldCBORTag = strings.Split(tag, ",")[0]
+		}
+
+		ret = append(ret, ExtensionValue{
+			CBORTag:   fieldCBORTag,
+			JSONTag:   fieldJSONTag,
+			FieldName: typeField.Name,
+			Value:     extVal.Field(i).Interface(),
+		})
+	}
+
+	return ret
 }
 
 func (o *Extensions) MustGetString(name string) string {
