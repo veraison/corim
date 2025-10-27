@@ -88,18 +88,25 @@ func TestDigests_Valid_empty(t *testing.T) {
 
 	assert.EqualError(t, d.Valid(), "digest at index 0: unknown hash algorithm 666")
 }
+
 func TestDigests_AddDigest_unknown_algo(t *testing.T) {
 	d := NewDigests()
 	require.NotNil(t, d)
 
-	assert.Nil(t, d.AddDigest(0, []byte("0 is a reserved value")))
+	assert.NotNil(t, d.AddDigest(0, []byte("0 is a reserved value")))
+
+	err := d.Valid()
+	assert.ErrorContains(t, err, "digest at index 0: unknown hash algorithm")
 }
 
 func TestDigests_AddDigest_inconsistent_length_for_algo(t *testing.T) {
 	d := NewDigests()
 	require.NotNil(t, d)
 
-	assert.Nil(t, d.AddDigest(swid.Sha3_512, MustHexDecode(t, "deadbeef")))
+	assert.NotNil(t, d.AddDigest(swid.Sha3_512, MustHexDecode(t, "deadbeef")))
+
+	err := d.Valid()
+	assert.ErrorContains(t, err, "digest at index 0: length mismatch")
 }
 
 func TestDigests_MarshalJSON(t *testing.T) {
