@@ -45,7 +45,7 @@ func corimTags() cbor.TagSet {
 
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 		TimeTag:     cbor.EncTagRequired,
 	}
 	return encOpt.EncModeWithTags(corimTags())

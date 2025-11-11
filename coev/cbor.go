@@ -39,7 +39,7 @@ func coevTags() cbor.TagSet {
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
 		Sort:        cbor.SortCoreDeterministic,
-		IndefLength: cbor.IndefLengthForbidden,
+		IndefLength: cbor.IndefLengthAllowed,
 		TimeTag:     cbor.EncTagRequired,
 	}
 	return encOpt.EncModeWithTags(coevTags())
