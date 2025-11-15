@@ -165,7 +165,7 @@ func TestClassID_UnmarshalCBOR_full(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, actual.ClassID)
-	//assert.Equal(t, b64TestImplID(), actual.ClassID.String())
+	assert.Equal(t, b64TestImplID(), actual.ClassID.String())
 	assert.NotNil(t, actual.Vendor)
 	assert.Equal(t, "EMCA Ltd", actual.GetVendor())
 	assert.NotNil(t, actual.Model)
