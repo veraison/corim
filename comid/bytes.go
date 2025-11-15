@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"encoding/base64"
 	"fmt"
 )
 
@@ -32,8 +33,32 @@ func NewBytes(val any) (*TaggedBytes, error) {
 	return &ret, nil
 }
 
+func NewBytesFromBase64(val any) (*TaggedBytes, error) {
+	var ret TaggedBytes
+
+	if val == nil {
+		return &ret, nil
+	}
+
+	switch t := val.(type) {
+	case string:
+		b, err := base64.StdEncoding.DecodeString(t)
+		if err != nil {
+			return nil, err
+		}
+		ret = TaggedBytes(b)
+	case []byte:
+		ret = TaggedBytes(t)
+	case *[]byte:
+		ret = TaggedBytes(*t)
+	default:
+		return nil, fmt.Errorf("unexpected type for bytes: %T", t)
+	}
+	return &ret, nil
+}
+
 func (o TaggedBytes) String() string {
-	return string(o)
+	return base64.StdEncoding.EncodeToString(o[:])
 }
 
 func (o TaggedBytes) Valid() error {

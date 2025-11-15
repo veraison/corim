@@ -211,6 +211,12 @@ func b64TestImplID() string {
 	return base64.StdEncoding.EncodeToString(implID)
 }
 
+func b64TestTaggedBytes() string {
+	var taggedBytes = TestTaggedBytes[:]
+
+	return base64.StdEncoding.EncodeToString(taggedBytes)
+}
+
 //nolint:lll
 var (
 	PSARefValJSONTemplate = `{
@@ -232,7 +238,7 @@ var (
 				"environment": {
 					"class": {
 						"id": {
-							"type": "psa.impl-id",
+							"type": "bytes",
 							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 						},
 						"vendor": "ACME",
@@ -310,7 +316,7 @@ var (
 				"environment": {
 					"class": {
 						"id": {
-							"type": "psa.impl-id",
+							"type": "bytes",
 							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 						},
 						"vendor": "ACME",
@@ -332,7 +338,7 @@ var (
 				"environment": {
 					"class": {
 						"id": {
-							"type": "psa.impl-id",
+							"type": "bytes",
 							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 						},
 						"vendor": "ACME",
@@ -373,7 +379,7 @@ var (
 				"environment": {
 					"class": {
 						"id": {
-							"type": "psa.impl-id",
+							"type": "bytes",
 							"value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
 						},
 						"vendor": "ACME",

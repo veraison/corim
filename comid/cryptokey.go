@@ -738,7 +738,7 @@ var cryptoKeyValueRegister = map[string]ICryptoKeyFactory{
 	ThumbprintType:         NewThumbprint,
 	CertThumbprintType:     NewCertThumbprint,
 	CertPathThumbprintType: NewCertPathThumbprint,
-	BytesType:              NewCryptoKeyTaggedBytes,
+	BytesType:              NewCryptoKeyBase64TaggedBytes,
 }
 
 // RegisterCryptoKeyType registers a new ICryptoKeyValue implementation
@@ -771,6 +771,15 @@ func (o TaggedBytes) PublicKey() (crypto.PublicKey, error) {
 
 func NewCryptoKeyTaggedBytes(val any) (*CryptoKey, error) {
 	tb, err := NewBytes(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CryptoKey{tb}, nil
+}
+
+func NewCryptoKeyBase64TaggedBytes(val any) (*CryptoKey, error) {
+	tb, err := NewBytesFromBase64(val)
 	if err != nil {
 		return nil, err
 	}

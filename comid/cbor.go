@@ -33,7 +33,6 @@ var (
 		561: TaggedCertPathThumbprint{},
 		564: TaggedRawIntRange{},
 		// PSA profile tags
-		600: TaggedImplID{},
 		601: TaggedPSARefValID{},
 		602: TaggedCCAPlatformConfigID(""),
 	}

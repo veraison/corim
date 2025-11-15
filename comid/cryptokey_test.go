@@ -201,7 +201,7 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 func Test_CryptoKey_NewTaggedBytes(t *testing.T) {
 	key, err := NewCryptoKeyTaggedBytes(TestTaggedBytes)
 	require.NoError(t, err)
-	assert.Equal(t, string(TestTaggedBytes), key.String())
+	assert.Equal(t, b64TestTaggedBytes(), key.String())
 	_, err = key.PublicKey()
 	assert.EqualError(t, err, "cannot get PublicKey from bytes")
 }
@@ -215,7 +215,7 @@ func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 		{
 			Type: BytesType,
 			In:   TestTaggedBytes,
-			Out:  string(TestTaggedBytes),
+			Out:  b64TestTaggedBytes(),
 		},
 		{
 			Type: PKIXBase64KeyType,

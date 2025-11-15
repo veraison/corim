@@ -141,8 +141,8 @@ func extractImplementationID(c *Class) error {
 		return fmt.Errorf("no class-id")
 	}
 
-	if classID.Type() != ImplIDType {
-		return fmt.Errorf("class id is not a psa.impl-id")
+	if classID.Type() != "bytes" {
+		return fmt.Errorf("class id should be tagged bytes")
 	}
 
 	fmt.Printf("ImplementationID: %x\n", classID.Bytes())

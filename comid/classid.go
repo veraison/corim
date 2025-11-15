@@ -145,7 +145,7 @@ func (o ClassID) String() string {
 // Implementation ID (see Section 3.2.2 of draft-tschofenig-rats-psa-token)
 func (o *ClassID) SetImplID(implID ImplID) *ClassID {
 	if o != nil {
-		o.Value = TaggedImplID(implID)
+		o.Value = TaggedBytes(implID[:])
 	}
 	return o
 }
@@ -154,9 +154,9 @@ func (o *ClassID) SetImplID(implID ImplID) *ClassID {
 // (see Section 3.2.2 of draft-tschofenig-rats-psa-token) from ClassID
 func (o ClassID) GetImplID() (ImplID, error) {
 	switch t := o.Value.(type) {
-	case *TaggedImplID:
+	case *TaggedBytes:
 		return ImplID(*t), nil
-	case TaggedImplID:
+	case TaggedBytes:
 		return ImplID(t), nil
 	default:
 		return ImplID{}, fmt.Errorf("class-id type is: %T", t)
@@ -229,13 +229,11 @@ func (o ImplID) Valid() error {
 	return nil
 }
 
-type TaggedImplID ImplID
-
 func NewImplIDClassID(val any) (*ClassID, error) {
-	var ret TaggedImplID
+	var ret TaggedBytes = make(TaggedBytes, 32)
 
 	if val == nil {
-		return &ClassID{&TaggedImplID{}}, nil
+		return &ClassID{&ret}, nil
 	}
 
 	switch t := val.(type) {
@@ -256,9 +254,17 @@ func NewImplIDClassID(val any) (*ClassID, error) {
 		}
 
 		copy(ret[:], v)
-	case TaggedImplID:
+	case TaggedBytes:
+		if nb := len(t); nb != 32 {
+			return nil, fmt.Errorf("bad psa.impl-id: got %d bytes, want 32", nb)
+		}
+
 		copy(ret[:], t[:])
-	case *TaggedImplID:
+	case *TaggedBytes:
+		if nb := len(*t); nb != 32 {
+			return nil, fmt.Errorf("bad psa.impl-id: got %d bytes, want 32", nb)
+		}
+
 		copy(ret[:], (*t)[:])
 	case ImplID:
 		copy(ret[:], t[:])
@@ -278,41 +284,6 @@ func MustNewImplIDClassID(val any) *ClassID {
 	}
 
 	return ret
-}
-
-func (o TaggedImplID) Valid() error {
-	return ImplID(o).Valid()
-}
-
-func (o TaggedImplID) String() string {
-	return ImplID(o).String()
-}
-
-func (o TaggedImplID) Type() string {
-	return ImplIDType
-}
-
-func (o TaggedImplID) Bytes() []byte {
-	return o[:]
-}
-
-func (o TaggedImplID) MarshalJSON() ([]byte, error) {
-	return json.Marshal((o)[:])
-}
-
-func (o *TaggedImplID) UnmarshalJSON(data []byte) error {
-	var out []byte
-	if err := json.Unmarshal(data, &out); err != nil {
-		return err
-	}
-
-	if len(out) != 32 {
-		return fmt.Errorf("bad psa.impl-id: decoded %d bytes, want 32", len(out))
-	}
-
-	copy((*o)[:], out)
-
-	return nil
 }
 
 func NewOIDClassID(val any) (*ClassID, error) {
@@ -459,6 +430,17 @@ func NewBytesClassID(val any) (*ClassID, error) {
 	return &ClassID{ret}, nil
 }
 
+// NewBase64BytesClassID creates a New ClassID of type bytes
+// The supplied interface parameter should be a base-64 encoded
+// string (typically inbound from a JSON unmarshal operation)
+func NewBase64BytesClassID(val any) (*ClassID, error) {
+	ret, err := NewBytesFromBase64(val)
+	if err != nil {
+		return nil, err
+	}
+	return &ClassID{ret}, nil
+}
+
 // IClassIDFactory defines the signature for the factory functions that may be
 // registred using RegisterClassIDType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *ClassID
@@ -473,7 +455,7 @@ var classIDValueRegister = map[string]IClassIDFactory{
 	OIDType:    NewOIDClassID,
 	UUIDType:   NewUUIDClassID,
 	IntType:    NewIntClassID,
-	BytesType:  NewBytesClassID,
+	BytesType:  NewBase64BytesClassID,
 	ImplIDType: NewImplIDClassID,
 }
 
