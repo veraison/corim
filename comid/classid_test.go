@@ -73,7 +73,7 @@ func TestClassID_UnmarshalCBOR_ImplID_OK(t *testing.T) {
 
 	expected := b64TestImplID()
 
-	var actual ClassID = *MustNewImplIDClassID(nil)
+	var actual = *MustNewImplIDClassID(nil)
 	err := actual.UnmarshalCBOR(tv)
 
 	assert.Nil(t, err)

@@ -212,7 +212,7 @@ func b64TestImplID() string {
 }
 
 func b64TestTaggedBytes() string {
-	var taggedBytes = TestTaggedBytes[:]
+	var taggedBytes = TestTaggedBytes
 
 	return base64.StdEncoding.EncodeToString(taggedBytes)
 }

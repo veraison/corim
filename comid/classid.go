@@ -230,7 +230,7 @@ func (o ImplID) Valid() error {
 }
 
 func NewImplIDClassID(val any) (*ClassID, error) {
-	var ret TaggedBytes = make(TaggedBytes, 32)
+	var ret = make(TaggedBytes, 32)
 
 	if val == nil {
 		return &ClassID{&ret}, nil
