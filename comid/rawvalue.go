@@ -22,11 +22,7 @@ func NewRawValue() *RawValue {
 
 func (o *RawValue) SetBytes(val []byte) *RawValue {
 	if o != nil {
-		v, err := NewBytes(val)
-		if err != nil {
-			return nil
-		}
-		o.val = *v
+		o.val = TaggedBytes(val)
 	}
 	return o
 }

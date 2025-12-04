@@ -146,7 +146,7 @@ func (o *Comid) AddEntity(name string, regID *string, roles ...Role) *Comid {
 		}
 
 		if o.Entities == nil {
-			o.Entities = new(Entities)
+			o.Entities = NewEntities()
 		}
 
 		if o.Entities.Add(&e) == nil {

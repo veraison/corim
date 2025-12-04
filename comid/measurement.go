@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -18,8 +19,8 @@ import (
 const MaxUint64 = ^uint64(0)
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are UUID, PSA refval-id, CCA platform-config-id and unsigned integer
-// TO DO Add tagged OID: see https://github.com/veraison/corim/issues/35
+// The supported types are OID, UUID, PSA refval-id, CCA platform-config-id,
+// unsigned integer, and string.
 type Mkey struct {
 	Value IMKeyValue
 }
@@ -177,18 +178,27 @@ func (o *Mkey) UnmarshalCBOR(data []byte) error {
 	}
 
 	majorType := (data[0] & 0xe0) >> 5
-	if majorType == 6 { // tag
+	switch majorType {
+	case 6: // tag
 		return dm.Unmarshal(data, &o.Value)
+	case 0: // uint
+		var val UintMkey
+		if err := dm.Unmarshal(data, &val); err != nil {
+			return err
+		}
+
+		o.Value = &val
+	case 3: // tstr
+		var val StringMkey
+		if err := dm.Unmarshal(data, &val); err != nil {
+			return err
+		}
+
+		o.Value = &val
+	default:
+		return fmt.Errorf("unexpected CBOR major type for mkey: %d", majorType)
 	}
 
-	// untagged value must be a uint
-
-	var val UintMkey
-	if err := dm.Unmarshal(data, &val); err != nil {
-		return err
-	}
-
-	o.Value = &val
 	return nil
 }
 
@@ -254,6 +264,55 @@ func (o *UintMkey) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+const StringType = "string"
+
+type StringMkey string
+
+func NewStringMkey(val any) (*StringMkey, error) {
+	var ret StringMkey
+
+	if val == nil {
+		return &ret, nil
+	}
+
+	switch t := val.(type) {
+	case StringMkey:
+		ret = t
+	case *StringMkey:
+		ret = *t
+	case string:
+		ret = StringMkey(t)
+	case *string:
+		ret = StringMkey(*t)
+	case []byte:
+		if !utf8.Valid(t) {
+			return nil, fmt.Errorf("invalid utf-8 string: %x", t)
+		}
+		ret = StringMkey(t)
+	case *[]byte:
+		if !utf8.Valid(*t) {
+			return nil, fmt.Errorf("invalid utf-8 string: %x", *t)
+		}
+		ret = StringMkey(*t)
+	default:
+		return nil, fmt.Errorf("unexpected type for StringMkey: %T", t)
+	}
+
+	return &ret, nil
+}
+
+func (o StringMkey) Type() string {
+	return StringType
+}
+
+func (o StringMkey) Valid() error {
+	return nil
+}
+
+func (o StringMkey) String() string {
+	return string(o)
+}
+
 func NewMkeyOID(val any) (*Mkey, error) {
 	ret, err := NewTaggedOID(val)
 	if err != nil {
@@ -274,6 +333,15 @@ func NewMkeyUUID(val any) (*Mkey, error) {
 
 func NewMkeyUint(val any) (*Mkey, error) {
 	ret, err := NewUintMkey(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Mkey{ret}, nil
+}
+
+func NewMkeyString(val any) (*Mkey, error) {
+	ret, err := NewStringMkey(val)
 	if err != nil {
 		return nil, err
 	}
@@ -313,6 +381,7 @@ var mkeyValueRegister = map[string]IMkeyFactory{
 	OIDType:                 NewMkeyOID,
 	UUIDType:                NewMkeyUUID,
 	UintType:                NewMkeyUint,
+	StringType:              NewMkeyString,
 	PSARefValIDType:         NewMkeyPSARefvalID,
 	CCAPlatformConfigIDType: NewMkeyCCAPlatformConfigID,
 }

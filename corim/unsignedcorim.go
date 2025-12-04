@@ -219,7 +219,7 @@ func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *Un
 		}
 
 		if o.Entities == nil {
-			o.Entities = new(Entities)
+			o.Entities = NewEntities()
 		}
 
 		if o.Entities.Add(e) == nil {
