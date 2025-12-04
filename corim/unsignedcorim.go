@@ -343,24 +343,20 @@ type Tag struct {
 }
 
 func (o Tag) Valid() error {
-	// Check that the tag is not zero-length
 	if len(o.Content) == 0 {
 		return errors.New("empty tag")
 	}
 
-	// Validate the tag content based on the tag number
 	switch o.Number {
-	case ComidTag: // 506 - CoMID tag
+	case ComidTag:
 		return o.validateComidTag()
-	case CoswidTag: // 505 - CoSWID tag
+	case CoswidTag:
 		return o.validateCoswidTag()
 	default:
-		// For unknown tags, just ensure the content is valid CBOR
 		return o.validateGenericCBOR()
 	}
 }
 
-// validateComidTag validates the content of a CoMID tag (506)
 func (o Tag) validateComidTag() error {
 	var c comid.Comid
 	if err := dm.Unmarshal(o.Content, &c); err != nil {
@@ -374,19 +370,15 @@ func (o Tag) validateComidTag() error {
 	return nil
 }
 
-// validateCoswidTag validates the content of a CoSWID tag (505)
 func (o Tag) validateCoswidTag() error {
 	var s swid.SoftwareIdentity
 	if err := dm.Unmarshal(o.Content, &s); err != nil {
 		return fmt.Errorf("invalid CoSWID content: %w", err)
 	}
 
-	// Basic validation - if unmarshaling succeeded, the structure is valid
-	// Additional validation could be added here if needed
 	return nil
 }
 
-// validateGenericCBOR validates that content is valid CBOR
 func (o Tag) validateGenericCBOR() error {
 	var raw interface{}
 	if err := dm.Unmarshal(o.Content, &raw); err != nil {
