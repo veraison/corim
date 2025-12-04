@@ -168,7 +168,8 @@ func TestMeasurement_NewUUIDMeasurement_bad_digest(t *testing.T) {
 	tv, err := NewUUIDMeasurement(TestUUID)
 	require.NoError(t, err)
 
-	assert.Nil(t, tv.AddDigest(swid.Sha256, []byte{0xff}))
+	assert.NotNil(t, tv.AddDigest(swid.Sha256, []byte{0xff}))
+	assert.ErrorContains(t, tv.Valid(), "digest at index 0")
 }
 
 func TestMeasurement_NewUUIDMeasurement_bad_ueid(t *testing.T) {
@@ -334,7 +335,7 @@ func TestMkey_UnmarshalCBOR_not_ok(t *testing.T) {
 	}{
 		{
 			input:    []byte{0xAB, 0xCD},
-			expected: "unexpected EOF",
+			expected: "unexpected CBOR major type for mkey: 5",
 		},
 		{
 			input:    []byte{0xCC, 0xDD, 0xFF},
@@ -519,6 +520,99 @@ func TestNewUintMkey(t *testing.T) {
 	}
 }
 
+func TestNewStringMkey(t *testing.T) {
+	testString := "foo"
+	testBytes := MustHexDecode(t, "666f6f")
+	testBytesBad := MustHexDecode(t, "ff")
+	testVal := StringMkey(testString)
+
+	tvs := []struct {
+		input    any
+		expected StringMkey
+		err      string
+	}{
+		{
+			input:    testString,
+			expected: testVal,
+		},
+		{
+			input:    &testString,
+			expected: testVal,
+		},
+		{
+			input:    testBytes,
+			expected: testVal,
+		},
+		{
+			input:    &testBytes,
+			expected: testVal,
+		},
+		{
+			input:    testVal,
+			expected: testVal,
+		},
+		{
+			input:    &testVal,
+			expected: testVal,
+		},
+		{
+			input: testBytesBad,
+			err:   "invalid utf-8 string: ff",
+		},
+		{
+			input: &testBytesBad,
+			err:   "invalid utf-8 string: ff",
+		},
+		{
+			input: 7,
+			err:   "unexpected type for StringMkey: int",
+		},
+	}
+
+	for _, tv := range tvs {
+		out, err := NewStringMkey(tv.input)
+		if tv.err != "" {
+			assert.Nil(t, out)
+			assert.EqualError(t, err, tv.err)
+		} else {
+			assert.Equal(t, tv.expected, *out)
+		}
+	}
+}
+
+func TestMKey_string_marshaling_round_trip(t *testing.T) {
+	tvs := []struct {
+		input         *Mkey
+		expected_json []byte
+		expected_cbor []byte
+	}{
+		{
+			input:         MustNewMkey("foo", "string"),
+			expected_json: []byte(`{"type":"string","value":"foo"}`),
+			expected_cbor: MustHexDecode(t, "63666f6f"),
+		},
+	}
+
+	for _, tv := range tvs {
+		actual_json, err := tv.input.MarshalJSON()
+		assert.Nil(t, err)
+		assert.Equal(t, tv.expected_json, actual_json)
+
+		var key Mkey
+		err = key.UnmarshalJSON(actual_json)
+		assert.Nil(t, err)
+		assert.Equal(t, tv.input, &key)
+
+		actual_cbor, err := tv.input.MarshalCBOR()
+		assert.Nil(t, err)
+		assert.Equal(t, tv.expected_cbor, actual_cbor)
+
+		err = key.UnmarshalCBOR(actual_cbor)
+		assert.Nil(t, err)
+		assert.Equal(t, tv.input, &key)
+	}
+}
+
 func TestNewMkeyOID(t *testing.T) {
 	var expectedOID OID
 	require.NoError(t, expectedOID.FromString(TestOID))
@@ -682,14 +776,14 @@ func TestMval_Valid(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("Digests valid", func(t *testing.T) {
+	t.Run("Digests invalid", func(t *testing.T) {
 		ds := NewDigests()
-		_ = ds.AddDigest(swid.Sha256, []byte{0xAA, 0xBB})
+		ds.AddDigest(swid.Sha256, []byte{0xAA, 0xBB})
 		mval := Mval{
 			Digests: ds,
 		}
 		err := mval.Valid()
-		assert.NoError(t, err)
+		assert.ErrorContains(t, err, "digest at index 0")
 	})
 
 	t.Run("Extensions valid", func(t *testing.T) {

@@ -427,6 +427,10 @@ func (o TaggedPKIXBase64CertPath) certPath() ([]*x509.Certificate, error) {
 type TaggedCOSEKey []byte
 
 func NewCOSEKey(k any) (*CryptoKey, error) {
+	if k == nil {
+		return &CryptoKey{TaggedCOSEKey{}}, nil
+	}
+
 	var b []byte
 	var err error
 

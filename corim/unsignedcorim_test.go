@@ -257,15 +257,11 @@ func TestUnsignedCorim_AddEntity_full(t *testing.T) {
 		AddEntity(name, &regID, role)
 
 	expected := UnsignedCorim{
-		Entities: &Entities{
-			Values: []Entity{
-				{
-					Name:  MustNewStringEntityName(name),
-					Roles: Roles{role},
-					RegID: &taggedRegID,
-				},
-			},
-		},
+		Entities: NewEntities().Add(&Entity{
+			Name:  MustNewStringEntityName(name),
+			Roles: Roles{role},
+			RegID: &taggedRegID,
+		}),
 	}
 
 	assert.NotNil(t, actual)

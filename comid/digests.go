@@ -24,11 +24,7 @@ func NewDigests() *Digests {
 // combinations.
 func (o *Digests) AddDigest(algID uint64, value []byte) *Digests {
 	if o != nil {
-		he := NewHashEntry(algID, value)
-		if he == nil {
-			return nil
-		}
-		*o = append(*o, *he)
+		*o = append(*o, swid.HashEntry{HashAlgID: algID, HashValue: value})
 	}
 	return o
 }

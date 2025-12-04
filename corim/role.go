@@ -12,15 +12,18 @@ import (
 type Role int64
 
 const (
-	RoleManifestCreator Role = iota + 1
+	RoleManifestCreator Role = 1
+	RoleManifestSigner  Role = 2
 )
 
 var (
 	stringToRole = map[string]Role{
 		"manifestCreator": RoleManifestCreator,
+		"manifestSigner":  RoleManifestSigner,
 	}
 	roleToString = map[Role]string{
 		RoleManifestCreator: "manifestCreator",
+		RoleManifestSigner:  "manifestSigner",
 	}
 )
 
