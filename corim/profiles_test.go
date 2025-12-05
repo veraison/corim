@@ -84,7 +84,7 @@ func TestProfileManifest_getters(t *testing.T) {
 	assert.NotNil(t, s.Meta.Signer.IMapValue)
 }
 
-func TestProfileManifest_marshaling(t *testing.T) {
+func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 	type corimExtensions struct {
 		Extension1 *string `cbor:"-1,keyasint,omitempty" json:"ext1,omitempty"`
 	}
@@ -163,6 +163,16 @@ func TestProfileManifest_marshaling(t *testing.T) {
 
 	cmd = profileManifest.GetComid()
 	err = cmd.FromJSON(testComidWithExtensionsJSON)
+	assert.NoError(t, err)
+
+	address = cmd.Entities.Values[0].MustGetString("Address")
+	assert.Equal(t, "123 Fake Street", address)
+
+	ts = cmd.Triples.ReferenceValues.Values[0].Measurements.Values[0].
+		Val.MustGetInt("timestamp")
+	assert.Equal(t, 1720782190, ts)
+
+	cmd, err = UnmarshalComidFromJSON(testComidWithExtensionsJSON, profID)
 	assert.NoError(t, err)
 
 	address = cmd.Entities.Values[0].MustGetString("Address")
