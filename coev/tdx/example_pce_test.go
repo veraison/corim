@@ -11,8 +11,8 @@ import (
 
 	"github.com/veraison/corim/coev"
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/corim/comid/tdx"
 	"github.com/veraison/corim/extensions"
+	"github.com/veraison/corim/profiles/tdx"
 	"github.com/veraison/eat"
 )
 
