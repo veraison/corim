@@ -198,8 +198,7 @@ func TestSignedCorim_TaggedFromCOSE_bad(t *testing.T) {
 	var actual SignedCorim
 	err := actual.FromCOSE(tv)
 
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "tag validation failed")
+	assert.ErrorContains(t, err, "tag validation failed")
 }
 
 func TestSignedCorim_FromCOSE_fail_no_tag(t *testing.T) {
