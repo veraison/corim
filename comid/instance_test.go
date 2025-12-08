@@ -136,6 +136,11 @@ func Test_NewBytesInstance_NOK(t *testing.T) {
 	}
 }
 
+func Test_MustNewBytesInstance(t *testing.T) {
+	MustNewBytesInstance([]byte{0x01, 0x02, 0x03, 0x04})
+	assert.Panics(t, func() { MustNewBytesInstance(7) })
+}
+
 func TestInstance_MarshalCBOR_Bytes(t *testing.T) {
 	tv, err := NewBytesInstance(TestBytes)
 	require.NoError(t, err)

@@ -189,6 +189,18 @@ func NewUEIDInstance(val any) (*Instance, error) {
 	return &Instance{ret}, nil
 }
 
+// MustNewBytesInstance is like NewBytesInstance except it does not return an
+// error, assuming that the provided value is valid. It panics if that isn't
+// the case.
+func MustNewBytesInstance(val any) *Instance {
+	ret, err := NewBytesInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
 // MustNewUEIDInstance is like NewUEIDInstance execept it does not return an
 // error, assuming that the provided value is valid. It panics if that isn't
 // the case.

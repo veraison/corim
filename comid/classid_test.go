@@ -577,6 +577,11 @@ func Test_NewBytesClassID_NOK(t *testing.T) {
 	}
 }
 
+func Test_MustNewBytesClassID(t *testing.T) {
+	MustNewBytesClassID([]byte{0x01, 0x02, 0x03, 0x04})
+	assert.Panics(t, func() { MustNewBytesClassID(7) })
+}
+
 func TestClassID_MarshalCBOR_Bytes(t *testing.T) {
 	tv, err := NewBytesClassID(TestBytes)
 	require.NoError(t, err)
