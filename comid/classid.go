@@ -448,6 +448,18 @@ func (o TaggedInt) Bytes() []byte {
 	return ret[:]
 }
 
+// MustNewBytesClassID is like NewBytesClassID except it does not return an
+// error, assuming that the provided value is valid. It panics if that isn't
+// the case.
+func MustNewBytesClassID(val any) *ClassID {
+	ret, err := NewBytesClassID(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
 // NewBytesClassID creates a New ClassID of type bytes
 // The supplied interface parameter could be
 // a byte slice, a pointer to a byte slice or a string

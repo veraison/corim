@@ -146,6 +146,18 @@ func MustNewUUIDGroup(val any) *Group {
 	return ret
 }
 
+// MustNewBytesGroup is like NewBytesGroup except it does not return an
+// error, assuming that the provided value is valid. It panics if that isn't
+// the case.
+func MustNewBytesGroup(val any) *Group {
+	ret, err := NewBytesGroup(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
 // NewBytesGroup creates a New Group of type bytes
 // The supplied interface parameter could be
 // a byte slice, a pointer to a byte slice or a string

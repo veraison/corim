@@ -110,6 +110,11 @@ func Test_NewBytesGroup_NOK(t *testing.T) {
 	}
 }
 
+func Test_MustNewBytesGroup(t *testing.T) {
+	MustNewBytesGroup([]byte{0x01, 0x02, 0x03, 0x04})
+	assert.Panics(t, func() { MustNewBytesGroup(7) })
+}
+
 func TestGroup_MarshalCBOR_Bytes(t *testing.T) {
 	tv, err := NewBytesGroup(TestBytes)
 	require.NoError(t, err)
