@@ -128,7 +128,7 @@ var (
 	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
 
 	//go:embed testcases/comid_qe_refval.cbor
-	testComid2 []byte
+	ComidQeRefVal []byte
 )
 
 func Example_decode_QE_CBOR() {
@@ -144,7 +144,7 @@ func Example_decode_QE_CBOR() {
 
 	m := manifest.GetComid()
 
-	if err := m.FromCBOR(testComid2); err != nil {
+	if err := m.FromCBOR(ComidQeRefVal); err != nil {
 		panic(err)
 	}
 	if err := m.Valid(); err != nil {
