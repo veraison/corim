@@ -222,7 +222,7 @@ var (
 	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
 
 	//go:embed testcases/comid_seam_refval.cbor
-	testComid1 []byte
+	ComidSeamRefVal []byte
 )
 
 func Example_decode_CBOR() {
@@ -238,7 +238,7 @@ func Example_decode_CBOR() {
 
 	m := manifest.GetComid()
 
-	if err := m.FromCBOR(testComid1); err != nil {
+	if err := m.FromCBOR(ComidSeamRefVal); err != nil {
 		panic(err)
 	}
 	if err := m.Valid(); err != nil {

@@ -100,7 +100,7 @@ var (
 	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
 
 	//go:embed testcases/comid_pce_refval.cbor
-	testComid3 []byte
+	ComidPceRefVal []byte
 )
 
 func Example_decode_PCE_CBOR() {
@@ -116,7 +116,7 @@ func Example_decode_PCE_CBOR() {
 
 	m := manifest.GetComid()
 
-	if err := m.FromCBOR(testComid3); err != nil {
+	if err := m.FromCBOR(ComidPceRefVal); err != nil {
 		panic(err)
 	}
 	if err := m.Valid(); err != nil {
