@@ -137,6 +137,26 @@ func UnmarshalComidFromCBOR(buf []byte, profileID *eat.Profile) (*comid.Comid, e
 	return ret, nil
 }
 
+// UnmarshalComidFromJSON unmarshals a comid.Comid from provided JSON data. If
+// there are extensions associated with the profile specified by the data, they
+// will be registered with the comid.Comid before it is unmarshaled.
+func UnmarshalComidFromJSON(buf []byte, profileID *eat.Profile) (*comid.Comid, error) {
+	var ret *comid.Comid
+
+	profileManifest, ok := GetProfileManifest(profileID)
+	if ok {
+		ret = profileManifest.GetComid()
+	} else {
+		ret = comid.NewComid()
+	}
+
+	if err := ret.FromJSON(buf); err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
 // GetSingedCorim returns a pointer to a new SingedCorim instance. If there
 // are extensions associated with the provided profileID, they will be
 // registered with the instance.
