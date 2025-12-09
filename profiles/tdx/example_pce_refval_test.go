@@ -4,7 +4,6 @@
 package tdx
 
 import (
-	_ "embed"
 	"errors"
 	"fmt"
 
@@ -94,14 +93,6 @@ func extractPCERefVals(c *comid.Comid) error {
 
 	return nil
 }
-
-var (
-	// test cases are based on diag files here:
-	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
-
-	//go:embed testcases/comid_pce_refval.cbor
-	ComidPceRefVal []byte
-)
 
 func Example_decode_PCE_CBOR() {
 	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")

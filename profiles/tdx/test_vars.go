@@ -3,6 +3,8 @@
 
 package tdx
 
+import _ "embed"
+
 //nolint:lll
 const (
 	TestUIntInstance     = 45
@@ -424,6 +426,18 @@ var (
 	TestInvalidTCBStatus   = []int{1, 2, 3}
 	TestAdvisoryIDs        = []string{"SA-00078", "SA-00077", "SA-00079"}
 	TestInvalidAdvisoryIDs = []float64{1.234, 2.567}
+
+	// test cases are based on diag files here:
+	// https://github.com/ietf-rats-wg/draft-ietf-rats-corim/tree/main/cddl/examples
+
+	//go:embed testcases/comid_seam_refval.cbor
+	ComidSeamRefVal []byte
+
+	//go:embed testcases/comid_qe_refval.cbor
+	ComidQeRefVal []byte
+
+	//go:embed testcases/comid_pce_refval.cbor
+	ComidPceRefVal []byte
 )
 
 type MessageType int
