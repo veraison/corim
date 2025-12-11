@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package encoding
 
@@ -48,4 +48,22 @@ func collectEmbedded(
 	}
 
 	return false
+}
+
+// isMapStringAny returns true iff the provided value, v, is of type
+// map[string]any.
+func isMapStringAny(v reflect.Value) bool {
+	if v.Kind() != reflect.Map {
+		return false
+	}
+
+	if v.Type().Key().Kind() != reflect.String {
+		return false
+	}
+
+	if v.Type().Elem().Kind() != reflect.Interface {
+		return false
+	}
+
+	return true
 }

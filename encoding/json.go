@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package encoding
 
@@ -42,6 +42,13 @@ func doSerializeStructToJSON(
 
 		if collectEmbedded(&typeField, valField, &embeds) {
 			continue
+		}
+
+		_, ok := typeField.Tag.Lookup("field-cache")
+		if ok {
+			if err := addCachedFieldsToMapJSON(valField, rawMap); err != nil {
+				return err
+			}
 		}
 
 		tag, ok := typeField.Tag.Lookup("json")
@@ -118,12 +125,19 @@ func doPopulateStructFromJSON(
 	}
 
 	var embeds []embedded
+	var fieldCache reflect.Value
 
 	for i := 0; i < structVal.NumField(); i++ {
 		typeField := structType.Field(i)
 		valField := structVal.Field(i)
 
 		if collectEmbedded(&typeField, valField, &embeds) {
+			continue
+		}
+
+		_, ok := typeField.Tag.Lookup("field-cache")
+		if ok {
+			fieldCache = valField
 			continue
 		}
 
@@ -176,7 +190,9 @@ func doPopulateStructFromJSON(
 		}
 	}
 
-	return nil
+	// Any remaining contents of rawMap will be added to the field cache,
+	// if current struct has one.
+	return updateFieldCacheJSON(fieldCache, rawMap)
 }
 
 // structFieldsJSON is a specialized implementation of "OrderedMap", where the
@@ -356,6 +372,68 @@ func (o *TypeAndValue) UnmarshalJSON(data []byte) error {
 
 	o.Type = temp.Type
 	o.Value = temp.Value
+
+	return nil
+}
+
+func addCachedFieldsToMapJSON(cacheField reflect.Value, rawMap *structFieldsJSON) error {
+	if !isMapStringAny(cacheField) {
+		return errors.New("field-cache does not appear to be a map[string]any")
+	}
+
+	if !cacheField.IsValid() || cacheField.IsNil() {
+		// field cache was never set, so nothing to do
+		return nil
+	}
+
+	for _, key := range cacheField.MapKeys() {
+		keyText := key.String()
+
+		data, err := json.Marshal(cacheField.MapIndex(key).Interface())
+		if err != nil {
+			return fmt.Errorf(
+				"error marshaling field-cache entry %q: %w",
+				keyText,
+				err,
+			)
+		}
+
+		if err := rawMap.Add(keyText, json.RawMessage(data)); err != nil {
+			return fmt.Errorf(
+				"could not add field-cache entry %q to serialization map: %w",
+				keyText,
+				err,
+			)
+		}
+	}
+
+	return nil
+}
+
+func updateFieldCacheJSON(cacheField reflect.Value, rawMap *structFieldsJSON) error {
+	if !cacheField.IsValid() {
+		// current struct does not have a field-cache field
+		return nil
+	}
+
+	if !isMapStringAny(cacheField) {
+		return errors.New("field-cache does not appear to be a map[string]any")
+	}
+
+	if cacheField.IsNil() {
+		cacheField.Set(reflect.MakeMap(cacheField.Type()))
+	}
+
+	for key, rawVal := range rawMap.Fields {
+		var val any
+		if err := json.Unmarshal(rawVal, &val); err != nil {
+			return fmt.Errorf("could not unmarshal key %q: %w", key, err)
+		}
+
+		keyVal := reflect.ValueOf(key)
+		valVal := reflect.ValueOf(val)
+		cacheField.SetMapIndex(keyVal, valVal)
+	}
 
 	return nil
 }
