@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package encoding
 
@@ -105,6 +105,41 @@ func Test_PopulateStructFromCBOR_simple(t *testing.T) {
 	require.NoError(t, err)
 	assert.EqualValues(t, c, c2)
 
+}
+
+func Test_SerializeStructToCBOR_cde_ordering(t *testing.T) {
+	val := struct {
+		Field8  int `cbor:"8,keyasint"`
+		FieldN3 int `cbor:"-3,keyasint"`
+		Field0  int `cbor:"0,keyasint"`
+		FieldN1 int `cbor:"-1,keyasint"`
+	}{
+		Field8:  1,
+		FieldN3: 3,
+		Field0:  0,
+		FieldN1: 2,
+	}
+
+	expected := []byte{
+		0xa4, // map(4)
+
+		0x00, // key: 0
+		0x00, // value: 0
+
+		0x08, // key: 8
+		0x01, // value: 1
+
+		0x20, // key: -1
+		0x02, // value: 2
+
+		0x22, // key: -3
+		0x03, // value: 3
+	}
+
+	em := mustInitEncMode()
+	data, err := SerializeStructToCBOR(em, val)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, data)
 }
 
 func Test_structFieldsCBOR_CRUD(t *testing.T) {
@@ -277,4 +312,46 @@ func Test_processAdditionalInfo(t *testing.T) {
 
 	_, _, err = processAdditionalInfo(addInfo, []byte{})
 	assert.EqualError(t, err, "unexpected EOF")
+}
+
+func Test_lexSort(t *testing.T) {
+	test_cases := []struct {
+		title    string
+		input    []int
+		expected []int
+	}{
+		{
+			title:    "non-negative",
+			input:    []int{1, 4, 0, 2, 3},
+			expected: []int{0, 1, 2, 3, 4},
+		},
+		{
+			title:    "negative",
+			input:    []int{-1, -4, -2, -3},
+			expected: []int{-1, -2, -3, -4},
+		},
+		{
+			title:    "mixed",
+			input:    []int{-1, 0, 3, 1, -2},
+			expected: []int{0, 1, 3, -1, -2},
+		},
+		{
+			title:    "already sorted",
+			input:    []int{0, 1, 3, -1, -2},
+			expected: []int{0, 1, 3, -1, -2},
+		},
+		{
+			title:    "different length encoding",
+			input:    []int{65535, 256},
+			expected: []int{256, 65535},
+		},
+	}
+
+	for _, tc := range test_cases {
+		em := mustInitEncMode()
+		t.Run(tc.title, func(t *testing.T) {
+			lexSort(em, tc.input)
+			assert.Equal(t, tc.expected, tc.input)
+		})
+	}
 }
