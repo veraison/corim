@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -285,6 +286,7 @@ func (o *structFieldsCBOR) ToCBOR(em cbor.EncMode) ([]byte, error) {
 		return nil, errors.New("mapLen cannot exceed math.MaxUint32")
 	}
 
+	lexSort(em, o.Keys)
 	for _, key := range o.Keys {
 		marshalledKey, err := em.Marshal(key)
 		if err != nil {
@@ -499,4 +501,30 @@ func updateFieldCacheCBOR(dm cbor.DecMode, cacheField reflect.Value, rawMap *str
 	}
 
 	return nil
+}
+
+// Lexicographic sorting of CBOR integer keys. See:
+// https://www.ietf.org/archive/id/draft-ietf-cbor-cde-13.html#name-the-lexicographic-map-sorti
+func lexSort(em cbor.EncMode, v []int) {
+	sort.Slice(v, func(i, j int) bool {
+		a, err := em.Marshal(v[i])
+		if err != nil {
+			panic(err) // integer encoding cannot fail
+		}
+
+		b, err := em.Marshal(v[j])
+		if err != nil {
+			panic(err) // integer encoding cannot fail
+		}
+
+		for k, v := range a {
+			if v < b[k] {
+				return true
+			} else if v > b[k] {
+				return false
+			}
+		}
+
+		return false
+	})
 }
