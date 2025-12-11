@@ -127,6 +127,20 @@ method, passing itself as the parameter.
 You do not need to define this method unless you actually want to enforce some
 constraints (i.e., if you just want to define additional fields).
 
+### Unknown extensions caching
+
+When unmarshaled data contains entries that do not correspond to fields inside
+a registered extensions struct, their values get cached inside the `Extensions`
+objects. If the containing object is later re-marshalled, cached values will be
+included, so that unknown extensions are not lost.
+
+Cached extension values are not accessible via `Get*()` methods described
+above, however they are available as `Extensions.Cached` map.
+
+If an extensions struct is registered after unmarshalling, it will be populated
+with any now-recognized cached values, which will then be removed from the
+cache.
+
 ### Example
 
 The following example illustrates how to implement a map extension by extending

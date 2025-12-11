@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Contributors to the Veraison project.
+// Copyright 2023-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package extensions
 
@@ -24,6 +24,8 @@ type ExtensionValue struct {
 
 type Extensions struct {
 	IMapValue `json:"extensions,omitempty"`
+
+	Cached map[string]any `field-cache:"" cbor:"-" json:"-"`
 }
 
 func (o *Extensions) Register(exts IMapValue) {
@@ -31,7 +33,15 @@ func (o *Extensions) Register(exts IMapValue) {
 		panic("attempting to register a non-pointer IMapValue")
 	}
 
+	// Ensure that the values of any existing extensions are preserved.
+	// The contents of the existing IMapValue (if there is one) are added
+	// to the cache, which is then applied to the new IMapValue. If the new
+	// IMapValue has fields corresponding to the old extensions, they will be
+	// populated into the new IMapValue; any old extensions that are not
+	// recognized by the new IMapValue will be cached.
+	updateMapFromInterface(&o.Cached, o.IMapValue)
 	o.IMapValue = exts
+	updateInterfaceFromMap(o.IMapValue, o.Cached)
 }
 
 func (o *Extensions) HaveExtensions() bool {
@@ -454,4 +464,90 @@ func newIMapValue(v IMapValue) IMapValue {
 	valType := reflect.Indirect(reflect.ValueOf(v)).Type()
 
 	return reflect.New(valType).Interface()
+}
+
+func updateMapFromInterface(mp *map[string]any, iface any) { // nolint: gocritic
+	if iface == nil {
+		return
+	}
+
+	if *mp == nil {
+		*mp = make(map[string]any)
+	}
+
+	ifType := reflect.TypeOf(iface)
+	ifVal := reflect.ValueOf(iface)
+	if ifType.Kind() == reflect.Pointer {
+		ifType = ifType.Elem()
+		ifVal = ifVal.Elem()
+	}
+
+	for i := 0; i < ifVal.NumField(); i++ {
+		typeField := ifType.Field(i)
+		tag, ok := typeField.Tag.Lookup("cbor")
+		if !ok {
+			continue
+		}
+
+		codePointText := strings.Split(tag, ",")[0]
+		valField := ifVal.Field(i)
+		if !valField.IsZero() {
+			(*mp)[codePointText] = valField.Interface()
+		}
+	}
+}
+
+func updateInterfaceFromMap(iface any, m map[string]any) {
+	if iface == nil {
+		panic("nil interface")
+	}
+
+	ifType := reflect.TypeOf(iface)
+	if ifType.Kind() != reflect.Pointer {
+		panic("interface must be a pointer")
+	}
+
+	ifType = ifType.Elem()
+	ifVal := reflect.ValueOf(iface).Elem()
+
+	for i := 0; i < ifVal.NumField(); i++ {
+		var fieldJSONTag, fieldCBORTag string
+		typeField := ifType.Field(i)
+		valField := ifVal.Field(i)
+
+		tag, ok := typeField.Tag.Lookup("json")
+		if ok {
+			fieldJSONTag = strings.Split(tag, ",")[0]
+		}
+
+		tag, ok = typeField.Tag.Lookup("cbor")
+		if ok {
+			fieldCBORTag = strings.Split(tag, ",")[0]
+		}
+
+		mapKey := fieldJSONTag
+		rawMapVal, ok := m[mapKey]
+		if !ok {
+			mapKey = fieldCBORTag
+			rawMapVal, ok = m[mapKey]
+			if !ok {
+				continue
+			}
+		}
+
+		mapVal := reflect.ValueOf(rawMapVal)
+		if !mapVal.Type().AssignableTo(typeField.Type) {
+			if mapVal.Type().ConvertibleTo(typeField.Type) {
+				mapVal = mapVal.Convert(typeField.Type)
+			} else {
+				// We cannot return an error here, and we don't
+				// want to panic, so we're just going to keep the
+				// entry in the cache.
+				continue
+			}
+		}
+
+		valField.Set(mapVal)
+		delete(m, mapKey)
+	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Contributors to the Veraison project.
+// Copyright 2023-2025 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package extensions
 
@@ -7,11 +7,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/veraison/corim/encoding"
 )
 
 type Entity struct {
-	EntityName string
-	Roles      []int64
+	EntityName string  `cbor:"0,keyasint" json:"entity-name"`
+	Roles      []int64 `cbor:"1,keyasint,omitempty" json:"roles,omitempty"`
 
 	Extensions
 }
@@ -167,4 +168,115 @@ func Test_Extensions_Values(t *testing.T) {
 	exts = Extensions{}
 	vals = exts.Values()
 	assert.Len(t, vals, 0)
+}
+
+func Test_Extensions_unknown_handling_CBOR(t *testing.T) {
+	// nolint: gocritic
+	data := []byte{
+		0xa4, // map(4) [entity]
+
+		0x00,             // key: 0 [entity-name]
+		0x63,             // value: tstr(3)
+		0x66, 0x6f, 0x6f, // "foo"
+
+		0x1,        // key: 1 [roles]
+		0x82,       // value: array(2)
+		0x01, 0x02, // [1, 2]
+
+		0x21, // key: -2 [extension(size)]
+		0x07, // value: 7
+
+		0x27, // key: -8 [extension(<unknown>)]
+		0xf5, // value: true
+	}
+
+	entity := Entity{}
+	err := encoding.PopulateStructFromCBOR(dm, data, &entity)
+	assert.NoError(t, err)
+	assert.Equal(t, "foo", entity.EntityName)
+	assert.Equal(t, []int64{1, 2}, entity.Roles)
+	assert.Equal(t, uint64(7), entity.Extensions.Cached["-2"]) // nolint: staticcheck
+
+	// Check that the cached value has been populated into the
+	// newly-registered struct.
+	entity.Register(&TestExtensions{})
+	assert.Equal(t, 7, entity.MustGetInt("size"))
+
+	// Check that the populated value is no longer cached.
+	_, ok := entity.Extensions.Cached["-2"] // nolint: staticcheck
+	assert.False(t, ok)
+
+	entity = Entity{}
+	entity.Register(&TestExtensions{})
+	err = encoding.PopulateStructFromCBOR(dm, data, &entity)
+	assert.NoError(t, err)
+
+	// If extensions were registered before unmarshalling, the value gets
+	// populated directly into the registered struct, bypassing the cache.
+	assert.Equal(t, 7, entity.MustGetInt("size"))
+	_, ok = entity.Extensions.Cached["-2"] // nolint: staticcheck
+	assert.False(t, ok)
+
+	// Values for keys in in the registered struct still go into cache.
+	val, ok := entity.Extensions.Cached["-8"] // nolint: staticcheck
+	assert.True(t, ok)
+	assert.True(t, val.(bool))
+
+	encoded, err := encoding.SerializeStructToCBOR(em, &entity)
+	assert.NoError(t, err)
+	assert.Equal(t, data, encoded)
+}
+
+func Test_Extensions_unknown_handling_JSON(t *testing.T) {
+	data := []byte(`{"entity-name":"foo","roles":[1,2],"size":7,"-8":true}`)
+
+	entity := Entity{}
+	err := encoding.PopulateStructFromJSON(data, &entity)
+	assert.NoError(t, err)
+	assert.Equal(t, "foo", entity.EntityName)
+	assert.Equal(t, []int64{1, 2}, entity.Roles)
+	assert.Equal(t, float64(7), entity.Extensions.Cached["size"]) // nolint: staticcheck
+
+	// since we only have the JSON field name "size", and we don't know
+	// what extension it corresponds to, CBOR encoding fails.
+	_, err = encoding.SerializeStructToCBOR(em, &entity)
+	assert.ErrorContains(t, err, "cached field name not an integer")
+
+	// Check that the cached value has been populated into the
+	// newly-registered struct.
+	entity.Register(&TestExtensions{})
+	assert.Equal(t, 7, entity.MustGetInt("size"))
+
+	// Check that the populated value is no longer cached.
+	_, ok := entity.Extensions.Cached["size"] // nolint: staticcheck
+	assert.False(t, ok)
+
+	// "size" has been recognized and removed form cache; we can now
+	// serialize it to CBOR as we now know its code point. The only
+	// remaining unknown extension has a name that can parse to an integer,
+	// so we can use that as the code point for CBOR, and serialization
+	// should succeed.
+	_, err = encoding.SerializeStructToCBOR(em, &entity)
+	assert.NoError(t, err)
+
+	entity = Entity{}
+	entity.Register(&TestExtensions{})
+	err = encoding.PopulateStructFromJSON(data, &entity)
+	assert.NoError(t, err)
+
+	// If extensions were registered before unmarshalling, the value gets
+	// populated directly into the registered struct, bypassing the cache.
+	assert.Equal(t, 7, entity.MustGetInt("size"))
+	_, ok = entity.Extensions.Cached["size"] // nolint: staticcheck
+	assert.False(t, ok)
+
+	// Values for keys in in the registered struct still go into cache.
+	val, ok := entity.Extensions.Cached["-8"] // nolint: staticcheck
+	assert.True(t, ok)
+	assert.True(t, val.(bool))
+
+	encoded, err := encoding.SerializeStructToJSON(&entity)
+	assert.NoError(t, err)
+
+	assert.JSONEq(t, string(data), string(encoded))
 }
