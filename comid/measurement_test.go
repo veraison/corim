@@ -798,3 +798,558 @@ func TestMval_Valid(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+// Unit tests for MKey with PSA refval-id
+
+func TestMKey_MarshalCBOR_PSARefValID_ok(t *testing.T) {
+	signerID32 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	signerID48 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	signerID64 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	tvs := []struct {
+		name     string
+		refvalID *PSARefValID
+		expected []byte
+	}{
+		{
+			name:     "PSA RefVal ID with 32-byte signer ID",
+			refvalID: MustCreatePSARefValID(signerID32, "BL", "2.1.0"),
+			expected: MustHexDecode(t, "d90259a30162424c0465322e312e30055820deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+		},
+		{
+			name:     "PSA RefVal ID with 48-byte signer ID",
+			refvalID: MustCreatePSARefValID(signerID48, "PRoT", "1.3.5"),
+			expected: MustHexDecode(t, "d90259a3016450526f540465312e332e35055830deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+		},
+		{
+			name:     "PSA RefVal ID with 64-byte signer ID",
+			refvalID: MustCreatePSARefValID(signerID64, "M1", "5.0.7"),
+			expected: MustHexDecode(t, "d90259a301624d310465352e302e37055840deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			mkey, err := NewMkeyPSARefvalID(tv.refvalID)
+			require.NoError(t, err)
+
+			actual, err := mkey.MarshalCBOR()
+			require.NoError(t, err)
+			assert.Equal(t, tv.expected, actual)
+		})
+	}
+}
+
+func TestMKey_UnmarshalCBOR_PSARefValID_ok(t *testing.T) {
+	signerID32 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	signerID48 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	signerID64 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	tvs := []struct {
+		name     string
+		input    []byte
+		expected *PSARefValID
+	}{
+		{
+			name:     "PSA RefVal ID with 32-byte signer ID",
+			input:    MustHexDecode(t, "d90259a30162424c0465322e312e30055820deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+			expected: MustCreatePSARefValID(signerID32, "BL", "2.1.0"),
+		},
+		{
+			name:     "PSA RefVal ID with 48-byte signer ID",
+			input:    MustHexDecode(t, "d90259a3016450526f540465312e332e35055830deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+			expected: MustCreatePSARefValID(signerID48, "PRoT", "1.3.5"),
+		},
+		{
+			name:     "PSA RefVal ID with 64-byte signer ID",
+			input:    MustHexDecode(t, "d90259a301624d310465352e302e37055840deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+			expected: MustCreatePSARefValID(signerID64, "M1", "5.0.7"),
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalCBOR(tv.input)
+			require.NoError(t, err)
+
+			actual, ok := mkey.Value.(*TaggedPSARefValID)
+			require.True(t, ok)
+			assert.Equal(t, tv.expected.Label, (*PSARefValID)(actual).Label)
+			assert.Equal(t, tv.expected.Version, (*PSARefValID)(actual).Version)
+			assert.Equal(t, tv.expected.SignerID, (*PSARefValID)(actual).SignerID)
+		})
+	}
+}
+
+func TestMKey_UnmarshalCBOR_PSARefValID_nok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    []byte
+		expected string
+	}{
+		{
+			name:     "Invalid CBOR data - truncated",
+			input:    MustHexDecode(t, "d9025ba301624254"),
+			expected: "unexpected EOF",
+		},
+		{
+			name:     "Invalid CBOR data - wrong type",
+			input:    MustHexDecode(t, "43616263"),
+			expected: "unexpected CBOR major type for mkey: 2",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalCBOR(tv.input)
+			assert.ErrorContains(t, err, tv.expected)
+		})
+	}
+}
+
+func TestMKey_MarshalJSON_PSARefValID_ok(t *testing.T) {
+	signerID32 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	tvs := []struct {
+		name     string
+		refvalID *PSARefValID
+		expected string
+	}{
+		{
+			name:     "PSA RefVal ID with all fields",
+			refvalID: MustCreatePSARefValID(signerID32, "BL", "2.1.0"),
+			expected: `{"type":"psa.refval-id","value":{"label":"BL","version":"2.1.0","signer-id":"3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8="}}`,
+		},
+		{
+			name:     "PSA RefVal ID with signer ID only",
+			refvalID: MustCreatePSARefValID(signerID32, "", ""),
+			expected: `{"type":"psa.refval-id","value":{"label":"","version":"","signer-id":"3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8="}}`,
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			mkey, err := NewMkeyPSARefvalID(tv.refvalID)
+			require.NoError(t, err)
+
+			actual, err := mkey.MarshalJSON()
+			require.NoError(t, err)
+			assert.JSONEq(t, tv.expected, string(actual))
+		})
+	}
+}
+
+func TestMKey_UnmarshalJSON_PSARefValID_ok(t *testing.T) {
+	signerID32 := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+
+	tvs := []struct {
+		name     string
+		input    string
+		expected *PSARefValID
+	}{
+		{
+			name:     "PSA RefVal ID with all fields",
+			input:    `{"type":"psa.refval-id","value":{"label":"BL","version":"2.1.0","signer-id":"3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8="}}`,
+			expected: MustCreatePSARefValID(signerID32, "BL", "2.1.0"),
+		},
+		{
+			name:     "PSA RefVal ID with signer ID only",
+			input:    `{"type":"psa.refval-id","value":{"signer-id":"3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8="}}`,
+			expected: MustCreatePSARefValID(signerID32, "", ""),
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalJSON([]byte(tv.input))
+			require.NoError(t, err)
+
+			actual, ok := mkey.Value.(*TaggedPSARefValID)
+			require.True(t, ok)
+
+			if tv.expected.Label != nil && *tv.expected.Label != "" {
+				assert.Equal(t, tv.expected.Label, (*PSARefValID)(actual).Label)
+			}
+			if tv.expected.Version != nil && *tv.expected.Version != "" {
+				assert.Equal(t, tv.expected.Version, (*PSARefValID)(actual).Version)
+			}
+			assert.Equal(t, tv.expected.SignerID, (*PSARefValID)(actual).SignerID)
+		})
+	}
+}
+
+func TestMKey_UnmarshalJSON_PSARefValID_nok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Invalid JSON - missing signer-id",
+			input:    `{"type":"psa.refval-id","value":{"label":"BL"}}`,
+			expected: "missing mandatory signer ID",
+		},
+		{
+			name:     "Invalid JSON - empty signer-id",
+			input:    `{"type":"psa.refval-id","value":{"signer-id":""}}`,
+			expected: "want 32, 48 or 64 bytes",
+		},
+		{
+			name:     "Invalid JSON - wrong signer-id length",
+			input:    `{"type":"psa.refval-id","value":{"signer-id":"YWJjZA=="}}`,
+			expected: "want 32, 48 or 64 bytes",
+		},
+		{
+			name:     "Invalid JSON - malformed JSON",
+			input:    `{"type":"psa.refval-id","value":`,
+			expected: "unexpected end of JSON input",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalJSON([]byte(tv.input))
+			assert.ErrorContains(t, err, tv.expected)
+		})
+	}
+}
+
+func TestMKey_PSARefValID_RoundTrip(t *testing.T) {
+	signerID := MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+	refvalID := MustCreatePSARefValID(signerID, "BL", "5.0.0")
+
+	t.Run("CBOR round trip", func(t *testing.T) {
+		mkey, err := NewMkeyPSARefvalID(refvalID)
+		require.NoError(t, err)
+
+		cborData, err := mkey.MarshalCBOR()
+		require.NoError(t, err)
+
+		var decoded Mkey
+		err = decoded.UnmarshalCBOR(cborData)
+		require.NoError(t, err)
+
+		decodedVal, ok := decoded.Value.(*TaggedPSARefValID)
+		require.True(t, ok)
+		assert.Equal(t, refvalID.SignerID, (*PSARefValID)(decodedVal).SignerID)
+		assert.Equal(t, refvalID.Label, (*PSARefValID)(decodedVal).Label)
+		assert.Equal(t, refvalID.Version, (*PSARefValID)(decodedVal).Version)
+	})
+
+	t.Run("JSON round trip", func(t *testing.T) {
+		mkey, err := NewMkeyPSARefvalID(refvalID)
+		require.NoError(t, err)
+
+		jsonData, err := mkey.MarshalJSON()
+		require.NoError(t, err)
+
+		var decoded Mkey
+		err = decoded.UnmarshalJSON(jsonData)
+		require.NoError(t, err)
+
+		decodedVal, ok := decoded.Value.(*TaggedPSARefValID)
+		require.True(t, ok)
+		assert.Equal(t, refvalID.SignerID, (*PSARefValID)(decodedVal).SignerID)
+		assert.Equal(t, refvalID.Label, (*PSARefValID)(decodedVal).Label)
+		assert.Equal(t, refvalID.Version, (*PSARefValID)(decodedVal).Version)
+	})
+}
+
+// Unit tests for MKey with UUID
+
+func TestMKey_MarshalCBOR_UUID_ok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		uuid     string
+		expected []byte
+	}{
+		{
+			name:     "Valid RFC4122 UUID v4",
+			uuid:     "31fb5abf-023e-4992-aa4e-95f9c1503bfa",
+			expected: MustHexDecode(t, "d8255031fb5abf023e4992aa4e95f9c1503bfa"),
+		},
+		{
+			name:     "Valid RFC4122 UUID v1",
+			uuid:     "f47ac10b-58cc-0372-8567-0e02b2c3d479",
+			expected: MustHexDecode(t, "d82550f47ac10b58cc037285670e02b2c3d479"),
+		},
+		{
+			name:     "Another valid RFC4122 UUID",
+			uuid:     "550e8400-e29b-41d4-a716-446655440000",
+			expected: MustHexDecode(t, "d82550550e8400e29b41d4a716446655440000"),
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			mkey, err := NewMkeyUUID(tv.uuid)
+			require.NoError(t, err)
+
+			actual, err := mkey.MarshalCBOR()
+			require.NoError(t, err)
+			assert.Equal(t, tv.expected, actual)
+		})
+	}
+}
+
+func TestMKey_UnmarshalCBOR_UUID_ok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    []byte
+		expected string
+	}{
+		{
+			name:     "Valid RFC4122 UUID v4",
+			input:    MustHexDecode(t, "d8255031fb5abf023e4992aa4e95f9c1503bfa"),
+			expected: "31fb5abf-023e-4992-aa4e-95f9c1503bfa",
+		},
+		{
+			name:     "Valid RFC4122 UUID v1",
+			input:    MustHexDecode(t, "d82550f47ac10b58cc037285670e02b2c3d479"),
+			expected: "f47ac10b-58cc-0372-8567-0e02b2c3d479",
+		},
+		{
+			name:     "Another valid RFC4122 UUID",
+			input:    MustHexDecode(t, "d82550550e8400e29b41d4a716446655440000"),
+			expected: "550e8400-e29b-41d4-a716-446655440000",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalCBOR(tv.input)
+			require.NoError(t, err)
+
+			actual, ok := mkey.Value.(*TaggedUUID)
+			require.True(t, ok)
+			assert.Equal(t, tv.expected, actual.String())
+		})
+	}
+}
+
+func TestMKey_UnmarshalCBOR_UUID_nok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    []byte
+		expected string
+	}{
+		{
+			name:     "Invalid CBOR - truncated UUID",
+			input:    MustHexDecode(t, "d825504831fb5abf023e4992"),
+			expected: "unexpected EOF",
+		},
+		{
+			name:     "Invalid CBOR - wrong type",
+			input:    MustHexDecode(t, "43616263"),
+			expected: "unexpected CBOR major type for mkey: 2",
+		},
+		{
+			name:     "Invalid CBOR - extraneous data",
+			input:    MustHexDecode(t, "d82550f47ac10b58cc037285670e02b2c3d47900"),
+			expected: "extraneous data",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalCBOR(tv.input)
+			assert.ErrorContains(t, err, tv.expected)
+		})
+	}
+}
+
+func TestMKey_MarshalJSON_UUID_ok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		uuid     string
+		expected string
+	}{
+		{
+			name:     "Valid RFC4122 UUID v4",
+			uuid:     "31fb5abf-023e-4992-aa4e-95f9c1503bfa",
+			expected: `{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}`,
+		},
+		{
+			name:     "Valid RFC4122 UUID v1",
+			uuid:     "f47ac10b-58cc-0372-8567-0e02b2c3d479",
+			expected: `{"type":"uuid","value":"f47ac10b-58cc-0372-8567-0e02b2c3d479"}`,
+		},
+		{
+			name:     "Another valid RFC4122 UUID",
+			uuid:     "550e8400-e29b-41d4-a716-446655440000",
+			expected: `{"type":"uuid","value":"550e8400-e29b-41d4-a716-446655440000"}`,
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			mkey, err := NewMkeyUUID(tv.uuid)
+			require.NoError(t, err)
+
+			actual, err := mkey.MarshalJSON()
+			require.NoError(t, err)
+			assert.JSONEq(t, tv.expected, string(actual))
+		})
+	}
+}
+
+func TestMKey_UnmarshalJSON_UUID_ok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Valid RFC4122 UUID v4",
+			input:    `{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}`,
+			expected: "31fb5abf-023e-4992-aa4e-95f9c1503bfa",
+		},
+		{
+			name:     "Valid RFC4122 UUID v1",
+			input:    `{"type":"uuid","value":"f47ac10b-58cc-0372-8567-0e02b2c3d479"}`,
+			expected: "f47ac10b-58cc-0372-8567-0e02b2c3d479",
+		},
+		{
+			name:     "Another valid RFC4122 UUID",
+			input:    `{"type":"uuid","value":"550e8400-e29b-41d4-a716-446655440000"}`,
+			expected: "550e8400-e29b-41d4-a716-446655440000",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalJSON([]byte(tv.input))
+			require.NoError(t, err)
+
+			actual, ok := mkey.Value.(*TaggedUUID)
+			require.True(t, ok)
+			assert.Equal(t, tv.expected, actual.String())
+		})
+	}
+}
+
+func TestMKey_UnmarshalJSON_UUID_nok(t *testing.T) {
+	tvs := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Invalid UUID format",
+			input:    `{"type":"uuid","value":"not-a-uuid"}`,
+			expected: "bad UUID",
+		},
+		{
+			name:     "Empty UUID",
+			input:    `{"type":"uuid","value":""}`,
+			expected: "bad UUID",
+		},
+		{
+			name:     "Non-RFC4122 UUID",
+			input:    `{"type":"uuid","value":"f47ac10b-58cc-4372-c567-0e02b2c3d479"}`,
+			expected: "expecting RFC4122 UUID",
+		},
+		{
+			name:     "Malformed JSON",
+			input:    `{"type":"uuid","value":`,
+			expected: "unexpected end of JSON input",
+		},
+		{
+			name:     "Wrong value type - integer",
+			input:    `{"type":"uuid","value":123}`,
+			expected: "json: cannot unmarshal number",
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			var mkey Mkey
+			err := mkey.UnmarshalJSON([]byte(tv.input))
+			assert.ErrorContains(t, err, tv.expected)
+		})
+	}
+}
+
+func TestMKey_UUID_RoundTrip(t *testing.T) {
+	uuidStr := "31fb5abf-023e-4992-aa4e-95f9c1503bfa"
+
+	t.Run("CBOR round trip", func(t *testing.T) {
+		mkey, err := NewMkeyUUID(uuidStr)
+		require.NoError(t, err)
+
+		cborData, err := mkey.MarshalCBOR()
+		require.NoError(t, err)
+
+		var decoded Mkey
+		err = decoded.UnmarshalCBOR(cborData)
+		require.NoError(t, err)
+
+		decodedVal, ok := decoded.Value.(*TaggedUUID)
+		require.True(t, ok)
+		assert.Equal(t, uuidStr, decodedVal.String())
+	})
+
+	t.Run("JSON round trip", func(t *testing.T) {
+		mkey, err := NewMkeyUUID(uuidStr)
+		require.NoError(t, err)
+
+		jsonData, err := mkey.MarshalJSON()
+		require.NoError(t, err)
+
+		var decoded Mkey
+		err = decoded.UnmarshalJSON(jsonData)
+		require.NoError(t, err)
+
+		decodedVal, ok := decoded.Value.(*TaggedUUID)
+		require.True(t, ok)
+		assert.Equal(t, uuidStr, decodedVal.String())
+	})
+}
+
+func TestMKey_UUID_Bytes_Input(t *testing.T) {
+	uuidBytes := []byte{
+		0x31, 0xfb, 0x5a, 0xbf, 0x02, 0x3e, 0x49, 0x92,
+		0xaa, 0x4e, 0x95, 0xf9, 0xc1, 0x50, 0x3b, 0xfa,
+	}
+
+	mkey, err := NewMkeyUUID(uuidBytes)
+	require.NoError(t, err)
+
+	val, ok := mkey.Value.(*TaggedUUID)
+	require.True(t, ok)
+	assert.Equal(t, "31fb5abf-023e-4992-aa4e-95f9c1503bfa", val.String())
+}
+
+func TestMKey_UUID_Invalid_Byte_Length(t *testing.T) {
+	tvs := []struct {
+		name  string
+		bytes []byte
+	}{
+		{
+			name:  "Too short - 15 bytes",
+			bytes: []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
+		},
+		{
+			name:  "Too long - 17 bytes",
+			bytes: []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11},
+		},
+		{
+			name:  "Empty bytes",
+			bytes: []byte{},
+		},
+	}
+
+	for _, tv := range tvs {
+		t.Run(tv.name, func(t *testing.T) {
+			_, err := NewMkeyUUID(tv.bytes)
+			assert.Error(t, err)
+		})
+	}
+}
