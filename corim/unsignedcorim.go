@@ -342,11 +342,54 @@ type Tag struct {
 	Content []byte
 }
 
+// Valid validates the tag content based on its tag number.
+// For CoMID tags (506), it unmarshals and validates the content.
+// For CoSWID tags (505), it validates the CoSWID structure.
+// For other tags, it ensures the content is valid CBOR.
 func (o Tag) Valid() error {
-	// there is no much we can check here, except making sure that the tag is
-	// not zero-length
 	if len(o.Content) == 0 {
 		return errors.New("empty tag")
+	}
+
+	switch o.Number {
+	case ComidTag:
+		return o.validateComidTag()
+	case CoswidTag:
+		return o.validateCoswidTag()
+	default:
+		return o.validateGenericCBOR()
+	}
+}
+
+// validateComidTag unmarshals and validates CoMID tag content.
+func (o Tag) validateComidTag() error {
+	var c comid.Comid
+	if err := dm.Unmarshal(o.Content, &c); err != nil {
+		return fmt.Errorf("invalid CoMID content: %w", err)
+	}
+
+	if err := c.Valid(); err != nil {
+		return fmt.Errorf("CoMID validation failed: %w", err)
+	}
+
+	return nil
+}
+
+// validateCoswidTag validates CoSWID tag content by attempting to unmarshal it.
+func (o Tag) validateCoswidTag() error {
+	var s swid.SoftwareIdentity
+	if err := dm.Unmarshal(o.Content, &s); err != nil {
+		return fmt.Errorf("invalid CoSWID content: %w", err)
+	}
+
+	return nil
+}
+
+// validateGenericCBOR ensures the tag content is valid CBOR for unknown tag types.
+func (o Tag) validateGenericCBOR() error {
+	var raw interface{}
+	if err := dm.Unmarshal(o.Content, &raw); err != nil {
+		return fmt.Errorf("invalid CBOR content: %w", err)
 	}
 	return nil
 }
