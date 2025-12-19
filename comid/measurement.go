@@ -423,6 +423,7 @@ type Mval struct {
 	UEID               *eat.UEID           `cbor:"9,keyasint,omitempty" json:"ueid,omitempty"`
 	UUID               *UUID               `cbor:"10,keyasint,omitempty" json:"uuid,omitempty"`
 	Name               *string             `cbor:"11,keyasint,omitempty" json:"name,omitempty"`
+	CryptoKeys         *CryptoKeys         `cbor:"13,keyasint,omitempty" json:"cryptokeys,omitempty"`
 	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
 	Extensions
 }
@@ -510,6 +511,7 @@ func (o Mval) Valid() error {
 		o.UEID == nil &&
 		o.UUID == nil &&
 		o.Name == nil &&
+		o.CryptoKeys == nil &&
 		o.IntegrityRegisters == nil &&
 		o.IsEmpty() {
 
@@ -526,6 +528,13 @@ func (o Mval) Valid() error {
 	// Validate Digests
 	if o.Digests != nil {
 		if err := o.Digests.Valid(); err != nil {
+			return err
+		}
+	}
+
+	// Validate CryptoKeys
+	if o.CryptoKeys != nil {
+		if err := o.CryptoKeys.Valid(); err != nil {
 			return err
 		}
 	}
@@ -730,6 +739,19 @@ func (o *Measurement) AddDigest(algID uint64, digest []byte) *Measurement {
 		o.Val.Digests = ds
 	}
 
+	return o
+}
+
+// AddCryptoKey adds the supplied CryptoKey to the measurement-values-map of the
+// target measurement
+func (o *Measurement) AddCryptoKey(key *CryptoKey) *Measurement {
+	if o != nil {
+		ck := o.Val.CryptoKeys
+		if ck == nil {
+			ck = NewCryptoKeys()
+		}
+		o.Val.CryptoKeys = ck.Add(key)
+	}
 	return o
 }
 

@@ -798,3 +798,36 @@ func TestMval_Valid(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+// Test Marshal and Unmarshal of Cryptokeys(tag 13)
+func TestMeasurement_CryptoKeys_RoundTrip(t *testing.T) {
+	// Create a new measurement with a valid key
+	m := MustNewMeasurement("31fb5abf-023e-4992-aa4e-95f9c1503bfa", UUIDType)
+
+	// Create a CryptoKey (using a dummy PKIX base64 key for testing)
+	pkText := `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE=
+-----END PUBLIC KEY-----`
+	ck := MustNewPKIXBase64Key(pkText)
+
+	// Add CryptoKey to Measurement
+	m.AddCryptoKey(ck)
+
+	// Marshal to CBOR
+	// Use em (from cbor.go)
+	data, err := em.Marshal(m)
+	require.NoError(t, err)
+
+	// Check if tag 13 is present in the CBOR output hex
+	// We can try to decode it back to verify.
+
+	// Unmarshal back
+	var m2 Measurement
+	err = dm.Unmarshal(data, &m2)
+	require.NoError(t, err)
+
+	// Verify CryptoKeys are present and correct
+	require.NotNil(t, m2.Val.CryptoKeys)
+	require.Len(t, *m2.Val.CryptoKeys, 1)
+	assert.Equal(t, pkText, (*m2.Val.CryptoKeys)[0].String())
+}
