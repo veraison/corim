@@ -144,8 +144,13 @@ func (o ClassID) String() string {
 // SetImplID sets the value of the target ClassID to the supplied PSA
 // Implementation ID (see Section 3.2.2 of draft-tschofenig-rats-psa-token)
 func (o *ClassID) SetImplID(implID ImplID) *ClassID {
+	b, err := NewBytes(implID.String())
+	if err != nil {
+		return nil
+	}
+	ret := TaggedImplID(*b)
 	if o != nil {
-		o.Value = TaggedImplID(implID)
+		o.Value = ret
 	}
 	return o
 }
@@ -229,7 +234,7 @@ func (o ImplID) Valid() error {
 	return nil
 }
 
-type TaggedImplID ImplID
+type TaggedImplID = TaggedBytes
 
 func NewImplIDClassID(val any) (*ClassID, error) {
 	var ret TaggedImplID
@@ -244,7 +249,12 @@ func NewImplIDClassID(val any) (*ClassID, error) {
 			return nil, fmt.Errorf("bad psa.impl-id: got %d bytes, want 32", nb)
 		}
 
-		copy(ret[:], t)
+		b, err := NewBytes(t)
+		if err != nil {
+			return nil, fmt.Errorf("bad psa.impl-id: got %x bytes, want 32", b)
+		}
+		ret = TaggedImplID(*b)
+
 	case string:
 		v, err := base64.StdEncoding.DecodeString(t)
 		if err != nil {
@@ -255,15 +265,35 @@ func NewImplIDClassID(val any) (*ClassID, error) {
 			return nil, fmt.Errorf("bad psa.impl-id: decoded %d bytes, want 32", nb)
 		}
 
-		copy(ret[:], v)
+		b, err := NewBytes(v)
+		if err != nil {
+			return nil, fmt.Errorf("bad psa.impl-id: got %x bytes, want 32", b)
+		}
+		ret = TaggedImplID(*b)
+
 	case TaggedImplID:
-		copy(ret[:], t[:])
+		if nb := len(t); nb != 32 {
+			return nil, fmt.Errorf("bad psa.impl-id: got %d bytes, want 32", nb)
+		}
+		ret = t
 	case *TaggedImplID:
-		copy(ret[:], (*t)[:])
+		if nb := len(*t); nb != 32 {
+			return nil, fmt.Errorf("bad psa.impl-id: got %d bytes, want 32", nb)
+		}
+		ret = *t
 	case ImplID:
-		copy(ret[:], t[:])
+		b, err := NewBytes(t.String())
+		if err != nil {
+			return nil, fmt.Errorf("bad %w", err)
+		}
+		ret = TaggedImplID(*b)
 	case *ImplID:
-		copy(ret[:], (*t)[:])
+		b, err := NewBytes((*t).String())
+		ret = TaggedImplID(*b)
+		if err != nil {
+			return nil, fmt.Errorf("bad %w", err)
+		}
+
 	default:
 		return nil, fmt.Errorf("unexpected type for psa.impl-id: %T", t)
 	}
@@ -278,22 +308,6 @@ func MustNewImplIDClassID(val any) *ClassID {
 	}
 
 	return ret
-}
-
-func (o TaggedImplID) Valid() error {
-	return ImplID(o).Valid()
-}
-
-func (o TaggedImplID) String() string {
-	return ImplID(o).String()
-}
-
-func (o TaggedImplID) Type() string {
-	return ImplIDType
-}
-
-func (o TaggedImplID) Bytes() []byte {
-	return o[:]
 }
 
 func (o TaggedImplID) MarshalJSON() ([]byte, error) {
