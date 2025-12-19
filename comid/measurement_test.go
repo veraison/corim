@@ -799,7 +799,7 @@ func TestMval_Valid(t *testing.T) {
 	})
 }
 
-// Test Marshal and Unmarshall of Cryptokeys(tag 13)
+// Test Marshal and Unmarshal of Cryptokeys(tag 13)
 func TestMeasurement_CryptoKeys_RoundTrip(t *testing.T) {
 	// Create a new measurement with a valid key
 	m := MustNewMeasurement("31fb5abf-023e-4992-aa4e-95f9c1503bfa", UUIDType)
@@ -819,7 +819,7 @@ MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE=
 	require.NoError(t, err)
 
 	// Check if tag 13 is present in the CBOR output hex
-	// We can try to decode it back to verifys.
+	// We can try to decode it back to verify.
 
 	// Unmarshal back
 	var m2 Measurement
