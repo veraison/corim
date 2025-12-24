@@ -107,6 +107,8 @@ func IsAbsoluteURI(s string) error {
 	return nil
 }
 
+// String2URI converts a string pointer to a TaggedURI pointer.
+// Returns nil if the input is nil. Validates that the string is an absolute URI.
 func String2URI(s *string) (*TaggedURI, error) {
 	if s == nil {
 		return nil, nil
@@ -119,7 +121,6 @@ func String2URI(s *string) (*TaggedURI, error) {
 	v := TaggedURI(*s)
 
 	return &v, nil
-
 }
 
 // AddEntity adds an organizational entity, together with the roles this entity
