@@ -48,3 +48,14 @@ func (o TaggedBytes) Bytes() []byte {
 
 	return o
 }
+
+// ValidatePSASignerID checks that TaggedBytes conforms to PSA Signer ID requirements.
+// Signer IDs must be 32, 48, or 64 bytes (SHA-256, SHA-384, or SHA-512).
+func (o TaggedBytes) ValidatePSASignerID() error {
+	switch len(o) {
+	case 32, 48, 64:
+		return nil
+	default:
+		return fmt.Errorf("PSA signer ID must be 32, 48, or 64 bytes (got %d)", len(o))
+	}
+}

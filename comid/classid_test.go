@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
@@ -31,9 +32,9 @@ func TestClassID_MarshalCBOR_UUID(t *testing.T) {
 func TestClassID_MarshalCBOR_ImplID(t *testing.T) {
 	tv := MustNewImplIDClassID(TestImplID)
 
-	// 600 (h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031')
-	// tag(600): d9 0258
-	expected := MustHexDecode(t, "d90258582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031")
+	// 560 (h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031')
+	// tag(560): d9 0230
+	expected := MustHexDecode(t, "d90230582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031")
 
 	actual, err := tv.MarshalCBOR()
 
@@ -69,16 +70,15 @@ func TestClassID_UnmarshalCBOR_UUID_OK(t *testing.T) {
 }
 
 func TestClassID_UnmarshalCBOR_ImplID_OK(t *testing.T) {
-	tv := MustHexDecode(t, "d90258582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031")
-
-	expected := b64TestImplID()
+	tv := MustHexDecode(t, "d90230582061636d652d696d706c656d656e746174696f6e2d69642d303030303030303031")
 
 	var actual ClassID
 	err := actual.UnmarshalCBOR(tv)
 
 	assert.Nil(t, err)
-	assert.Equal(t, "psa.impl-id", actual.Type())
-	assert.Equal(t, expected, actual.String())
+	assert.Equal(t, "bytes", actual.Type()) // Now "bytes" because it's TaggedBytes
+	// TaggedBytes.String() returns the raw string, not base64 encoded
+	assert.Equal(t, string(TestImplID[:]), actual.String())
 }
 
 func TestClassID_UnmarshalCBOR_badInput(t *testing.T) {
@@ -118,9 +118,12 @@ func TestClassID_UnmarshalJSON_ImplID(t *testing.T) {
 	err := actual.UnmarshalJSON([]byte(tv))
 
 	assert.Nil(t, err)
-	assert.Equal(t, "psa.impl-id", actual.Type())
-	// the returned string is the base64 encoding of the stored binary
-	assert.Equal(t, expected, actual.String())
+	assert.Nil(t, err)
+	assert.Equal(t, "bytes", actual.Type()) // Type is now "bytes" due to TaggedBytes
+	// TaggedBytes.String() returns the raw string, but "expected" here is base64
+	// So we need to decode expected to compare with actual.String()
+	expBytes, _ := base64.StdEncoding.DecodeString(expected)
+	assert.Equal(t, string(expBytes), actual.String())
 }
 
 func TestClassID_UnmarshalJSON_badInput_unknown_type(t *testing.T) {
@@ -149,8 +152,10 @@ func TestClassID_UnmarshalJSON_badInput_empty_value(t *testing.T) {
 	var actual ClassID
 	err := actual.UnmarshalJSON([]byte(tv))
 
-	assert.EqualError(t, err, "cannot unmarshal class id: bad psa.impl-id: decoded 0 bytes, want 32")
-	assert.Equal(t, "", actual.Type())
+	// TaggedBytes is permissive, BUT ClassID.UnmarshalJSON now enforces strict validation for psa.impl-id
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "bad psa.impl-id: decoded 0 bytes, want 32")
+	assert.Equal(t, "", actual.Type()) // type remains unset/invalid
 }
 
 func TestClassID_UnmarshalJSON_badInput_badly_encoded_ImplID_value(t *testing.T) {
@@ -321,18 +326,14 @@ func Test_NewImplIDClassID(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expected[:], classID.Bytes())
 
-	taggedImplID := TaggedImplID(TestImplID)
-
 	for _, v := range []any{
 		TestImplID,
 		&TestImplID,
-		taggedImplID,
-		&taggedImplID,
-		taggedImplID.Bytes(),
+		TestImplID[:],
 	} {
 		classID, err = NewImplIDClassID(v)
 		require.NoError(t, err)
-		assert.Equal(t, taggedImplID.Bytes(), classID.Bytes())
+		assert.Equal(t, TestImplID[:], classID.Bytes())
 	}
 
 	expected = [32]byte{

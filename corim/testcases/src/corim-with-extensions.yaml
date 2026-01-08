@@ -30,7 +30,7 @@ value:
           0:
           - - 0:
                 0:
-                  tag: 600
+                  tag: 560
                   value: !!binary  |-
                       YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
                 1: ACME

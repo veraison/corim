@@ -38,8 +38,8 @@ func TestClass_MarshalCBOR_ImplID_full(t *testing.T) {
 		SetIndex(1)
 	require.NotNil(t, tv)
 
-	// {0: 600(h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031'), 1: "EMCA Ltd", 2: "Rennurdaor", 3: 2, 4: 1}
-	expected := MustHexDecode(t, "a500d90258582061636d652d696d706c656d656e746174696f6e2d69642d3030303030303030310168454d4341204c7464026a52656e6e757264616f7203020401")
+	// {0: 560(h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031'), 1: "EMCA Ltd", 2: "Rennurdaor", 3: 2, 4: 1}
+	expected := MustHexDecode(t, "a500d90230582061636d652d696d706c656d656e746174696f6e2d69642d3030303030303030310168454d4341204c7464026a52656e6e757264616f7203020401")
 
 	actual, err := tv.ToCBOR()
 
@@ -157,15 +157,15 @@ func TestClass_MarshalCBOR_Index_only(t *testing.T) {
 }
 
 func TestClassID_UnmarshalCBOR_full(t *testing.T) {
-	// {0: 600(h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031'), 1: "EMCA Ltd", 2: "Rennurdaor", 3: 2, 4: 1}
-	tv := MustHexDecode(t, "a500d90258582061636d652d696d706c656d656e746174696f6e2d69642d3030303030303030310168454d4341204c7464026a52656e6e757264616f7203020401")
+	// {0: 560(h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031'), 1: "EMCA Ltd", 2: "Rennurdaor", 3: 2, 4: 1}
+	tv := MustHexDecode(t, "a500d90230582061636d652d696d706c656d656e746174696f6e2d69642d3030303030303030310168454d4341204c7464026a52656e6e757264616f7203020401")
 
 	var actual Class
 	err := actual.FromCBOR(tv)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, actual.ClassID)
-	assert.Equal(t, b64TestImplID(), actual.ClassID.String())
+	assert.Equal(t, string(TestImplID[:]), actual.ClassID.String())
 	assert.NotNil(t, actual.Vendor)
 	assert.Equal(t, "EMCA Ltd", actual.GetVendor())
 	assert.NotNil(t, actual.Model)
