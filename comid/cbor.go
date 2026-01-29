@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -32,9 +32,6 @@ var (
 		560: TaggedBytes{},
 		561: TaggedCertPathThumbprint{},
 		564: TaggedRawIntRange{},
-		// PSA profile tags
-		601: TaggedPSARefValID{},
-		602: TaggedCCAPlatformConfigID(""),
 	}
 )
 

@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package corim
 
@@ -106,6 +106,7 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 		Add(comid.ExtReferenceValue, &refValExtensions{})
 	err = RegisterProfile(profID, extMap)
 	require.NoError(t, err)
+	defer UnregisterProfile(profID)
 
 	c, err := UnmarshalUnsignedCorimFromCBOR(testGoodUnsignedCorimCBOR)
 	assert.NoError(t, err)
@@ -191,6 +192,66 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 
 	assert.Equal(t, profID, s.UnsignedCorim.Profile)
 	assert.Equal(t, "foo", s.UnsignedCorim.MustGetString("Extension1"))
+}
 
-	UnregisterProfile(profID)
+func TestGetSignedCorim_NilProfile(t *testing.T) {
+	s := GetSignedCorim(nil)
+	assert.NotNil(t, s)
+}
+
+func TestGetSignedCorim_UnregisteredProfile(t *testing.T) {
+	profID, err := eat.NewProfile("http://unregistered.example.com")
+	require.NoError(t, err)
+
+	s := GetSignedCorim(profID)
+	assert.NotNil(t, s)
+}
+
+func TestGetUnsignedCorim_NilProfile(t *testing.T) {
+	c := GetUnsignedCorim(nil)
+	assert.NotNil(t, c)
+}
+
+func TestGetUnsignedCorim_UnregisteredProfile(t *testing.T) {
+	profID, err := eat.NewProfile("http://unregistered.example.com")
+	require.NoError(t, err)
+
+	c := GetUnsignedCorim(profID)
+	assert.NotNil(t, c)
+}
+
+func TestUnmarshalUnsignedCorimFromCBOR_NoTag(t *testing.T) {
+	// Test with invalid data (no tag)
+	_, err := UnmarshalUnsignedCorimFromCBOR([]byte{0x00, 0x01, 0x02})
+	assert.Error(t, err)
+}
+
+func TestUnmarshalUnsignedCorimFromJSON_Invalid(t *testing.T) {
+	_, err := UnmarshalUnsignedCorimFromJSON([]byte(`{invalid`))
+	assert.Error(t, err)
+}
+
+func TestUnmarshalSignedCorimFromCBOR_Invalid(t *testing.T) {
+	_, err := UnmarshalSignedCorimFromCBOR([]byte{0x00, 0x01, 0x02})
+	assert.Error(t, err)
+}
+
+func TestUnmarshalComidFromCBOR_NilProfile(t *testing.T) {
+	// Build a valid comid with triples and serialize to CBOR
+	c, err := UnmarshalComidFromJSON(testComidJSON, nil)
+	require.NoError(t, err)
+
+	cborData, err := c.ToCBOR()
+	require.NoError(t, err)
+
+	result, err := UnmarshalComidFromCBOR(cborData, nil)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestUnmarshalComidFromJSON_NilProfile(t *testing.T) {
+	// Use testComidJSON embedded file, which has valid comid
+	result, err := UnmarshalComidFromJSON(testComidJSON, nil)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
 }

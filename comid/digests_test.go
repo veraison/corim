@@ -236,3 +236,13 @@ func TestDigests_Compare_False_PartialMatch(t *testing.T) {
 
 	assert.False(t, claim.CompareAgainstReference(*ref))
 }
+
+func TestNewHashEntry(t *testing.T) {
+	// Valid hash entry
+	he := NewHashEntry(swid.Sha256, MustHexDecode(t, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
+	assert.NotNil(t, he)
+
+	// Invalid hash entry - wrong length for algorithm
+	he = NewHashEntry(swid.Sha256, []byte{0x01, 0x02})
+	assert.Nil(t, he)
+}

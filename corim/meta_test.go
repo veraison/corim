@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -215,4 +215,41 @@ func Test_meta_Valid(t *testing.T) {
 	err := meta.Valid()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid validity: invalid not-before / not-after")
+}
+
+func TestMeta_ToJSON(t *testing.T) {
+	var (
+		notAfter  = time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)
+		notBefore = time.Date(2020, time.October, 1, 0, 0, 0, 0, time.UTC)
+		name      = "ACME Ltd."
+		uri       = "https://acme.example"
+	)
+
+	tv := NewMeta().
+		SetSigner(name, &uri).
+		SetValidity(notAfter, &notBefore)
+	require.NotNil(t, tv)
+
+	jsonData, err := tv.ToJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, jsonData)
+	assert.Contains(t, string(jsonData), "ACME Ltd.")
+	assert.Contains(t, string(jsonData), "acme.example")
+}
+
+func TestMeta_FromJSON(t *testing.T) {
+	jsonData := []byte(`{"signer":{"name":"ACME Ltd.","uri":"https://acme.example"},"validity":{"not-after":"2021-10-01T00:00:00Z","not-before":"2020-10-01T00:00:00Z"}}`)
+
+	var meta Meta
+	err := meta.FromJSON(jsonData)
+	assert.NoError(t, err)
+	assert.Equal(t, "ACME Ltd.", meta.Signer.Name)
+}
+
+func TestMeta_FromJSON_Invalid(t *testing.T) {
+	jsonData := []byte(`{invalid}`)
+
+	var meta Meta
+	err := meta.FromJSON(jsonData)
+	assert.Error(t, err)
 }

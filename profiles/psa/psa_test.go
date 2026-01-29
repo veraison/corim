@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package psa
@@ -103,13 +103,6 @@ func newPSAEnvironmentWithImplIDLength(length int) comid.Environment {
 		Class:    class,
 		Instance: mustNewPSAInstanceID(),
 	}
-}
-
-// newTestMeasurementWithSignerID creates a Measurement with cryptokeys (signer-id)
-func newTestMeasurementWithSignerID(signerID *comid.CryptoKeys) comid.Measurement {
-	m := comid.Measurement{}
-	m.Val.CryptoKeys = signerID
-	return m
 }
 
 func TestValidatePSASignerID_ValidAndInvalidLengths(t *testing.T) {

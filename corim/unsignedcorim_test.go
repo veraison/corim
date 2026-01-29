@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -53,23 +53,43 @@ func TestUnsignedCorim_id_uuid_empty(t *testing.T) {
 }
 
 func TestUnsignedCorim_AddComid_and_marshal(t *testing.T) {
+	// Build a CoMID with generic types (UUID for class-id and measurement key)
+	c := comid.NewComid().
+		SetLanguage("en-GB").
+		SetTagIdentity("43BBE37F-2E61-4B33-AED3-53CFF1428B16", 0).
+		AddEntity("ACME Ltd.", &comid.TestRegID, comid.RoleCreator, comid.RoleTagCreator, comid.RoleMaintainer).
+		AddReferenceValue(
+			&comid.ValueTriple{
+				Environment: comid.Environment{
+					Class: comid.NewClassUUID(comid.TestUUID).
+						SetVendor("ACME").
+						SetModel("RoadRunner"),
+				},
+				Measurements: *comid.NewMeasurements().
+					Add(
+						comid.MustNewUUIDMeasurement(comid.TestUUID).
+							AddDigest(1, comid.MustHexDecode(t, "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7")),
+					),
+			},
+		)
+	require.NotNil(t, c)
+
 	tv := NewUnsignedCorim().SetID("test corim id")
 	require.NotNil(t, tv)
-
-	c := &comid.Comid{}
-	err := c.FromJSON([]byte(comid.PSARefValJSONTemplate))
-	require.Nil(t, err)
 
 	assert.NotNil(t, tv.AddComid(c))
 
 	actual, err := tv.ToCBOR()
 	assert.Nil(t, err)
 
-	fmt.Printf("CBOR: %x", actual)
+	fmt.Printf("CBOR: %x\n", actual)
 
-	expected := testGoodUnsignedCorimCBOR
-
-	assertCoRIMEq(t, expected, actual)
+	// Verify the result can be decoded back
+	var decoded UnsignedCorim
+	err = decoded.FromCBOR(actual)
+	assert.Nil(t, err)
+	assert.Equal(t, "test corim id", decoded.GetID())
+	assert.Equal(t, 1, len(decoded.Tags))
 }
 
 func TestUnsignedCorim_AddCots_and_marshal(t *testing.T) {
@@ -431,4 +451,41 @@ func TestTag_CBOR_marshal(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, actual)
+}
+
+func TestUnsignedCorim_ToJSON_FromJSON_roundtrip(t *testing.T) {
+	tv := NewUnsignedCorim().
+		SetID("test-corim-id")
+	require.NotNil(t, tv)
+
+	// Use testGoodUnsignedCorimCBOR which is known to be valid
+	var valid UnsignedCorim
+	err := valid.FromCBOR(testGoodUnsignedCorimCBOR)
+	require.NoError(t, err)
+
+	jsonData, err := valid.ToJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, jsonData)
+
+	var decoded UnsignedCorim
+	err = decoded.FromJSON(jsonData)
+	assert.NoError(t, err)
+
+	assert.EqualValues(t, valid.ID, decoded.ID)
+	assert.EqualValues(t, valid.Profile, decoded.Profile)
+	assert.EqualValues(t, valid.DependentRims, decoded.DependentRims)
+	assert.EqualValues(t, valid.RimValidity, decoded.RimValidity)
+	assert.EqualValues(t, valid.Entities, decoded.Entities)
+	assert.Equal(t, len(valid.Tags), len(decoded.Tags))
+	for i, expectedTag := range valid.Tags {
+		actualTag := decoded.Tags[i]
+		assert.Equal(t, expectedTag.Number, actualTag.Number)
+		assertCBOREq(t, expectedTag.Content, actualTag.Content)
+	}
+}
+
+func TestUnsignedCorim_FromJSON_Invalid(t *testing.T) {
+	var c UnsignedCorim
+	err := c.FromJSON([]byte(`{invalid}`))
+	assert.Error(t, err)
 }

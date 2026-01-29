@@ -36,12 +36,9 @@ value:
                 1: ACME
                 2: RoadRunner
             - - 0:
-                  tag: 601
-                  value:
-                    1: BL
-                    4: 2.1.0
-                    5: !!binary |-
-                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                  tag: 37
+                  value: !!binary |-
+                    MftavwI+SZKqTpX5wVA7+g==
                 1:
                   2:
                   - - 1
@@ -49,12 +46,9 @@ value:
                       h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=
                   -1: 1720782190
               - 0:
-                  tag: 601
-                  value:
-                    1: PRoT
-                    4: 1.3.5
-                    5: !!binary |-
-                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                  tag: 37
+                  value: !!binary |-
+                    MftavwI+SZKqTpX5wVA7+g==
                 1:
                   2:
                   - - 1
@@ -62,12 +56,9 @@ value:
                       AmOCmYm2/ZVPcrqvL8ZLwuLwHWktTecphuqAj26ZgT8=
                   -1: 1720782190
               - 0:
-                  tag: 601
-                  value:
-                    1: ARoT
-                    4: 0.1.4
-                    5: !!binary |-
-                      rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                  tag: 37
+                  value: !!binary |-
+                    MftavwI+SZKqTpX5wVA7+g==
                 1:
                   2:
                   - - 1

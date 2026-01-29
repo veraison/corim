@@ -9,11 +9,7 @@
       "name": "ACME Ltd.",
       "regid": "https://acme.example",
       "address": "123 Fake Street",
-      "roles": [
-        "tagCreator",
-        "creator",
-        "maintainer"
-      ]
+      "roles": ["tagCreator", "creator", "maintainer"]
     }
   ],
   "triples": {
@@ -22,7 +18,7 @@
         "environment": {
           "class": {
             "id": {
-              "type": "psa.impl-id",
+              "type": "bytes",
               "value": "YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE="
             },
             "vendor": "ACME",
@@ -32,8 +28,8 @@
         "measurements": [
           {
             "key": {
-              "type": "cca.platform-config-id",
-              "value": "cfg v1.0.0"
+              "type": "uuid",
+              "value": "31FB5ABF-023E-4992-AA4E-95E9DFE6323D"
             },
             "value": {
               "timestamp": 1720782190,
@@ -48,4 +44,3 @@
     ]
   }
 }
-
