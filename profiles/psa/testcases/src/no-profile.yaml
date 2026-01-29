@@ -1,0 +1,45 @@
+# CoRIM without any profile (control case):
+# - No profile field
+# - Should parse successfully without profile validation
+---
+tag: 501
+value:
+  0: no-profile-corim
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          0: en-GB
+          1:
+            0: !!binary |-
+              Q7vjfy5hSzOu01PP8UKLFg==
+          2:
+            - 0: ACME Ltd.
+              1:
+                tag: 32
+                value: https://acme.example
+              2:
+                - 0
+                - 1
+                - 2
+          4:
+            0:
+              - - 0:
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
+                    1: ACME
+                    2: RoadRunner
+                - - 0:
+                      tag: 601
+                      value:
+                        1: BL
+                        4: 2.1.0
+                        5: !!binary |-
+                          rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                    1:
+                      2:
+                        - - 1
+                          - !!binary |-
+                            h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=
