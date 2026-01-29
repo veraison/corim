@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
@@ -29,4 +29,12 @@ func Test_NewTaggedUEID(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, []byte(TestUEID), ret.Bytes())
 	}
+}
+
+func TestUEID_Empty(t *testing.T) {
+	var empty UEID
+	assert.True(t, empty.Empty())
+
+	nonEmpty := UEID(TestUEID)
+	assert.False(t, nonEmpty.Empty())
 }

@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -275,4 +275,102 @@ func Test_MustNewEntityName(t *testing.T) {
 	assert.Panics(t, func() {
 		MustNewEntityName(7, "int")
 	})
+}
+
+func TestEntity_MarshalCBOR(t *testing.T) {
+	e := NewEntity().
+		SetName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+
+	data, err := e.MarshalCBOR()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+
+	var decoded Entity
+	err = decoded.UnmarshalCBOR(data)
+	assert.NoError(t, err)
+	assert.Equal(t, "ACME Ltd.", decoded.Name.String())
+}
+
+func TestEntity_MarshalJSON(t *testing.T) {
+	e := NewEntity().
+		SetName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+
+	data, err := e.MarshalJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+	assert.Contains(t, string(data), "ACME Ltd.")
+}
+
+func TestEntity_UnmarshalJSON(t *testing.T) {
+	jsonData := []byte(`{"name":"ACME Ltd.","regid":"http://acme.example","roles":["manifestCreator"]}`)
+
+	var e Entity
+	err := e.UnmarshalJSON(jsonData)
+	assert.NoError(t, err)
+	assert.Equal(t, "ACME Ltd.", e.Name.String())
+}
+
+func TestEntity_GetExtensions(t *testing.T) {
+	e := NewEntity()
+	exts := e.GetExtensions()
+	// Should return nil or empty for unregistered extensions
+	assert.Nil(t, exts)
+}
+
+func TestEntities_MarshalCBOR(t *testing.T) {
+	e := NewEntity().
+		SetName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+
+	es := NewEntities().Add(e)
+	require.NotNil(t, es)
+
+	data, err := es.MarshalCBOR()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+
+	var decoded Entities
+	err = decoded.UnmarshalCBOR(data)
+	assert.NoError(t, err)
+	assert.False(t, decoded.IsEmpty())
+}
+
+func TestEntities_MarshalJSON(t *testing.T) {
+	e := NewEntity().
+		SetName("ACME Ltd.").
+		SetRegID("http://acme.example").
+		SetRoles(RoleManifestCreator)
+	require.NotNil(t, e)
+
+	es := NewEntities().Add(e)
+	require.NotNil(t, es)
+
+	data, err := es.MarshalJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+	assert.Contains(t, string(data), "ACME Ltd.")
+}
+
+func TestEntities_UnmarshalJSON(t *testing.T) {
+	jsonData := []byte(`[{"name":"ACME Ltd.","regid":"http://acme.example","roles":["manifestCreator"]}]`)
+
+	var es Entities
+	err := es.UnmarshalJSON(jsonData)
+	assert.NoError(t, err)
+	assert.False(t, es.IsEmpty())
+}
+
+func TestEntities_GetExtensions(t *testing.T) {
+	es := NewEntities()
+	exts := es.GetExtensions()
+	// Should return nil or empty for unregistered extensions
+	assert.Nil(t, exts)
 }

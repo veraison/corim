@@ -31,15 +31,20 @@ value:
                         YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
                     1: ACME
                     2: RoadRunner
-                - - 0:
-                      tag: 601
-                      value:
-                        1: BL
-                        4: 2.1.0
-                        5: !!binary |-
-                          rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=
+                - - 0: "psa.software-component"
                     1:
+                      # version (key 0)
+                      0:
+                        0: 2.1.0
+                      # digests (key 2)
                       2:
                         - - 1
                           - !!binary |-
                             h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=
+                      # name (key 11)
+                      11: BL
+                      # cryptokeys (key 13) - signer-id: tagged-bytes with 32 bytes
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            rLsRx+TaIXIFUjzkzhokWuGiOa48a/2eeHH35di66Gs=

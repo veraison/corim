@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -24,17 +24,6 @@ type Class struct {
 // identifier
 func NewClassUUID(uuid UUID) *Class {
 	classID, err := NewUUIDClassID(uuid)
-	if err != nil {
-		return nil
-	}
-
-	return &Class{ClassID: classID}
-}
-
-// NewClassImplID instantiates a new Class object that identifies the specified PSA
-// Implementation ID
-func NewClassImplID(implID ImplID) *Class {
-	classID, err := NewImplIDClassID(implID)
 	if err != nil {
 		return nil
 	}

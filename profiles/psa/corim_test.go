@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,8 +29,12 @@ func getTestcasePath(filename string) string {
 
 // loadTestcase loads a CBOR testcase file
 func loadTestcase(t *testing.T, filename string) []byte {
+	// Validate filename is relative (no absolute paths or parent directory traversal)
+	if filepath.IsAbs(filename) || strings.Contains(filename, "..") {
+		t.Fatalf("invalid testcase filename: %s", filename)
+	}
 	path := getTestcasePath(filename)
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // #nosec G304 - path is validated above
 	require.NoError(t, err, "failed to load testcase %s", filename)
 	return data
 }
@@ -87,11 +92,7 @@ func TestCoRIMIntegration_InvalidImplementationID(t *testing.T) {
 
 	// Validation should FAIL due to invalid Implementation ID
 	err := m.Valid()
-	require.Error(t, err, "PSA validation should fail for invalid implementation-id")
-	assert.Contains(t, err.Error(), "implementation-id",
-		"error should mention implementation-id")
-	assert.Contains(t, err.Error(), "32 bytes",
-		"error should mention expected length")
+	assert.ErrorContains(t, err, "implementation-id must be exactly 32 bytes")
 }
 
 // TestCoRIMIntegration_InvalidAttestVerifKey tests that a CoRIM with invalid
@@ -105,11 +106,7 @@ func TestCoRIMIntegration_InvalidAttestVerifKey(t *testing.T) {
 
 	// Validation should FAIL due to multiple attestation keys
 	err := m.Valid()
-	require.Error(t, err, "PSA validation should fail for multiple attest keys")
-	assert.Contains(t, err.Error(), "verification-keys",
-		"error should mention verification-keys")
-	assert.Contains(t, err.Error(), "exactly one",
-		"error should mention exactly one key required")
+	assert.ErrorContains(t, err, "verification-keys must contain exactly one entry")
 }
 
 // TestCoRIMIntegration_NoProfile tests that a CoRIM without a profile:

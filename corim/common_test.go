@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	// minimalist unsigned-corim that embeds comid.PSARefValJSONTemplate
+	// minimalist unsigned-corim that embeds comid test template
 	//go:embed testcases/unsigned-good-corim.cbor
 	testGoodUnsignedCorimCBOR []byte
 

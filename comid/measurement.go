@@ -1,4 +1,4 @@
-// Copyright 2021-2025 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -19,8 +19,8 @@ import (
 const MaxUint64 = ^uint64(0)
 
 // Mkey stores a $measured-element-type-choice.
-// The supported types are OID, UUID, PSA refval-id, CCA platform-config-id,
-// unsigned integer, and string.
+// The supported types are OID, UUID, unsigned integer, and string.
+// Profile-specific measurement key types can be registered via RegisterMkeyType.
 type Mkey struct {
 	Value IMKeyValue
 }
@@ -70,34 +70,6 @@ func (o Mkey) Valid() error {
 	return nil
 }
 
-func (o Mkey) GetPSARefValID() (PSARefValID, error) {
-	if !o.IsSet() {
-		return PSARefValID{}, errors.New("MKey is not set")
-	}
-	switch t := o.Value.(type) {
-	case *TaggedPSARefValID:
-		return PSARefValID(*t), nil
-	case TaggedPSARefValID:
-		return PSARefValID(t), nil
-	default:
-		return PSARefValID{}, fmt.Errorf("measurement-key type is: %T", t)
-	}
-}
-
-func (o Mkey) GetCCAPlatformConfigID() (CCAPlatformConfigID, error) {
-	if !o.IsSet() {
-		return "", errors.New("MKey is not set")
-	}
-	switch t := o.Value.(type) {
-	case *TaggedCCAPlatformConfigID:
-		return CCAPlatformConfigID(*t), nil
-	case TaggedCCAPlatformConfigID:
-		return CCAPlatformConfigID(t), nil
-	default:
-		return "", fmt.Errorf("measurement-key type is: %T", t)
-	}
-}
-
 func (o Mkey) GetKeyUint() (uint64, error) {
 	switch t := o.Value.(type) {
 	case UintMkey:
@@ -118,14 +90,10 @@ func (o Mkey) GetKeyUint() (uint64, error) {
 //	}
 //
 // where <MKEY_TYPE> must be one of the known IMKeyValue implementation
-// type names (available in the base implementation: "uuid", "oid",
-// "psa.impl-id"), and <MKEY_JSON_VALUE> is the class id value serialized to
-// JSON. The exact serialization is <CLASS_ID_TYPE> depenent. For the base
-// implementation types it is
-//
-//	oid: dot-seprated integers, e.g. "1.2.3.4"
-//	uuid: standard UUID string representation, e.g. "550e8400-e29b-41d4-a716-446655440000"
-//	psa.refval-id: JSON representation of the PSA refval-id
+// type names (available in the base implementation: "uuid", "oid", "uint", "string")
+// and profile-specific types can be registered via RegisterMkeyType.
+// <MKEY_JSON_VALUE> is the measurement key value serialized to JSON.
+// The exact serialization is <MKEY_TYPE> dependent.
 func (o *Mkey) UnmarshalJSON(data []byte) error {
 	var tnv encoding.TypeAndValue
 
@@ -349,26 +317,8 @@ func NewMkeyString(val any) (*Mkey, error) {
 	return &Mkey{ret}, nil
 }
 
-func NewMkeyPSARefvalID(val any) (*Mkey, error) {
-	ret, err := NewTaggedPSARefValID(val)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Mkey{ret}, nil
-}
-
-func NewMkeyCCAPlatformConfigID(val any) (*Mkey, error) {
-	ret, err := NewTaggedCCAPlatformConfigID(val)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Mkey{ret}, nil
-}
-
 // IMkeyFactory defines the signature for the factory functions that may be
-// registred using RegisterMkeyType to provide a new implementation of the
+// registered using RegisterMkeyType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *Mkey
 // with the underlying value created based on the provided input. The range of
 // valid inputs is up to the specific type choice implementation, however it
@@ -378,12 +328,10 @@ func NewMkeyCCAPlatformConfigID(val any) (*Mkey, error) {
 type IMkeyFactory = func(val any) (*Mkey, error)
 
 var mkeyValueRegister = map[string]IMkeyFactory{
-	OIDType:                 NewMkeyOID,
-	UUIDType:                NewMkeyUUID,
-	UintType:                NewMkeyUint,
-	StringType:              NewMkeyString,
-	PSARefValIDType:         NewMkeyPSARefvalID,
-	CCAPlatformConfigIDType: NewMkeyCCAPlatformConfigID,
+	OIDType:    NewMkeyOID,
+	UUIDType:   NewMkeyUUID,
+	UintType:   NewMkeyUint,
+	StringType: NewMkeyString,
 }
 
 // RegisterMkeyType registers a new IMKeyValue implementation
@@ -599,38 +547,6 @@ func NewMeasurement(val any, typ string) (*Measurement, error) {
 
 func MustNewMeasurement(val any, typ string) *Measurement {
 	ret, err := NewMeasurement(val, typ)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return ret
-}
-
-// NewPSAMeasurement instantiates a new measurement-map with the key set to the
-// supplied PSA refval-id
-func NewPSAMeasurement(key any) (*Measurement, error) {
-	return NewMeasurement(key, PSARefValIDType)
-}
-
-func MustNewPSAMeasurement(key any) *Measurement {
-	ret, err := NewPSAMeasurement(key)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return ret
-}
-
-// NewCCAPlatCfgMeasurement instantiates a new measurement-map with the key set to the
-// supplied CCA platform-config-id
-func NewCCAPlatCfgMeasurement(key any) (*Measurement, error) {
-	return NewMeasurement(key, CCAPlatformConfigIDType)
-}
-
-func MustNewCCAPlatCfgMeasurement(key any) *Measurement {
-	ret, err := NewCCAPlatCfgMeasurement(key)
 
 	if err != nil {
 		panic(err)

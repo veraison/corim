@@ -1,4 +1,4 @@
-// Copyright 2021 Contributors to the Veraison project.
+// Copyright 2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -21,25 +21,6 @@ func TestClass_MarshalCBOR_UUID_full(t *testing.T) {
 
 	// {0: 37(h'31FB5ABF023E4992AA4E95F9C1503BFA'), 1: "ACME Ltd", 2: "Roadrunner", 3: 1, 4: 2}
 	expected := MustHexDecode(t, "a500d8255031fb5abf023e4992aa4e95f9c1503bfa016841434d45204c7464026a526f616472756e6e657203010402")
-
-	actual, err := tv.ToCBOR()
-
-	fmt.Printf("CBOR: %x\n", actual)
-
-	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
-}
-
-func TestClass_MarshalCBOR_ImplID_full(t *testing.T) {
-	tv := NewClassImplID(TestImplID).
-		SetVendor("EMCA Ltd").
-		SetModel("Rennurdaor").
-		SetLayer(2).
-		SetIndex(1)
-	require.NotNil(t, tv)
-
-	// {0: 560(h'61636D652D696D706C656D656E746174696F6E2D69642D303030303030303031'), 1: "EMCA Ltd", 2: "Rennurdaor", 3: 2, 4: 1}
-	expected := MustHexDecode(t, "a500d90230582061636d652d696d706c656d656e746174696f6e2d69642d3030303030303030310168454d4341204c7464026a52656e6e757264616f7203020401")
 
 	actual, err := tv.ToCBOR()
 
@@ -232,4 +213,29 @@ func TestClass_UnmarshalJSON_full(t *testing.T) {
 	assert.Equal(t, uint64(4), actual.GetLayer())
 	assert.NotNil(t, actual.Index)
 	assert.Equal(t, uint64(2), actual.GetIndex())
+}
+
+func TestClass_NewClassBytes(t *testing.T) {
+	// Valid bytes
+	c := NewClassBytes([]byte{0x01, 0x02, 0x03})
+	assert.NotNil(t, c)
+
+	// Invalid type returns nil
+	c = NewClassBytes(12345)
+	assert.Nil(t, c)
+}
+
+func TestClass_ToJSON(t *testing.T) {
+	// Valid class
+	c := NewClassUUID(TestUUID).SetVendor("ACME Ltd")
+	require.NotNil(t, c)
+
+	data, err := c.ToJSON()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+
+	// Invalid/empty class
+	var empty Class
+	_, err = empty.ToJSON()
+	assert.Error(t, err)
 }

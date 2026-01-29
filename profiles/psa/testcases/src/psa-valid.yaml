@@ -36,18 +36,18 @@ value:
                         MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=
                     1: ACME
                     2: RoadRunner
-                - - 0:
-                      tag: 601
-                      value:
-                        1: BL
-                        4: 2.1.0
-                        5: !!binary |-
-                          MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=
+                - - 0: "psa.software-component"
                     1:
+                      # version (key 0) - optional, contains version-map with version text
+                      0:
+                        0: 2.1.0
+                      # digests (key 2) - mandatory
                       2:
                         - - 1
                           - !!binary |-
                             h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=
+                      # name (key 11) - optional, contains measurement-type
+                      11: BL
                       # cryptokeys (key 13) - signer-id: tagged-bytes with 32 bytes
                       13:
                         - tag: 560

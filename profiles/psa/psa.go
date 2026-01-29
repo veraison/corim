@@ -1,7 +1,7 @@
-package psa
-
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
+
+package psa
 
 import (
 	"fmt"
@@ -14,25 +14,12 @@ import (
 
 const ProfileURI = "tag:arm.com,2025:psa#1.0.0"
 
-// PSARefValIDTag is the CBOR tag for PSA reference value identifiers
-const PSARefValIDTag = 601
+// PSASoftwareComponentMkey is the required value for mkey in PSA reference value measurements
+const PSASoftwareComponentMkey = "psa.software-component"
 
 func init() {
 	profileID, err := eat.NewProfile(ProfileURI)
 	if err != nil {
-		panic(err)
-	}
-
-	// Register PSA-specific ClassID factory (psa.impl-id)
-	// CBOR tag 560 is already registered for TaggedBytes in comid/cbor.go
-	// so we only register the factory here
-	if err := comid.RegisterClassIDFactory(NewImplIDClassID); err != nil {
-		panic(err)
-	}
-
-	// Register PSA-specific Mkey type (psa.refval-id) with CBOR tag 601
-	// This registers both the CBOR tag and the factory
-	if err := comid.RegisterMkeyType(PSARefValIDTag, NewMkeyPSARefvalID); err != nil {
 		panic(err)
 	}
 
@@ -41,26 +28,22 @@ func init() {
 	extMap := extensions.NewMap().
 		Add(comid.ExtTriples, &TriplesExtensions{}).
 		Add(comid.ExtReferenceValue, mvalExt).
-		Add(comid.ExtEndorsedValue, mvalExt).
-		Add(corim.ExtUnsignedCorim, &CorimExtensions{})
+		Add(comid.ExtEndorsedValue, mvalExt)
 
 	if err := corim.RegisterProfile(profileID, extMap); err != nil {
 		panic(err)
 	}
 }
 
-// TriplesExtensions carries PSA-specific fields and constraints for Triples
-type TriplesExtensions struct {
-	PsaSwRelTriples *PsaSwRelTriples `cbor:"5,keyasint,omitempty" json:"psa-swrel-triples,omitempty"`
-}
+// TriplesExtensions provides PSA-specific validation for Triples via the ValidTriples method
+type TriplesExtensions struct{}
 
 // ValidTriples implements ITriplesConstrainer to enforce PSA-specific constraints
 // on the Triples structure. This is called automatically during Triples.Valid().
 func (o TriplesExtensions) ValidTriples(triples *comid.Triples) error {
 	// Validate Reference Values (Section 3.3)
 	if triples.ReferenceValues != nil {
-		refVals := (*extensions.Collection[comid.ValueTriple, *comid.ValueTriple])(triples.ReferenceValues)
-		for i, refVal := range refVals.Values {
+		for i, refVal := range triples.ReferenceValues.Values {
 			if err := validatePSAReferenceValue(&refVal, i); err != nil {
 				return err
 			}
@@ -88,18 +71,46 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 		return err
 	}
 
-	// Access the Measurements collection
-	measurements := (*extensions.Collection[comid.Measurement, *comid.Measurement])(&refVal.Measurements)
+	for j := range refVal.Measurements.Values {
+		measurement := &refVal.Measurements.Values[j]
 
-	for j, m := range measurements.Values {
+		// Validate mkey: must be the string "psa.software-component" (Section 3.3)
+		if err := validatePSAMkey(measurement.Key, tripleIndex, j); err != nil {
+			return err
+		}
+
 		// Validate cryptokeys field (signer-id):
 		// - cryptokeys (key 13) is MANDATORY
 		// - Must have exactly one entry
 		// - Entry must be tagged-bytes (type "bytes")
 		// - Byte length must be 32, 48, or 64 (psa-hash-type)
-		if err := validatePSASignerID(m.Val.CryptoKeys, tripleIndex, j); err != nil {
+		if err := validatePSASignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// validatePSAMkey validates that the mkey is the string "psa.software-component"
+// as required by Section 3.3 of the PSA Endorsements spec.
+func validatePSAMkey(key *comid.Mkey, tripleIndex, measurementIndex int) error {
+	prefix := fmt.Sprintf("reference value at index %d, measurement at index %d", tripleIndex, measurementIndex)
+
+	// mkey is mandatory for PSA profile
+	if key == nil || !key.IsSet() {
+		return fmt.Errorf("%s: mkey is mandatory but not set", prefix)
+	}
+
+	// mkey must be of type "string"
+	if key.Type() != comid.StringType {
+		return fmt.Errorf("%s: mkey must be of type 'string', got '%s'", prefix, key.Type())
+	}
+
+	// The value must be exactly "psa.software-component"
+	if key.Value.String() != PSASoftwareComponentMkey {
+		return fmt.Errorf("%s: mkey must be %q, got %q",
+			prefix, PSASoftwareComponentMkey, key.Value.String())
 	}
 
 	return nil
@@ -262,12 +273,4 @@ func validatePSAInstanceID(env *comid.Environment, prefix string) error {
 // MvalExtensions carries PSA-specific fields and constraints for Measurements
 type MvalExtensions struct {
 	PsaCertNum *string `cbor:"100,keyasint,omitempty" json:"psa-cert-num,omitempty"`
-}
-
-// CorimExtensions carries PSA-specific constraints for the top-level CoRIM
-type CorimExtensions struct{}
-
-// PsaSwRelTriples represents the psa-swrel-triples field (key 5)
-type PsaSwRelTriples struct {
-	// To be Implemented
 }
