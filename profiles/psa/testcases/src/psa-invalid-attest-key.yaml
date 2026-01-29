@@ -1,0 +1,49 @@
+# PSA CoRIM with INVALID AttestVerifKey:
+# - PSA profile (tag:arm.com,2025:psa#1.0.0)
+# - Valid Implementation ID (32 bytes)
+# - Valid Instance ID (33-byte UEID with RAND type)
+# - INVALID: AttestVerifKeys has 2 keys (must be exactly 1)
+# - This is a valid CoRIM but invalid for PSA profile
+---
+tag: 501
+value:
+  0: psa-invalid-attest-key-corim
+  3: "tag:arm.com,2025:psa#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          0: en-GB
+          1:
+            0: !!binary |-
+              Q7vjfy5hSzOu01PP8UKLFg==
+          2:
+            - 0: ACME Ltd.
+              1:
+                tag: 32
+                value: https://acme.example
+              2:
+                - 0
+                - 1
+                - 2
+          4:
+            # attest-key-triples (key 3) with INVALID multiple keys
+            3:
+              - - 0:
+                    # class with valid 32-byte Implementation ID
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=
+                    1: ACME
+                    2: RoadRunner
+                  # instance with valid 33-byte UEID (0x01 RAND type + 32 bytes)
+                  1:
+                    tag: 550
+                    value: !!binary |-
+                      ATAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAx
+                # verification-keys: INVALID - has 2 keys instead of 1
+                - - tag: 554
+                    value: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8B\nlLT4MFHOaO+ICTtIvrEeEpr/sfTAP66H2hCHdb5HEXKtRKod6QLcOLPA1Q==\n-----END PUBLIC KEY-----"
+                  - tag: 554
+                    value: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8B\nlLT4MFHOaO+ICTtIvrEeEpr/sfTAP66H2hCHdb5HEXKtRKod6QLcOLPA1Q==\n-----END PUBLIC KEY-----"
