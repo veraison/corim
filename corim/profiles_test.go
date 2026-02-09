@@ -107,11 +107,11 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 	err = RegisterProfile(profID, extMap)
 	require.NoError(t, err)
 
-	c, err := UnmarshalUnsignedCorimFromCBOR(testGoodUnsignedCorimCBOR)
+	c, err := UnmarshalAndValidateUnsignedCorimFromCBOR(testGoodUnsignedCorimCBOR)
 	assert.NoError(t, err)
 	assert.Nil(t, c.Profile)
 
-	c, err = UnmarshalUnsignedCorimFromCBOR(testUnsignedCorimWithExtensionsCBOR)
+	c, err = UnmarshalAndValidateUnsignedCorimFromCBOR(testUnsignedCorimWithExtensionsCBOR)
 	assert.NoError(t, err)
 
 	assert.Equal(t, profID, c.Profile)
@@ -182,11 +182,11 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 		Val.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
-	s, err := UnmarshalSignedCorimFromCBOR(testGoodSignedCorimCBOR)
+	s, err := UnmarshalAndValidateSignedCorimFromCBOR(testGoodSignedCorimCBOR)
 	assert.NoError(t, err)
 	assert.Nil(t, s.UnsignedCorim.Profile)
 
-	s, err = UnmarshalSignedCorimFromCBOR(testSignedCorimWithExtensionsCBOR)
+	s, err = UnmarshalAndValidateSignedCorimFromCBOR(testSignedCorimWithExtensionsCBOR)
 	assert.NoError(t, err)
 
 	assert.Equal(t, profID, s.UnsignedCorim.Profile)
