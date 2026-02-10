@@ -5,6 +5,7 @@ package corim
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -488,4 +489,38 @@ func TestUnsignedCorim_FromJSON_Invalid(t *testing.T) {
 	var c UnsignedCorim
 	err := c.FromJSON([]byte(`{invalid}`))
 	assert.Error(t, err)
+}
+
+func TestComid_iterators(t *testing.T) {
+	cm := comid.NewTestComid(t)
+	c := NewUnsignedCorim()
+	c.AddComid(cm)
+
+	keySeq, errFunc := c.IterAttestVerifKeys()
+	assert.Equal(t,
+		slices.Collect(keySeq)[0].VerifKeys[0].String(),
+		(*cm.Triples.AttestVerifKeys)[0].VerifKeys[0].String(),
+	)
+	assert.NoError(t, errFunc())
+
+	keySeq, errFunc = c.IterDevIdentityKeys()
+	assert.Equal(t,
+		slices.Collect(keySeq)[0].VerifKeys[0].String(),
+		(*cm.Triples.DevIdentityKeys)[0].VerifKeys[0].String(),
+	)
+	assert.NoError(t, errFunc())
+
+	valSeq, errFunc := c.IterRefVals()
+	assert.Equal(t,
+		slices.Collect(valSeq)[0].Measurements.Values[0].Val.RawValue,
+		cm.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val.RawValue,
+	)
+	assert.NoError(t, errFunc())
+
+	valSeq, errFunc = c.IterEndVals()
+	assert.Equal(t,
+		slices.Collect(valSeq)[0].Measurements.Values[0].Val.RawValue,
+		cm.Triples.EndorsedValues.Values[0].Measurements.Values[0].Val.RawValue,
+	)
+	assert.NoError(t, errFunc())
 }
