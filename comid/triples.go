@@ -5,6 +5,7 @@ package comid
 
 import (
 	"fmt"
+	"iter"
 
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
@@ -138,6 +139,70 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 	}
 
 	return encoding.SerializeStructToJSON(o)
+}
+
+// IterRefVals provides an iterator over reference value ValueTriple's inside
+// the Comid.
+func (o *Triples) IterRefVals() iter.Seq[*ValueTriple] {
+	seq := func(yield func(*ValueTriple) bool) {
+		if o.ReferenceValues != nil {
+			for _, vt := range o.ReferenceValues.Values {
+				if !yield(&vt) {
+					return
+				}
+			}
+		}
+	}
+
+	return seq
+}
+
+// IterRefVals provides an iterator over endorsed value ValueTriple's inside
+// the Triples.
+func (o *Triples) IterEndVals() iter.Seq[*ValueTriple] {
+	seq := func(yield func(*ValueTriple) bool) {
+		if o.EndorsedValues != nil {
+			for _, vt := range o.EndorsedValues.Values {
+				if !yield(&vt) {
+					return
+				}
+			}
+		}
+	}
+
+	return seq
+}
+
+// IterAttestVerifKeys provides an iterator over attest. verif. key KeyTriple's
+// inside the Triples.
+func (o *Triples) IterAttestVerifKeys() iter.Seq[*KeyTriple] {
+	seq := func(yield func(*KeyTriple) bool) {
+		if o.AttestVerifKeys != nil {
+			for _, kt := range *o.AttestVerifKeys {
+				if !yield(&kt) {
+					return
+				}
+			}
+		}
+	}
+
+	return seq
+}
+
+// IterDevIdentityKeys provides an iterator over device identity key
+// KeyTriple's inside the Triples.
+func (o *Triples) IterDevIdentityKeys() iter.Seq[*KeyTriple] {
+	seq := func(yield func(*KeyTriple) bool) {
+		if o.DevIdentityKeys != nil {
+			for _, kt := range *o.DevIdentityKeys {
+				if !yield(&kt) {
+					return
+				}
+			}
+		}
+	}
+
+	return seq
 }
 
 // Valid checks that the Triples is valid as per the specification

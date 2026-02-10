@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"iter"
 	"time"
 
 	cbor "github.com/fxamacker/cbor/v2"
@@ -227,6 +228,176 @@ func (o *UnsignedCorim) AddEntity(name string, regID *string, roles ...Role) *Un
 		}
 	}
 	return o
+}
+
+// IterComids provides an iterator over all Comids inside an UnsignedCorim. The
+// second return value is a function that should be called after the iteration
+// has finished. If an error occurred while iterating, the function will return
+// that error (note: an error also results in immediate termination of
+// iteration); if the function returns nil, that means it was possible to
+// iterate over all Comid's without error.
+func (o *UnsignedCorim) IterComids() (it iter.Seq[*comid.Comid], errFunc func() error) {
+	var err error
+
+	seq := func(yield func(*comid.Comid) bool) {
+		for i, tag := range o.Tags {
+			if tag.Number != ComidTag {
+				err = fmt.Errorf("unknown CBOR tag %x detected at index %d", tag.Number, i)
+				return
+			}
+
+			var cm comid.Comid
+			if err = cm.FromCBOR(tag.Content); err != nil {
+				err = fmt.Errorf("decoding CoMID at index %d: %w", i, err)
+				return
+			}
+
+			if !yield(&cm) {
+				return
+			}
+		}
+	}
+
+	errf := func() error {
+		return err
+	}
+
+	return seq, errf
+}
+
+// IterRefVals provides an iterator over reference values inside the
+// UnsignedCorim. The second return value is a function that should be called
+// after the iteration has finished. If an error occurred while iterating, the
+// function will return that error (note: an error also results in immediate
+// termination of iteration); if the function returns nil, that means it was
+// possible to iterate over all reference values in the UnsignedCorim without
+// error.
+func (o *UnsignedCorim) IterRefVals() (it iter.Seq[*comid.ValueTriple], errFunc func() error) { // nolint:dupl
+	var err error
+
+	seq := func(yield func(*comid.ValueTriple) bool) {
+
+		comidSeq, comidErrf := o.IterComids()
+
+		for cm := range comidSeq {
+			for refVal := range cm.IterRefVals() {
+				if !yield(refVal) {
+					return
+				}
+			}
+		}
+
+		if err = comidErrf(); err != nil {
+			return
+		}
+	}
+
+	errf := func() error {
+		return err
+	}
+
+	return seq, errf
+}
+
+// IterEndVals provides an iterator over endorsed values inside the
+// UnsignedCorim. The second return value is a function that should be called
+// after the iteration has finished. If an error occurred while iterating, the
+// function will return that error (note: an error also results in immediate
+// termination of iteration); if the function returns nil, that means it was
+// possible to iterate over all values in the UnsignedCorim without error.
+func (o *UnsignedCorim) IterEndVals() (it iter.Seq[*comid.ValueTriple], errFunc func() error) { // nolint:dupl
+	var err error
+
+	seq := func(yield func(*comid.ValueTriple) bool) {
+
+		comidSeq, comidErrf := o.IterComids()
+
+		for cm := range comidSeq {
+			for refVal := range cm.IterEndVals() {
+				if !yield(refVal) {
+					return
+				}
+			}
+		}
+
+		if err = comidErrf(); err != nil {
+			return
+		}
+	}
+
+	errf := func() error {
+		return err
+	}
+
+	return seq, errf
+}
+
+// IterAttestVerifKeys provides an iterator over attest. verif. keys inside the
+// UnsignedCorim. The second return value is a function that should be called
+// after the iteration has finished. If an error occurred while iterating, the
+// function will return that error (note: an error also results in immediate
+// termination of iteration); if the function returns nil, that means it was
+// possible to iterate over all attest. verif. keys in the UnsignedCorim without
+// error.
+func (o *UnsignedCorim) IterAttestVerifKeys() (it iter.Seq[*comid.KeyTriple], errFunc func() error) { // nolint:dupl
+	var err error
+
+	seq := func(yield func(*comid.KeyTriple) bool) {
+
+		comidSeq, comidErrf := o.IterComids()
+
+		for cm := range comidSeq {
+			for key := range cm.IterAttestVerifKeys() {
+				if !yield(key) {
+					return
+				}
+			}
+		}
+
+		if err = comidErrf(); err != nil {
+			return
+		}
+	}
+
+	errf := func() error {
+		return err
+	}
+
+	return seq, errf
+}
+
+// IterDevIdentityKeys provides an iterator over device identity keys inside
+// the UnsignedCorim. The second return value is a function that should be
+// called after the iteration has finished. If an error occurred while
+// iterating, the function will return that error (note: an error also results
+// in immediate termination of iteration); if the function returns nil, that
+// means it was possible to iterate over all values in the UnsignedCorim
+// without error.
+func (o *UnsignedCorim) IterDevIdentityKeys() (it iter.Seq[*comid.KeyTriple], errFunc func() error) { // nolint:dupl
+	var err error
+
+	seq := func(yield func(*comid.KeyTriple) bool) {
+
+		comidSeq, comidErrf := o.IterComids()
+
+		for cm := range comidSeq {
+			for key := range cm.IterDevIdentityKeys() {
+				if !yield(key) {
+					return
+				}
+			}
+		}
+
+		if err = comidErrf(); err != nil {
+			return
+		}
+	}
+
+	errf := func() error {
+		return err
+	}
+
+	return seq, errf
 }
 
 // Valid checks the validity (according to the spec) of the target unsigned CoRIM

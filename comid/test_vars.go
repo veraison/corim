@@ -202,3 +202,48 @@ func MustHexDecode(t *testing.T, s string) []byte {
 	}
 	return data
 }
+
+func NewTestComid(t *testing.T) *Comid {
+	c := NewComid()
+	c.TagIdentity = TagIdentity{TagID: *swid.NewTagID("test"), TagVersion: 1}
+	c.Triples = Triples{
+		ReferenceValues: NewValueTriples().Add(&ValueTriple{
+			Environment: Environment{
+				Instance: MustNewUUIDInstance(TestUUID),
+			},
+			Measurements: *NewMeasurements().Add(&Measurement{
+				Val: Mval{
+					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
+				},
+			}),
+		}),
+		EndorsedValues: NewValueTriples().Add(&ValueTriple{
+			Environment: Environment{
+				Instance: MustNewUUIDInstance(TestUUID),
+			},
+			Measurements: *NewMeasurements().Add(&Measurement{
+				Val: Mval{
+					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
+				},
+			}),
+		}),
+		AttestVerifKeys: &KeyTriples{
+			{
+				Environment: Environment{
+					Instance: MustNewUUIDInstance(TestUUID),
+				},
+				VerifKeys: *NewCryptoKeys().Add(MustNewPKIXBase64Key(TestECPubKey)),
+			},
+		},
+		DevIdentityKeys: &KeyTriples{
+			{
+				Environment: Environment{
+					Instance: MustNewUUIDInstance(TestUUID),
+				},
+				VerifKeys: *NewCryptoKeys().Add(MustNewPKIXBase64Key(TestECPubKey)),
+			},
+		},
+	}
+
+	return c
+}
