@@ -3,6 +3,7 @@
 package comid
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -93,4 +94,13 @@ func Test_String2URI_nok(t *testing.T) {
 	s := "@@@"
 	_, err := String2URI(&s)
 	assert.EqualError(t, err, `expecting an absolute URI: "@@@" is not an absolute URI`)
+}
+
+func TestComid_iterators(t *testing.T) {
+	c := NewTestComid(t)
+
+	assert.Equal(t, *slices.Collect(c.IterAttestVerifKeys())[0], (*c.Triples.AttestVerifKeys)[0])
+	assert.Equal(t, *slices.Collect(c.IterDevIdentityKeys())[0], (*c.Triples.DevIdentityKeys)[0])
+	assert.Equal(t, *slices.Collect(c.IterRefVals())[0], c.Triples.ReferenceValues.Values[0])
+	assert.Equal(t, *slices.Collect(c.IterEndVals())[0], c.Triples.EndorsedValues.Values[0])
 }

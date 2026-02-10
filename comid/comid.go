@@ -6,6 +6,7 @@ package comid
 import (
 	"encoding/json"
 	"fmt"
+	"iter"
 	"net/url"
 
 	"github.com/veraison/corim/encoding"
@@ -228,7 +229,7 @@ func (o *Comid) AddAttestVerifKey(val *KeyTriple) *Comid {
 }
 
 // AddDevIdentityKey adds the supplied identity key to the
-// identity-triples list of the target Comid.
+// identity-triples list of the Comid.
 func (o *Comid) AddDevIdentityKey(val *KeyTriple) *Comid {
 	if o != nil {
 		if o.Triples.DevIdentityKeys == nil {
@@ -243,7 +244,7 @@ func (o *Comid) AddDevIdentityKey(val *KeyTriple) *Comid {
 }
 
 // AddCondEndorseSeries adds the supplied conditional series triple to the
-// conditional series triple list of the target Comid.
+// conditional series triple list of the Comid.
 func (o *Comid) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Comid {
 	if o != nil {
 		if o.Triples.CondEndorseSeries == nil {
@@ -255,6 +256,30 @@ func (o *Comid) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Comid {
 		}
 	}
 	return o
+}
+
+// IterRefVals provides an iterator over reference value ValueTriple's inside
+// the Comid.
+func (o *Comid) IterRefVals() iter.Seq[*ValueTriple] {
+	return o.Triples.IterRefVals()
+}
+
+// IterRefVals provides an iterator over endorsed value ValueTriple's inside
+// the Comid.
+func (o *Comid) IterEndVals() iter.Seq[*ValueTriple] {
+	return o.Triples.IterEndVals()
+}
+
+// IterAttestVerifKeys provides an iterator over attest. verif. key KeyTriple's
+// inside the Comid.
+func (o *Comid) IterAttestVerifKeys() iter.Seq[*KeyTriple] {
+	return o.Triples.IterAttestVerifKeys()
+}
+
+// IterDevIdentityKeys provides an iterator over device identity key
+// KeyTriple's inside the Comid.
+func (o *Comid) IterDevIdentityKeys() iter.Seq[*KeyTriple] {
+	return o.Triples.IterDevIdentityKeys()
 }
 
 // nolint:gocritic
