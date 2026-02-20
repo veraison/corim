@@ -243,6 +243,21 @@ func (o *Comid) AddDevIdentityKey(val *KeyTriple) *Comid {
 	return o
 }
 
+// AddMembershipTriple adds the supplied membership triple to the
+// membership-triples list of the target Comid.
+func (o *Comid) AddMembershipTriple(val *MembershipTriple) *Comid {
+	if o != nil {
+		if o.Triples.MembershipTriples == nil {
+			o.Triples.MembershipTriples = NewMembershipTriples()
+		}
+
+		if o.Triples.AddMembershipTriple(val) == nil {
+			return nil
+		}
+	}
+	return o
+}
+
 // AddCondEndorseSeries adds the supplied conditional series triple to the
 // conditional series triple list of the Comid.
 func (o *Comid) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Comid {
