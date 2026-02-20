@@ -23,11 +23,10 @@ import (
 )
 
 var (
-	testExpiry, _    = time.Parse("2006-01-02T15:04:05Z", "2030-12-13T18:30:02Z")
-	testTimestamp, _ = time.Parse("2006-01-02T15:04:05Z", "2030-12-01T18:30:01Z")
-	testAuthority    = []byte{0xab, 0xcd, 0xef}
-	testBytes        = []byte{0x00, 0x11, 0x22, 0x33}
-	testES256Key     = []byte(`{
+	testExpiry, _ = time.Parse("2006-01-02T15:04:05Z", "2030-12-13T18:30:02Z")
+	testAuthority = []byte{0xab, 0xcd, 0xef}
+	testBytes     = []byte{0x00, 0x11, 0x22, 0x33}
+	testES256Key  = []byte(`{
     "kty": "EC",
     "crv": "P-256",
     "x": "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
@@ -115,13 +114,24 @@ func badExampleMixedSelector(t *testing.T) *EnvironmentSelector {
 	instance0, err := comid.NewUEIDInstance(comid.TestUEID)
 	require.NoError(t, err)
 
+	selector := NewEnvironmentSelector().
+		AddGroup(StatefulGroup{Group: group0}).
+		AddInstance(StatefulInstance{Instance: instance0})
+	require.NotNil(t, selector)
+
+	return selector
+}
+
+func badExampleMixedSelectorAlt(t *testing.T) *EnvironmentSelector {
+	instance0, err := comid.NewUEIDInstance(comid.TestUEID)
+	require.NoError(t, err)
+
 	class0 := comid.NewClassUUID(comid.TestUUID)
 	require.NotNil(t, class0)
 
 	selector := NewEnvironmentSelector().
-		AddGroup(StatefulGroup{Group: group0}).
 		AddInstance(StatefulInstance{Instance: instance0}).
-		AddGroup(StatefulGroup{Group: group0})
+		AddClass(StatefulClass{Class: class0})
 	require.NotNil(t, selector)
 
 	return selector
@@ -131,12 +141,6 @@ func badExampleEmptySelector(t *testing.T) *EnvironmentSelector {
 	es := NewEnvironmentSelector()
 	require.NotNil(t, es)
 	return es
-}
-
-func exampleClassQuery(t *testing.T) *Query {
-	qry, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
-	require.NoError(t, err)
-	return qry
 }
 
 func exampleReferenceValuesResultSet(t *testing.T) *ResultSet {

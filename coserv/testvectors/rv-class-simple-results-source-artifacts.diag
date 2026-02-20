@@ -11,8 +11,7 @@
         }
       ] ]
     },
-    / timestamp /   2: 0("2030-12-01T18:30:01Z"),
-    / result-type / 3: 1 / source-artifacts /
+    / result-type / 2: 1 / source-artifacts /
   },
   / results / 2: {
     / rvq / 0: [ ],
