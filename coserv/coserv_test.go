@@ -27,9 +27,6 @@ func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeSourceArtifacts)
 	require.NoError(t, err)
 
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
-
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
 		*query,
@@ -46,9 +43,6 @@ func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
 func TestCoserv_ToCBOR_exampleClassSelector(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
-
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
@@ -71,9 +65,6 @@ func TestCoserv_ToCBOR_exampleInstanceSelector(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
 	require.NoError(t, err)
 
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
-
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
 		*query,
@@ -90,9 +81,6 @@ func TestCoserv_ToCBOR_exampleInstanceSelector(t *testing.T) {
 func TestCoserv_ToCBOR_exampleGroupSelector(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
 	require.NoError(t, err)
-
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
@@ -129,7 +117,6 @@ func TestCoserv_FromBase64Url_ok_class(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
-	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
 	assert.Equal(t, "collected-artifacts", actual.Query.ResultType.String())
 	assert.Equal(t, *exampleClassSelector(t), actual.Query.EnvironmentSelector)
 }
@@ -146,7 +133,6 @@ func TestCoserv_FromBase64Url_ok_instance(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
-	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
 	assert.Equal(t, "both", actual.Query.ResultType.String())
 	assert.Equal(t, *exampleInstanceSelector(t), actual.Query.EnvironmentSelector)
 }
@@ -163,7 +149,6 @@ func TestCoserv_FromBase64Url_ok_group(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
-	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
 	assert.Equal(t, "source-artifacts", actual.Query.ResultType.String())
 	assert.Equal(t, *exampleGroupSelector(t), actual.Query.EnvironmentSelector)
 }
@@ -180,9 +165,6 @@ func TestCoserv_FromBase64Url_fail(t *testing.T) {
 func TestCoserv_ToBase64Url_ok_instance(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
 	require.NoError(t, err)
-
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
@@ -204,9 +186,6 @@ func TestCoserv_ToBase64Url_ok_class(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
 
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
-
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
 		*query,
@@ -227,9 +206,6 @@ func TestCoserv_ToBase64Url_ok_group(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
 	require.NoError(t, err)
 
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
-
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
 		*query,
@@ -249,9 +225,6 @@ func TestCoserv_ToBase64Url_ok_group(t *testing.T) {
 func TestCoserv_ToEDN_ok(t *testing.T) {
 	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
-
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,
@@ -292,7 +265,6 @@ func TestCoserv_FromCBOR_Results(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
-	assert.Equal(t, testTimestamp, actual.Query.Timestamp)
 	assert.Equal(t, *exampleClassSelector2(t), actual.Query.EnvironmentSelector)
 
 	// results-related assertions
@@ -375,9 +347,6 @@ func TestCoserv_results_ToCBOR_ok(t *testing.T) {
 
 	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
-
-	// overwrite the default query timestamp
-	query.SetTimestamp(testTimestamp)
 
 	tv, err := NewCoserv(
 		`tag:example.com,2025:cc-platform#1.0.0`,

@@ -11,8 +11,7 @@
         }
       ] ]
     },
-    / timestamp /   2: 0("2030-12-01T18:30:01Z"),
-    / result-type / 3: 0 / collected-material /
+    / result-type / 2: 0 / collected-material /
   },
   / results / 2: {
     / rvq / 0: [

@@ -5,10 +5,8 @@ package coserv
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestQuery_Valid_empty_query(t *testing.T) {
@@ -21,14 +19,8 @@ func TestQuery_Valid_empty_query(t *testing.T) {
 	assert.EqualError(t, actual, expected)
 }
 
-func TestQuery_Valid_invalid_timestamp(t *testing.T) {
-	tv := exampleClassQuery(t)
-
-	require.NotNil(t, tv.SetTimestamp(time.Time{}))
-
-	actual := tv.Valid()
-
-	expected := "timestamp not set"
-
-	assert.EqualError(t, actual, expected)
+func TestQuery_NewQuery_invalid_selector(t *testing.T) {
+	actual, err := NewQuery(ArtifactTypeEndorsedValues, *NewEnvironmentSelector(), ResultTypeBoth)
+	assert.Nil(t, actual)
+	assert.EqualError(t, err, "invalid environment selector: non-empty<> constraint violation")
 }
