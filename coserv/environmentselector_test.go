@@ -17,6 +17,13 @@ func TestEnvironmentSelector_Valid_mixed_fail(t *testing.T) {
 	assert.EqualError(t, err, "only one selector type is allowed")
 }
 
+func TestEnvironmentSelector_Valid_mixed_fail_alt(t *testing.T) {
+	tv := badExampleMixedSelectorAlt(t)
+
+	err := tv.Valid()
+	assert.EqualError(t, err, "only one selector type is allowed")
+}
+
 func TestEnvironmentSelector_Valid_empty_fail(t *testing.T) {
 	tv := badExampleEmptySelector(t)
 
