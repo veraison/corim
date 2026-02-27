@@ -67,7 +67,7 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 	prefix := fmt.Sprintf("reference value at index %d", tripleIndex)
 
 	// Validate Implementation ID in Environment (Section 3.2)
-	if err := validatePSAImplementationID(&refVal.Environment, prefix); err != nil {
+	if err := ValidateImplementationID(&refVal.Environment, prefix); err != nil {
 		return err
 	}
 
@@ -84,7 +84,7 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 		// - Must have exactly one entry
 		// - Entry must be tagged-bytes (type "bytes")
 		// - Byte length must be 32, 48, or 64 (psa-hash-type)
-		if err := validatePSASignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
+		if err := ValidateSignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
 			return err
 		}
 	}
@@ -116,12 +116,12 @@ func validatePSAMkey(key *comid.Mkey, tripleIndex, measurementIndex int) error {
 	return nil
 }
 
-// validatePSASignerID validates the cryptokeys field (signer-id)
+// ValidateSignerID validates the cryptokeys field (signer-id)
 //
 //	a) CryptoKeys field is set and contains exactly one entry
 //	b) The type of CryptoKey is TaggedBytes (Type() returns "bytes")
 //	c) The length of the value is 32, 48, or 64
-func validatePSASignerID(keys *comid.CryptoKeys, tripleIndex, measurementIndex int) error {
+func ValidateSignerID(keys *comid.CryptoKeys, tripleIndex, measurementIndex int) error {
 	prefix := fmt.Sprintf("reference value at index %d, measurement at index %d", tripleIndex, measurementIndex)
 
 	// a) CryptoKeys field MUST be set (mandatory per PSA profile)
@@ -172,13 +172,13 @@ func validatePSAAttestVerifKey(avk *comid.KeyTriple, index int) error {
 	prefix := fmt.Sprintf("attester verification key at index %d", index)
 
 	// Validate Implementation ID in Environment (Section 3.2)
-	if err := validatePSAImplementationID(&avk.Environment, prefix); err != nil {
+	if err := ValidateImplementationID(&avk.Environment, prefix); err != nil {
 		return err
 	}
 
 	// Validate Instance ID in Environment (Section 3.2)
 	// Instance ID is required for Attestation Verification Keys
-	if err := validatePSAInstanceID(&avk.Environment, prefix); err != nil {
+	if err := ValidateInstanceID(&avk.Environment, prefix); err != nil {
 		return err
 	}
 
@@ -205,18 +205,18 @@ func validatePSAAttestVerifKey(avk *comid.KeyTriple, index int) error {
 	return nil
 }
 
-// validatePSAImplementationID validates the Implementation ID
+// ValidateImplementationID validates the Implementation ID
 // The Implementation ID must be:
 //   - A tagged-bytes type (CBOR tag 560)
 //   - Exactly 32 bytes in length
-func validatePSAImplementationID(env *comid.Environment, prefix string) error {
+func ValidateImplementationID(env *comid.Environment, prefix string) error {
 	// Implementation ID is in Environment.Class.ClassID
 	if env.Class == nil {
-		return fmt.Errorf("%s: environment.class is required for PSA profile", prefix)
+		return fmt.Errorf("%s: environment.class is required", prefix)
 	}
 
 	if env.Class.ClassID == nil {
-		return fmt.Errorf("%s: environment.class.id (implementation-id) is required for PSA profile", prefix)
+		return fmt.Errorf("%s: environment.class.id (implementation-id) is required", prefix)
 	}
 
 	classID := env.Class.ClassID
@@ -235,15 +235,15 @@ func validatePSAImplementationID(env *comid.Environment, prefix string) error {
 	return nil
 }
 
-// validatePSAInstanceID validates the Instance ID (UEID) per PSA Endorsements Section 3.2
+// ValidateInstanceID validates the Instance ID (UEID) per PSA Endorsements Section 3.2
 // The Instance ID must be:
 //   - A tagged-ueid-type (CBOR tag 550)
 //   - The first byte MUST be 0x01 (RAND type)
 //   - Followed by exactly 32 bytes (total 33 bytes)
-func validatePSAInstanceID(env *comid.Environment, prefix string) error {
+func ValidateInstanceID(env *comid.Environment, prefix string) error {
 	// Instance ID is in Environment.Instance
 	if env.Instance == nil {
-		return fmt.Errorf("%s: environment.instance (instance-id) is required for PSA profile", prefix)
+		return fmt.Errorf("%s: environment.instance (instance-id) is required", prefix)
 	}
 
 	instance := env.Instance

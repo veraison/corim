@@ -192,7 +192,7 @@ func TestValidatePSASignerID_ValidAndInvalidLengths(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			keys := &comid.CryptoKeys{mustNewTaggedBytesCryptoKey(tc.length)}
-			err := validatePSASignerID(keys, 0, 0)
+			err := ValidateSignerID(keys, 0, 0)
 			if tc.shouldError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.expectedMessage)
@@ -241,7 +241,7 @@ func TestValidatePSASignerID_InvalidCases(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			err := validatePSASignerID(tc.keys, 0, 0)
+			err := ValidateSignerID(tc.keys, 0, 0)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedMessage)
 		})
@@ -345,7 +345,7 @@ func TestValidatePSAImplementationID_AllCases(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			env := tc.setupEnv()
-			err := validatePSAImplementationID(&env, "test")
+			err := ValidateImplementationID(&env, "test")
 			if tc.shouldError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.expectedMessage)
@@ -445,7 +445,7 @@ func TestValidatePSAInstanceID_AllCases(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			env := tc.setupEnv()
-			err := validatePSAInstanceID(&env, "test")
+			err := ValidateInstanceID(&env, "test")
 			if tc.shouldError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.expectedMessage)
