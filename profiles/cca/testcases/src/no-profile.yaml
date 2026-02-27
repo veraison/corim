@@ -1,0 +1,35 @@
+# CoRIM without a profile - Control case
+# This should parse and validate without profile-specific constraints
+# - No profile attribute
+# - Same structure as CCA Platform CoRIM but no CCA validation applied
+---
+tag: 501
+value:
+  0: no-profile-corim
+  # No profile (key 3) - this is the key difference
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
+                - - 0: "cca.software-component"
+                    1:
+                      2:
+                        - - 1
+                          - !!binary |-
+                            micc8qkWsLbubOyyQm8LMgbvB0V4vlXZvJT28/46uGo=
+                      11: "RSE_BL1_2"
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=
