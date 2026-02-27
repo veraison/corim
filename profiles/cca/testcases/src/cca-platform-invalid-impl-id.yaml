@@ -1,0 +1,37 @@
+# Invalid CCA Platform CoRIM - Wrong Implementation ID Length
+# Should fail CCA Platform profile validation
+# - CCA Platform profile present
+# - Implementation ID is 31 bytes (should be 32)
+---
+tag: 501
+value:
+  0: cca-platform-invalid-impl-id
+  3: "tag:arm.com,2025:cca_platform#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    # class with INVALID 31-byte Implementation ID (tag 560)
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAw
+                - # Measurements array
+                  - 0: "cca.software-component"
+                    1:
+                      2:
+                        - - 1
+                          - !!binary |-
+                            micc8qkWsLbubOyyQm8LMgbvB0V4vlXZvJT28/46uGo=
+                      11: "RSE_BL1_2"
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=

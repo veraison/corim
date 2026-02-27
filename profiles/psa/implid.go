@@ -16,7 +16,7 @@ const ImplIDSize = 32
 // NewImplIDClassID creates a new ClassID containing a PSA Implementation ID.
 // The Implementation ID is represented as TaggedBytes (CBOR tag 560) and must be exactly 32 bytes.
 // Validation of the 32-byte requirement is performed here; additional profile-level validation
-// is done via validatePSAImplementationID().
+// is done via ValidateImplementationID().
 //
 // Accepted input types:
 //   - []byte: raw 32-byte implementation ID

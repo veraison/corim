@@ -1,0 +1,36 @@
+# Invalid CCA Platform CoRIM - Wrong Digest Length
+# Should fail CCA Platform profile validation
+# - CCA Platform profile present
+# - Digest is 31 bytes (should be 32, 48, or 64)
+---
+tag: 501
+value:
+  0: cca-platform-invalid-digests
+  3: "tag:arm.com,2025:cca_platform#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
+                - - 0: "cca.software-component"
+                    1:
+                      # INVALID digest: 31 bytes instead of 32/48/64
+                      2:
+                        - - 1
+                          - !!binary |-
+                            MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA==
+                      11: "RSE_BL1_2"
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=

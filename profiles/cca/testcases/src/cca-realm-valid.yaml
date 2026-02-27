@@ -1,0 +1,77 @@
+# Valid CCA Realm CoRIM with Reference Values
+# - CCA Realm profile (tag:arm.com,2025:cca_realm#1.0.0)
+# - Valid RIM as class identifier (32 bytes, CBOR tag 560)
+# - RIM measurement (digest)
+# - REM measurements (extended)
+# - RPV measurement (Realm Personalization Value)
+---
+tag: 501
+value:
+  0: cca-realm-valid-corim
+  3: "tag:arm.com,2025:cca_realm#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    # class with valid 32-byte RIM (tag 560)
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        HRFQuzWp0fGGIKXMJhLlTnDxULj6FGiTnVICaekT0P8=
+                - # Measurements array
+                  # RIM measurement (mandatory)
+                  - 0: "cca.rim"
+                    1:
+                      # digests (key 2) - exactly one entry
+                      2:
+                        - - 1
+                          - !!binary |-
+                            HRFQuzWp0fGGIKXMJhLlTnDxULj6FGiTnVICaekT0P8=
+                  # REM[0] measurement
+                  - 0: "cca.rem0"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            WzjIq0hfYMCxJtblDH7AgQQUKJ+Edt8I+4OwChRvTuk=
+                  # REM[1] measurement
+                  - 0: "cca.rem1"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            qOieMhR0WaTDC7sEoxwXbDHPdEQW8TCl6TJdR7A67Ns=
+                  # REM[2] measurement
+                  - 0: "cca.rem2"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            JWXWMrZqdr6qAUwcJWNWytBo1sX4finAjNQnjrHUn5U=
+                  # REM[3] measurement
+                  - 0: "cca.rem3"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            923v+SOPbyby8bWosdJUAhPu50Blg7Bvebg/g8r3MxM=
+                  # RPV measurement (Realm Personalization Value)
+                  - 0: "cca.rpv"
+                    1:
+                      # raw-value (key 4) - tagged-bytes
+                      4:
+                        tag: 560
+                        value: !!binary |-
+                          VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIDEzIGxhenkgZG9ncy4=
+
