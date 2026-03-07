@@ -1,0 +1,34 @@
+# Invalid CCA Realm CoRIM - RIM with wrong size
+# - CCA Realm profile (tag:arm.com,2025:cca_realm#1.0.0)
+# - Invalid RIM as class identifier (16 bytes instead of 32/48/64, CBOR tag 560)
+# - This should fail realm profile validation
+---
+tag: 501
+value:
+  0: cca-realm-invalid-rim-size-corim
+  3: "tag:arm.com,2025:cca_realm#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    # class with INVALID 16-byte RIM (should be 32/48/64 bytes, tag 560)
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        HRFQuzWp0fGGIKXMJhLlTg==
+                - # Measurements array
+                  # RIM measurement (mandatory)
+                  - 0: "cca.rim"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            HRFQuzWp0fGGIKXMJhLlTnDxULj6FGiTnVICaekT0P8=

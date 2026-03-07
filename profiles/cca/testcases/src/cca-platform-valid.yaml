@@ -1,0 +1,75 @@
+# Valid CCA Platform CoRIM with Reference Values and Attestation Key
+# - CCA Platform profile (tag:arm.com,2025:cca_platform#1.0.0)
+# - Valid Implementation ID (32 bytes, CBOR tag 560)
+# - Two software components with digests and signer-id (reference-triples)
+# - Valid Instance ID (33 bytes with 0x01 prefix, CBOR tag 550)
+# - PKIX Base64 public key (attest-key-triples)
+---
+tag: 501
+value:
+  0: cca-platform-valid-corim
+  3: "tag:arm.com,2025:cca_platform#1.0.0"
+  1:
+    - tag: 506
+      value:
+        encodedCBOR:
+          1:
+            0: !!binary |-
+              Pwavzaycc5R5lwBQVpB3Pw==
+          4:
+            # reference-triples (key 0)
+            0:
+              - - 0:
+                    # class with valid 32-byte Implementation ID (tag 560)
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
+                - # Measurements array
+                  - # First software component
+                    0: "cca.software-component"
+                    1:
+                      # digests (key 2) - mandatory
+                      2:
+                        - - 1
+                          - !!binary |-
+                            micc8qkWsLbubOyyQm8LMgbvB0V4vlXZvJT28/46uGo=
+                      # name (key 11) - optional
+                      11: "RSE_BL1_2"
+                      # cryptokeys (key 13) - signer-id: tagged-bytes with 32 bytes
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=
+                  # Second software component
+                  - 0: "cca.software-component"
+                    1:
+                      # digests (key 2)
+                      2:
+                        - - 1
+                          - !!binary |-
+                            U8I05eSHK2rFHBoey6P+Bv0FO+uOv9iXewEGVb/dPMM=
+                      # name (key 11)
+                      11: "RSE_BL2"
+                      # cryptokeys (key 13) - signer-id
+                      13:
+                        - tag: 560
+                          value: !!binary |-
+                            U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=
+            # attest-key-triples (key 3)
+            3:
+              - - 0:
+                    # class with valid 32-byte Implementation ID (tag 560)
+                    0:
+                      tag: 560
+                      value: !!binary |-
+                        YWNtZS1pbXBsZW1lbnRhdGlvbi1pZC0wMDAwMDAwMDE=
+                  # instance with valid 33-byte UEID (tag 550)
+                  # Base64 of: 0x01 + 32 bytes instance ID from draft Figure 4
+                  1:
+                    tag: 550
+                    value: !!binary |-
+                      AUyj5PUL8kjDl4cCDWj/0FyIdndRvyZFypI/V6mL7NKW
+                # verification-keys: exactly 1 pkix-base64-key (tag 554)
+                - - tag: 554
+                    value: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8B\nlLT4MFHOaO+ICTtIvrEeEpr/sfTAP66H2hCHdb5HEXKtRKod6QLcOLPA1Q==\n-----END PUBLIC KEY-----"
