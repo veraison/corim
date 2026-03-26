@@ -12,11 +12,12 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues   *ValueTriples             `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues    *ValueTriples             `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
-	DevIdentityKeys   *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
-	AttestVerifKeys   *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
-	CondEndorseSeries *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
+	ReferenceValues    *ValueTriples             `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues     *ValueTriples             `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	DevIdentityKeys    *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+	AttestVerifKeys    *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
+	DomainDependencies *DomainDependencyTriples  `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
+	CondEndorseSeries  *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
 	Extensions
 }
 
@@ -110,6 +111,10 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 		o.CondEndorseSeries = nil
 	}
 
+	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
+		o.DomainDependencies = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -136,6 +141,10 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 
 	if o.CondEndorseSeries != nil && o.CondEndorseSeries.IsEmpty() {
 		o.CondEndorseSeries = nil
+	}
+
+	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
+		o.DomainDependencies = nil
 	}
 
 	return encoding.SerializeStructToJSON(o)
@@ -212,6 +221,7 @@ func (o Triples) Valid() error {
 		(o.EndorsedValues == nil || o.EndorsedValues.IsEmpty()) &&
 		(o.AttestVerifKeys == nil || len(*o.AttestVerifKeys) == 0) &&
 		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) &&
+		(o.DomainDependencies == nil || o.DomainDependencies.IsEmpty()) &&
 		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) {
 		return fmt.Errorf("triples struct must not be empty")
 	}
@@ -241,6 +251,12 @@ func (o Triples) Valid() error {
 			if err := dk.Valid(); err != nil {
 				return fmt.Errorf("device identity key at index %d: %w", i, err)
 			}
+		}
+	}
+
+	if o.DomainDependencies != nil {
+		if err := o.DomainDependencies.Valid(); err != nil {
+			return fmt.Errorf("dependency triples: %w", err)
 		}
 	}
 
@@ -288,6 +304,18 @@ func (o *Triples) AddAttestVerifKey(val *KeyTriple) *Triples {
 func (o *Triples) AddDevIdentityKey(val *KeyTriple) *Triples {
 	if o != nil {
 		*o.DevIdentityKeys = append(*o.DevIdentityKeys, *val)
+	}
+
+	return o
+}
+
+// AddDomainDependency appends a domain-dependency-triple to DomainDependencies.
+func (o *Triples) AddDomainDependency(val *DomainDependencyTriple) *Triples {
+	if o != nil {
+		if o.DomainDependencies == nil {
+			o.DomainDependencies = new(DomainDependencyTriples)
+		}
+		*o.DomainDependencies = append(*o.DomainDependencies, *val)
 	}
 
 	return o
