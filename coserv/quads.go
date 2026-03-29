@@ -3,7 +3,10 @@
 
 package coserv
 
-import "github.com/veraison/corim/comid"
+import (
+	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/cots"
+)
 
 type RefValQuad struct {
 	Authorities *comid.CryptoKeys  `cbor:"1,keyasint"`
@@ -13,4 +16,9 @@ type RefValQuad struct {
 type AKQuad struct {
 	Authorities *comid.CryptoKeys `cbor:"1,keyasint"`
 	AKTriple    *comid.KeyTriple  `cbor:"2,keyasint"`
+}
+
+type CoTSStmt struct {
+	Authorities *comid.CryptoKeys    `cbor:"1,keyasint"`
+	CoTS        *cots.ConciseTaStore `cbor:"2,keyasint"`
 }
