@@ -211,7 +211,7 @@ func TestUnsignedCorim_Valid_ok(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		SetProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("tag:trustedcomputinggroup.org,2025:psa-token").
 		AddComid(c).
 		SetRimValidity(time.Now().Add(time.Hour), nil).
 		AddEntity("ACME Ltd.", nil, RoleManifestCreator)
@@ -341,7 +341,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		SetProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("tag:trustedcomputinggroup.org,2025:psa-token").
 		AddComid(c)
 
 	require.NotNil(t, tv)
@@ -358,7 +358,7 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 		"corim-id":"invalid.tags.corim",
 		"tags":["2QH6WOuiAaEAdXZlbmRvci5leGFtcGxlL3Byb2QvMQShA4GCoQHYJVAx+1q/Aj5JkqpOlfnBUDv6gdkCKnixLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFVzFCdnFGKy9yeThCV2E3WkVNVTF4WVlIRVE4QgpsTFQ0TUZIT2FPK0lDVHRJdnJFZUVwci9zZlRBUDY2SDJoQ0hkYjVIRVhLdFJLb2Q2UUxjT0xQQTFRPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"],
 		"dependent-rims":[{"href":"http://endorser.example/addon.corim"}],
-		"profile":"https://arm.com/psa/iot/2.0.0"
+		"profile":"tag:trustedcomputinggroup.org,2025:psa-token"
 	}
 	`
 
@@ -384,7 +384,7 @@ func TestUnsignedCorim_ToCBOR(t *testing.T) {
 	tv := NewUnsignedCorim().
 		SetID("invalid.tags.corim").
 		AddDependentRim("http://endorser.example/addon.corim", nil).
-		SetProfile("https://arm.com/psa/iot/2.0.0").
+		SetProfile("tag:trustedcomputinggroup.org,2025:psa-token").
 		AddComid(c)
 
 	require.NotNil(t, tv)
