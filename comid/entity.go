@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"unicode/utf8"
 
+	"github.com/veraison/corim/common"
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 )
@@ -333,8 +334,5 @@ func RegisterEntityNameType(tag uint64, factory IEntityNameFactory) error {
 	return nil
 }
 
-type TaggedURI string
-
-func (o TaggedURI) Empty() bool {
-	return o == ""
-}
+// TaggedURI is a type alias for common.TaggedURI for backward compatibility.
+type TaggedURI = common.TaggedURI
