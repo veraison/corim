@@ -3,6 +3,7 @@ module github.com/veraison/corim
 go 1.23.0
 
 require (
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/fxamacker/cbor/v2 v2.8.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
@@ -12,6 +13,7 @@ require (
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.3.0
 	github.com/veraison/swid v1.1.1-0.20251003121634-fd1f7f1e1897
+	github.com/yosida95/uritemplate/v3 v3.0.2
 )
 
 require (

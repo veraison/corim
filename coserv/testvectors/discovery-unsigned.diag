@@ -1,0 +1,14 @@
+{
+  / version / 1: "1.2.3-beta",
+  / capabilities / 2: [
+    {
+      / media-type / 1: "application/coserv+cbor; profile=\"tag:vendor.com,2025:cc_platform#1.0.0\"",
+      / artifact-support / 2: [
+        "collected"
+      ]
+    }
+  ],
+  / api-endpoints / 3: {
+    "CoSERVRequestResponse": "/endorsement-distribution/v1/coserv/{query}"
+  }
+}

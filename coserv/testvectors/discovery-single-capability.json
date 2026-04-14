@@ -1,0 +1,25 @@
+{
+  "version": "1.2.3-beta",
+  "capabilities": [
+    {
+      "media-type": "application/coserv+cose; profile=\"tag:vendor.com,2025:cc_platform#1.0.0\"",
+      "artifact-support": [
+        "source",
+        "collected"
+      ]
+    }
+  ],
+  "api-endpoints": {
+    "CoSERVRequestResponse": "/endorsement-distribution/v1/coserv/{query}"
+  },
+  "result-verification-key": [
+    {
+      "alg": "ES256",
+      "crv": "P-256",
+      "kty": "EC",
+      "x": "usWxHK2PmfnHKwXPS54m0kTcGJ90UiglWiGahtagnv8",
+      "y": "IBOL-C3BttVivg-lSreASjpkttcsz-1rb7btKLv8EX4",
+      "kid": "key1"
+    }
+  ]
+}
