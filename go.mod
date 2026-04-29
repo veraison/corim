@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
-	github.com/veraison/go-cose v1.2.1
+	github.com/veraison/go-cose v1.3.0
 	github.com/veraison/swid v1.1.1-0.20251003121634-fd1f7f1e1897
 )
 
