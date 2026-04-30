@@ -507,7 +507,7 @@ func TestMval_Valid(t *testing.T) {
 		mval := Mval{
 			Ver: &Version{
 				Version: "1.0",
-				Scheme:  scheme,
+				Scheme:  &scheme,
 			},
 		}
 		err := mval.Valid()
