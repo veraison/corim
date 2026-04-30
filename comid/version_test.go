@@ -47,3 +47,12 @@ func TestVersion_Equal_False(t *testing.T) {
 
 	assert.False(t, claim.Equal(*ref))
 }
+
+func TestVersion_no_scheme(t *testing.T) {
+	claim := NewVersion()
+	claim.SetVersion("1.55.22")
+
+	bytes, err := em.Marshal(claim)
+	assert.NoError(t, err)
+	assert.Equal(t, MustHexDecode(t, "a10067312e35352e3232"), bytes)
+}
