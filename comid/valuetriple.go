@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -47,45 +47,8 @@ func (o ValueTriple) Valid() error {
 
 // ValueTriples is a container for ValueTriple instances and their extensions.
 // It is a thin wrapper around extensions.Collection.
-type ValueTriples extensions.Collection[ValueTriple, *ValueTriple]
+type ValueTriples = extensions.Collection[ValueTriple, *ValueTriple]
 
 func NewValueTriples() *ValueTriples {
-	return (*ValueTriples)(extensions.NewCollection[ValueTriple]())
-}
-
-func (o *ValueTriples) RegisterExtensions(exts extensions.Map) error {
-	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).RegisterExtensions(exts)
-}
-
-func (o *ValueTriples) GetExtensions() extensions.IMapValue {
-	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).GetExtensions()
-}
-
-func (o ValueTriples) Valid() error {
-	return (extensions.Collection[ValueTriple, *ValueTriple])(o).Valid()
-}
-
-func (o *ValueTriples) IsEmpty() bool {
-	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).IsEmpty()
-}
-
-func (o *ValueTriples) Add(val *ValueTriple) *ValueTriples {
-	ret := (*extensions.Collection[ValueTriple, *ValueTriple])(o).Add(val)
-	return (*ValueTriples)(ret)
-}
-
-func (o ValueTriples) MarshalCBOR() ([]byte, error) {
-	return (extensions.Collection[ValueTriple, *ValueTriple])(o).MarshalCBOR()
-}
-
-func (o *ValueTriples) UnmarshalCBOR(data []byte) error {
-	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).UnmarshalCBOR(data)
-}
-
-func (o ValueTriples) MarshalJSON() ([]byte, error) {
-	return (extensions.Collection[ValueTriple, *ValueTriple])(o).MarshalJSON()
-}
-
-func (o *ValueTriples) UnmarshalJSON(data []byte) error {
-	return (*extensions.Collection[ValueTriple, *ValueTriple])(o).UnmarshalJSON(data)
+	return extensions.NewCollection[ValueTriple]()
 }
