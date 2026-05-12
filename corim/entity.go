@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -128,47 +128,10 @@ func (o Entity) MarshalJSON() ([]byte, error) {
 
 // Entities is a container for Entity instances and their extensions.
 // It is a thin wrapper around extensions.Collection.
-type Entities extensions.Collection[Entity, *Entity]
+type Entities = extensions.Collection[Entity, *Entity]
 
 func NewEntities() *Entities {
-	return (*Entities)(extensions.NewCollection[Entity]())
-}
-
-func (o *Entities) RegisterExtensions(exts extensions.Map) error {
-	return (*extensions.Collection[Entity, *Entity])(o).RegisterExtensions(exts)
-}
-
-func (o *Entities) GetExtensions() extensions.IMapValue {
-	return (*extensions.Collection[Entity, *Entity])(o).GetExtensions()
-}
-
-func (o *Entities) Valid() error {
-	return (*extensions.Collection[Entity, *Entity])(o).Valid()
-}
-
-func (o *Entities) IsEmpty() bool {
-	return (*extensions.Collection[Entity, *Entity])(o).IsEmpty()
-}
-
-func (o *Entities) Add(val *Entity) *Entities {
-	ret := (*extensions.Collection[Entity, *Entity])(o).Add(val)
-	return (*Entities)(ret)
-}
-
-func (o Entities) MarshalCBOR() ([]byte, error) {
-	return (extensions.Collection[Entity, *Entity])(o).MarshalCBOR()
-}
-
-func (o *Entities) UnmarshalCBOR(data []byte) error {
-	return (*extensions.Collection[Entity, *Entity])(o).UnmarshalCBOR(data)
-}
-
-func (o Entities) MarshalJSON() ([]byte, error) {
-	return (extensions.Collection[Entity, *Entity])(o).MarshalJSON()
-}
-
-func (o *Entities) UnmarshalJSON(data []byte) error {
-	return (*extensions.Collection[Entity, *Entity])(o).UnmarshalJSON(data)
+	return extensions.NewCollection[Entity]()
 }
 
 // EntityName encapsulates the name of the associated Entity. The CoRIM
