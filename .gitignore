@@ -15,3 +15,6 @@
 # vendor/
 
 mocks/
+
+# install location for project-local tools such as golangci-lint
+tools-bin/

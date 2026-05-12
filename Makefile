@@ -11,12 +11,23 @@ GOPKG += github.com/veraison/corim/encoding
 GOPKG += github.com/veraison/corim/extensions
 GOPKG += github.com/veraison/corim/coserv
 
-GOLINT ?= golangci-lint
-
 GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E staticcheck -E lll -E prealloc
 
+TOPDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+
+GOLINT_VERSION = v2.1.6
+GOLINT = $(TOPDIR)/tools-bin/golangci-lint
+GOLINT_STAMP = $(TOPDIR)/tools-bin/golangci-lint-$(GOLINT_VERSION).stamp
+
+$(GOLINT): $(GOLINT_STAMP)
+
+$(GOLINT_STAMP):
+	mkdir -p $(dir $(GOLINT))
+	touch $(GOLINT_STAMP)
+	GOBIN=$(dir $(GOLINT)) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLINT_VERSION)
+
 .PHONY: lint
-lint:
+lint: $(GOLINT)
 	$(GOLINT) $(GOLINT_ARGS)
 
 ifeq ($(MAKECMDGOALS),test)
