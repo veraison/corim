@@ -18,6 +18,7 @@ type Triples struct {
 	AttestVerifKeys    *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
 	DomainDependencies *DomainDependencyTriples  `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
 	CondEndorseSeries  *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
+	CondEndorsements   *CondEndorseTriples       `cbor:"10,keyasint,omitempty" json:"conditional-endorsements,omitempty"`
 	Extensions
 }
 
@@ -26,6 +27,7 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 	refValExts := extensions.NewMap()
 	endValExts := extensions.NewMap()
 	conSeriesExts := extensions.NewMap()
+	conExts := extensions.NewMap()
 
 	for p, v := range exts {
 		switch p {
@@ -39,6 +41,10 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 			endValExts[ExtMval] = v
 		case ExtEndorsedValueFlags:
 			endValExts[ExtFlags] = v
+		case ExtCondEndorseValue:
+			conExts[ExtMval] = v
+		case ExtCondEndorseValueFlags:
+			conExts[ExtFlags] = v
 		case ExtCondEndorseSeriesValue:
 			conSeriesExts[ExtMval] = v
 		case ExtCondEndorseSeriesValueFlags:
@@ -78,6 +84,16 @@ func (o *Triples) RegisterExtensions(exts extensions.Map) error {
 		}
 	}
 
+	if len(conExts) != 0 {
+		if o.CondEndorsements == nil {
+			o.CondEndorsements = NewCondEndorseTriples()
+		}
+
+		if err := o.CondEndorsements.RegisterExtensions(conExts); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -91,6 +107,7 @@ func (o *Triples) UnmarshalCBOR(data []byte) error {
 	return encoding.PopulateStructFromCBOR(dm, data, o)
 }
 
+// nolint:gocritic
 // MarshalCBOR serializes to CBOR
 func (o Triples) MarshalCBOR() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
@@ -111,6 +128,10 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 		o.CondEndorseSeries = nil
 	}
 
+	if o.CondEndorsements != nil && o.CondEndorsements.IsEmpty() {
+		o.CondEndorsements = nil
+	}
+
 	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
 		o.DomainDependencies = nil
 	}
@@ -123,6 +144,7 @@ func (o *Triples) UnmarshalJSON(data []byte) error {
 	return encoding.PopulateStructFromJSON(data, o)
 }
 
+// nolint:gocritic
 // MarshalJSON serializes to JSON
 func (o Triples) MarshalJSON() ([]byte, error) {
 	// If extensions have been registered, the collection will exist, but
@@ -141,6 +163,10 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 
 	if o.CondEndorseSeries != nil && o.CondEndorseSeries.IsEmpty() {
 		o.CondEndorseSeries = nil
+	}
+
+	if o.CondEndorsements != nil && o.CondEndorsements.IsEmpty() {
+		o.CondEndorsements = nil
 	}
 
 	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
@@ -215,7 +241,7 @@ func (o *Triples) IterDevIdentityKeys() iter.Seq[*KeyTriple] {
 }
 
 // Valid checks that the Triples is valid as per the specification
-func (o Triples) Valid() error {
+func (o *Triples) Valid() error {
 	// non-empty<>
 	if (o.ReferenceValues == nil || o.ReferenceValues.IsEmpty()) &&
 		(o.EndorsedValues == nil || o.EndorsedValues.IsEmpty()) &&
@@ -266,7 +292,13 @@ func (o Triples) Valid() error {
 		}
 	}
 
-	return o.validTriples(&o)
+	if o.CondEndorsements != nil {
+		if err := o.CondEndorsements.Valid(); err != nil {
+			return fmt.Errorf("conditional endorsements: %w", err)
+		}
+	}
+
+	return o.validTriples(o)
 }
 
 func (o *Triples) AddReferenceValue(val *ValueTriple) *Triples {
@@ -329,6 +361,18 @@ func (o *Triples) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Triples {
 		}
 
 		o.CondEndorseSeries.Add(val)
+	}
+
+	return o
+}
+
+func (o *Triples) AddCondEndorsement(val *CondEndorseTriple) *Triples {
+	if o != nil {
+		if o.CondEndorsements == nil {
+			o.CondEndorsements = NewCondEndorseTriples()
+		}
+
+		o.CondEndorsements.Add(val)
 	}
 
 	return o

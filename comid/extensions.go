@@ -14,6 +14,8 @@ const (
 	ExtReferenceValueFlags         extensions.Point = "ReferenceValueFlags"
 	ExtEndorsedValue               extensions.Point = "EndorsedValue"
 	ExtEndorsedValueFlags          extensions.Point = "EndorsedValueFlags"
+	ExtCondEndorseValue            extensions.Point = "CondEndorseValue"
+	ExtCondEndorseValueFlags       extensions.Point = "CondEndorseValueFlags"
 	ExtCondEndorseSeriesValue      extensions.Point = "CondEndorseSeriesValue"
 	ExtCondEndorseSeriesValueFlags extensions.Point = "CondEndorseSeriesValueFlags"
 	ExtMval                        extensions.Point = "Mval"
