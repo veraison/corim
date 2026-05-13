@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coev
@@ -38,9 +38,10 @@ func coevTags() cbor.TagSet {
 
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
-		Sort:        cbor.SortCoreDeterministic,
-		IndefLength: cbor.IndefLengthForbidden,
-		TimeTag:     cbor.EncTagRequired,
+		Sort:          cbor.SortCoreDeterministic,
+		IndefLength:   cbor.IndefLengthForbidden,
+		NilContainers: cbor.NilContainerAsEmpty,
+		TimeTag:       cbor.EncTagRequired,
 	}
 	return encOpt.EncModeWithTags(coevTags())
 }

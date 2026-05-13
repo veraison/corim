@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package cots
@@ -42,8 +42,10 @@ func cotsTags() cbor.TagSet {
 
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
-		IndefLength: cbor.IndefLengthForbidden,
-		TimeTag:     cbor.EncTagRequired,
+		Sort:          cbor.SortCoreDeterministic,
+		IndefLength:   cbor.IndefLengthForbidden,
+		NilContainers: cbor.NilContainerAsEmpty,
+		TimeTag:       cbor.EncTagRequired,
 	}
 	return encOpt.EncModeWithTags(cotsTags())
 }
