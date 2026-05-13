@@ -83,7 +83,7 @@ func TestTriples_Valid(t *testing.T) {
 	triples.CondEndorseSeries = &CondEndorseSeriesTriples{}
 	triples.CondEndorseSeries.Add(&CondEndorseSeriesTriple{})
 	err = triples.Valid()
-	assert.EqualError(t, err, "conditional series: error at index 0: stateful environment validation failed: environment validation failed: environment must not be empty")
+	assert.EqualError(t, err, "conditional series: error at index 0: condition validation failed: environment validation failed: environment must not be empty")
 }
 
 func TestTriples_adders(t *testing.T) {
