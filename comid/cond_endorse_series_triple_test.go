@@ -22,7 +22,7 @@ func Test_CondEndorseSeriesTriple_Add_Valid(t *testing.T) {
 	c := NewCondEndorseSeriesTriples()
 	// Create a valid triple
 	triple := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -35,7 +35,7 @@ func Test_CondEndorseSeriesTriple_Add_Valid(t *testing.T) {
 	c.Add(triple)
 	assert.False(t, c.IsEmpty())
 	err := c.Valid()
-	assert.Contains(t, err.Error(), "no measurement entries")
+	assert.ErrorContains(t, err, "empty conditional series")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_EmptyCondition(t *testing.T) {
@@ -45,13 +45,13 @@ func Test_CondEndorseSeriesTriple_Valid_EmptyCondition(t *testing.T) {
 	}
 	ces.Add(ces_triple)
 	err := ces.Valid()
-	assert.EqualError(t, err, "error at index 0: stateful environment validation failed: environment validation failed: environment must not be empty")
+	assert.EqualError(t, err, "error at index 0: condition validation failed: environment validation failed: environment must not be empty")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_InvalidCondition(t *testing.T) {
 	c := NewCondEndorseSeriesTriples()
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -75,7 +75,7 @@ func Test_CondEndorseSeriesTriple_Valid_InvalidSeries(t *testing.T) {
 	c := NewCondEndorseSeriesTriples()
 	// Create series with invalid record
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -95,13 +95,13 @@ func Test_CondEndorseSeriesTriple_Valid_InvalidSeries(t *testing.T) {
 	series.Series.Add(invalidRecord)
 	c.Add(series)
 	err := c.Valid()
-	assert.ErrorContains(t, err, "no measurement entries")
+	assert.ErrorContains(t, err, "no measurement value")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_EmptySeries(t *testing.T) {
 	c := NewCondEndorseSeriesTriples()
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -112,7 +112,7 @@ func Test_CondEndorseSeriesTriple_Valid_EmptySeries(t *testing.T) {
 	}
 	c.Add(series)
 	err := c.Valid()
-	assert.ErrorContains(t, err, "no measurement entries")
+	assert.ErrorContains(t, err, "empty conditional series")
 }
 
 func Test_CondEndorseSeriesTriple_Valid_ValidSeries(t *testing.T) {
@@ -139,7 +139,7 @@ func Test_CondEndorseSeriesTriple_Valid_ValidSeries(t *testing.T) {
 	}
 
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -170,7 +170,7 @@ func Test_CondEndorseSeriesTriple_RegisterExtensions_OK(t *testing.T) {
 	extMap := extensions.NewMap().
 		Add(ExtMval, &testExtensions{})
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -188,7 +188,7 @@ func Test_CondEndorseSeriesTriple_RegisterExtensions_NOK(t *testing.T) {
 	extMap := extensions.NewMap().
 		Add(ExtReferenceValue, &testExtensions{})
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -207,7 +207,7 @@ func Test_CondEndorseSeriesTriple_RegisterExtensions_SeriesError(t *testing.T) {
 
 	// Create series with record that will cause extension registration error
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -363,7 +363,7 @@ func Test_CondEndorseSeriesRecords_RegisterExtensions_Error(t *testing.T) {
 
 func Test_CondEndorseSeriesTriple_GetExtensions(t *testing.T) {
 	series := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -381,7 +381,7 @@ func Test_CondEndorseSeriesTriple_MarshalJSON(t *testing.T) {
 
 	// Create valid triple
 	triple := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -416,7 +416,7 @@ func Test_CondEndorseSeriesTriple_MarshalCBOR(t *testing.T) {
 
 	// Create valid triple
 	triple := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -437,7 +437,7 @@ func Test_CondEndorseSeriesTriple_UnmarshalCBOR(t *testing.T) {
 
 	// First marshal a valid triple to CBOR
 	triple := &CondEndorseSeriesTriple{
-		Condition: ValueTriple{
+		Condition: CondEndorseSeriesCondition{
 			Environment: Environment{
 				Class: &Class{
 					ClassID: MustNewUUIDClassID(TestUUID),
@@ -648,4 +648,120 @@ func Test_CondEndorseSeriesRecords_GetExtensions(t *testing.T) {
 
 	exts := records.GetExtensions()
 	assert.Nil(t, exts)
+}
+
+func Test_CondEndorseSeriesCondition_serialize_round_trip(t *testing.T) {
+	testCases := []struct {
+		title        string
+		condition    CondEndorseSeriesCondition
+		expectedCBOR []byte
+		expectedJSON string
+	}{
+		{
+			title: "minimal",
+			condition: CondEndorseSeriesCondition{
+				Environment: Environment{
+					Class: &Class{
+						ClassID: MustNewUUIDClassID(TestUUID),
+					},
+				},
+			},
+			expectedCBOR: []byte{
+				0x82,       // array(2) [condition]
+				0xa1,       // . [0]map(1) [environment]
+				0x0,        // . . key: 0 [class]
+				0xa1,       // . . value: map(1) [class]
+				0x0,        // . . . key: 0 [class-id]
+				0xd8, 0x25, // . . . value: tag(37) [uuid]
+				0x50, //       . . . . bstr(16)
+				0x31, 0xfb, 0x5a, 0xbf, 0x02, 0x3e, 0x49, 0x92,
+				0xaa, 0x4e, 0x95, 0xf9, 0xc1, 0x50, 0x3b, 0xfa,
+				0x80, //       . [1]array(0) [measurements]
+			},
+			expectedJSON: `{"environment":{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}},"measurements":null}`,
+		},
+		{
+			title: "all fields",
+			condition: CondEndorseSeriesCondition{
+				Environment: Environment{
+					Class: &Class{
+						ClassID: MustNewUUIDClassID(TestUUID),
+					},
+				},
+				Measurements: *NewMeasurements().Add((&Measurement{}).SetSVN(5)),
+				AuthorizedBy: NewCryptoKeys().Add(MustNewPKIXBase64Key(TestECPubKey)),
+			},
+			expectedCBOR: []byte{
+				0x83,       //       array(3) [condition]
+				0xa1,       //       . [0]map(1) [environment]
+				0x0,        //       . . key: 0 [class]
+				0xa1,       //       . . value: map(1) [class]
+				0x0,        //       . . . key: 0 [class-id]
+				0xd8, 0x25, //       . . . value: tag(37) [uuid]
+				0x50, //             . . . . bstr(16)
+				0x31, 0xfb, 0x5a, 0xbf, 0x02, 0x3e, 0x49, 0x92,
+				0xaa, 0x4e, 0x95, 0xf9, 0xc1, 0x50, 0x3b, 0xfa,
+				0x81,             // . [1]array(0) [measurements]
+				0xa1,             // . . [0]map(1) [measurement]
+				0x01,             // . . . key: 1 [val]
+				0xa1,             // . . . value: map(1) [mval]
+				0x01,             // . . . . key: 1 [svn]
+				0xd9, 0x02, 0x28, // . . . . value: tag(552) [svn]
+				0x05,             // . . . . . 5
+				0x81,             // . [2]array(1) [authorized-by]
+				0xd9, 0x02, 0x2a, // . . [0]tag(554) [pkix-base64-key]
+				0x78, 0xb1, //       . . . tstr(177)
+				0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x42, 0x45, 0x47,
+				0x49, 0x4e, 0x20, 0x50, 0x55, 0x42, 0x4c, 0x49,
+				0x43, 0x20, 0x4b, 0x45, 0x59, 0x2d, 0x2d, 0x2d,
+				0x2d, 0x2d, 0x0a, 0x4d, 0x46, 0x6b, 0x77, 0x45, // 32
+
+				0x77, 0x59, 0x48, 0x4b, 0x6f, 0x5a, 0x49, 0x7a,
+				0x6a, 0x30, 0x43, 0x41, 0x51, 0x59, 0x49, 0x4b,
+				0x6f, 0x5a, 0x49, 0x7a, 0x6a, 0x30, 0x44, 0x41,
+				0x51, 0x63, 0x44, 0x51, 0x67, 0x41, 0x45, 0x57, // 64
+
+				0x31, 0x42, 0x76, 0x71, 0x46, 0x2b, 0x2f, 0x72,
+				0x79, 0x38, 0x42, 0x57, 0x61, 0x37, 0x5a, 0x45,
+				0x4d, 0x55, 0x31, 0x78, 0x59, 0x59, 0x48, 0x45,
+				0x51, 0x38, 0x42, 0x0a, 0x6c, 0x4c, 0x54, 0x34, // 96
+
+				0x4d, 0x46, 0x48, 0x4f, 0x61, 0x4f, 0x2b, 0x49,
+				0x43, 0x54, 0x74, 0x49, 0x76, 0x72, 0x45, 0x65,
+				0x45, 0x70, 0x72, 0x2f, 0x73, 0x66, 0x54, 0x41,
+				0x50, 0x36, 0x36, 0x48, 0x32, 0x68, 0x43, 0x48, // 128
+
+				0x64, 0x62, 0x35, 0x48, 0x45, 0x58, 0x4b, 0x74,
+				0x52, 0x4b, 0x6f, 0x64, 0x36, 0x51, 0x4c, 0x63,
+				0x4f, 0x4c, 0x50, 0x41, 0x31, 0x51, 0x3d, 0x3d,
+				0x0a, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x45, 0x4e, // 160
+
+				0x44, 0x20, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x43,
+				0x20, 0x4b, 0x45, 0x59, 0x2d, 0x2d, 0x2d, 0x2d,
+				0x2d, // 177
+			},
+			expectedJSON: `{"environment":{"class":{"id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}},"measurements":[{"value":{"svn":{"type":"exact-value","value":5}}}],"authorized-by":[{"type":"pkix-base64-key","value":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEW1BvqF+/ry8BWa7ZEMU1xYYHEQ8B\nlLT4MFHOaO+ICTtIvrEeEpr/sfTAP66H2hCHdb5HEXKtRKod6QLcOLPA1Q==\n-----END PUBLIC KEY-----"}]}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			bytes, err := em.Marshal(&tc.condition)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedCBOR, bytes)
+
+			var decoded CondEndorseSeriesCondition
+			err = dm.Unmarshal(bytes, &decoded)
+			assert.NoError(t, err)
+			assert.EqualValues(t, tc.condition.Environment, decoded.Environment)
+
+			bytes, err = json.Marshal(&tc.condition)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedJSON, string(bytes))
+
+			err = json.Unmarshal(bytes, &decoded)
+			assert.NoError(t, err)
+			assert.EqualValues(t, tc.condition.Environment, decoded.Environment)
+		})
+	}
 }
