@@ -14,9 +14,10 @@ var (
 
 func initCBOREncMode() (en cbor.EncMode, err error) {
 	encOpt := cbor.EncOptions{
-		Sort:        cbor.SortCoreDeterministic,
-		IndefLength: cbor.IndefLengthForbidden,
-		TimeTag:     cbor.EncTagRequired,
+		Sort:          cbor.SortCoreDeterministic,
+		IndefLength:   cbor.IndefLengthForbidden,
+		NilContainers: cbor.NilContainerAsEmpty,
+		TimeTag:       cbor.EncTagRequired,
 	}
 	return encOpt.EncMode()
 }
