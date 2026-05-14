@@ -20,7 +20,6 @@ var (
 		111: TaggedOID{},
 		// CoMID tags
 		550: TaggedUEID{},
-		551: TaggedInt(0),
 		552: TaggedSVN(0),
 		553: TaggedMinSVN(0),
 		554: TaggedPKIXBase64Key(""),

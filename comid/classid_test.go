@@ -1,10 +1,9 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -294,66 +293,6 @@ func Test_NewOIDClassID(t *testing.T) {
 	classID, err = NewOIDClassID(taggedOID.String())
 	require.NoError(t, err)
 	assert.Equal(t, taggedOID.Bytes(), classID.Bytes())
-}
-
-func Test_NewIntClassID(t *testing.T) {
-	classID, err := NewIntClassID(nil)
-	require.NoError(t, err)
-	assert.Equal(t, []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, classID.Bytes())
-
-	testInt := 7
-	testInt64 := int64(7)
-	testUint64 := uint64(7)
-
-	var testBytes [8]byte
-	binary.BigEndian.PutUint64(testBytes[:], testUint64)
-
-	for _, v := range []any{
-		testInt,
-		&testInt,
-		testInt64,
-		&testInt64,
-		testUint64,
-		&testUint64,
-		"7",
-		testBytes[:],
-	} {
-		classID, err = NewIntClassID(v)
-		require.NoError(t, err)
-		got := classID.Bytes()
-		assert.Equal(t, testBytes[:], got)
-	}
-}
-
-func Test_TaggedInt(t *testing.T) {
-	val := TaggedInt(7)
-	assert.Equal(t, "7", val.String())
-	assert.Equal(t, []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07}, val.Bytes())
-	assert.Equal(t, "int", val.Type())
-	assert.NoError(t, val.Valid())
-
-	classID := ClassID{&val}
-
-	bytes, err := em.Marshal(classID)
-	require.NoError(t, err)
-	assert.Equal(t, []byte{
-		0xd9, 0x02, 0x27, // tag 551
-		0x07, // int 7
-	}, bytes)
-
-	var out ClassID
-	err = dm.Unmarshal(bytes, &out)
-	require.NoError(t, err)
-	assert.Equal(t, classID, out)
-
-	jsonBytes, err := json.Marshal(classID)
-	require.NoError(t, err)
-	assert.Equal(t, `{"type":"int","value":7}`, string(jsonBytes))
-
-	out = ClassID{}
-	err = json.Unmarshal(jsonBytes, &out)
-	require.NoError(t, err)
-	assert.Equal(t, classID, out)
 }
 
 type testClassID [4]byte

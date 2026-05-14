@@ -4,13 +4,10 @@
 package comid
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 
-	"fortio.org/safecast"
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 )
@@ -230,99 +227,6 @@ func MustNewUUIDClassID(val any) *ClassID {
 	return ret
 }
 
-const IntType = "int"
-
-type TaggedInt int
-
-func NewIntClassID(val any) (*ClassID, error) {
-	if val == nil {
-		zeroVal := TaggedInt(0)
-		return &ClassID{&zeroVal}, nil
-	}
-
-	var ret TaggedInt
-
-	switch t := val.(type) {
-	case string:
-		i, err := strconv.Atoi(t)
-		if err != nil {
-			return nil, fmt.Errorf("bad int: %w", err)
-		}
-		ret = TaggedInt(i)
-	case []byte:
-		if len(t) != 8 {
-			return nil, fmt.Errorf("bad int: want 8 bytes, got %d bytes", len(t))
-		}
-		ti, err := safecast.Convert[int, uint64](binary.BigEndian.Uint64(t))
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedInt(ti)
-	case int:
-		ret = TaggedInt(t)
-	case *int:
-		ret = TaggedInt(*t)
-	case int64:
-		ti, err := safecast.Convert[int, int64](t)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedInt(ti)
-	case *int64:
-		ti, err := safecast.Convert[int, int64](*t)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedInt(ti)
-	case uint64:
-		ti, err := safecast.Convert[int, uint64](t)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedInt(ti)
-	case *uint64:
-		ti, err := safecast.Convert[int, uint64](*t)
-		if err != nil {
-			return nil, err
-		}
-		ret = TaggedInt(ti)
-	default:
-		return nil, fmt.Errorf("unexpected type for int: %T", t)
-	}
-
-	if err := ret.Valid(); err != nil {
-		return nil, err
-	}
-
-	return &ClassID{&ret}, nil
-}
-
-func (o TaggedInt) String() string {
-	return fmt.Sprint(int(o))
-}
-
-func (o TaggedInt) Valid() error {
-	return nil
-}
-
-func (o TaggedInt) Type() string {
-	return "int"
-}
-
-func (o TaggedInt) Bytes() []byte {
-	var ret [8]byte
-	var uo uint64
-	io := int(o) // Needed for gosec flow typing.
-	// Use 2's complement for negative values since this can't return an error.
-	if io < 0 {
-		uo = ^uint64(0) - uint64(-io) + 1
-	} else {
-		uo = uint64(io)
-	}
-	binary.BigEndian.PutUint64(ret[:], uo)
-	return ret[:]
-}
-
 // MustNewBytesClassID is like NewBytesClassID except it does not return an
 // error, assuming that the provided value is valid. It panics if that isn't
 // the case.
@@ -359,7 +263,6 @@ type IClassIDFactory func(any) (*ClassID, error)
 var classIDValueRegister = map[string]IClassIDFactory{
 	OIDType:   NewOIDClassID,
 	UUIDType:  NewUUIDClassID,
-	IntType:   NewIntClassID,
 	BytesType: NewBytesClassID,
 }
 
