@@ -1,4 +1,4 @@
-// Copyright 2023 Contributors to the Veraison project.
+// Copyright 2023-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -35,6 +35,8 @@ const (
 	// COSEKeyType represents a CBOR encoded COSE_Key or COSE_KeySet. See
 	// https://www.rfc-editor.org/rfc/rfc9052#section-7
 	COSEKeyType = "cose-key"
+	// PKIXBase64CertType indicates an X.509 public key certificate.
+	PKIXAsn1DerCertType = "pkix-asn1der-cert"
 	// ThumbprintType represents a digest of a raw public key. The digest
 	// value may be used to find the public key if contained in a lookup
 	// table.
@@ -566,6 +568,74 @@ func (o TaggedCOSEKey) coseKeySet() ([]*cose.Key, error) {
 	return keySet, nil
 }
 
+// TaggedPKIXAsn1DerCert is a X.509 public key certificate.
+type TaggedPKIXAsn1DerCert []byte
+
+func NewPKIXAsn1DerCert(k any) (*CryptoKey, error) {
+	b, ok := k.([]byte)
+	if !ok {
+		return nil, fmt.Errorf("value must be a []byte; found %T", k)
+	}
+
+	cert := TaggedPKIXAsn1DerCert(b)
+	if err := cert.Valid(); err != nil {
+		return nil, err
+	}
+	return &CryptoKey{cert}, nil
+}
+
+func MustNewPKIXAsn1DerCert(k any) *CryptoKey {
+	cert, err := NewPKIXAsn1DerCert(k)
+	if err != nil {
+		panic(err)
+	}
+	return cert
+}
+
+func (o TaggedPKIXAsn1DerCert) String() string {
+	block := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: o,
+	}
+
+	return string(pem.EncodeToMemory(block))
+}
+
+func (o TaggedPKIXAsn1DerCert) Valid() error {
+	_, err := o.cert()
+	return err
+}
+
+func (o TaggedPKIXAsn1DerCert) Type() string {
+	return PKIXBase64CertType
+}
+
+func (o TaggedPKIXAsn1DerCert) PublicKey() (crypto.PublicKey, error) {
+	cert, err := o.cert()
+	if err != nil {
+		return nil, err
+	}
+
+	if cert.PublicKey == nil {
+		return nil, errors.New("cert does not contain a crypto.PublicKey")
+	}
+
+	return cert.PublicKey, nil
+}
+
+func (o TaggedPKIXAsn1DerCert) cert() (*x509.Certificate, error) {
+	if len(o) == 0 {
+		return nil, errors.New("cert value not set")
+	}
+
+	cert, err := x509.ParseCertificate(o)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse x509 cert: %w", err)
+	}
+
+	return cert, nil
+}
+
 type digest struct {
 	swid.HashEntry
 }
@@ -735,6 +805,7 @@ var cryptoKeyValueRegister = map[string]ICryptoKeyFactory{
 	PKIXBase64CertType:     NewPKIXBase64Cert,
 	PKIXBase64CertPathType: NewPKIXBase64CertPath,
 	COSEKeyType:            NewCOSEKey,
+	PKIXAsn1DerCertType:    NewPKIXAsn1DerCert,
 	ThumbprintType:         NewThumbprint,
 	CertThumbprintType:     NewCertThumbprint,
 	CertPathThumbprintType: NewCertPathThumbprint,

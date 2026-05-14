@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Contributors to the Veraison project.
+// Copyright 2023-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -481,4 +482,26 @@ func Test_RegisterCryptoKey(t *testing.T) {
 	err = dm.Unmarshal(data, &out2)
 	require.NoError(t, err)
 	assert.Equal(t, key, &out2)
+}
+
+func Test_CryptoKey_NewPKIXAsn1DerCert(t *testing.T) {
+	cert, err := NewPKIXAsn1DerCert(TestCertDER)
+	require.NoError(t, err)
+	assert.Equal(t, TestCert, strings.TrimSpace(cert.String()))
+	pub, err := cert.PublicKey()
+	assert.NoError(t, err)
+	assert.NotNil(t, pub)
+
+	_, err = NewPKIXAsn1DerCert("foo")
+	assert.ErrorContains(t, err, "value must be a []byte")
+
+	_, err = NewPKIXAsn1DerCert([]byte{})
+	assert.EqualError(t, err, "cert value not set")
+
+	_, err = NewPKIXAsn1DerCert([]byte{0xde, 0xad, 0xbe, 0xef})
+	assert.ErrorContains(t, err, "could not parse x509 cert")
+
+	assert.Panics(t, func() {
+		MustNewPKIXAsn1DerCert("")
+	})
 }
