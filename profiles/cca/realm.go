@@ -191,11 +191,5 @@ func validateCCARealmPersonalizationValue(measurement *comid.Measurement) error 
 		return fmt.Errorf("raw-value is mandatory for cca.rpv")
 	}
 
-	// Validate we can extract bytes from raw-value
-	_, err := measurement.Val.RawValue.GetBytes()
-	if err != nil {
-		return fmt.Errorf("unable to extract bytes from raw-value: %w", err)
-	}
-
 	return nil
 }

@@ -195,12 +195,6 @@ func validateCCAPlatformConfig(measurement *comid.Measurement) error {
 		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
 	}
 
-	// Validate we can extract bytes from raw-value
-	_, err := measurement.Val.RawValue.GetBytes()
-	if err != nil {
-		return fmt.Errorf("unable to extract bytes from raw-value: %w", err)
-	}
-
 	return nil
 }
 

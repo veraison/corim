@@ -62,7 +62,7 @@ func mustNewCCARealmRPVMeasurement(data []byte) *comid.Measurement {
 	}
 
 	// Set raw-value as tagged bytes
-	rv := comid.NewRawValue().SetBytes(data)
+	rv := comid.NewRawValueFromBytes(data)
 	measurement.Val.RawValue = rv
 
 	return measurement

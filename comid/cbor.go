@@ -31,6 +31,7 @@ var (
 		560: TaggedBytes{},
 		561: TaggedCertPathThumbprint{},
 		562: TaggedPKIXAsn1DerCert{},
+		563: TaggedMaskedRawValue{},
 		564: TaggedRawIntRange{},
 	}
 )
