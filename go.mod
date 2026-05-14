@@ -3,7 +3,6 @@ module github.com/veraison/corim
 go 1.23.0
 
 require (
-	fortio.org/safecast v1.0.0
 	github.com/fxamacker/cbor/v2 v2.8.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
