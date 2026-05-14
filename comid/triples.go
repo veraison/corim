@@ -17,6 +17,7 @@ type Triples struct {
 	DevIdentityKeys    *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
 	AttestVerifKeys    *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
 	DomainDependencies *DomainDependencyTriples  `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
+	DomainMemberships  *DomainMembershipTriples  `cbor:"5,keyasint,omitempty" json:"membership-triples,omitempty"`
 	CondEndorseSeries  *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
 	CondEndorsements   *CondEndorseTriples       `cbor:"10,keyasint,omitempty" json:"conditional-endorsements,omitempty"`
 	Extensions
@@ -136,6 +137,10 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 		o.DomainDependencies = nil
 	}
 
+	if o.DomainMemberships != nil && o.DomainMemberships.IsEmpty() {
+		o.DomainMemberships = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -171,6 +176,10 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 
 	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
 		o.DomainDependencies = nil
+	}
+
+	if o.DomainMemberships != nil && o.DomainMemberships.IsEmpty() {
+		o.DomainMemberships = nil
 	}
 
 	return encoding.SerializeStructToJSON(o)
@@ -241,6 +250,7 @@ func (o *Triples) IterDevIdentityKeys() iter.Seq[*KeyTriple] {
 }
 
 // Valid checks that the Triples is valid as per the specification
+// nolint:gocyclo
 func (o *Triples) Valid() error {
 	// non-empty<>
 	if (o.ReferenceValues == nil || o.ReferenceValues.IsEmpty()) &&
@@ -248,7 +258,9 @@ func (o *Triples) Valid() error {
 		(o.AttestVerifKeys == nil || len(*o.AttestVerifKeys) == 0) &&
 		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) &&
 		(o.DomainDependencies == nil || o.DomainDependencies.IsEmpty()) &&
-		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) {
+		(o.DomainMemberships == nil || o.DomainMemberships.IsEmpty()) &&
+		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) &&
+		(o.CondEndorsements == nil || o.CondEndorsements.IsEmpty()) {
 		return fmt.Errorf("triples struct must not be empty")
 	}
 
@@ -283,6 +295,12 @@ func (o *Triples) Valid() error {
 	if o.DomainDependencies != nil {
 		if err := o.DomainDependencies.Valid(); err != nil {
 			return fmt.Errorf("dependency triples: %w", err)
+		}
+	}
+
+	if o.DomainMemberships != nil {
+		if err := o.DomainMemberships.Valid(); err != nil {
+			return fmt.Errorf("membership triples: %w", err)
 		}
 	}
 
@@ -348,6 +366,18 @@ func (o *Triples) AddDomainDependency(val *DomainDependencyTriple) *Triples {
 			o.DomainDependencies = new(DomainDependencyTriples)
 		}
 		*o.DomainDependencies = append(*o.DomainDependencies, *val)
+	}
+
+	return o
+}
+
+// AddDomainMembership appends a domain-memberbship-triple to DomainMemberships.
+func (o *Triples) AddDomainMembership(val *DomainMembershipTriple) *Triples {
+	if o != nil {
+		if o.DomainMemberships == nil {
+			o.DomainMemberships = new(DomainMembershipTriples)
+		}
+		*o.DomainMemberships = append(*o.DomainMemberships, *val)
 	}
 
 	return o
