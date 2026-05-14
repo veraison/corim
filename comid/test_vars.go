@@ -277,7 +277,7 @@ func NewTestComid(t *testing.T) *Comid {
 			},
 			Measurements: *NewMeasurements().Add(&Measurement{
 				Val: Mval{
-					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
+					RawValue: NewRawValueFromBytes(MustHexDecode(t, "deadbeef")),
 				},
 			}),
 		}),
@@ -287,7 +287,7 @@ func NewTestComid(t *testing.T) *Comid {
 			},
 			Measurements: *NewMeasurements().Add(&Measurement{
 				Val: Mval{
-					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
+					RawValue: NewRawValueFromBytes(MustHexDecode(t, "deadbeef")),
 				},
 			}),
 		}),

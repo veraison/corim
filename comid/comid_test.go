@@ -51,7 +51,7 @@ func Test_Comid_ToJSONPretty(t *testing.T) {
 			},
 			Measurements: *NewMeasurements().Add(&Measurement{
 				Val: Mval{
-					RawValue: NewRawValue().SetBytes(MustHexDecode(t, "deadbeef")),
+					RawValue: NewRawValueFromBytes(MustHexDecode(t, "deadbeef")),
 				},
 			}),
 		}),
