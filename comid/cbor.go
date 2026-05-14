@@ -30,6 +30,7 @@ var (
 		559: TaggedCertThumbprint{},
 		560: TaggedBytes{},
 		561: TaggedCertPathThumbprint{},
+		562: TaggedPKIXAsn1DerCert{},
 		564: TaggedRawIntRange{},
 	}
 )
