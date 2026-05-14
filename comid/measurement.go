@@ -618,7 +618,7 @@ func (o *Measurement) SetVersion(ver string, scheme int64) *Measurement {
 // measurement-values-map of the target measurement
 func (o *Measurement) SetRawValueBytes(rawValue, rawValueMask []byte) *Measurement {
 	if o != nil {
-		o.Val.RawValue = NewRawValue().SetBytes(rawValue)
+		o.Val.RawValue = NewRawValueFromBytes(rawValue)
 		if len(rawValueMask) != 0 {
 			o.Val.RawValueMask = &rawValueMask
 		}
