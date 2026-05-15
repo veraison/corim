@@ -7,6 +7,7 @@ import (
 	"crypto"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -216,7 +217,7 @@ func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 		{
 			Type: BytesType,
 			In:   TestTaggedBytes,
-			Out:  string(TestTaggedBytes),
+			Out:  base64.StdEncoding.EncodeToString(TestTaggedBytes),
 		},
 		{
 			Type: PKIXBase64KeyType,
@@ -263,17 +264,19 @@ func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 			),
 		},
 	} {
-		key := MustNewCryptoKey(tv.In, tv.Type)
-		data, err := json.Marshal(key)
-		require.NoError(t, err)
+		t.Run(tv.Type, func(t *testing.T) {
+			key := MustNewCryptoKey(tv.In, tv.Type)
+			data, err := json.Marshal(key)
+			require.NoError(t, err)
 
-		expected := fmt.Sprintf(`{"type": %q, "value": %q}`, tv.Type, tv.Out)
-		assert.JSONEq(t, expected, string(data))
+			expected := fmt.Sprintf(`{"type": %q, "value": %q}`, tv.Type, tv.Out)
+			assert.JSONEq(t, expected, string(data))
 
-		var key2 CryptoKey
-		err = json.Unmarshal(data, &key2)
-		require.NoError(t, err)
-		assert.Equal(t, *key, key2)
+			var key2 CryptoKey
+			err = json.Unmarshal(data, &key2)
+			require.NoError(t, err)
+			assert.Equal(t, *key, key2)
+		})
 	}
 }
 
@@ -298,15 +301,15 @@ func Test_CryptoKey_UnmarshalJSON_negative(t *testing.T) {
 		},
 		{
 			Val:    `{"type": "cose-key", "value":";;;"}`,
-			ErrMsg: "base64 decode error",
+			ErrMsg: "illegal base64 data",
 		},
 		{
 			Val:    `{"type": "thumbprint", "value":"deadbeef"}`,
-			ErrMsg: "swid.HashEntry decode error",
+			ErrMsg: "bad format: expecting <hash-alg-string>;<hash-value>",
 		},
 		{
 			Val:    `{"type": "random-key", "value":"deadbeef"}`,
-			ErrMsg: "unexpected ICryptoKeyValue type",
+			ErrMsg: "unexpected CryptoKey type: random-key",
 		},
 	} {
 		err := key.UnmarshalJSON([]byte(tv.Val))
@@ -435,7 +438,7 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 type testCryptoKey [4]byte
 
 func newTestCryptoKey(_ any) (*CryptoKey, error) {
-	return &CryptoKey{&testCryptoKey{0x74, 0x64, 0x73, 0x74}}, nil
+	return &CryptoKey{&testCryptoKey{0x74, 0x65, 0x73, 0x74}}, nil
 }
 
 func (o testCryptoKey) PublicKey() (crypto.PublicKey, error) {
@@ -451,6 +454,27 @@ func (o testCryptoKey) String() string {
 }
 
 func (o testCryptoKey) Valid() error {
+	return nil
+}
+
+func (o testCryptoKey) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.String())
+}
+
+func (o *testCryptoKey) UnmarshalJSON(data []byte) error {
+	var text string
+	if err := json.Unmarshal(data, &text); err != nil {
+		return err
+	}
+
+	if len(text) != 4 {
+		return errors.New("wrong length")
+	}
+
+	for i, b := range []byte(text) {
+		o[i] = b
+	}
+
 	return nil
 }
 
@@ -475,7 +499,7 @@ func Test_RegisterCryptoKey(t *testing.T) {
 	assert.Equal(t, data, []byte{
 		0xda, 0x0, 0x1, 0x86, 0x9e, // tag 99998
 		0x44,                   // bstr(4)
-		0x74, 0x64, 0x73, 0x74, // "test"
+		0x74, 0x65, 0x73, 0x74, // "test"
 	})
 
 	var out2 CryptoKey
