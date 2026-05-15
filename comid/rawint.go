@@ -40,6 +40,16 @@ func NewRawInt(val any, typ string) (*RawInt, error) {
 	return factory(val)
 }
 
+// MustNewRawInt is like NewRawInt but panics on error.
+func MustNewRawInt(val any, typ string) *RawInt {
+	ret, err := NewRawInt(val, typ)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
 // IsSet confirms if RawInt has a value or if it's empty
 func (o RawInt) IsSet() bool { return o.Value != nil }
 
@@ -161,6 +171,8 @@ func NewRawIntInteger(val any) (*RawIntInteger, error) {
 	case *RawIntInteger:
 		ret = *v
 	case int64:
+		ret = RawIntInteger(v)
+	case int:
 		ret = RawIntInteger(v)
 	default:
 		return nil, fmt.Errorf("unexpected type for RawIntInteger: %T", v)

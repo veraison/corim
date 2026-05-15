@@ -577,6 +577,18 @@ func TestMval_Valid(t *testing.T) {
 		assert.ErrorContains(t, err, "digest at index 0")
 	})
 
+	t.Run("IntRange valid", func(t *testing.T) {
+		mval := Mval{IntRange: MustNewRawInt(1, RawIntIntegerType)}
+		err := mval.Valid()
+		assert.NoError(t, err)
+	})
+
+	t.Run("IntRange invalid", func(t *testing.T) {
+		mval := Mval{IntRange: &RawInt{}}
+		err := mval.Valid()
+		assert.ErrorContains(t, err, "RawInt value unset")
+	})
+
 	t.Run("Extensions valid", func(t *testing.T) {
 		// Suppose we have some extension data that is considered valid
 		ext := Extensions{}
