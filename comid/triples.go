@@ -18,6 +18,7 @@ type Triples struct {
 	AttestVerifKeys    *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
 	DomainDependencies *DomainDependencyTriples  `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
 	DomainMemberships  *DomainMembershipTriples  `cbor:"5,keyasint,omitempty" json:"membership-triples,omitempty"`
+	CoswidTriples      *CoswidTriples            `cbor:"6,keyasint,omitempty" json:"coswid-triples,omitempty"`
 	CondEndorseSeries  *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
 	CondEndorsements   *CondEndorseTriples       `cbor:"10,keyasint,omitempty" json:"conditional-endorsements,omitempty"`
 	Extensions
@@ -141,6 +142,10 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 		o.DomainMemberships = nil
 	}
 
+	if o.CoswidTriples != nil && o.CoswidTriples.IsEmpty() {
+		o.CoswidTriples = nil
+	}
+
 	return encoding.SerializeStructToCBOR(em, o)
 }
 
@@ -180,6 +185,10 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 
 	if o.DomainMemberships != nil && o.DomainMemberships.IsEmpty() {
 		o.DomainMemberships = nil
+	}
+
+	if o.CoswidTriples != nil && o.CoswidTriples.IsEmpty() {
+		o.CoswidTriples = nil
 	}
 
 	return encoding.SerializeStructToJSON(o)
@@ -259,6 +268,7 @@ func (o *Triples) Valid() error {
 		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) &&
 		(o.DomainDependencies == nil || o.DomainDependencies.IsEmpty()) &&
 		(o.DomainMemberships == nil || o.DomainMemberships.IsEmpty()) &&
+		(o.CoswidTriples == nil || o.CoswidTriples.IsEmpty()) &&
 		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) &&
 		(o.CondEndorsements == nil || o.CondEndorsements.IsEmpty()) {
 		return fmt.Errorf("triples struct must not be empty")
@@ -301,6 +311,12 @@ func (o *Triples) Valid() error {
 	if o.DomainMemberships != nil {
 		if err := o.DomainMemberships.Valid(); err != nil {
 			return fmt.Errorf("membership triples: %w", err)
+		}
+	}
+
+	if o.CoswidTriples != nil {
+		if err := o.CoswidTriples.Valid(); err != nil {
+			return fmt.Errorf("coswid triples: %w", err)
 		}
 	}
 
@@ -383,7 +399,21 @@ func (o *Triples) AddDomainMembership(val *DomainMembershipTriple) *Triples {
 	return o
 }
 
+// AddCoswidTriple appends a CoswidTriple to CoswidTriples.
+func (o *Triples) AddCoswidTriple(val *CoswidTriple) *Triples {
+	if o != nil {
+		if o.CoswidTriples == nil {
+			o.CoswidTriples = NewCoswidTriples()
+		}
+
+		o.CoswidTriples.Add(val)
+	}
+
+	return o
+}
+
 // nolint:gocritic
+// AddCondEndorseSeries appends a CondEndorseSeriesTriple to CondEndorseSeries.
 func (o *Triples) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Triples {
 	if o != nil {
 		if o.CondEndorseSeries == nil {
@@ -396,6 +426,7 @@ func (o *Triples) AddCondEndorseSeries(val *CondEndorseSeriesTriple) *Triples {
 	return o
 }
 
+// AddCondEndorsement appends a CondEndorseTriple to CondEndorsements.
 func (o *Triples) AddCondEndorsement(val *CondEndorseTriple) *Triples {
 	if o != nil {
 		if o.CondEndorsements == nil {
