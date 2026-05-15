@@ -503,9 +503,9 @@ func TestComid_iterators(t *testing.T) {
 	)
 	assert.NoError(t, errFunc())
 
-	keySeq, errFunc = c.IterDevIdentityKeys()
+	identSeq, errFunc := c.IterDevIdentityKeys()
 	assert.Equal(t,
-		slices.Collect(keySeq)[0].VerifKeys[0].String(),
+		slices.Collect(identSeq)[0].VerifKeys[0].String(),
 		(*cm.Triples.DevIdentityKeys)[0].VerifKeys[0].String(),
 	)
 	assert.NoError(t, errFunc())

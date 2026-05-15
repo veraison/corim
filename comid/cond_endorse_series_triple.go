@@ -54,6 +54,7 @@ func (o *CondEndorseSeriesCondition) MarshalCBOR() ([]byte, error) {
 	return em.Marshal(toMarshal)
 }
 
+// nolint:dupl
 func (o *CondEndorseSeriesCondition) UnmarshalCBOR(data []byte) error {
 	var raw []cbor.RawMessage
 	if err := dm.Unmarshal(data, &raw); err != nil {
