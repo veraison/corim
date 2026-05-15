@@ -373,6 +373,7 @@ type Mval struct {
 	Name               *string             `cbor:"11,keyasint,omitempty" json:"name,omitempty"`
 	CryptoKeys         *CryptoKeys         `cbor:"13,keyasint,omitempty" json:"cryptokeys,omitempty"`
 	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
+	IntRange           *RawInt             `cbor:"15,keyasint,omitempty" json:"int-range,omitempty"`
 	Extensions
 }
 
@@ -444,7 +445,7 @@ func (o Mval) MarshalJSON() ([]byte, error) {
 }
 
 // Valid returns an error if none of the measurement values are set and the Extensions are empty.
-// nolint:gocritic
+// nolint:gocritic,gocyclo
 func (o Mval) Valid() error {
 	// Check if no measurement values are set
 	if o.Ver == nil &&
@@ -461,6 +462,7 @@ func (o Mval) Valid() error {
 		o.Name == nil &&
 		o.CryptoKeys == nil &&
 		o.IntegrityRegisters == nil &&
+		o.IntRange == nil &&
 		o.IsEmpty() {
 
 		return fmt.Errorf("no measurement value set")
@@ -508,6 +510,12 @@ func (o Mval) Valid() error {
 		// Must be valid IPv4 or IPv6 (i.e., .To4() != nil or .To16() != nil)
 		if ip.To4() == nil && ip.To16() == nil {
 			return fmt.Errorf("invalid IP address: %s", ip.String())
+		}
+	}
+
+	if o.IntRange != nil {
+		if err := o.IntRange.Valid(); err != nil {
+			return err
 		}
 	}
 
