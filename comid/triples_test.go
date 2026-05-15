@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -72,12 +72,12 @@ func TestTriples_Valid(t *testing.T) {
 	triples.EndorsedValues = nil
 	triples.AttestVerifKeys = &KeyTriples{{}}
 	err = triples.Valid()
-	assert.EqualError(t, err, "attestation verification key at index 0: environment validation failed: environment must not be empty")
+	assert.EqualError(t, err, "attestation verification key at index 0: environment: environment must not be empty")
 
 	triples.AttestVerifKeys = nil
 	triples.DevIdentityKeys = &KeyTriples{{}}
 	err = triples.Valid()
-	assert.EqualError(t, err, "device identity key at index 0: environment validation failed: environment must not be empty")
+	assert.EqualError(t, err, "device identity key at index 0: environment: environment must not be empty")
 
 	triples.DevIdentityKeys = nil
 	triples.CondEndorseSeries = &CondEndorseSeriesTriples{}

@@ -91,6 +91,9 @@ func (o CryptoKey) String() string {
 // Valid returns an error if validation of the CryptoKey fails, or nil if it
 // succeeds.
 func (o CryptoKey) Valid() error {
+	if o.Value == nil {
+		return errors.New("CryptoKey not set")
+	}
 	return o.Value.Valid()
 }
 
