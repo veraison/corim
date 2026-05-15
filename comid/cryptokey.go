@@ -109,7 +109,7 @@ func (o CryptoKey) PublicKey() (crypto.PublicKey, error) {
 // MarshalJSON returns a []byte containing the JSON representation of the
 // CryptoKey.
 func (o CryptoKey) MarshalJSON() ([]byte, error) {
-	valueBytes, err := json.Marshal(o.Value.String())
+	valueBytes, err := json.Marshal(o.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -135,22 +135,16 @@ func (o *CryptoKey) UnmarshalJSON(b []byte) error {
 		return errors.New("key type not set")
 	}
 
-	factory, ok := cryptoKeyValueRegister[value.Type]
-	if !ok {
-		return fmt.Errorf("unexpected ICryptoKeyValue type: %q", value.Type)
-	}
-
-	var valueString string
-	if err := json.Unmarshal(value.Value, &valueString); err != nil {
-		return err
-	}
-
-	k, err := factory(valueString)
+	dest, err := NewCryptoKey(nil, value.Type)
 	if err != nil {
 		return err
 	}
 
-	o.Value = k.Value
+	if err := json.Unmarshal(value.Value, &dest.Value); err != nil {
+		return err
+	}
+
+	o.Value = dest.Value
 
 	return o.Valid()
 }
@@ -183,6 +177,11 @@ type ICryptoKeyValue interface {
 type TaggedPKIXBase64Key string
 
 func NewPKIXBase64Key(k any) (*CryptoKey, error) {
+	if k == nil {
+		key := TaggedPKIXBase64Key("")
+		return &CryptoKey{&key}, nil
+	}
+
 	s, ok := k.(string)
 	if !ok {
 		return nil, fmt.Errorf("value must be a string; found %T", k)
@@ -192,7 +191,7 @@ func NewPKIXBase64Key(k any) (*CryptoKey, error) {
 	if err := key.Valid(); err != nil {
 		return nil, err
 	}
-	return &CryptoKey{key}, nil
+	return &CryptoKey{&key}, nil
 }
 
 func MustNewPKIXBase64Key(k any) *CryptoKey {
@@ -250,6 +249,11 @@ func (o TaggedPKIXBase64Key) PublicKey() (crypto.PublicKey, error) {
 type TaggedPKIXBase64Cert string
 
 func NewPKIXBase64Cert(k any) (*CryptoKey, error) {
+	if k == nil {
+		cert := TaggedPKIXBase64Cert("")
+		return &CryptoKey{&cert}, nil
+	}
+
 	s, ok := k.(string)
 	if !ok {
 		return nil, fmt.Errorf("value must be a string; found %T", k)
@@ -259,7 +263,7 @@ func NewPKIXBase64Cert(k any) (*CryptoKey, error) {
 	if err := cert.Valid(); err != nil {
 		return nil, err
 	}
-	return &CryptoKey{cert}, nil
+	return &CryptoKey{&cert}, nil
 }
 
 func MustNewPKIXBase64Cert(k any) *CryptoKey {
@@ -332,6 +336,11 @@ func (o TaggedPKIXBase64Cert) cert() (*x509.Certificate, error) {
 type TaggedPKIXBase64CertPath string
 
 func NewPKIXBase64CertPath(k any) (*CryptoKey, error) {
+	if k == nil {
+		cert := TaggedPKIXBase64CertPath("")
+		return &CryptoKey{&cert}, nil
+	}
+
 	s, ok := k.(string)
 	if !ok {
 		return nil, fmt.Errorf("value must be a string; found %T", k)
@@ -342,7 +351,7 @@ func NewPKIXBase64CertPath(k any) (*CryptoKey, error) {
 		return nil, err
 	}
 
-	return &CryptoKey{cert}, nil
+	return &CryptoKey{&cert}, nil
 }
 
 func MustNewPKIXBase64CertPath(k any) *CryptoKey {
@@ -430,7 +439,7 @@ type TaggedCOSEKey []byte
 
 func NewCOSEKey(k any) (*CryptoKey, error) {
 	if k == nil {
-		return &CryptoKey{TaggedCOSEKey{}}, nil
+		return &CryptoKey{&TaggedCOSEKey{}}, nil
 	}
 
 	var b []byte
@@ -454,7 +463,7 @@ func NewCOSEKey(k any) (*CryptoKey, error) {
 		return nil, err
 	}
 
-	return &CryptoKey{key}, nil
+	return &CryptoKey{&key}, nil
 }
 
 func MustNewCOSEKey(k any) *CryptoKey {
@@ -659,7 +668,12 @@ type TaggedThumbprint struct {
 	digest
 }
 
+// nolint:dupl
 func NewThumbprint(k any) (*CryptoKey, error) {
+	if k == nil {
+		return &CryptoKey{&TaggedThumbprint{}}, nil
+	}
+
 	var he swid.HashEntry
 	var err error
 
@@ -675,7 +689,7 @@ func NewThumbprint(k any) (*CryptoKey, error) {
 		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
 	}
 
-	key := &CryptoKey{TaggedThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -704,7 +718,12 @@ type TaggedCertThumbprint struct {
 	digest
 }
 
+// nolint:dupl
 func NewCertThumbprint(k any) (*CryptoKey, error) {
+	if k == nil {
+		return &CryptoKey{&TaggedCertThumbprint{}}, nil
+	}
+
 	var he swid.HashEntry
 	var err error
 
@@ -720,7 +739,7 @@ func NewCertThumbprint(k any) (*CryptoKey, error) {
 		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
 	}
 
-	key := &CryptoKey{TaggedCertThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedCertThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -750,7 +769,12 @@ type TaggedCertPathThumbprint struct {
 	digest
 }
 
+// nolint:dupl
 func NewCertPathThumbprint(k any) (*CryptoKey, error) {
+	if k == nil {
+		return &CryptoKey{&TaggedCertPathThumbprint{}}, nil
+	}
+
 	var he swid.HashEntry
 	var err error
 
@@ -766,7 +790,7 @@ func NewCertPathThumbprint(k any) (*CryptoKey, error) {
 		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
 	}
 
-	key := &CryptoKey{TaggedCertPathThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedCertPathThumbprint{digest{he}}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -847,4 +871,13 @@ func NewCryptoKeyTaggedBytes(val any) (*CryptoKey, error) {
 	}
 
 	return &CryptoKey{tb}, nil
+}
+
+func MustNewCryptoKeyTaggedBytes(val any) *CryptoKey {
+	ret, err := NewCryptoKeyTaggedBytes(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
 }
