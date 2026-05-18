@@ -173,6 +173,9 @@ type ICryptoKeyValue interface {
 	// ICryptoKeyValue's underlying value. This returns an error if the
 	// ICryptoKeyValue is one of the thumbprint types.
 	PublicKey() (crypto.PublicKey, error)
+
+	// Bytes returns the raw bytes of the key
+	Bytes() []byte
 }
 
 // TaggedPKIXBase64Key is a PEM-encoded SubjectPublicKeyInfo. See
@@ -216,6 +219,10 @@ func (o TaggedPKIXBase64Key) Valid() error {
 
 func (o TaggedPKIXBase64Key) Type() string {
 	return PKIXBase64KeyType
+}
+
+func (o TaggedPKIXBase64Key) Bytes() []byte {
+	return []byte(o)
 }
 
 func (o TaggedPKIXBase64Key) PublicKey() (crypto.PublicKey, error) {
@@ -288,6 +295,10 @@ func (o TaggedPKIXBase64Cert) Valid() error {
 
 func (o TaggedPKIXBase64Cert) Type() string {
 	return PKIXBase64CertType
+}
+
+func (o TaggedPKIXBase64Cert) Bytes() []byte {
+	return []byte(o)
 }
 
 func (o TaggedPKIXBase64Cert) PublicKey() (crypto.PublicKey, error) {
@@ -378,6 +389,10 @@ func (o TaggedPKIXBase64CertPath) Valid() error {
 
 func (o TaggedPKIXBase64CertPath) Type() string {
 	return PKIXBase64CertPathType
+}
+
+func (o TaggedPKIXBase64CertPath) Bytes() []byte {
+	return []byte(o)
 }
 
 func (o TaggedPKIXBase64CertPath) PublicKey() (crypto.PublicKey, error) {
@@ -504,6 +519,10 @@ func (o TaggedCOSEKey) Type() string {
 	return COSEKeyType
 }
 
+func (o TaggedCOSEKey) Bytes() []byte {
+	return []byte(o)
+}
+
 func (o TaggedCOSEKey) PublicKey() (crypto.PublicKey, error) {
 	if len(o) == 0 {
 		return nil, errors.New("empty COSE_Key value")
@@ -622,6 +641,10 @@ func (o TaggedPKIXAsn1DerCert) Type() string {
 	return PKIXBase64CertType
 }
 
+func (o TaggedPKIXAsn1DerCert) Bytes() []byte {
+	return []byte(o)
+}
+
 func (o TaggedPKIXAsn1DerCert) PublicKey() (crypto.PublicKey, error) {
 	cert, err := o.cert()
 	if err != nil {
@@ -662,6 +685,11 @@ func (o digest) Valid() error {
 
 func (o digest) PublicKey() (crypto.PublicKey, error) {
 	return nil, errors.New("cannot get PublicKey from a digest")
+}
+
+func (o digest) Bytes() []byte {
+	ret, _ := em.Marshal(o)
+	return ret
 }
 
 // ThumbprintTypeTaggedThumbprint represents a digest of a raw public key. The

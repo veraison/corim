@@ -249,6 +249,138 @@ func MustNewUUIDInstance(val any) *Instance {
 	return ret
 }
 
+// NewPKIXBase64KeyInstance instantiates a new instance with the supplied
+// PEM-encoded PKIX key identity.
+func NewPKIXBase64KeyInstance(val any) (*Instance, error) {
+	ck, err := NewPKIXBase64Key(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewPKIXBase64KeyInstance is like NewPKIXBase64KeyInstance but panics on
+// error.
+func MustNewPKIXBase64KeyInstance(val any) *Instance {
+	ret, err := NewPKIXBase64KeyInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewPKIXBase64CertInstance instantiates a new instance with the supplied
+// PEM-encoded X.509 certificate identity.
+func NewPKIXBase64CertInstance(val any) (*Instance, error) {
+	ck, err := NewPKIXBase64Cert(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewPKIXBase64CertInstance is like NewPKIXBase64CertInstance but panics on
+// error.
+func MustNewPKIXBase64CertInstance(val any) *Instance {
+	ret, err := NewPKIXBase64CertInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewCOSEKeyInstance instantiates a new instance with the supplied
+// COSE key identity.
+func NewCOSEKeyInstance(val any) (*Instance, error) {
+	ck, err := NewCOSEKey(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewCOSEKeyInstance is like NewCOSEKeyInstance but panics on
+// error.
+func MustNewCOSEKeyInstance(val any) *Instance {
+	ret, err := NewCOSEKeyInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewThumbprintInstance instantiates a new instance with the supplied
+// key thumbprint identity.
+func NewThumbprintInstance(val any) (*Instance, error) {
+	ck, err := NewThumbprint(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewThumbprintInstance is like NewThumbprintInstance but panics on
+// error.
+func MustNewThumbprintInstance(val any) *Instance {
+	ret, err := NewThumbprintInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewCertThumbprintInstance instantiates a new instance with the supplied
+// certificate thumbprint identity.
+func NewCertThumbprintInstance(val any) (*Instance, error) {
+	ck, err := NewCertThumbprint(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewCertThumbprintInstance is like NewCertThumbprintInstance but panics
+// on error.
+func MustNewCertThumbprintInstance(val any) *Instance {
+	ret, err := NewCertThumbprintInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewPKIXAsn1DerCertInstance instantiates a new instance with the supplied
+// ASN.1 DER-encoded X.509 certificate identity.
+func NewPKIXAsn1DerCertInstance(val any) (*Instance, error) {
+	ck, err := NewPKIXAsn1DerCert(val)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Instance{ck.Value}, nil
+}
+
+// MustNewPKIXAsn1DerCertInstance is like NewPKIXAsn1DerCertInstance but panics on
+// error.
+func MustNewPKIXAsn1DerCertInstance(val any) *Instance {
+	ret, err := NewPKIXAsn1DerCertInstance(val)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
 // IInstanceFactory defines the signature for the factory functions that may be
 // registered using RegisterInstanceType to provide a new implementation of the
 // corresponding type choice. The factory function should create a new *Instance
@@ -260,9 +392,15 @@ func MustNewUUIDInstance(val any) *Instance {
 type IInstanceFactory func(any) (*Instance, error)
 
 var instanceValueRegister = map[string]IInstanceFactory{
-	UEIDType:  NewUEIDInstance,
-	UUIDType:  NewUUIDInstance,
-	BytesType: NewBytesInstance,
+	UEIDType:            NewUEIDInstance,
+	UUIDType:            NewUUIDInstance,
+	BytesType:           NewBytesInstance,
+	PKIXBase64KeyType:   NewPKIXBase64KeyInstance,
+	PKIXBase64CertType:  NewPKIXBase64CertInstance,
+	COSEKeyType:         NewCOSEKeyInstance,
+	ThumbprintType:      NewThumbprintInstance,
+	CertThumbprintType:  NewCertThumbprintInstance,
+	PKIXAsn1DerCertType: NewPKIXAsn1DerCertInstance,
 }
 
 // RegisterInstanceType registers a new IInstanceValue implementation (created
