@@ -23,14 +23,28 @@
       [
         / measurement-map / {
           / comid.mval / 1 : {
-            / comid.ver / 0 : {
-              / comid.version / 0 : "1.0.0",
-              / comid.version-scheme / 1 : 16384 / semver /
-            },
-            / comid.digests / 2 : [ [
-              / hash-alg-id / 1, / sha256 /
-              / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
-            ] ]
+            / comid.integrity-registers / 14 : {
+              0: [
+                [
+                  / hash-alg-id / 1, / sha256 /
+                  / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+                ],
+                [
+                  / hash-alg-id / "my-alg-id",
+                  / hash-value / h'deadbeef'
+                ]
+              ],
+              "my-ir": [
+                [
+                  / hash-alg-id / 1, / sha256 /
+                  / hash-value / h'50aa341af9cb20a879440e58dd6581c14fa14bccafb75f488259262d6ea3a4d9'
+                ],
+                [
+                  / hash-alg-id / "my-alg-id",
+                  / hash-value / h'fefefafa'
+                ]
+              ]
+            }
           }
         }
       ]

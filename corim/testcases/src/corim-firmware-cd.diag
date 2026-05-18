@@ -1,0 +1,92 @@
+/ tagged-unsigned-corim-map / 501({
+  / corim.id / 0 : h'29B834181A5C4E4EA53E8F8786BC8C5B',
+  / corim.tags / 1 : [
+   / concise-mid-tag / 506( <<
+    / concise-mid-tag / {
+     / comid.tag-identity / 1 : {
+      / comid.tag-id / 0 : h'AF1CD895BE784ADBB7E9ADD44A65ABF3'
+     },
+     / comid.entity / 2 : [ {
+      / comid.entity-name / 0 : "Firmware MFG Inc.",
+      / comid.reg-id / 1 : 32("https://fwmfginc.example"),
+      / comid.role / 2 : [ 0 ] / tag-creator /
+     } ],
+     / comid.triples / 4 : {
+      / comid.reference-triples / 0 : [
+        [
+          / environment-map / {
+            / ** Hash of layer 0 firmware Y ** /
+            / comid.class / 0 : {
+              / comid.vendor / 1 : "fwmfginc.example",
+              / comid.model / 2 : "fwY_n5x",
+              / comid.layer / 3 : 0,
+              / comid.index / 4 : 0
+            }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / comid.svn / 1 : 552(1),
+                / comid.digests / 2 : [
+                  [
+                    / hash-alg-id / 7, / SHA384 /
+                    / hash-value / h'15E77D6F133252F1DB7044901313884F2977D2109B33C79F33E079BFC78865255C0FB733C240FDDA544B8215D7B8F815'
+                  ]
+                ]
+              }
+            }
+          ]
+        ],
+        [
+          / environment-map / {
+            / ** Hash of layer 1 firmware X ** /
+            / comid.class / 0 : {
+              / comid.vendor / 1 : "fwmfginc.example",
+              / comid.model / 2 : "fwX_n5x",
+              / comid.layer / 3 : 1,
+              / comid.index / 4 : 0
+            }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / comid.svn / 1 : 552(1),
+                / comid.digests / 2 : [
+                  [
+                    / hash-alg-id / 7, / SHA384 /
+                    / hash-value / h'3D90B6BF003DA2D94EA5463F97FB3C53DDC51CFBA1E3E38EEF7AF071A67986595D22729131DF9FE80F5451EEF154F85E'
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      ],
+      / comid.endorsed-triples / 1 : [
+        [
+          / environment-map / {
+           / comid.class / 0 : {
+             / ** Firmware is valid (example) ** /
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D010F046301'), / 2.16.840.1.113741.1.15.4.99.1 /
+              / comid.vendor / 1 : "fwmfginc.example"
+           }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / raw-value-group /
+                / comid.raw-value / 4 : 560(h'0000000000000000'),
+                / comid.raw-value-mask-DEPRECATED / 5 : h'FFFFFFFF00000000'
+              }
+            }
+          ]
+        ]
+      ]
+    }
+  }
+  >> )
+  ],
+  / corim.profile / 3 :
+    111( h'6086480186F84D010F06') / 2.16.840.1.113741.1.15.6 /
+})

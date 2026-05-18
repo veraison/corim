@@ -1,0 +1,133 @@
+
+/ Use case (1) - cyclic trust - NOT PERMITTED /
+/ ┌────────────┐       has trustee       ┌────────────┐ /
+/ │ XYZ_RoT_A  │ ──────────────────────▶ │ XYZ_RoT_B  │ /
+/ └────────────┘                         └────────────┘ /
+/ ┌────────────┐       has trustee       ┌────────────┐ /
+/ │ XYZ_RoT_B  │ ──────────────────────▶ │ XYZ_RoT_A  │ /
+/ └────────────┘                         └────────────┘ /
+
+/ Use case (2) - bootstrapped or transitive trust /
+/ ┌────────────────┐       has trustee       ┌───────────┐ /
+/ │ PQC_L1_Loader1 │ ──────────────────────▶ │  PQC_RoT  │ /
+/ └────────────────┘                         └───────────┘ /
+/ ┌────────────────┐       has trustee       ┌────────────────┐ /
+/ │ PQC_L1_Loader2 │ ──────────────────────▶ │ PQC_L1_Loader1 │ /
+/ └────────────────┘                         └────────────────┘ /
+/ NOTE: PQC_L1_Loader2 --has transitive trustee --> PQC_RoT can be inferred /
+
+/ Use case (3) - module Extension or call graph trust /
+/ ┌──────────────────────┐       has trustee       ┌───────────────┐ /
+/ │ RoadRunner Extension │ ──────────────────────▶ │ RoadRunner    │ /
+/ │   (LoadInc.example)  │                         │   (ACME Inc.) │ /
+/ └──────────────────────┘                         └───────────────┘ /
+
+/ concise-mid-tag / {
+    / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'1EACD596F4A34FB699BFAEB58E0A4E47'
+  },
+  / comid.linked-tags / 3 : [ {
+    / comid.linked-tag-id / 0 : h'97F5A7071C6F438F877A4A020780EBE9',
+      / comid.tag-rel / 1 : / comid.supplements / 0
+  } ],
+  / triples / 4 : {
+    / dependency-triples / 4 : [
+      [ / ** XYZ Root of Trust fragment A ** /
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F6201'), / 2.1.123.1.15.98.1 /
+            / comid.vendor / 1 : "XYZ.example",
+            / comid.model / 2 : "XYZ_Root-of-trust"
+          }
+        },
+        [ / ** trustees ** /
+          / ** XYZ Root of Trust fragment B ** /
+          / environment-map / {
+            / comid.class / 0 : {
+                / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F6202'), / 2.1.123.1.15.98.2 /
+                / comid.vendor / 1 : "XYZ.example",
+                / comid.model / 2 : "XYZ_Root-of-trust"
+            }
+          }
+        ]
+      ],
+      [ / ** XYZ Root of Trust fragment B ** /
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F6202'), / 2.1.123.1.15.98.2 /
+            / comid.vendor / 1 : "XYZ.example",
+            / comid.model / 2 : "XYZ_Root-of-trust"
+          }
+        },
+        [ / ** trustees ** /
+          / ** XYZ Root of Trust fragment A ** /
+          / environment-map / {
+            / comid.class / 0 : {
+                / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F6201'), / 2.1.123.1.15.98.1 /
+                / comid.vendor / 1 : "XYZ.example",
+                / comid.model / 2 : "XYZ_Root-of-trust"
+            }
+          }
+        ]
+      ],
+      [ / ** PQR Layer 1 loader module 1 ** /
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F0801'), / 2.1.123.1.15.8.1 /
+            / comid.vendor / 1 : "LoadInc.example",
+            / comid.layer / 3 : 1
+          }
+        },
+        [ / ** trustee modules ** /
+          / ** PQR Root of Trust module ** /
+          / environment-map / {
+            / comid.class / 0 : {
+              / comid.class-id / 0 : / tagged-bytes / 560(h'c0de'),
+              / comid.vendor / 1 : "PQR.example",
+              / comid.model / 2 : "PQR_Root-of-trust"
+            }
+          }
+        ]
+      ],
+      [ / ** PQR Layer 1 loader module 2 ** /
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F0802'), / 2.1.123.1.15.8.2 /
+            / comid.vendor / 1 : "LoadInc.example",
+            / comid.layer / 3 : 1
+          }
+        },
+        [ / ** trustee modules ** /
+         / ** PQR Layer 1 loader module 1 ** /
+         / environment-map / {
+           / comid.class / 0 : {
+             / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F0801'), / 2.1.123.1.15.8.1 /
+             / comid.vendor / 1 : "LoadInc.example",
+             / comid.layer / 3 : 1
+           }
+         }
+        ]
+      ],
+      [ / ** L1 RoadRunner Extension module 1 ** /
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 : / tagged-oid-type / 111(h'0607517B010F0903'), / 2.1.123.1.15.9.3 /
+            / comid.vendor / 1 : "LoadInc.example",
+            / comid.layer / 3 : 1
+          }
+        },
+        [ / ** trustee modules ** /
+          / ** Layer 1 RoadRunner module ** /
+          / environment-map / {
+            / comid.class / 0 : {
+              / comid.class-id / 0 : / tagged-uuid-type / 37(h'67b28b6c34cc40a19117ab5b05911e37'),
+              / comid.vendor / 1 : "ACME Inc.",
+              / comid.model / 2 : "ACME RoadRunner",
+              / comid.layer / 3 : 1
+            }
+          }
+        ]
+      ]
+    ]
+  }
+}
