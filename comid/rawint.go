@@ -239,8 +239,9 @@ const TaggedRawIntRangeType = "rawIntRange"
 // to be negative infinity. If the maximum is nil, it's assumed to be
 // positive infinity.
 type TaggedRawIntRange struct {
-	Min *int64
-	Max *int64
+	_   struct{} `cbor:",toarray"`
+	Min *int64   `json:"min,omitempty"`
+	Max *int64   `json:"max,omitempty"`
 }
 
 // NewRawIntRange creates a TaggedRawIntRange with the input value
