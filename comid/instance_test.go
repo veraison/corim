@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
@@ -219,6 +219,75 @@ func TestInstance_UnmarshalJSON_Bytes_NOK(t *testing.T) {
 			var actual Instance
 			err := actual.UnmarshalJSON([]byte(tv.Input))
 			assert.EqualError(t, err, tv.Err)
+		})
+	}
+}
+
+func TestNewPKIXBase64KeyInstance(t *testing.T) {
+	_, err := NewPKIXBase64KeyInstance(TestECPubKey)
+	assert.NoError(t, err)
+
+	MustNewPKIXBase64KeyInstance(TestECPubKey)
+
+	_, err = NewPKIXBase64KeyInstance("foo")
+	assert.ErrorContains(t, err, "could not decode PEM block")
+
+	assert.Panics(t, func() { MustNewPKIXBase64KeyInstance("foo") })
+}
+
+func TestNewPKIXBase64CertInstance(t *testing.T) {
+	_, err := NewPKIXBase64CertInstance(TestCert)
+	assert.NoError(t, err)
+
+	MustNewPKIXBase64CertInstance(TestCert)
+
+	_, err = NewPKIXBase64CertInstance("foo")
+	assert.ErrorContains(t, err, "could not decode PEM block")
+
+	assert.Panics(t, func() { MustNewPKIXBase64CertInstance("foo") })
+}
+
+func TestNewCOSEKeyInstance(t *testing.T) {
+	_, err := NewCOSEKeyInstance(TestCOSEKey)
+	assert.NoError(t, err)
+
+	MustNewCOSEKeyInstance(TestCOSEKey)
+
+	_, err = NewCOSEKeyInstance("foo")
+	assert.ErrorContains(t, err, "base64 decode error")
+
+	assert.Panics(t, func() { MustNewCOSEKeyInstance("foo") })
+}
+
+func TestNewThumbprintInstance(t *testing.T) {
+	testCases := []struct {
+		title       string
+		newFunc     func(any) (*Instance, error)
+		mustNewFunc func(any) *Instance
+	}{
+		{
+			title:       "thumbprint",
+			newFunc:     NewThumbprintInstance,
+			mustNewFunc: MustNewThumbprintInstance,
+		},
+		{
+			title:       "cert thumbprint",
+			newFunc:     NewCertThumbprintInstance,
+			mustNewFunc: MustNewCertThumbprintInstance,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			_, err := tc.newFunc(TestThumbprint)
+			assert.NoError(t, err)
+
+			tc.mustNewFunc(TestThumbprint)
+
+			_, err = tc.newFunc(7)
+			assert.ErrorContains(t, err, "must be a Digest or a string")
+
+			assert.Panics(t, func() { tc.mustNewFunc("foo") })
 		})
 	}
 }

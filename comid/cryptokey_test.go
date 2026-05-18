@@ -453,6 +453,10 @@ func (o testCryptoKey) String() string {
 	return "test"
 }
 
+func (o testCryptoKey) Bytes() []byte {
+	return []byte("test")
+}
+
 func (o testCryptoKey) Valid() error {
 	return nil
 }
