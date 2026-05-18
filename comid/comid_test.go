@@ -1,8 +1,10 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package comid
 
 import (
+	"os"
+	"path/filepath"
 	"slices"
 	"testing"
 
@@ -103,4 +105,21 @@ func TestComid_iterators(t *testing.T) {
 	assert.Equal(t, *slices.Collect(c.IterDevIdentityKeys())[0], (*c.Triples.DevIdentityKeys)[0])
 	assert.Equal(t, *slices.Collect(c.IterRefVals())[0], c.Triples.ReferenceValues.Values[0])
 	assert.Equal(t, *slices.Collect(c.IterEndVals())[0], c.Triples.EndorsedValues.Values[0])
+}
+
+func TestComid_unmarshal_RFC_examples(t *testing.T) {
+	files, err := filepath.Glob("testcases/comid-*.cbor")
+	require.NoError(t, err)
+
+	for _, path := range files {
+		t.Run(path, func(t *testing.T) {
+			data, err := os.ReadFile(path) // nolint:gosec
+			require.NoError(t, err)
+
+			var cd Comid
+
+			err = cd.FromCBOR(data)
+			assert.NoError(t, err)
+		})
+	}
 }

@@ -1,0 +1,140 @@
+/ tagged-unsigned-corim-map / 501({
+  / corim.id / 0 : h'0A2D9D8C56F74071B4F38065C37E4ACF',
+   / corim.tags / 1 : [
+    / concise-mid-tag / 506( <<
+     / concise-mid-tag / {
+      / comid.tag-identity / 1 : {
+       / comid.tag-id / 0 : h'1EACD596F4A34FB699BFAEB58E0A4E47'
+      },
+      / comid.entity / 2 : [ {
+       / comid.entity-name / 0 : "FPGA Designs-R-Us",
+       / comid.reg-id / 1 : 32("https://fpgadesignsrus.example"),
+       / comid.role / 2 : [ 0 ] / tag-creator /
+      } ],
+      / comid.linked-tags / 3 : [ {
+        / comid.linked-tag-id / 0 : h'97F5A7071C6F438F877A4A020780EBE9',
+        / comid.tag-rel / 1 : / comid.supplements / 0
+        }
+       ],
+      / comid.triples / 4 : {
+       / comid.reference-triples / 0 : [
+        [
+          / environment-map / {
+            / ** Layer 3 device state ** /
+            / comid.class / 0 : {
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D010F0401'), / 2.16.840.1.113741.1.15.4.1 /
+             / comid.vendor / 1 : "fpgadesignsrus.example",
+             / comid.layer / 3 : 2
+            }
+          },
+          [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / raw-value-group /
+              / comid.raw-value / 4 : 560(h'0000000000000000'),
+              / comid.raw-value-mask-DEPRECATED / 5 : h'FFFFFFFF00000000'
+            }
+           }
+          ]
+         ],
+         [
+          / environment-map / {
+            / ** Layer 2 design (IO descriptor) hash ** /
+            / comid.class / 0 : {
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D010F0402'), / 2.16.840.1.113741.1.15.4.2 /
+             / comid.vendor / 1 : "fpgadesignsrus.example",
+             / comid.layer / 3 : 2
+            }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / comid.digests / 2 : [
+                  [
+                  / hash-alg-id / 7, / SHA384 /
+                  / hash-value / h'3FE18ECA4053879E017EF5EB7A3E5157659C5F9BB15B7D09959B8B8647822A4CC21C3AA6721CEF87F5BFA53495DB0833'
+                  ]
+                ]
+              }
+            }
+          ]
+        ],
+        [
+          / environment-map / {
+            / ** Layer 2 design (CORE descriptor) hash ** /
+            / comid.class / 0 : {
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D010F0403'), / 2.16.840.1.113741.1.15.4.3 /
+             / comid.vendor / 1 : "fpgadesignsrus.example",
+             / comid.layer / 3 : 2
+            }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / comid.digests / 2 : [
+                  [
+                  / hash-alg-id / 7, / SHA384 /
+                  / hash-value / h'20FF681A0882E29B481953888936209CB53DF9C5AAEC606A2C24A0FB138595124B8E3F24A12771BC3854CC68B40361AD'
+                  ]
+                ]
+              }
+            }
+          ]
+        ],
+        [
+          / environment-map / {
+            / ** Firmware is valid (example assertion) ** /
+            / comid.class / 0 : {
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'6086480186F84D010F046301'), / 2.16.840.1.113741.1.15.4.99.1 /
+             / comid.vendor / 1 : "fpgadesignsrus.example"
+            }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / raw-value-group /
+                / comid.raw-value / 4 : 560(h'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'),
+                / comid.raw-value-mask-DEPRECATED / 5 : h'466224343D681802C1506BBED7D7F00B969BADDD6346E4F2E7CE146692996F22A45814DE81D248F583B65F817B5FCEAB'
+              }
+            }
+          ]
+         ]
+        ],
+        / comid.endorsed-triples / 1 : [
+         [
+          / environment-map / {
+           / ** Design is valid (example assertion) ** /
+           / comid.class / 0 : {
+            / comid.class-id / 0 :
+             / tagged-oid-type / 111(h'6086480186F84D010F046302'), / 2.16.840.1.113741.1.15.4.99.2 /
+            / comid.vendor / 1 : "fpgadesignsrus.example"
+           }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / raw-value-group /
+                / comid.raw-value / 4 : 560(h'0000000000000000'),
+                / comid.raw-value-mask-DEPRECATED / 5 : h'FFFFFFFF00000000'
+              }
+            }
+          ]
+         ]
+       ]
+    }
+  }
+  >> )
+  ],
+  / corim.dependent-rims / 2 : [
+   {
+    / ** link to firmware rim file ** /
+    / corim.href / 0 : 32("https://rims.example.com/path/to/file_adkfhaeria-dfka_efkj.rim")
+   }
+  ],
+  / corim.profile / 3 :
+   111(h'6086480186F84D010F06') / 2.16.840.1.113741.1.15.6 /
+})

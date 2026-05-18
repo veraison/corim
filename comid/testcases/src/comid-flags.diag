@@ -1,0 +1,52 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'1EACD596F4A34FB699BFAEB58E0A4E49'
+  },
+    / comid.entities / 2 : [ {
+    / comid.entity-name / 0 : "OEM-A",
+    / comid.reg-id / 1 : 32("https://oem-a.example"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.linked-tags / 3 : [ 
+    / linked-tag-map / {
+        / comid.linked-tag-id / 0 : h'1EACD596F4A34FB699BFAEB58E0A4E47',
+        / comid.tag-rel / 1 : / comid.supplements / 0
+      },
+    / linked-tag-map / {
+        / comid.linked-tag-id / 0 : h'AF1CD895BE784ADBB7E9ADD44A65ABF3',
+        / comid.tag-rel / 1 : / comid.supplements / 0
+      }
+    ],
+  / comid.triples / 4 : {
+      / comid.endorsed-triples / 1 : [
+        [
+          / environment-map / {
+           / comid.class / 0 : {
+             / ** Firmware is valid (example) ** /
+             / comid.class-id / 0 :
+              / tagged-oid-type / 111(h'060C6086480186F84D010F046301'), / 2.16.840.1.113741.1.15.4.99.1 /
+              / comid.vendor / 1 : "fwmfginc.example"
+           }
+          },
+          [
+            / measurement-map / {
+              / comid.mval / 1 : {
+                / comid.flags / 3 : { 
+                  / configured / 0 : true,
+                  / secure / 1 : true,
+                  / recovery / 2 : true,
+                  / debug / 3 : false,
+                  / replay-protected / 4 : true,
+                  / integrity-protected / 5 : true,
+                  / runtime-meas / 6 : true,
+                  / immutable / 7 : true,
+                  / tcb / 8 : true,
+                  / confidentiality-protected / 9 : true
+                }
+              }
+            }
+          ]
+        ]
+      ]
+  }
+}

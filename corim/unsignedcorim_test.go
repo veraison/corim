@@ -5,6 +5,8 @@ package corim
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"slices"
 	"testing"
 	"time"
@@ -526,4 +528,19 @@ func TestComid_iterators(t *testing.T) {
 		cm.Triples.EndorsedValues.Values[0].Measurements.Values[0].Val.RawValue,
 	)
 	assert.NoError(t, errFunc())
+}
+
+func TestCorim_unmarshal_RFC_examples(t *testing.T) {
+	files, err := filepath.Glob("testcases/corim-*.cbor")
+	require.NoError(t, err)
+
+	for _, path := range files {
+		t.Run(path, func(t *testing.T) {
+			data, err := os.ReadFile(path) // nolint:gosec
+			require.NoError(t, err)
+
+			_, err = UnmarshalAndValidateUnsignedCorimFromCBOR(data)
+			assert.NoError(t, err)
+		})
+	}
 }

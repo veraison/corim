@@ -1,0 +1,88 @@
+/ concise-mid-tag / {
+    / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'1EACD596F4A34FB699BFAEB58E0A4E47'
+  },
+  / comid.linked-tags / 3 : [ {
+    / comid.linked-tag-id / 0 : h'97F5A7071C6F438F877A4A020780EBE9',
+      / comid.tag-rel / 1 : / comid.supplements / 0
+  }
+  ],
+  / triples / 4 : {
+    / membership-triples / 5 : [
+      [
+        / environment-map / {
+          / ** A Root of Trust module ** /
+          / comid.class / 0 : {
+              / comid.class-id / 0 :
+                / tagged-oid-type / 111(h'0607517B010F6202'), / 2.1.123.1.15.98.2 /
+                / comid.vendor / 1 : "XYZ.example",
+                / comid.model / 2 : "XYZ_Root-of-trust"
+            }
+          },
+        [
+          / environment-map / {
+            / ** A Root of Trust module ** /
+            / comid.class / 0 : {
+                / comid.class-id / 0 :
+                  / tagged-oid-type / 111(h'0607517B010F6201'), / 2.1.123.1.15.98.1 /
+                / comid.vendor / 1 : "XYZ.example"
+            }
+          }
+        ]
+      ],
+      [   / environment-map / {
+          / ** A Root of Trust module ** /
+          / comid.class / 0 : {
+              / comid.class-id / 0 :
+                / tagged-bytes / 560(h'c0de'),
+                / comid.vendor / 1 : "PQR.example",
+                / comid.model / 2 : "PQR_Root-of-trust"
+            }
+          },
+        [
+          / environment-map / {
+            / ** Layer 1 loader module 1 ** /
+            / comid.class / 0 : {
+                / comid.class-id / 0 :
+                  / tagged-oid-type / 111(h'0607517B010F0801'), / 2.1.123.1.15.8.1 /
+                / comid.vendor / 1 : "LoadInc.example",
+                / comid.layer / 3 : 1
+            }
+          },
+          / environment-map / {
+            / ** Layer 1 loader module 2 ** /
+            / comid.class / 0 : {
+              / comid.class-id / 0 :
+                / tagged-oid-type / 111(h'0607517B010F0802'), / 2.1.123.1.15.8.2 /
+              / comid.vendor / 1 : "LoadInc.example",
+              / comid.layer / 3 : 1
+            }
+          }
+        ]
+      ],
+      [  / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-uuid-type / 37(
+              h'67b28b6c34cc40a19117ab5b05911e37'
+            ),
+          / comid.vendor / 1 : "ACME Inc.",
+          / comid.model / 2 : "ACME RoadRunner",
+          / comid.layer / 3 : 1
+        }
+      },
+        [
+          / environment-map / {
+            / ** L1 Extension module 1 ** /
+            / comid.class / 0 : {
+              / comid.class-id / 0 :
+                / tagged-oid-type / 111(h'0607517B010F0903'), / 2.1.123.1.15.9.3 /
+              / comid.vendor / 1 : "LoadInc.example",
+              / comid.layer / 3 : 1
+            }
+          }
+        ]
+      ]
+    ]
+  }
+}

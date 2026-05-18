@@ -1,0 +1,30 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'3827e03b25dd454cb36a679c923af51f'
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "ACME Inc.",
+    / comid.reg-id / 1 : 32("https://acme.example"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+    / comid.reference-triples / 0 : [ [
+      / environment-map / {
+        / comid.instance / 1 : / tagged-pkix-base64-key-type / 554("base64_key_X")
+      },
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+            / comid.int-range / 15 : 564([/ min: / 1, / max: / null])
+          }
+        },
+        / measurement-map / {
+          / comid.mkey / 0 : 1,
+          / comid.mval / 1 : {
+            / comid.int-range / 15 : 564([/ min: / -1, / max: / 1 ])
+          }
+        }
+      ]
+    ] ]
+  }
+}

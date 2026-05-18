@@ -10,15 +10,7 @@
   / comid.triples / 4 : {
     / comid.reference-triples / 0 : [ [
       / environment-map / {
-        / comid.class / 0 : {
-          / comid.class-id / 0 :
-            / tagged-uuid-type / 37(
-              h'67b28b6c34cc40a19117ab5b05911e37'
-            ),
-          / comid.vendor / 1 : "ACME Inc.",
-          / comid.model / 2 : "ACME RoadRunner",
-          / comid.layer / 3 : 1
-        }
+        / comid.instance / 1 : / tagged-pkix-base64-key-type / 554("base64_key_X")
       },
       [
         / measurement-map / {

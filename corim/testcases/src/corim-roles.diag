@@ -1,0 +1,42 @@
+/ tagged-corim-map / 501({
+  / corim.id / 0 : h'284e6c3e5d9f4f6b851f5a4247f243a7',
+  / corim.entities / 5 : [
+    {
+      / corim.entity-name / 0 : "OEM-A",
+      / corim.reg-id / 1 : 32("https://oem-a.example"),
+      / corim.role / 2 : [ 2 ] / manifest-signer /
+    }
+  ],
+  / corim.tags / 1 : [
+    / concise-mid-tag / 506( <<
+      / concise-mid-tag / {
+        / comid.tag-identity / 1 : {
+          / comid.tag-id / 0 : h'3f06af63a93c11e4979700505690773f'
+        },
+        / comid.triples / 4 : {
+          / comid.reference-triples / 0 : [ [
+            / environment-map / {
+              / comid.class / 0 : {
+                / comid.class-id / 0 :
+                  / tagged-uuid-type / 37(
+                    h'67b28b6c34cc40a19117ab5b05911e37'
+                  )
+              }
+            },
+            [
+              / measurement-map / {
+                / comid.mval / 1 : {
+                  / comid.ver / 0 : {
+                    / comid.version / 0 : "1.0.0",
+                    / comid.version-scheme / 1 : 16384 / semver /
+                  }
+                }
+              }
+            ]
+          ] ]
+        }
+      }
+    >> )
+    ]
+  }
+)

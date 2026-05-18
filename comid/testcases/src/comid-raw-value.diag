@@ -1,0 +1,78 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'3f06af63a93c11e4979700505690773f'
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "ACME Inc.",
+    / comid.reg-id / 1 : 32("https://acme.example"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+
+    / The reference triples below all match against an ACS entry containing a raw value. /
+    / The first matches against the complete raw value, the next two match against part of the value /
+
+    / comid.reference-triples / 0 : [ [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-uuid-type / 37(
+              h'67b28b6c34cc40a19117ab5b05911e37'
+            ),
+          / comid.vendor / 1 : "ACME Inc.",
+          / comid.model / 2 : "ACME RoadRunner",
+          / comid.layer / 3 : 1
+        }
+      },
+      [
+        / measurement-map / {
+          / This version compares the whole 32 bits /
+          / comid.mval / 1 : {
+            / comid.raw-value / 4 : 560(h'12345678') 
+          }
+        }
+      ]
+    ], [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-uuid-type / 37(
+              h'67b28b6c34cc40a19117ab5b05911e37'
+            ),
+          / comid.vendor / 1 : "ACME Inc.",
+          / comid.model / 2 : "ACME RoadRunner",
+          / comid.layer / 3 : 1
+        }
+      },
+      [
+        / measurement-map / {
+          / This version compares the first 16 bits using preferred syntax /
+          / comid.mval / 1 : {
+            / comid.raw-value / 4 : 563( [ / value / h'12340000', / mask / h'FFFF0000' ] )
+          }
+        }
+      ]
+    ], [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-uuid-type / 37(
+              h'67b28b6c34cc40a19117ab5b05911e37'
+            ),
+          / comid.vendor / 1 : "ACME Inc.",
+          / comid.model / 2 : "ACME RoadRunner",
+          / comid.layer / 3 : 1
+        }
+      },
+      [
+        / measurement-map / {
+          / This version compares the first 16 bits using deprecated syntax /
+          / comid.mval / 1 : {
+            / comid.raw-value / 4 : 560(h'12340000'),
+            / comid.raw-value-mask-DEPRECATED / 5 : h'FFFF0000'
+          }
+        }
+      ]
+    ] ]
+  }
+}

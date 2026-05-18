@@ -2,52 +2,186 @@
   / comid.tag-identity / 1 : {
     / comid.tag-id / 0 : h'3f06af63a93c11e4979700505690773f'
   },
-  / comid.entity / 2 : [ {
-    / comid.entity-name / 0 : "ACME Inc.",
-    / comid.reg-id / 1 : 32("https://acme.example"),
-    / comid.role / 2 : [ 0 ] / tag-creator /
-  } ],
   / comid.triples / 4 : {
-    / comid.reference-triples / 0 : [ [
-      / environment-map / {
-        / comid.class / 0 : {
-          / comid.class-id / 0 :
-            / tagged-uuid-type / 37(
-              h'67b28b6c34cc40a19117ab5b05911e37'
-            ),
-          / comid.vendor / 1 : "ACME Inc.",
-          / comid.model / 2 : "ACME RoadRunner",
-          / comid.layer / 3 : 1
-        }
-      },
+    / reference-triples / 0 : [
       [
-      / measurement-map A / {
-        /comid.mkey / 0 : 1,
-        / comid.mval / 1 : {
-          / comid.ver / 0 : {
-            / comid.version / 0 : "1.0.0",
-            / comid.version-scheme / 1 : 16384 / semver /
-          },
-          / comid.digests / 2 : [ [
-            / hash-alg-id / 1, / sha256 /
-            / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
-          ] ]
-        }
-      },
-      / measurement-map B / {
-        /comid.mkey / 0 : 2,
-        / comid.mval / 1 : {
-          / comid.ver / 0 : {
-            / comid.version / 0 : "2.0.0",
-            / comid.version-scheme / 1 : 16384 / semver /
-          },
-          / comid.digests / 2 : [ [
-            / hash-alg-id / 1, / sha256 /
-            / hash-value / h'FFaa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
-          ] ]
-        }
-      }
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e39' )
+          }
+        },
+        [
+          / measurement-map / {
+            / mkey / 0 : "thing 2",
+            / mval / 1 : {
+              / cryptokeys / 13 : [
+                / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+                / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+              ]
+            }
+          }
+        ]
       ]
-    ] ]
+    ],
+    / identity-triples / 2 : [ 
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37(
+                h'67b28b6c34cc40a19117ab5b05911e37'
+              ),
+            / vendor / 1 : "ACME Inc.",
+            / model / 2 : "ACME RoadRunner",
+            / layer / 3 : 1
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-key-type / 554("base64_key_X"),
+          / tagged-pkix-base64-cert-type / 555("base64_cert_Y"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Z"),
+          / tagged-thumbprint-type / 557([
+            / alg / 1, / sha256 /
+            / value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+          ]),
+          / tagged-cose-key-type / 558( { 1 : "Key 1" } ),
+          / tagged-cert-thumbprint-type / 559([
+            / alg / 1, / sha256 /
+            / value / h'55aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+          ]),
+          / tagged-cert-path-thumbprint-type / 561([
+            / alg / 1, / sha256 /
+            / value / h'66aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+          ])
+        ]
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e38' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / mkey / 0 : "thing 1"
+        }
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e39' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / mkey / 0 : "thing 2",
+          / authorized-by / 1: [
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_A"),
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_B")
+          ]
+        }
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e40' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / authorized-by / 1: [
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_A"),
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_B")
+          ]
+        }
+      ]
+    ],
+    / attest-key-triples / 3 : [ 
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37(
+                h'67b28b6c34cc40a19117ab5b05911e37'
+              ),
+            / vendor / 1 : "ACME Inc.",
+            / model / 2 : "ACME RoadRunner",
+            / layer / 3 : 1
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-key-type / 554("base64_key_X"),
+          / tagged-pkix-base64-cert-type / 555("base64_cert_Y"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Z")
+        ]
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e30' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / mkey / 0 : "thing 1"
+        }
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e31' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / mkey / 0 : "thing 2",
+          / authorized-by / 1: [
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_A"),
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_B")
+          ]
+        }
+      ],
+      [
+        / environment-map / {
+          / class / 0 : {
+            / class-id / 0 :
+              / tagged-uuid-type / 37( h'67b28b6c34cc40a19117ab5b05911e32' )
+          }
+        },
+        / key-list / [
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_X"),
+          / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_Y")
+        ],
+        / conditions / {
+          / authorized-by / 1: [
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_A"),
+            / tagged-pkix-base64-cert-path-type / 556("base64_cert_path_B")
+          ]
+        }
+      ]
+    ]
   }
 }
+
+    
