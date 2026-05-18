@@ -358,7 +358,10 @@ func TestUnsignedCorim_ToJSON(t *testing.T) {
 		"corim-id":"invalid.tags.corim",
 		"tags":["2QH6WOuiAaEAdXZlbmRvci5leGFtcGxlL3Byb2QvMQShA4GCoQHYJVAx+1q/Aj5JkqpOlfnBUDv6gdkCKnixLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFVzFCdnFGKy9yeThCV2E3WkVNVTF4WVlIRVE4QgpsTFQ0TUZIT2FPK0lDVHRJdnJFZUVwci9zZlRBUDY2SDJoQ0hkYjVIRVhLdFJLb2Q2UUxjT0xQQTFRPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"],
 		"dependent-rims":[{"href":"http://endorser.example/addon.corim"}],
-		"profile":"https://arm.com/psa/iot/2.0.0"
+		"profile":{
+			"type": "uri",
+			"value": "https://arm.com/psa/iot/2.0.0"
+		}
 	}
 	`
 

@@ -10,7 +10,6 @@ import (
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/corim/profiles/psa"
-	"github.com/veraison/eat"
 )
 
 const PlatformProfileURI = "tag:arm.com,2025:cca_platform#1.0.0"
@@ -22,10 +21,7 @@ const (
 )
 
 func init() {
-	profileID, err := eat.NewProfile(PlatformProfileURI)
-	if err != nil {
-		panic(err)
-	}
+	profileID := corim.MustNewURIProfile(PlatformProfileURI)
 
 	extMap := extensions.NewMap().
 		Add(comid.ExtTriples, &PlatformTriplesExtensions{})

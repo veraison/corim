@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -19,7 +19,6 @@ import (
 	"github.com/veraison/corim/extensions"
 
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/eat"
 	"github.com/veraison/swid"
 )
 
@@ -35,11 +34,11 @@ type UnsignedCorim struct {
 	// if a field is optional, so we use it during unmarshaling as well as
 	// marshaling. Hence omitempty is present for the json tag, but not
 	// cbor.
-	Tags          []Tag        `cbor:"1,keyasint" json:"tags,omitempty"`
-	DependentRims *[]Locator   `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
-	Profile       *eat.Profile `cbor:"3,keyasint,omitempty" json:"profile,omitempty"`
-	RimValidity   *Validity    `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
-	Entities      *Entities    `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
+	Tags          []Tag      `cbor:"1,keyasint" json:"tags,omitempty"`
+	DependentRims *[]Locator `cbor:"2,keyasint,omitempty" json:"dependent-rims,omitempty"`
+	Profile       *Profile   `cbor:"3,keyasint,omitempty" json:"profile,omitempty"`
+	RimValidity   *Validity  `cbor:"4,keyasint,omitempty" json:"validity,omitempty"`
+	Entities      *Entities  `cbor:"5,keyasint,omitempty" json:"entities,omitempty"`
 
 	Extensions
 }
@@ -178,7 +177,7 @@ func (o *UnsignedCorim) AddDependentRim(href string, thumbprint *swid.HashEntry)
 // the profile in the unsigned-corim-map
 func (o *UnsignedCorim) SetProfile(urlOrOID string) *UnsignedCorim {
 	if o != nil {
-		p, err := eat.NewProfile(urlOrOID)
+		p, err := NewProfileFromString(urlOrOID)
 		if err != nil {
 			return nil
 		}
@@ -429,7 +428,7 @@ func (o UnsignedCorim) Valid() error {
 	}
 
 	if o.Profile != nil {
-		if err := ValidProfile(*o.Profile); err != nil {
+		if err := o.Profile.Valid(); err != nil {
 			return fmt.Errorf("profile validation failed: %w", err)
 		}
 	}
@@ -596,14 +595,5 @@ func (o Locator) Valid() error {
 		}
 	}
 
-	return nil
-}
-
-// ValidProfile checks that the supplied profile is in one of the supported
-// formats (i.e., URI or OID)
-func ValidProfile(p eat.Profile) error {
-	if !p.IsOID() && !p.IsURI() {
-		return errors.New("profile should be OID or URI")
-	}
 	return nil
 }

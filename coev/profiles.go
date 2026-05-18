@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coev
@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 // ProfileManifest associates an EAT profile ID with a set of extensions. It allows
 // obtaining new Concise Evidence structure that had associated extensions
 // registered.
 type ProfileManifest struct {
-	ID            *eat.Profile
+	ID            *corim.Profile
 	MapExtensions extensions.Map
 }
 
@@ -74,11 +74,12 @@ func (o *ProfileManifest) registerExtensions(e iextensible, points []extensions.
 // RegisterProfile registers a set of extensions with the specified profile. If
 // the profile has already been registered, or if the extensions are invalid,
 // an error is returned.
-func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
-	strID, err := id.Get()
-	if err != nil {
+func RegisterProfile(id *corim.Profile, exts extensions.Map) error {
+	if err := id.Valid(); err != nil {
 		return err
 	}
+
+	strID := id.String()
 
 	if _, ok := profilesRegister[strID]; ok {
 		return fmt.Errorf("profile with id %q already registered", strID)
@@ -102,32 +103,24 @@ func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
 // GetProfileManifest returns the ProfileManifest associated with the specified ID, or an empty
 // profileManifest if no ProfileManifest has been registered for the ID. The second return
 // value indicates whether a profileManifest for the ID has been found.
-func GetProfileManifest(id *eat.Profile) (*ProfileManifest, bool) {
-	if id == nil {
+func GetProfileManifest(id *corim.Profile) (*ProfileManifest, bool) {
+	if id.IsNil() {
 		return nil, false
 	}
 
-	strID, err := id.Get()
-	if err != nil {
-		return nil, false
-	}
-
-	prof, ok := profilesRegister[strID]
+	prof, ok := profilesRegister[id.String()]
 	return &prof, ok
 }
 
 // UnregisterProfile ensures there are no extensions registered for the
 // specified profile ID. Returns true if extensions were previously registered
 // and have been removed, and false otherwise.
-func UnregisterProfile(id *eat.Profile) bool {
-	if id == nil {
+func UnregisterProfile(id *corim.Profile) bool {
+	if id.IsNil() {
 		return false
 	}
 
-	strID, err := id.Get()
-	if err != nil {
-		return false
-	}
+	strID := id.String()
 
 	if _, ok := profilesRegister[strID]; ok {
 		delete(profilesRegister, strID)
@@ -140,7 +133,7 @@ func UnregisterProfile(id *eat.Profile) bool {
 // UnmarshalConciseEvidenceFromCBOR unmarshals a ConciseEvidence from provided CBOR data. If
 // there are extensions associated with the profile specified by the data, they
 // will be registered with the coev.ConciseEvidence before it is unmarshaled.
-func UnmarshalConciseEvidenceFromCBOR(buf []byte, profileID *eat.Profile) (*ConciseEvidence, error) {
+func UnmarshalConciseEvidenceFromCBOR(buf []byte, profileID *corim.Profile) (*ConciseEvidence, error) {
 	var ret *ConciseEvidence
 
 	profileManifest, ok := GetProfileManifest(profileID)
@@ -160,10 +153,10 @@ func UnmarshalConciseEvidenceFromCBOR(buf []byte, profileID *eat.Profile) (*Conc
 // GetConciseEvidence returns a pointer to a new ConciseEvidence instance. If there
 // are extensions associated with the provided profileID, they will be
 // registered with the instance.
-func GetConciseEvidence(profileID *eat.Profile) *ConciseEvidence {
+func GetConciseEvidence(profileID *corim.Profile) *ConciseEvidence {
 	var ret *ConciseEvidence
 
-	if profileID == nil {
+	if profileID.IsNil() {
 		ret = NewConciseEvidence()
 	} else {
 		profileManifest, ok := GetProfileManifest(profileID)

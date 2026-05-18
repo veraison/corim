@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package tdx
@@ -9,15 +9,11 @@ import (
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
-	"github.com/veraison/eat"
 )
 
 // Example_decode_PCE_JSON decodes the TDX Provisioning Certification Enclave Measurement Extensions from the given JSON Template
 func Example_decode_PCE_JSON() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := corim.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("CoRIM Profile NOT FOUND")
@@ -95,10 +91,7 @@ func extractPCERefVals(c *comid.Comid) error {
 }
 
 func Example_decode_PCE_CBOR() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := corim.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("CoRIM Profile NOT FOUND")
@@ -162,10 +155,7 @@ func Example_decode_PCE_CBOR() {
 }
 
 func Example_encode_tdx_pce_refval_with_profile() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := corim.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("CoRIM Profile NOT FOUND")
@@ -173,9 +163,6 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	}
 
 	m := manifest.GetComid()
-	if m == nil {
-		panic(err)
-	}
 	m.SetTagIdentity("43BBE37F-2E61-4B33-AED3-53CFF1428B20", 0).
 		AddEntity("INTEL", &TestRegID, comid.RoleCreator, comid.RoleTagCreator, comid.RoleMaintainer)
 
@@ -190,7 +177,7 @@ func Example_encode_tdx_pce_refval_with_profile() {
 	refVal.Measurements.Add(measurement)
 	m.Triples.AddReferenceValue(refVal)
 
-	err = SetTdxPceMvalExtensions(ReferenceValue, &m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
+	err := SetTdxPceMvalExtensions(ReferenceValue, &m.Triples.ReferenceValues.Values[0].Measurements.Values[0].Val)
 	if err != nil {
 		fmt.Printf("unable to set extensions :%s", err.Error())
 	}
