@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package comid
@@ -331,10 +331,4 @@ func RegisterEntityNameType(tag uint64, factory IEntityNameFactory) error {
 	entityNameValueRegister[typ] = factory
 
 	return nil
-}
-
-type TaggedURI string
-
-func (o TaggedURI) Empty() bool {
-	return o == ""
 }
