@@ -9,7 +9,6 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 const ProfileURI = "tag:arm.com,2025:psa#1.0.0"
@@ -18,10 +17,7 @@ const ProfileURI = "tag:arm.com,2025:psa#1.0.0"
 const PSASoftwareComponentMkey = "psa.software-component"
 
 func init() {
-	profileID, err := eat.NewProfile(ProfileURI)
-	if err != nil {
-		panic(err)
-	}
+	profileID := corim.MustNewURIProfile(ProfileURI)
 
 	mvalExt := &MvalExtensions{}
 

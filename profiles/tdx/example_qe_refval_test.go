@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package tdx
@@ -10,15 +10,11 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 // Example_decode_QE_JSON decodes the TDX Quoting Enclave Measurement Extensions from the given JSON Template
 func Example_decode_QE_JSON() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := corim.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("CoRIM Profile NOT FOUND")
@@ -123,10 +119,7 @@ func Example_encode_tdx_QE_refval_without_profile() {
 }
 
 func Example_decode_QE_CBOR() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := corim.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("CoRIM Profile NOT FOUND")

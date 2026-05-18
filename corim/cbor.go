@@ -22,7 +22,8 @@ var (
 	ComidTag         uint64 = 506
 
 	corimTagsMap = map[uint64]interface{}{
-		32: comid.TaggedURI(""),
+		32:  comid.TaggedURI(""),
+		111: comid.TaggedOID{},
 	}
 )
 

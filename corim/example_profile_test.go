@@ -12,7 +12,6 @@ import (
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 	"github.com/veraison/swid"
 )
 
@@ -56,10 +55,7 @@ func (*ComidExtensions) ConstrainComid(c *comid.Comid) error {
 // which should not happen if it a registered PEN or a URL containing a domain
 // that you own.
 func init() {
-	profileID, err := eat.NewProfile("http://example.com/example-profile")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := MustNewURIProfile("http://example.com/example-profile")
 
 	extMap := extensions.NewMap().
 		Add(ExtEntity, &EntityExtensions{}).
@@ -128,10 +124,7 @@ func Example_profile_unmarshal() {
 // then unmarshal that into a CoRIM before marshaling it into CBOR (in which
 // case, extensions will work as with unmarshaling example above).
 func Example_profile_marshal() {
-	profileID, err := eat.NewProfile("http://example.com/example-profile")
-	if err != nil {
-		panic(err)
-	}
+	profileID := MustNewURIProfile("http://example.com/example-profile")
 
 	profileManifest, ok := GetProfileManifest(profileID)
 	if !ok {
@@ -146,7 +139,7 @@ func Example_profile_marshal() {
 		AddEntity("ACME Ltd.", &comid.TestRegID, comid.RoleCreator)
 
 	address := "123 Fake Street"
-	err = myComid.Entities.Values[0].Set("Address", &address)
+	err := myComid.Entities.Values[0].Set("Address", &address)
 	if err != nil {
 		log.Fatalf("could not set entity Address: %v", err)
 	}
@@ -199,5 +192,5 @@ func Example_profile_marshal() {
 	fmt.Printf("corim: %v", hex.EncodeToString(buf))
 
 	// output:
-	// corim: d901f5a30063666f6f0181d901fa58a5a40065656e2d474201a100676578616d706c650281a4006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028101206f3132332046616b652053747265657404a1008182a100a300d8255031fb5abf023e4992aa4e95f9c1503bfa016941434d45204c74642e026e526f616452756e6e657220322e3081a200d8255031fb5abf023e4992aa4e95f9c1503bfa01a10281820644abcdef00037822687474703a2f2f6578616d706c652e636f6d2f6578616d706c652d70726f66696c65
+	// corim: d901f5a30063666f6f0181d901fa58a5a40065656e2d474201a100676578616d706c650281a4006941434d45204c74642e01d8207468747470733a2f2f61636d652e6578616d706c65028101206f3132332046616b652053747265657404a1008182a100a300d8255031fb5abf023e4992aa4e95f9c1503bfa016941434d45204c74642e026e526f616452756e6e657220322e3081a200d8255031fb5abf023e4992aa4e95f9c1503bfa01a10281820644abcdef0003d8207822687474703a2f2f6578616d706c652e636f6d2f6578616d706c652d70726f66696c65
 }
