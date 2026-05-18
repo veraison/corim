@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
-	"github.com/veraison/eat"
 )
 
 // getTestcasePath returns the absolute path to a testcase file
@@ -49,9 +48,7 @@ func getComidFromCorimWithProfile(t *testing.T, corimData []byte, profileURI str
 	require.Greater(t, len(c.Tags), 0, "CoRIM must have at least one tag")
 
 	// Get a CoMID with the specified profile extensions registered
-	profileID, err := eat.NewProfile(profileURI)
-	require.NoError(t, err)
-
+	profileID := corim.MustNewURIProfile(profileURI)
 	manifest, found := corim.GetProfileManifest(profileID)
 	require.True(t, found, "profile %s should be registered", profileURI)
 

@@ -1,4 +1,4 @@
-// Copyright 2024 Contributors to the Veraison project.
+// Copyright 2024-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 package corim
 
@@ -11,7 +11,6 @@ import (
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 	"github.com/veraison/go-cose"
 )
 
@@ -60,7 +59,7 @@ func UnmarshalSignedCorimFromCBOR(buf []byte) (*SignedCorim, error) {
 	}
 
 	profiled := struct {
-		Profile *eat.Profile `cbor:"3,keyasint,omitempty"`
+		Profile *Profile `cbor:"3,keyasint,omitempty"`
 	}{}
 
 	if err := dm.Unmarshal(message.Payload, &profiled); err != nil {
@@ -118,7 +117,7 @@ func UnmarshalUnsignedCorimFromCBOR(buf []byte) (*UnsignedCorim, error) {
 	}
 
 	profiled := struct {
-		Profile *eat.Profile `cbor:"3,keyasint,omitempty"`
+		Profile *Profile `cbor:"3,keyasint,omitempty"`
 	}{}
 
 	if err := dm.Unmarshal(buf[3:], &profiled); err != nil {
@@ -139,7 +138,7 @@ func UnmarshalUnsignedCorimFromCBOR(buf []byte) (*UnsignedCorim, error) {
 // unmarshaled.
 func UnmarshalUnsignedCorimFromJSON(buf []byte) (*UnsignedCorim, error) {
 	profiled := struct {
-		Profile *eat.Profile `json:"profile,omitempty"`
+		Profile *Profile `json:"profile,omitempty"`
 	}{}
 
 	if err := json.Unmarshal(buf, &profiled); err != nil {
@@ -193,7 +192,7 @@ func UnmarshalAndValidateUnsignedCorimFromJSON(data []byte) (*UnsignedCorim, err
 // UnmarshalComidFromCBOR unmarshals a comid.Comid from provided CBOR data. If
 // there are extensions associated with the profile specified by the data, they
 // will be registered with the comid.Comid before it is unmarshaled.
-func UnmarshalComidFromCBOR(buf []byte, profileID *eat.Profile) (*comid.Comid, error) {
+func UnmarshalComidFromCBOR(buf []byte, profileID *Profile) (*comid.Comid, error) {
 	var ret *comid.Comid
 
 	profileManifest, ok := GetProfileManifest(profileID)
@@ -213,7 +212,7 @@ func UnmarshalComidFromCBOR(buf []byte, profileID *eat.Profile) (*comid.Comid, e
 // UnmarshalComidFromJSON unmarshals a comid.Comid from provided JSON data. If
 // there are extensions associated with the profile specified by the data, they
 // will be registered with the comid.Comid before it is unmarshaled.
-func UnmarshalComidFromJSON(buf []byte, profileID *eat.Profile) (*comid.Comid, error) {
+func UnmarshalComidFromJSON(buf []byte, profileID *Profile) (*comid.Comid, error) {
 	var ret *comid.Comid
 
 	profileManifest, ok := GetProfileManifest(profileID)
@@ -233,7 +232,7 @@ func UnmarshalComidFromJSON(buf []byte, profileID *eat.Profile) (*comid.Comid, e
 // GetSingedCorim returns a pointer to a new SingedCorim instance. If there
 // are extensions associated with the provided profileID, they will be
 // registered with the instance.
-func GetSignedCorim(profileID *eat.Profile) *SignedCorim {
+func GetSignedCorim(profileID *Profile) *SignedCorim {
 	var ret *SignedCorim
 
 	if profileID == nil {
@@ -262,7 +261,7 @@ func GetSignedCorim(profileID *eat.Profile) *SignedCorim {
 // GetUnsignedCorim returns a pointer to a new UnsignedCorim instance. If there
 // are extensions associated with the provided profileID, they will be
 // registered with the instance.
-func GetUnsignedCorim(profileID *eat.Profile) *UnsignedCorim {
+func GetUnsignedCorim(profileID *Profile) *UnsignedCorim {
 	var ret *UnsignedCorim
 
 	if profileID == nil {
@@ -292,7 +291,7 @@ func GetUnsignedCorim(profileID *eat.Profile) *UnsignedCorim {
 // obtaining new CoRIM and CoMID structures that had associated extensions
 // registered.
 type ProfileManifest struct {
-	ID            *eat.Profile
+	ID            *Profile
 	MapExtensions extensions.Map
 }
 
@@ -341,11 +340,12 @@ func (o *ProfileManifest) registerExtensions(e iextensible, points []extensions.
 // RegisterProfile registers a set of extensions with the specified profile. If
 // the profile has already been registered, or if the extensions are invalid,
 // an error is returned.
-func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
-	strID, err := id.Get()
-	if err != nil {
+func RegisterProfile(id *Profile, exts extensions.Map) error {
+	if err := id.Valid(); err != nil {
 		return err
 	}
+
+	strID := id.String()
 
 	if _, ok := profilesRegister[strID]; ok {
 		return fmt.Errorf("profile with id %q already registered", strID)
@@ -369,15 +369,12 @@ func RegisterProfile(id *eat.Profile, exts extensions.Map) error {
 // UnregisterProfile ensures there are no extensions registered for the
 // specified profile ID. Returns true if extensions were previously registered
 // and have been removed, and false otherwise.
-func UnregisterProfile(id *eat.Profile) bool {
-	if id == nil {
+func UnregisterProfile(id *Profile) bool {
+	if id.IsNil() {
 		return false
 	}
 
-	strID, err := id.Get()
-	if err != nil {
-		return false
-	}
+	strID := id.String()
 
 	if _, ok := profilesRegister[strID]; ok {
 		delete(profilesRegister, strID)
@@ -390,17 +387,12 @@ func UnregisterProfile(id *eat.Profile) bool {
 // GetProfileManifest returns the ProfileManifest associated with the specified ID, or an empty
 // profileManifest if no ProfileManifest has been registered for the id. The second return
 // value indicates whether a profileManifest for the ID has been found.
-func GetProfileManifest(id *eat.Profile) (ProfileManifest, bool) {
-	if id == nil {
+func GetProfileManifest(id *Profile) (ProfileManifest, bool) {
+	if id.IsNil() {
 		return ProfileManifest{}, false
 	}
 
-	strID, err := id.Get()
-	if err != nil {
-		return ProfileManifest{}, false
-	}
-
-	prof, ok := profilesRegister[strID]
+	prof, ok := profilesRegister[id.String()]
 	return prof, ok
 }
 

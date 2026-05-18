@@ -9,23 +9,20 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 func TestProfileManifest_registration(t *testing.T) {
 	exts := extensions.NewMap()
 
-	err := RegisterProfile(&eat.Profile{}, exts)
-	assert.EqualError(t, err, "no valid EAT profile")
+	err := RegisterProfile(&Profile{}, exts)
+	assert.EqualError(t, err, "cannot be nil")
 
-	p1, err := eat.NewProfile("1.2.3")
-	require.NoError(t, err)
+	p1 := MustNewOIDProfile("1.2.3")
 
 	err = RegisterProfile(p1, exts)
 	assert.NoError(t, err)
 
-	p2, err := eat.NewProfile("1.2.3")
-	require.NoError(t, err)
+	p2 := MustNewOIDProfile("1.2.3")
 
 	err = RegisterProfile(p2, exts)
 	assert.EqualError(t, err, `profile with id "1.2.3" already registered`)
@@ -44,11 +41,10 @@ func TestProfileManifest_registration(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, exts, prof.MapExtensions)
 
-	_, ok = GetProfileManifest(&eat.Profile{})
+	_, ok = GetProfileManifest(&Profile{})
 	assert.False(t, ok)
 
-	p3, err := eat.NewProfile("2.3.4")
-	require.NoError(t, err)
+	p3 := MustNewOIDProfile("2.3.4")
 
 	exts2 := extensions.NewMap().Add(extensions.Point("test"), &struct{}{})
 	err = RegisterProfile(p3, exts2)
@@ -62,8 +58,7 @@ func TestProfileManifest_registration(t *testing.T) {
 }
 
 func TestProfileManifest_getters(t *testing.T) {
-	id, err := eat.NewProfile("1.2.3")
-	require.NoError(t, err)
+	id := MustNewOIDProfile("1.2.3")
 
 	profileManifest := ProfileManifest{
 		ID: id,
@@ -97,14 +92,13 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 		Timestamp *int `cbor:"-1,keyasint,omitempty" json:"timestamp,omitempty"`
 	}
 
-	profID, err := eat.NewProfile("http://example.com/test-profile")
-	require.NoError(t, err)
+	profID := MustNewURIProfile("http://example.com/test-profile")
 
 	extMap := extensions.NewMap().
 		Add(ExtUnsignedCorim, &corimExtensions{}).
 		Add(comid.ExtEntity, &entityExtensions{}).
 		Add(comid.ExtReferenceValue, &refValExtensions{})
-	err = RegisterProfile(profID, extMap)
+	err := RegisterProfile(profID, extMap)
 	require.NoError(t, err)
 	defer UnregisterProfile(profID)
 
@@ -131,8 +125,7 @@ func TestProfileManifest_Marshaling_UnMarshaling(t *testing.T) {
 		Val.MustGetInt("timestamp")
 	assert.Equal(t, 1720782190, ts)
 
-	unregProfID, err := eat.NewProfile("http://example.com")
-	require.NoError(t, err)
+	unregProfID := MustNewURIProfile("http://example.com")
 
 	cmdNoExt, err := UnmarshalComidFromCBOR(c.Tags[0].Content, unregProfID)
 	assert.NoError(t, err)
@@ -200,8 +193,7 @@ func TestGetSignedCorim_NilProfile(t *testing.T) {
 }
 
 func TestGetSignedCorim_UnregisteredProfile(t *testing.T) {
-	profID, err := eat.NewProfile("http://unregistered.example.com")
-	require.NoError(t, err)
+	profID := MustNewURIProfile("http://unregistered.example.com")
 
 	s := GetSignedCorim(profID)
 	assert.NotNil(t, s)
@@ -213,8 +205,7 @@ func TestGetUnsignedCorim_NilProfile(t *testing.T) {
 }
 
 func TestGetUnsignedCorim_UnregisteredProfile(t *testing.T) {
-	profID, err := eat.NewProfile("http://unregistered.example.com")
-	require.NoError(t, err)
+	profID := MustNewURIProfile("http://unregistered.example.com")
 
 	c := GetUnsignedCorim(profID)
 	assert.NotNil(t, c)

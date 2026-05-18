@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package tdx
@@ -11,9 +11,9 @@ import (
 
 	"github.com/veraison/corim/coev"
 	"github.com/veraison/corim/comid"
+	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/corim/profiles/tdx"
-	"github.com/veraison/eat"
 )
 
 func Example_decode_Seam_Evidence_JSON() {
@@ -110,10 +110,7 @@ var (
 )
 
 func Example_encode_tdx_seam_evidence_with_profile() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 
 	manifest, found := coev.GetProfileManifest(profileID)
 	if !found {
@@ -132,7 +129,7 @@ func Example_encode_tdx_seam_evidence_with_profile() {
 	valTriple.Measurements.Add(measurement)
 	coEv.EvTriples.EvidenceTriples.Add(valTriple)
 
-	if err = tdx.SetTDXSeamMvalExtensions(tdx.Evidence, &coEv.EvTriples.EvidenceTriples.Values[0].Measurements.Values[0].Val); err != nil {
+	if err := tdx.SetTDXSeamMvalExtensions(tdx.Evidence, &coEv.EvTriples.EvidenceTriples.Values[0].Measurements.Values[0].Val); err != nil {
 		panic(err)
 	}
 
@@ -161,10 +158,7 @@ func Example_encode_tdx_seam_evidence_with_profile() {
 }
 
 func Example_decode_CBOR() {
-	profileID, err := eat.NewProfile("2.16.840.1.113741.1.16.1")
-	if err != nil {
-		panic(err) // will not error, as the hard-coded string above is valid
-	}
+	profileID := corim.MustNewOIDProfile("2.16.840.1.113741.1.16.1")
 	manifest, found := coev.GetProfileManifest(profileID)
 	if !found {
 		fmt.Printf("Evidence Profile NOT FOUND")

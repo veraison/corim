@@ -9,7 +9,6 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/eat"
 )
 
 const RealmProfileURI = "tag:arm.com,2025:cca_realm#1.0.0"
@@ -25,10 +24,7 @@ const (
 )
 
 func init() {
-	profileID, err := eat.NewProfile(RealmProfileURI)
-	if err != nil {
-		panic(err)
-	}
+	profileID := corim.MustNewURIProfile(RealmProfileURI)
 
 	extMap := extensions.NewMap().
 		Add(comid.ExtTriples, &RealmTriplesExtensions{})
