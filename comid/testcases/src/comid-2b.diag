@@ -1,0 +1,105 @@
+/ concise-mid-tag / {
+  / comid.tag-identity / 1 : {
+    / comid.tag-id / 0 : h'3f06af63a93c11e4979700505690773f'
+  },
+  / comid.entity / 2 : [ {
+    / comid.entity-name / 0 : "ACME Inc.",
+    / comid.reg-id / 1 : 32("https://acme.example"),
+    / comid.role / 2 : [ 0 ] / tag-creator /
+  } ],
+  / comid.triples / 4 : {
+    / comid.reference-triples / 0 : [
+      [
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-uuid-type / 37(
+                h'67b28b6c34cc40a19117ab5b05911e37'
+              ),
+            / comid.vendor / 1 : "ACME Inc.",
+            / comid.model / 2 : "ACME RoadRunner Firmware",
+            / comid.layer / 3 : 1
+          }
+        },
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+              ] ]
+            }
+          }
+        ]
+      ],
+      [
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-uuid-type / 37(
+		h'a71b3e388d454a0581f352e58c832c5c'
+              ),
+            / comid.vendor / 1 : "WYLIE Inc.",
+            / comid.model / 2 : "WYLIE Coyote Trusted OS",
+            / comid.layer / 3 : 2,
+	      / comid.index / 4 : 0
+          }
+        },
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
+              ] ]
+            }
+          }
+        ]
+      ],
+      [
+        / environment-map / {
+          / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-uuid-type / 37(
+		h'a71b3e388d454a0581f352e58c832c5c'
+              ),
+            / comid.vendor / 1 : "WYLIE Inc.",
+            / comid.model / 2 : "WYLIE Coyote Trusted OS",
+            / comid.layer / 3 : 2,
+	      / comid.index / 4 : 1
+          }
+        },
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [ [
+                / hash-alg-id / 1, / sha256 /
+                / hash-value / h'bb71198ed60a95dc3c619e555c2c0b8d7564a38031b034a195892591c65365b0'
+              ] ]
+            }
+          }
+        ]
+      ]
+    ],
+    / comid.endorsed-triples / 1 : [ [
+      / environment-map / {
+        / comid.class / 0 : {
+          / comid.class-id / 0 :
+            / tagged-uuid-type / 37(
+              h'67b28b6c34cc40a19117ab5b05911e37'
+            ),
+          / comid.vendor / 1 : "ACME Inc.",
+          / comid.model / 2 : "ACME Root of Trust",
+          / comid.layer / 3 : 0
+        }
+      },
+      [
+        / measurement-map / {
+          / comid.mval / 1 : {
+            / comid.svn / 1 : 552(1)
+          }
+        }
+      ]
+    ] ]
+  }
+}

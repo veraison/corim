@@ -28,6 +28,38 @@
               / hash-alg-id / 6, / sha-256-32 /
               / hash-value /  h'ABCDEF00' ]]
             }
+          },
+            / measurement-map / {
+            / comid.mkey / 0: "my_element",
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [[
+              / hash-alg-id / 6, / sha-256-32 /
+              / hash-value /  h'00FEDCBA' ]]
+            }
+          },
+            / measurement-map / {
+            / comid.mkey / 0: 111( h'5502C001' ),
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [[
+              / hash-alg-id / 6, / sha-256-32 /
+              / hash-value /  h'00FEDCBA' ]]
+            }
+          },
+            / measurement-map / {
+            / comid.mkey / 0: 37( h'67b28b6c34cc40a19117ab5b05911e38' ),
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [[
+              / hash-alg-id / 6, / sha-256-32 /
+              / hash-value /  h'00FEDCBA' ]]
+            }
+          },
+            / measurement-map / {
+            / anonymous mkey /
+            / comid.mval / 1 : {
+              / comid.digests / 2 : [[
+              / hash-alg-id / 6, / sha-256-32 /
+              / hash-value /  h'11223344' ]]
+            }
           }
         ]
       ]

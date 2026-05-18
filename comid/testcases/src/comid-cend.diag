@@ -1,0 +1,94 @@
+/ concise-mid-tag / {	
+  / tag-identity / 1 : {	
+    / tag-id / 0 : "my-ns:acme-roadrunner-supplement"	
+  },	
+  / entity / 2 : [ {	
+    / entity-name / 0 : "ACME Inc.",	
+    / reg-id / 1 : 32("https://acme.example"),	
+    / role / 2 : [ 1,0,2 ] / creator, tag-creator, maintainer /	
+  } ],	
+  / triples / 4 : {	
+    / conditional-endorsement-triples / 10 : [	
+    [
+      [
+        [ / *** stateful-environment-record -1st entry *** /	
+          / environment-map / {	
+            / class / 0 : {	
+              / class-id / 0 :	
+                / tagged-oid-type / 111(	
+                  h'5502C000'	
+                ),	
+              / vendor / 1 : "ACME Inc.",	
+              / model / 2 : "ACME RoadRunner Firmware"	
+            }	
+          }, 
+          [         	
+            { / *** measurement-map *** /	
+              / mval / 1 : / measurement-values-map / {	
+                / ver / 0 : {	
+                  / version / 0 : "1.0.0",	
+                  / version-scheme / 1 : 16384 / semver /	
+                }	
+              },	
+              / authorized-by / 2 : [	
+                / tagged-pkix-base64-key-type / 554("base64_key_X")	
+              ]	
+            }	
+          ]
+        ], 
+        [ / *** stateful-environment-record -2nd entry *** /
+          / environment-map / {
+            / comid.class / 0 : {
+            / comid.class-id / 0 :
+              / tagged-uuid-type / 37(
+                h'67b28b6c34cc40a19117ab5b05911e37'
+              ),
+            / comid.vendor / 1 : "ACME Inc.",
+            / comid.model / 2 : "ACME RoadRunner",
+            / comid.layer / 3 : 1
+          }
+        },
+        [
+            / *** measurement-map *** / {
+              / comid.mval / 1 : {
+                / comid.ver / 0 : {
+                  / comid.version / 0 : "1.0.0",
+                  / comid.version-scheme / 1 : 16384 / semver /
+                },
+                / comid.digests / 2 : [ [
+                  / hash-alg-id / 1, / sha256 /
+                  / hash-value / h'44aa336af4cb14a879432e53dd6571c7fa9bccafb75f488259262d6ea3a4d91b'
+                ]   
+              ]
+            }
+          }
+        ]
+      ]
+    ], /*** end stateful-environment-record ***/
+    [  /*** endorsements ***/
+      [ /*** endorsed-triple-record ***/
+        / environment-map / {
+          / class / 0 : {	
+            / class-id / 0 :	
+              / tagged-oid-type / 111(	
+                h'5502C000'	
+              ),	
+            / vendor / 1 : "ACME Inc.",	
+            / model / 2 : "ACME RoadRunner Firmware"	
+          }
+        },
+        [
+          / measurement-map / {
+            / comid.mval / 1 : {
+              / raw-value-group /
+                / comid.raw-value / 4 : 560(h'0000000000000000'),
+                / comid.raw-value-mask-DEPRECATED / 5 : h'FFFFFFFF00000000'
+            }
+          }
+        ]
+      ]
+     ]
+    ]
+   ]
+  }	
+}
