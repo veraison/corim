@@ -64,7 +64,7 @@ func TestMeasurement_NewUUIDMeasurement_bad_digest(t *testing.T) {
 	tv, err := NewUUIDMeasurement(TestUUID)
 	require.NoError(t, err)
 
-	assert.NotNil(t, tv.AddDigest(swid.Sha256, []byte{0xff}))
+	assert.NotNil(t, tv.AddDigest(Sha256, []byte{0xff}))
 	assert.ErrorContains(t, tv.Valid(), "digest at index 0")
 }
 
@@ -569,7 +569,7 @@ func TestMval_Valid(t *testing.T) {
 
 	t.Run("Digests invalid", func(t *testing.T) {
 		ds := NewDigests()
-		ds.AddDigest(swid.Sha256, []byte{0xAA, 0xBB})
+		ds.AddDigest(Sha256, []byte{0xAA, 0xBB})
 		mval := Mval{
 			Digests: ds,
 		}

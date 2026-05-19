@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
 )
 
 // Helper Functions
@@ -243,7 +242,7 @@ func TestValidateCCADigests_AllCases(t *testing.T) {
 			title: "valid digest with SHA-256 (32 bytes)",
 			digests: func() *comid.Digests {
 				d := &comid.Digests{}
-				d.AddDigest(swid.Sha256, make([]byte, 32))
+				d.AddDigest(comid.Sha256, make([]byte, 32))
 				return d
 			}(),
 			shouldError: false,
@@ -252,7 +251,7 @@ func TestValidateCCADigests_AllCases(t *testing.T) {
 			title: "valid digest with SHA-384 (48 bytes)",
 			digests: func() *comid.Digests {
 				d := &comid.Digests{}
-				d.AddDigest(swid.Sha384, make([]byte, 48))
+				d.AddDigest(comid.Sha384, make([]byte, 48))
 				return d
 			}(),
 			shouldError: false,
@@ -261,7 +260,7 @@ func TestValidateCCADigests_AllCases(t *testing.T) {
 			title: "valid digest with SHA-512 (64 bytes)",
 			digests: func() *comid.Digests {
 				d := &comid.Digests{}
-				d.AddDigest(swid.Sha512, make([]byte, 64))
+				d.AddDigest(comid.Sha512, make([]byte, 64))
 				return d
 			}(),
 			shouldError: false,
@@ -472,7 +471,7 @@ func TestValidateCCAPlatformReferenceValue_AllCases(t *testing.T) {
 				// Set digests
 				digests := &comid.Digests{}
 				hash := make([]byte, 32)
-				digests.AddDigest(swid.Sha256, hash)
+				digests.AddDigest(comid.Sha256, hash)
 				measurement.Val.Digests = digests
 
 				// Set signer-id (cryptokeys)

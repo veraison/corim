@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package tdx
@@ -46,8 +46,8 @@ func extractDigest(typ string, d *Digests) error {
 	}
 
 	for _, digest := range *d {
-		fmt.Printf("\n%s Digest Alg: %d", typ, digest.HashAlgID)
-		fmt.Printf("\n%s Digest Value: %x", typ, digest.HashValue)
+		fmt.Printf("\n%s Digest Alg: %d", typ, digest.Algorithm.Int())
+		fmt.Printf("\n%s Digest Value: %x", typ, digest.Value)
 	}
 
 	return nil
