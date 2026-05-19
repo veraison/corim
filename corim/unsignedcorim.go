@@ -153,14 +153,14 @@ func (o *UnsignedCorim) AddCoswid(c *swid.SoftwareIdentity) *UnsignedCorim {
 
 // AddDependentRim creates a corim-locator-map from the supplied arguments and
 // appends it to the dependent RIMs in the unsigned-corim-map
-func (o *UnsignedCorim) AddDependentRim(href string, thumbprint *swid.HashEntry) *UnsignedCorim {
+func (o *UnsignedCorim) AddDependentRim(href string, thumbprint *comid.Digest) *UnsignedCorim {
 	if o != nil {
 		l := Locator{
 			Href: OneOrMore[comid.TaggedURI]{comid.TaggedURI(href)},
 		}
 
 		if thumbprint != nil {
-			l.Thumbprint = &OneOrMore[swid.HashEntry]{*thumbprint}
+			l.Thumbprint = &OneOrMore[comid.Digest]{*thumbprint}
 		}
 
 		if o.DependentRims == nil {
@@ -573,7 +573,7 @@ func (o *Tag) UnmarshalJSON(data []byte) error {
 // JSON serialization.
 type Locator struct {
 	Href       OneOrMore[comid.TaggedURI] `cbor:"0,keyasint" json:"href"`
-	Thumbprint *OneOrMore[swid.HashEntry] `cbor:"1,keyasint,omitempty" json:"thumbprint,omitempty"`
+	Thumbprint *OneOrMore[comid.Digest]   `cbor:"1,keyasint,omitempty" json:"thumbprint,omitempty"`
 }
 
 func (o Locator) Valid() error {
@@ -590,7 +590,7 @@ func (o Locator) Valid() error {
 	}
 
 	for i, tp := range *o.Thumbprint {
-		if err := swid.ValidHashEntry(tp.HashAlgID, tp.HashValue); err != nil {
+		if err := tp.Valid(); err != nil {
 			return fmt.Errorf("invalid locator thumbprint at index %d: %w", i, err)
 		}
 	}

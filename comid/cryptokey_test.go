@@ -14,7 +14,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/veraison/swid"
 )
 
 func Test_CryptoKey_NewPKIXBase64Key(t *testing.T) {
@@ -169,17 +168,11 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 		_, err = key.PublicKey()
 		assert.EqualError(t, err, "cannot get PublicKey from a digest")
 
-		badAlg := swid.HashEntry{
-			HashAlgID: 99,
-			HashValue: MustHexDecode(nil, `deadbeef`),
-		}
+		badAlg := NewDigestIntAlg(0, MustHexDecode(nil, `deadbeef`))
 		_, err = newFunc(badAlg)
-		assert.Contains(t, err.Error(), "unknown hash algorithm 99")
+		assert.Contains(t, err.Error(), "zero algorithm")
 
-		badHash := swid.HashEntry{
-			HashAlgID: 1,
-			HashValue: MustHexDecode(nil, `deadbeef`),
-		}
+		badHash := NewDigestIntAlg(Sha256, MustHexDecode(nil, `deadbeef`))
 		_, err = newFunc(badHash)
 		assert.Contains(t, err.Error(), "length mismatch for hash algorithm")
 	}
@@ -195,7 +188,7 @@ func Test_CryptoKey_NewThumbprint(t *testing.T) {
 		assert.Equal(t, TestThumbprint.String(), key.String())
 
 		assert.Panics(t, func() {
-			mustNewFunc(swid.HashEntry{})
+			mustNewFunc(Digest{})
 		})
 	}
 }
@@ -217,50 +210,50 @@ func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 		{
 			Type: BytesType,
 			In:   TestTaggedBytes,
-			Out:  base64.StdEncoding.EncodeToString(TestTaggedBytes),
+			Out:  fmt.Sprintf("%q", base64.StdEncoding.EncodeToString(TestTaggedBytes)),
 		},
 		{
 			Type: PKIXBase64KeyType,
 			In:   TestECPubKey,
-			Out:  TestECPubKey,
+			Out:  fmt.Sprintf("%q", TestECPubKey),
 		},
 		{
 			Type: PKIXBase64CertType,
 			In:   TestCert,
-			Out:  TestCert,
+			Out:  fmt.Sprintf("%q", TestCert),
 		},
 		{
 			Type: PKIXBase64CertPathType,
 			In:   TestCertPath,
-			Out:  TestCertPath,
+			Out:  fmt.Sprintf("%q", TestCertPath),
 		},
 		{
 			Type: COSEKeyType,
 			In:   TestCOSEKey,
-			Out:  base64.StdEncoding.EncodeToString(TestCOSEKey),
+			Out:  fmt.Sprintf("%q", base64.StdEncoding.EncodeToString(TestCOSEKey)),
 		},
 		{
 			Type: ThumbprintType,
 			In:   TestThumbprint,
-			Out: fmt.Sprintf("%s;%s",
-				TestThumbprint.AlgIDToString(),
-				base64.StdEncoding.EncodeToString(TestThumbprint.HashValue),
+			Out: fmt.Sprintf("[%d,%q]",
+				TestThumbprint.Algorithm.Int(),
+				base64.RawURLEncoding.EncodeToString(TestThumbprint.Value),
 			),
 		},
 		{
 			Type: CertThumbprintType,
 			In:   TestThumbprint,
-			Out: fmt.Sprintf("%s;%s",
-				TestThumbprint.AlgIDToString(),
-				base64.StdEncoding.EncodeToString(TestThumbprint.HashValue),
+			Out: fmt.Sprintf("[%d,%q]",
+				TestThumbprint.Algorithm.Int(),
+				base64.RawURLEncoding.EncodeToString(TestThumbprint.Value),
 			),
 		},
 		{
 			Type: CertPathThumbprintType,
 			In:   TestThumbprint,
-			Out: fmt.Sprintf("%s;%s",
-				TestThumbprint.AlgIDToString(),
-				base64.StdEncoding.EncodeToString(TestThumbprint.HashValue),
+			Out: fmt.Sprintf("[%d,%q]",
+				TestThumbprint.Algorithm.Int(),
+				base64.RawURLEncoding.EncodeToString(TestThumbprint.Value),
 			),
 		},
 	} {
@@ -269,7 +262,7 @@ func Test_CryptoKey_JSON_roundtrip(t *testing.T) {
 			data, err := json.Marshal(key)
 			require.NoError(t, err)
 
-			expected := fmt.Sprintf(`{"type": %q, "value": %q}`, tv.Type, tv.Out)
+			expected := fmt.Sprintf(`{"type": %q, "value": %s}`, tv.Type, tv.Out)
 			assert.JSONEq(t, expected, string(data))
 
 			var key2 CryptoKey
@@ -305,7 +298,7 @@ func Test_CryptoKey_UnmarshalJSON_negative(t *testing.T) {
 		},
 		{
 			Val:    `{"type": "thumbprint", "value":"deadbeef"}`,
-			ErrMsg: "bad format: expecting <hash-alg-string>;<hash-value>",
+			ErrMsg: "cannot unmarshal string into Go value of type []interface {}",
 		},
 		{
 			Val:    `{"type": "random-key", "value":"deadbeef"}`,
@@ -412,17 +405,17 @@ func Test_NewCryptoKey_negative(t *testing.T) {
 		{
 			Type:   ThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry or a string; found int",
+			ErrMsg: "value must be a Digest or a string; found int",
 		},
 		{
 			Type:   CertThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry or a string; found int",
+			ErrMsg: "value must be a Digest or a string; found int",
 		},
 		{
 			Type:   CertPathThumbprintType,
 			In:     7,
-			ErrMsg: "value must be a swid.HashEntry or a string; found int",
+			ErrMsg: "value must be a Digest or a string; found int",
 		},
 		{
 			Type:   "random-key",

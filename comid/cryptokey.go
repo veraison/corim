@@ -17,7 +17,6 @@ import (
 	"github.com/veraison/corim/encoding"
 	"github.com/veraison/corim/extensions"
 	"github.com/veraison/go-cose"
-	"github.com/veraison/swid"
 )
 
 const (
@@ -62,7 +61,7 @@ type CryptoKey struct {
 // NewCryptoKey returns the pointer to a new CryptoKey of the specified type,
 // constructed using the provided value k. The type of k depends on the
 // specified crypto key type. For PKIX types, k must be a string. For COSE_Key,
-// k must be a []byte. For thumbprint types, k must be a swid.HashEntry.
+// k must be a []byte. For thumbprint types, k must be a Digest.
 func NewCryptoKey(k any, typ string) (*CryptoKey, error) {
 	factory, ok := cryptoKeyValueRegister[typ]
 	if !ok {
@@ -671,32 +670,11 @@ func (o TaggedPKIXAsn1DerCert) cert() (*x509.Certificate, error) {
 	return cert, nil
 }
 
-type digest struct {
-	swid.HashEntry
-}
-
-func (o digest) String() string {
-	return o.HashEntry.String()
-}
-
-func (o digest) Valid() error {
-	return swid.ValidHashEntry(o.HashAlgID, o.HashValue)
-}
-
-func (o digest) PublicKey() (crypto.PublicKey, error) {
-	return nil, errors.New("cannot get PublicKey from a digest")
-}
-
-func (o digest) Bytes() []byte {
-	ret, _ := em.Marshal(o)
-	return ret
-}
-
 // ThumbprintTypeTaggedThumbprint represents a digest of a raw public key. The
 // digest value may be used to find the public key if contained in a lookup
 // table.
 type TaggedThumbprint struct {
-	digest
+	Digest
 }
 
 // nolint:dupl
@@ -705,22 +683,24 @@ func NewThumbprint(k any) (*CryptoKey, error) {
 		return &CryptoKey{&TaggedThumbprint{}}, nil
 	}
 
-	var he swid.HashEntry
+	var digest Digest
 	var err error
 
 	switch t := k.(type) {
 	case string:
-		he, err = swid.ParseHashEntry(t)
+		digest, err = DigestFromString(t)
 		if err != nil {
-			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+			return nil, fmt.Errorf("digest: %w", err)
 		}
-	case swid.HashEntry:
-		he = t
+	case *Digest:
+		digest = *t
+	case Digest:
+		digest = t
 	default:
-		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+		return nil, fmt.Errorf("value must be a Digest or a string; found %T", k)
 	}
 
-	key := &CryptoKey{&TaggedThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedThumbprint{digest}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -746,7 +726,7 @@ func (o TaggedThumbprint) Type() string {
 // TaggedCertThumbprint represents a digest of a certificate. The digest value
 // may be used to find the certificate if contained in a lookup table.
 type TaggedCertThumbprint struct {
-	digest
+	Digest
 }
 
 // nolint:dupl
@@ -755,22 +735,24 @@ func NewCertThumbprint(k any) (*CryptoKey, error) {
 		return &CryptoKey{&TaggedCertThumbprint{}}, nil
 	}
 
-	var he swid.HashEntry
+	var digest Digest
 	var err error
 
 	switch t := k.(type) {
 	case string:
-		he, err = swid.ParseHashEntry(t)
+		digest, err = DigestFromString(t)
 		if err != nil {
-			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+			return nil, fmt.Errorf("digest: %w", err)
 		}
-	case swid.HashEntry:
-		he = t
+	case *Digest:
+		digest = *t
+	case Digest:
+		digest = t
 	default:
-		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+		return nil, fmt.Errorf("value must be a Digest or a string; found %T", k)
 	}
 
-	key := &CryptoKey{&TaggedCertThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedCertThumbprint{digest}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err
@@ -797,7 +779,7 @@ func (o TaggedCertThumbprint) Type() string {
 // digest value may be used to find the certificate path if contained in a
 // lookup table.
 type TaggedCertPathThumbprint struct {
-	digest
+	Digest
 }
 
 // nolint:dupl
@@ -806,22 +788,24 @@ func NewCertPathThumbprint(k any) (*CryptoKey, error) {
 		return &CryptoKey{&TaggedCertPathThumbprint{}}, nil
 	}
 
-	var he swid.HashEntry
+	var digest Digest
 	var err error
 
 	switch t := k.(type) {
 	case string:
-		he, err = swid.ParseHashEntry(t)
+		digest, err = DigestFromString(t)
 		if err != nil {
-			return nil, fmt.Errorf("swid.HashEntry decode error: %w", err)
+			return nil, fmt.Errorf("digest: %w", err)
 		}
-	case swid.HashEntry:
-		he = t
+	case *Digest:
+		digest = *t
+	case Digest:
+		digest = t
 	default:
-		return nil, fmt.Errorf("value must be a swid.HashEntry or a string; found %T", k)
+		return nil, fmt.Errorf("value must be a Digest or a string; found %T", k)
 	}
 
-	key := &CryptoKey{&TaggedCertPathThumbprint{digest{he}}}
+	key := &CryptoKey{&TaggedCertPathThumbprint{digest}}
 
 	if err := key.Valid(); err != nil {
 		return nil, err

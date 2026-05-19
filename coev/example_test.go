@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coev
@@ -29,8 +29,8 @@ func Example_encode_EvidenceTriples() {
 					comid.MustNewUUIDMeasurement(TestUUID).
 						SetRawValueBytes([]byte{0x01, 0x02, 0x03, 0x04}, []byte{0xff, 0xff, 0xff, 0xff}).
 						SetSVN(2).
-						AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
-						AddDigest(swid.Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
+						AddDigest(comid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00}).
+						AddDigest(comid.Sha256_32, []byte{0xff, 0xff, 0xff, 0xff}).
 						SetFlagsTrue(comid.FlagIsDebug).
 						SetFlagsFalse(comid.FlagIsSecure).
 						SetSerialNumber("C02X70VHJHD5").
@@ -65,7 +65,7 @@ func Example_encode_EvidenceTriples() {
 
 	// Output:
 	// a300a1008182a100a500d86f445502c000016941434d45204c74642e026a526f616452756e6e65720300040181a200d8255031fb5abf023e4992aa4e95f9c1503bfa01aa01d90228020282820644abcdef00820644ffffffff03a201f403f504d9023044010203040544ffffffff064802005e1000000001075020010db8000000000000000000000068086c43303258373056484a484435094702deadbeefdead0a5031fb5abf023e4992aa4e95f9c1503bfa01d8255031fb5abf023e4992aa4e95f9c1503bfa026f68747470733a2f2f6162632e636f6d
-	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.5.2.8192"},"vendor":"ACME Ltd.","model":"RoadRunner","layer":0,"index":1}},"measurements":[{"key":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"value":{"svn":{"type":"exact-value","value":2},"digests":["sha-256-32;q83vAA==","sha-256-32;/////w=="],"flags":{"is-secure":false,"is-debug":true},"raw-value":{"type":"bytes","value":"AQIDBA=="},"raw-value-mask":"/////w==","mac-addr":"02:00:5e:10:00:00:00:01","ip-addr":"2001:db8::68","serial-number":"C02X70VHJHD5","ueid":"At6tvu/erQ==","uuid":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}]}]},"evidence-id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"profile":"https://abc.com"}
+	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.5.2.8192"},"vendor":"ACME Ltd.","model":"RoadRunner","layer":0,"index":1}},"measurements":[{"key":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"value":{"svn":{"type":"exact-value","value":2},"digests":[[6,"q83vAA"],[6,"_____w"]],"flags":{"is-secure":false,"is-debug":true},"raw-value":{"type":"bytes","value":"AQIDBA=="},"raw-value-mask":"/////w==","mac-addr":"02:00:5e:10:00:00:00:01","ip-addr":"2001:db8::68","serial-number":"C02X70VHJHD5","ueid":"At6tvu/erQ==","uuid":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"}}]}]},"evidence-id":{"type":"uuid","value":"31fb5abf-023e-4992-aa4e-95f9c1503bfa"},"profile":"https://abc.com"}
 
 }
 
@@ -238,8 +238,8 @@ func Example_decode_JSON() {
                                 "value": 2
                             },
                             "digests": [
-                                "sha-256-32;q83vAA==",
-                                "sha-256-32;/////w=="
+                                [6, "q83vAA"],
+                                [6, "_____w"]
                             ],
                             "flags": {
                                 "is-secure": false,
@@ -284,8 +284,8 @@ func Example_decode_JSON() {
                                 "value": 2
                             },
                             "digests": [
-                                "sha-256-32;q83vAA==",
-                                "sha-256-32;/////w=="
+                                [6, "q83vAA"],
+                                [6, "_____w"]
                             ],
                             "flags": {
                                 "is-secure": false,

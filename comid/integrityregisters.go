@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-
-	"github.com/veraison/swid"
 )
 
 const TextType = "text"
@@ -42,7 +40,7 @@ func (i *IntegrityRegisters) AddDigests(index IRegisterIndex, digests Digests) e
 
 // AddDigest allows inserting a digest at a specific index
 // Supported index types are uint and text
-func (i *IntegrityRegisters) AddDigest(index IRegisterIndex, digest swid.HashEntry) error {
+func (i *IntegrityRegisters) AddDigest(index IRegisterIndex, digest Digest) error {
 	if i.IndexMap == nil {
 		return fmt.Errorf("no register to add digest")
 	}

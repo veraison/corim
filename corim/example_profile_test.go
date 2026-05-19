@@ -12,7 +12,6 @@ import (
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/swid"
 )
 
 // ----- profile definition -----
@@ -102,7 +101,7 @@ func Example_profile_unmarshal() {
 	for i := range extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values {
 		m := &extractedComid.Triples.ReferenceValues.Values[0].Measurements.Values[i]
 
-		val := hex.EncodeToString((*m.Val.Digests)[0].HashValue)
+		val := hex.EncodeToString((*m.Val.Digests)[0].Value)
 		tsInt := m.Val.MustGetInt64("timestamp")
 		ts := time.Unix(tsInt, 0).UTC()
 
@@ -159,7 +158,7 @@ func Example_profile_marshal() {
 	if err != nil {
 		log.Fatalf("could not create measurement: %v", err)
 	}
-	measurement.AddDigest(swid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00})
+	measurement.AddDigest(comid.Sha256_32, []byte{0xab, 0xcd, 0xef, 0x00})
 
 	// alternatively, we can add extensions to individual value before
 	// adding it to the collection. Note that because we're adding the

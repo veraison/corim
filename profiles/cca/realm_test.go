@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
 )
 
 // Helper Functions for Realm Tests
@@ -48,7 +47,7 @@ func mustNewCCARealmDigestMeasurement(mkey string, hashSize int) *comid.Measurem
 	// Set digests with specified hash size
 	digests := &comid.Digests{}
 	hash := make([]byte, hashSize)
-	digests.AddDigest(swid.Sha256, hash)
+	digests.AddDigest(comid.Sha256, hash)
 	measurement.Val.Digests = digests
 
 	return measurement
@@ -211,8 +210,8 @@ func TestValidateCCARealmMeasurement_AllCases(t *testing.T) {
 
 				// Add two digests
 				digests := &comid.Digests{}
-				digests.AddDigest(swid.Sha256, make([]byte, 32))
-				digests.AddDigest(swid.Sha384, make([]byte, 48))
+				digests.AddDigest(comid.Sha256, make([]byte, 32))
+				digests.AddDigest(comid.Sha384, make([]byte, 48))
 				measurement.Val.Digests = digests
 
 				return measurement

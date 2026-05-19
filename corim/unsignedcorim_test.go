@@ -437,8 +437,8 @@ func TestLocator_Valid(t *testing.T) {
 	l.Href = OneOrMore[comid.TaggedURI]{comid.TaggedURI("https://example.com")}
 	assert.NoError(t, l.Valid())
 
-	l.Thumbprint = &OneOrMore[swid.HashEntry]{swid.HashEntry{}}
-	assert.EqualError(t, l.Valid(), "invalid locator thumbprint at index 0: unknown hash algorithm 0")
+	l.Thumbprint = &OneOrMore[comid.Digest]{comid.Digest{}}
+	assert.EqualError(t, l.Valid(), "invalid locator thumbprint at index 0: zero length value")
 
 }
 
