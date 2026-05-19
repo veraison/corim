@@ -9,12 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
 )
 
 func getNewDigests() Digests {
 	d := comid.NewDigests()
-	d.AddDigest(swid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
+	d.AddDigest(comid.Sha256, comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
 	return *d
 }
 func TestTeeDigest_NewTeeDigest_OK(t *testing.T) {

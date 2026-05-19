@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
 )
 
 func Test_OneOrMore_serilize_round_trip(t *testing.T) {
@@ -62,24 +61,24 @@ func Test_OneOrMore_serilize_round_trip(t *testing.T) {
 		})
 	}
 
-	hash1 := *comid.NewHashEntry(
-		swid.Sha256,
+	hash1 := comid.NewDigestIntAlg(
+		comid.Sha256,
 		comid.MustHexDecode(t, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
 	)
-	hash2 := *comid.NewHashEntry(
-		swid.Sha256,
+	hash2 := comid.NewDigestIntAlg(
+		comid.Sha256,
 		comid.MustHexDecode(t, "c0decafec0decafec0decafec0decafec0decafec0decafec0decafec0decafe"),
 	)
 
 	digestCases := []struct {
 		title        string
-		oom          OneOrMore[swid.HashEntry]
+		oom          OneOrMore[comid.Digest]
 		expectdCBOR  []byte
 		expectedJSON string
 	}{
 		{
 			title: "one digest",
-			oom:   OneOrMore[swid.HashEntry]{hash1},
+			oom:   OneOrMore[comid.Digest]{hash1},
 			expectdCBOR: []byte{
 				0x82,       // array(2)
 				0x01,       // . [0]1 [sha-256]
@@ -89,11 +88,11 @@ func Test_OneOrMore_serilize_round_trip(t *testing.T) {
 				0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef,
 				0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, // 32
 			},
-			expectedJSON: `"sha-256;3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8="`,
+			expectedJSON: `[1, "3q2-796tvu_erb7v3q2-796tvu_erb7v3q2-796tvu8"]`,
 		},
 		{
 			title: "more digests",
-			oom:   OneOrMore[swid.HashEntry]{hash1, hash2},
+			oom:   OneOrMore[comid.Digest]{hash1, hash2},
 			expectdCBOR: []byte{
 				0x82,       // array(2)
 				0x82,       // . [0]array(2)
@@ -111,7 +110,7 @@ func Test_OneOrMore_serilize_round_trip(t *testing.T) {
 				0xc0, 0xde, 0xca, 0xfe, 0xc0, 0xde, 0xca, 0xfe,
 				0xc0, 0xde, 0xca, 0xfe, 0xc0, 0xde, 0xca, 0xfe, // 32
 			},
-			expectedJSON: `["sha-256;3q2+796tvu/erb7v3q2+796tvu/erb7v3q2+796tvu8=","sha-256;wN7K/sDeyv7A3sr+wN7K/sDeyv7A3sr+wN7K/sDeyv4="]`,
+			expectedJSON: `[[1, "3q2-796tvu_erb7v3q2-796tvu_erb7v3q2-796tvu8"],[1, "wN7K_sDeyv7A3sr-wN7K_sDeyv7A3sr-wN7K_sDeyv4"]]`,
 		},
 	}
 
@@ -121,16 +120,16 @@ func Test_OneOrMore_serilize_round_trip(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectdCBOR, encoded)
 
-			var decoded OneOrMore[swid.HashEntry]
+			var decoded OneOrMore[comid.Digest]
 			err = decoded.UnmarshalCBOR(encoded)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.oom, decoded)
 
 			encoded, err = tc.oom.MarshalJSON()
 			assert.NoError(t, err)
-			assert.Equal(t, tc.expectedJSON, string(encoded))
+			assert.JSONEq(t, tc.expectedJSON, string(encoded))
 
-			decoded = OneOrMore[swid.HashEntry]{}
+			decoded = OneOrMore[comid.Digest]{}
 			err = decoded.UnmarshalJSON(encoded)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.oom, decoded)

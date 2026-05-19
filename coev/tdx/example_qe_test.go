@@ -104,7 +104,7 @@ func Example_encode_tdx_qe_evidence_without_profile() {
 
 	// output:
 	// d9023ba100a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02703031323334353637383941424344454681a101a538480a385046c000fbff000038538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638540138550b
-	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":{"type":"uint","value":10},"miscselect":"wAD7/wAA","mrsigner":{"type":"digest","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]},"isvprodid":{"type":"uint","value":1},"tcbevalnum":{"type":"uint","value":11}}}]}]}}
+	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":{"type":"uint","value":10},"miscselect":"wAD7/wAA","mrsigner":{"type":"digest","value":[[1,"5Fty9cDAtXLbTY06t-l_No_3TmI0eoJN7LZ6hOUiTXU"],[7,"5Fty9cDAtXLbTY06t-l_No_3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]]},"isvprodid":{"type":"uint","value":1},"tcbevalnum":{"type":"uint","value":11}}}]}]}}
 }
 
 func Example_encode_tdx_qe_evidence_with_profile() {
@@ -153,7 +153,7 @@ func Example_encode_tdx_qe_evidence_with_profile() {
 
 	// output:
 	// d9023ba100a1008182a100a300d86f4c6086480186f84d01020304050171496e74656c20436f72706f726174696f6e02703031323334353637383941424344454681a101a538480a385046c000fbff000038538282015820e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d7582075830e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f3638540138550b
-	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":{"type":"uint","value":10},"miscselect":"wAD7/wAA","mrsigner":{"type":"digest","value":["sha-256;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXU=","sha-384;5Fty9cDAtXLbTY06t+l/No/3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]},"isvprodid":{"type":"uint","value":1},"tcbevalnum":{"type":"uint","value":11}}}]}]}}
+	// {"ev-triples":{"evidence-triples":[{"environment":{"class":{"id":{"type":"oid","value":"2.16.840.1.113741.1.2.3.4.5"},"vendor":"Intel Corporation","model":"0123456789ABCDEF"}},"measurements":[{"value":{"isvsvn":{"type":"uint","value":10},"miscselect":"wAD7/wAA","mrsigner":{"type":"digest","value":[[1,"5Fty9cDAtXLbTY06t-l_No_3TmI0eoJN7LZ6hOUiTXU"],[7,"5Fty9cDAtXLbTY06t-l_No_3TmI0eoJN7LZ6hOUiTXXkW3L1wMC1cttNjTq36X82"]]},"isvprodid":{"type":"uint","value":1},"tcbevalnum":{"type":"uint","value":11}}}]}]}}
 }
 
 var (

@@ -244,9 +244,9 @@ rpT6kiSnAzk+2zgSiA4=
 
 	TestCOSEKeySetMulti = MustHexDecode(nil, `82a501020258246d65726961646f632e6272616e64796275636b406275636b6c616e642e6578616d706c65200121582065eda5a12577c2bae829437fe338701a10aaa375e1bb5b5de108de439c08551d2258201e52ed75701163f7f9e40ddf9f341b3dc9ba860af7e0ca7ca7e9eecd0084d19ca601010327048202647369676e0543030201200621582015522ef15729ccf39509ea5c15a26be949e38807a5c26ef9281487ef4ae67b46`)
 
-	TestThumbprint = swid.HashEntry{
-		HashAlgID: 1,
-		HashValue: MustHexDecode(nil, `68e656b251e67e8358bef8483ab0d51c6619f3e7a1a9f0e75838d41ff368f728`),
+	TestThumbprint = Digest{
+		Algorithm: IntDigestAlgorithm(Sha256),
+		Value:     MustHexDecode(nil, `68e656b251e67e8358bef8483ab0d51c6619f3e7a1a9f0e75838d41ff368f728`),
 	}
 
 	TestTaggedBytes = []byte("taggedbytes")

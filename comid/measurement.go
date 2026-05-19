@@ -651,7 +651,7 @@ func (o *Measurement) SetMinSVN(svn uint64) *Measurement {
 // AddDigest add the supplied digest - comprising the digest itself together
 // with the hash algorithm used to obtain it - to the measurement-values-map of
 // the target measurement
-func (o *Measurement) AddDigest(algID uint64, digest []byte) *Measurement {
+func (o *Measurement) AddDigest(algID int, digest []byte) *Measurement {
 	if o != nil {
 		ds := o.Val.Digests
 		if ds == nil {

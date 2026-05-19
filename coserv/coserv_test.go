@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/go-cose"
-	"github.com/veraison/swid"
 )
 
 func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
@@ -282,15 +281,15 @@ func TestCoserv_FromCBOR_Results(t *testing.T) {
 
 	assert.Len(t, *(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests, 2)
 
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].HashAlgID, swid.Sha256)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].HashValue, []byte{0xaa})
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].HashAlgID, swid.Sha256_128)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].HashValue, []byte{0xbb})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].Algorithm.Int(), comid.Sha256)
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].Value, []byte{0xaa})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].Algorithm.Int(), comid.Sha256_128)
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].Value, []byte{0xbb})
 
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].HashAlgID, swid.Sha256)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].HashValue, []byte{0xcc})
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].HashAlgID, swid.Sha256_128)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].HashValue, []byte{0xdd})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].Algorithm.Int(), comid.Sha256)
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].Value, []byte{0xcc})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].Algorithm.Int(), comid.Sha256_128)
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].Value, []byte{0xdd})
 }
 
 func TestCoserv_FromCBOR_Results_Source_Artifacts(t *testing.T) {

@@ -163,7 +163,7 @@ func validateCCADigests(digests *comid.Digests) error {
 		// The hash value size is what matters most for validation
 
 		// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
-		if err := ValidateHashDigestSize(digest.HashValue); err != nil {
+		if err := ValidateHashDigestSize(digest.Value); err != nil {
 			return fmt.Errorf("digest at index %d: %w", i, err)
 		}
 	}

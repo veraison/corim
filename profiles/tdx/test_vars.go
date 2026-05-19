@@ -279,8 +279,8 @@ const (
                                 "value": {
                                     "set-operator": "member",
                                     "set-digest": [
-                                        "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=",
-                                        "sha-512:oxT8LcZjrnpra8Z4dZQFc5bms/VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag=="
+                                        [1, "h0KPxSKAPTEGXnvOPPA_5HUJZjHl4Hu9eg_eYMTPJcc"],
+                                        [8, "oxT8LcZjrnpra8Z4dZQFc5bms_VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag"]
                                     ]
                                 }
                             },
@@ -385,7 +385,7 @@ const (
                                 "value": {
                                     "set-operator": "member",
                                     "set-digest": [
-                                        "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc="
+                                        [1, "h0KPxSKAPTEGXnvOPPA_5HUJZjHl4Hu9eg_eYMTPJcc"]
                                     ]
                                 }
                             },
@@ -394,8 +394,8 @@ const (
                                 "value": {
                                     "set-operator": "member",
                                     "set-digest": [
-                                        "sha-256:h0KPxSKAPTEGXnvOPPA/5HUJZjHl4Hu9eg/eYMTPJcc=",
-                                        "sha-512:oxT8LcZjrnpra8Z4dZQFc5bms/VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag=="
+                                        [1, "h0KPxSKAPTEGXnvOPPA_5HUJZjHl4Hu9eg_eYMTPJcc"],
+                                        [8, "oxT8LcZjrnpra8Z4dZQFc5bms_VpzVD9XdtNG7r9K2qjFPwtxmOuemtrxnh1lAVzluaz9WnNUP1d200buv0rag"]
                                     ]
                                 }
                             }

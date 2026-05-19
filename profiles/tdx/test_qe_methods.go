@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/veraison/corim/comid"
-	"github.com/veraison/swid"
 )
 
 //nolint:funlen // reason: this function is long but readability is fine
@@ -59,9 +58,9 @@ func SetTdxQeMvalExtensions(typ MessageType, val *comid.Mval) error {
 	var ts *TeeDigest
 	// assign mrSignerDigest
 	dSign := comid.NewDigests()
-	dSign.AddDigest(swid.Sha256,
+	dSign.AddDigest(comid.Sha256,
 		comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75"))
-	dSign.AddDigest(swid.Sha384,
+	dSign.AddDigest(comid.Sha384,
 		comid.MustHexDecode(nil, "e45b72f5c0c0b572db4d8d3ab7e97f368ff74e62347a824decb67a84e5224d75e45b72f5c0c0b572db4d8d3ab7e97f36"))
 
 	// assign mrsignerDigest

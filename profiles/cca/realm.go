@@ -172,7 +172,7 @@ func validateCCARealmMeasurement(measurement *comid.Measurement) error {
 	digest := (*digests)[0]
 
 	// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
-	if err := ValidateHashDigestSize(digest.HashValue); err != nil {
+	if err := ValidateHashDigestSize(digest.Value); err != nil {
 		return fmt.Errorf("hash value must be 32, 48, or 64 bytes")
 	}
 
