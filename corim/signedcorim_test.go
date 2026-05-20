@@ -639,3 +639,32 @@ func TestSignedCorim_Sign_with_x5chain_fail_missing_ee_cert(t *testing.T) {
 	_, err = signedCorimIn.Sign(signer)
 	assert.EqualError(t, err, "intermediate certificates supplied but no signing certificate")
 }
+
+func TestSignedCorim_SignVerify_with_kid_ok(t *testing.T) {
+	signer, err := NewSignerFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	var signedCorimIn SignedCorim
+
+	signedCorimIn.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
+	signedCorimIn.Meta = *metaGood(t)
+	signedCorimIn.KeyID = []byte("test")
+
+	cbor, err := signedCorimIn.Sign(signer)
+	assert.Nil(t, err)
+
+	var signedCorimOut SignedCorim
+
+	fmt.Printf("signed-corim: %x\n", cbor)
+
+	err = signedCorimOut.FromCOSE(cbor)
+	assert.Nil(t, err)
+
+	pk, err := NewPublicKeyFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	err = signedCorimOut.Verify(pk)
+	assert.Nil(t, err)
+
+	assert.Equal(t, signedCorimIn.KeyID, signedCorimOut.KeyID)
+}

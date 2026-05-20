@@ -1,4 +1,4 @@
-// Copyright 2021-2024 Contributors to the Veraison project.
+// Copyright 2021-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package corim
@@ -27,6 +27,7 @@ var (
 type SignedCorim struct {
 	UnsignedCorim     UnsignedCorim
 	Meta              Meta
+	KeyID             []byte
 	SigningCert       *x509.Certificate
 	IntermediateCerts []*x509.Certificate
 	message           *cose.Sign1Message
@@ -70,9 +71,14 @@ func (o *SignedCorim) processHdrs() error {
 		return errors.New("missing mandatory content type")
 	}
 
-	// TODO(tho) key id is apparently mandatory, which doesn't look right.
-	// TODO(tho) Check with the CoRIM design team.
-	// See https://github.com/ietf-rats-wg/draft-ietf-rats-corim/issues/363
+	if v, ok := hdr.Protected[cose.HeaderLabelKeyID]; ok {
+		switch t := v.(type) {
+		case []byte:
+			o.KeyID = t
+		default:
+			return fmt.Errorf("kid: expected a []byte but got %v (%T)", t, t)
+		}
+	}
 
 	if v, ok := hdr.Protected[HeaderLabelCorimMeta]; ok {
 		if err := o.extractMeta(v); err != nil {
@@ -249,6 +255,10 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 	o.message.Headers.Protected.SetAlgorithm(alg)
 	o.message.Headers.Protected[cose.HeaderLabelContentType] = ContentType
 	o.message.Headers.Protected[HeaderLabelCorimMeta] = metaCBOR
+
+	if o.KeyID != nil {
+		o.message.Headers.Protected[cose.HeaderLabelKeyID] = o.KeyID
+	}
 
 	if o.SigningCert != nil {
 		// COSE_X509 = bstr / [ 2*certs: bstr ]
