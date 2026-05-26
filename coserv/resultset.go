@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coserv
@@ -11,9 +11,10 @@ import (
 )
 
 type ResultSet struct {
-	RVQ *[]RefValQuad `cbor:"0,keyasint,omitempty"`
-	AKQ *[]AKQuad     `cbor:"3,keyasint,omitempty"`
-	TAS *[]CoTSStmt   `cbor:"4,keyasint,omitempty"`
+	RVQ  *[]RefValQuad `cbor:"0,keyasint,omitempty"`
+	AKQ  *[]AKQuad     `cbor:"3,keyasint,omitempty"`
+	TAS  *[]CoTSStmt   `cbor:"4,keyasint,omitempty"`
+	RIMs *cmw.CMW      `cbor:"5,keyasint,omitempty"`
 	// TODO(tho) add endorsed values
 	Expiry          *time.Time `cbor:"10,keyasint"`
 	SourceArtifacts *[]cmw.CMW `cbor:"11,keyasint,omitempty"`
@@ -68,6 +69,12 @@ func (o *ResultSet) AddSourceArtifacts(v cmw.CMW) *ResultSet { // nolint:gocriti
 	return o
 }
 
+// SetRIMs sets the RIMs in the ResultSet to the supplied CMW.
+func (o *ResultSet) SetRIMs(v cmw.CMW) *ResultSet { // nolint:gocritic
+	o.RIMs = &v
+	return o
+}
+
 // SetExpiry sets the Expiry attribute of the target ResultSet to the supplied time
 func (o *ResultSet) SetExpiry(exp time.Time) *ResultSet {
 	o.Expiry = &exp
@@ -79,7 +86,15 @@ func (o ResultSet) Valid() error {
 	if o.Expiry == nil {
 		return errors.New("missing mandatory expiry")
 	}
+
+	if o.RIMs != nil {
+		if o.RIMs.GetKind() != cmw.KindCollection {
+			return errors.New("RIMs CMW must be a collection")
+		}
+	}
+
 	// The coherency between query and results must be checked by the Coserv's
 	// Valid()
+
 	return nil
 }

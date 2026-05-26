@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coserv
@@ -23,7 +23,7 @@ func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
 		AddClass(StatefulClass{Class: class})
 	require.NotNil(t, envSelector)
 
-	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeSourceArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeSourceArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -40,7 +40,7 @@ func TestCoserv_ToCBOR_rv_class_simple(t *testing.T) {
 }
 
 func TestCoserv_ToCBOR_exampleClassSelector(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -61,7 +61,7 @@ func TestCoserv_ToCBOR_exampleClassSelector(t *testing.T) {
 }
 
 func TestCoserv_ToCBOR_exampleInstanceSelector(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -78,7 +78,7 @@ func TestCoserv_ToCBOR_exampleInstanceSelector(t *testing.T) {
 }
 
 func TestCoserv_ToCBOR_exampleGroupSelector(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -117,7 +117,7 @@ func TestCoserv_FromBase64Url_ok_class(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, "collected-artifacts", actual.Query.ResultType.String())
-	assert.Equal(t, *exampleClassSelector(t), actual.Query.EnvironmentSelector)
+	assert.Equal(t, exampleClassSelector(t), actual.Query.EnvironmentSelector)
 }
 
 func TestCoserv_FromBase64Url_ok_instance(t *testing.T) {
@@ -133,7 +133,7 @@ func TestCoserv_FromBase64Url_ok_instance(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, "both", actual.Query.ResultType.String())
-	assert.Equal(t, *exampleInstanceSelector(t), actual.Query.EnvironmentSelector)
+	assert.Equal(t, exampleInstanceSelector(t), actual.Query.EnvironmentSelector)
 }
 
 func TestCoserv_FromBase64Url_ok_group(t *testing.T) {
@@ -149,7 +149,7 @@ func TestCoserv_FromBase64Url_ok_group(t *testing.T) {
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
 	assert.Equal(t, "source-artifacts", actual.Query.ResultType.String())
-	assert.Equal(t, *exampleGroupSelector(t), actual.Query.EnvironmentSelector)
+	assert.Equal(t, exampleGroupSelector(t), actual.Query.EnvironmentSelector)
 }
 
 func TestCoserv_FromBase64Url_fail(t *testing.T) {
@@ -162,7 +162,7 @@ func TestCoserv_FromBase64Url_fail(t *testing.T) {
 }
 
 func TestCoserv_ToBase64Url_ok_instance(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleInstanceSelector(t), ResultTypeBoth)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -182,7 +182,7 @@ func TestCoserv_ToBase64Url_ok_instance(t *testing.T) {
 }
 
 func TestCoserv_ToBase64Url_ok_class(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -202,7 +202,7 @@ func TestCoserv_ToBase64Url_ok_class(t *testing.T) {
 }
 
 func TestCoserv_ToBase64Url_ok_group(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleGroupSelector(t), ResultTypeSourceArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -222,7 +222,7 @@ func TestCoserv_ToBase64Url_ok_group(t *testing.T) {
 }
 
 func TestCoserv_ToEDN_ok(t *testing.T) {
-	query, err := NewQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *exampleClassSelector(t), ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
@@ -264,7 +264,7 @@ func TestCoserv_FromCBOR_Results(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, `tag:example.com,2025:cc-platform#1.0.0`, actualProfile)
 	assert.Equal(t, "reference-values", actual.Query.ArtifactType.String())
-	assert.Equal(t, *exampleClassSelector2(t), actual.Query.EnvironmentSelector)
+	assert.EqualValues(t, exampleClassSelector2(t), actual.Query.EnvironmentSelector)
 
 	// results-related assertions
 	assert.NotNil(t, actual.Results)
@@ -344,7 +344,7 @@ func TestCoserv_results_ToCBOR_ok(t *testing.T) {
 		AddClass(StatefulClass{Class: class})
 	require.NotNil(t, envSelector)
 
-	query, err := NewQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeCollectedArtifacts)
+	query, err := NewEnvironmentQuery(ArtifactTypeReferenceValues, *envSelector, ResultTypeCollectedArtifacts)
 	require.NoError(t, err)
 
 	tv, err := NewCoserv(
