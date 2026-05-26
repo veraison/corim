@@ -7,6 +7,7 @@ package coserv
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 
 	"github.com/fxamacker/cbor/v2"
@@ -67,6 +68,23 @@ func (o Coserv) Valid() error { // nolint:gocritic
 	if err := o.Query.Valid(); err != nil {
 		return fmt.Errorf("invalid query: %w", err)
 	}
+
+	if o.Results != nil {
+		if err := o.Results.Valid(); err != nil {
+			return fmt.Errorf("invalid result set: %w", err)
+		}
+
+		if o.Results.RIMs != nil && o.Query.RimSelector == nil {
+			return errors.New("RIMs in result set for environment query")
+		}
+
+		if (o.Results.RVQ != nil || o.Results.AKQ != nil || 
+		o.Results.TAS != nil || o.Results.SourceArtifacts != nil) &&
+		o.Query.EnvironmentSelector == nil {
+			return errors.New("Environment result elements for RIMs query")
+		}
+	}
+
 	return nil
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coserv
@@ -71,5 +71,13 @@ func TestResultSet_AddSourceArtifacts(t *testing.T) {
 	require.NoError(t, err)
 
 	rset := NewResultSet().SetExpiry(testExpiry).AddSourceArtifacts(*cmw0)
+	assert.NotNil(t, rset)
+}
+
+func TestResultSet_SetRIMs(t *testing.T) {
+	collection, err := cmw.NewCollection("")
+	require.NoError(t, err)
+
+	rset := NewResultSet().SetExpiry(testExpiry).SetRIMs(*collection)
 	assert.NotNil(t, rset)
 }
