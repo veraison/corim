@@ -11,13 +11,14 @@ import (
 )
 
 type ResultSet struct {
-	RVQ  *[]RefValQuad `cbor:"0,keyasint,omitempty"`
-	AKQ  *[]AKQuad     `cbor:"3,keyasint,omitempty"`
-	TAS  *[]CoTSStmt   `cbor:"4,keyasint,omitempty"`
-	RIMs *cmw.CMW      `cbor:"5,keyasint,omitempty"`
-	// TODO(tho) add endorsed values
-	Expiry          *time.Time `cbor:"10,keyasint"`
-	SourceArtifacts *[]cmw.CMW `cbor:"11,keyasint,omitempty"`
+	RVQ             *[]RefValQuad     `cbor:"0,keyasint,omitempty"`
+	EVQ             *[]EndValQuad     `cbor:"1,keyasint,omitempty"`
+	CEQ             *[]CondEndValQuad `cbor:"2,keyasint,omitempty"`
+	AKQ             *[]AKQuad         `cbor:"3,keyasint,omitempty"`
+	TAS             *[]CoTSStmt       `cbor:"4,keyasint,omitempty"`
+	RIMs            *cmw.CMW          `cbor:"5,keyasint,omitempty"`
+	Expiry          *time.Time        `cbor:"10,keyasint"`
+	SourceArtifacts *[]cmw.CMW        `cbor:"11,keyasint,omitempty"`
 }
 
 // NewResultSet instantiates a new ResultSet
@@ -32,6 +33,28 @@ func (o *ResultSet) AddReferenceValues(v RefValQuad) *ResultSet {
 	}
 
 	*o.RVQ = append(*o.RVQ, v)
+
+	return o
+}
+
+// AddEndorsedValues adds the supplied end-val quad to the target ResultSet
+func (o *ResultSet) AddEndorsedValues(v EndValQuad) *ResultSet {
+	if o.EVQ == nil {
+		o.EVQ = new([]EndValQuad)
+	}
+
+	*o.EVQ = append(*o.EVQ, v)
+
+	return o
+}
+
+// AddConditionalEndorsementValues adds the supplied ce-val quad to the target ResultSet
+func (o *ResultSet) AddConditionalEndorsementValues(v CondEndValQuad) *ResultSet {
+	if o.CEQ == nil {
+		o.CEQ = new([]CondEndValQuad)
+	}
+
+	*o.CEQ = append(*o.CEQ, v)
 
 	return o
 }

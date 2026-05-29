@@ -33,6 +33,56 @@ func TestResultSet_AddAttestationKeys(t *testing.T) {
 	assert.NotNil(t, rset)
 }
 
+func TestResultSet_AddEndorsedValues(t *testing.T) {
+	authority, err := comid.NewCryptoKeyTaggedBytes(testAuthority)
+	require.NoError(t, err)
+
+	evq := EndValQuad{
+		Authorities: comid.NewCryptoKeys().Add(authority),
+		EVTriple: &comid.ValueTriple{
+			Environment: comid.Environment{
+				Class: comid.NewClassBytes(testBytes),
+			},
+			Measurements: *comid.NewMeasurements().Add(
+				comid.MustNewUUIDMeasurement(comid.TestUUID).SetName("foo"),
+			),
+		},
+	}
+
+	rset := NewResultSet().SetExpiry(testExpiry).AddEndorsedValues(evq)
+	assert.NotNil(t, rset)
+}
+
+func TestResultSet_AddConditionalEndorsementValues(t *testing.T) {
+	authority, err := comid.NewCryptoKeyTaggedBytes(testAuthority)
+	require.NoError(t, err)
+
+	ceq := CondEndValQuad{
+		Authorities: comid.NewCryptoKeys().Add(authority),
+		CETriple: &comid.CondEndorseTriple{
+			Conditions: *comid.NewStatefulEnvironments().Add(&comid.ValueTriple{
+				Environment: comid.Environment{
+					Class: comid.NewClassBytes(testBytes),
+				},
+				Measurements: *comid.NewMeasurements().Add(
+					comid.MustNewUUIDMeasurement(comid.TestUUID).SetName("foo"),
+				),
+			}),
+			Endorsements: *comid.NewValueTriples().Add(&comid.ValueTriple{
+				Environment: comid.Environment{
+					Class: comid.NewClassBytes(testBytes),
+				},
+				Measurements: *comid.NewMeasurements().Add(
+					comid.MustNewUUIDMeasurement(comid.TestUUID).SetName("foo"),
+				),
+			}),
+		},
+	}
+
+	rset := NewResultSet().SetExpiry(testExpiry).AddConditionalEndorsementValues(ceq)
+	assert.NotNil(t, rset)
+}
+
 func TestResultSet_AddCoTS(t *testing.T) {
 	authority, err := comid.NewCryptoKeyTaggedBytes(testAuthority)
 	require.NoError(t, err)
