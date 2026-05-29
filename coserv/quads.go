@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 package coserv
@@ -11,6 +11,16 @@ import (
 type RefValQuad struct {
 	Authorities *comid.CryptoKeys  `cbor:"1,keyasint"`
 	RVTriple    *comid.ValueTriple `cbor:"2,keyasint"`
+}
+
+type EndValQuad struct {
+	Authorities *comid.CryptoKeys  `cbor:"1,keyasint"`
+	EVTriple    *comid.ValueTriple `cbor:"2,keyasint"`
+}
+
+type CondEndValQuad struct {
+	Authorities *comid.CryptoKeys        `cbor:"1,keyasint"`
+	CETriple    *comid.CondEndorseTriple `cbor:"2,keyasint"`
 }
 
 type AKQuad struct {

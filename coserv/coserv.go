@@ -1,4 +1,4 @@
-// Copyright 2025 Contributors to the Veraison project.
+// Copyright 2025-2026 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package coserv provides an implementation of draft-howard-rats-coserv
@@ -78,10 +78,11 @@ func (o Coserv) Valid() error { // nolint:gocritic
 			return errors.New("RIMs in result set for environment query")
 		}
 
-		if (o.Results.RVQ != nil || o.Results.AKQ != nil || 
-		o.Results.TAS != nil || o.Results.SourceArtifacts != nil) &&
-		o.Query.EnvironmentSelector == nil {
-			return errors.New("Environment result elements for RIMs query")
+		if (o.Results.RVQ != nil || o.Results.AKQ != nil ||
+			o.Results.EVQ != nil || o.Results.CEQ != nil ||
+			o.Results.TAS != nil || o.Results.SourceArtifacts != nil) &&
+			o.Query.EnvironmentSelector == nil {
+			return errors.New("environment result elements for RIMs query")
 		}
 	}
 
