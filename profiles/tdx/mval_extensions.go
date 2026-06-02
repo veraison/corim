@@ -50,7 +50,8 @@ func init() {
 
 	extMap := extensions.NewMap().
 		Add(comid.ExtReferenceValue, &MValExtensions{}).
-		Add(comid.ExtEndorsedValue, &MValExtensions{})
+		Add(comid.ExtEndorsedValue, &MValExtensions{}).
+		Add(comid.ExtCondEndorseSeriesValue, &MValExtensions{})
 
 	if err := corim.RegisterProfile(profileID, extMap); err != nil {
 		// will not error, assuming our profile ID is unique, and we've
