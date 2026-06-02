@@ -15,7 +15,7 @@ GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E staticcheck -E lll -E pre
 
 TOPDIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-GOLINT_VERSION = v2.1.6
+GOLINT_VERSION = v2.5.0
 GOLINT = $(TOPDIR)/tools-bin/golangci-lint
 GOLINT_STAMP = $(TOPDIR)/tools-bin/golangci-lint-$(GOLINT_VERSION).stamp
 
