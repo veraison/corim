@@ -14,22 +14,48 @@ mkdir -p "$MISC_DIR"
 
 trap '[[ $_should_clean_certs_artifacts == true ]] && clean_certs_artifacts' EXIT
 
+function write_intermediate_extfile() {
+    cat > "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.ext" <<'EOF'
+[ v3_intermediate ]
+basicConstraints = critical, CA:TRUE, pathlen:0
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+EOF
+}
+
+function write_end_entity_extfile() {
+    cat > "${MISC_DIR}/${END_ENTITY_CERT_NAME}.ext" <<'EOF'
+[ v3_end_entity ]
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+EOF
+}
+
 function create_root_cert() {
     _check_openssl
 
-    if [[ -f "${MISC_DIR}/${ROOT_CERT_NAME}.der" ]]; then
+    if [[ -f "${MISC_DIR}/${ROOT_CERT_NAME}.der" ]] && [[ "${FORCE:-}" != "1" ]]; then
         echo "Root certificate already exists. Skipping creation."
         return
     fi
 
-    openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${ROOT_CERT_NAME}.key
+    if [[ ! -f "${MISC_DIR}/${ROOT_CERT_NAME}.key" ]]; then
+        openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${ROOT_CERT_NAME}.key
+    fi
+
     openssl req -x509 -new -nodes -key ${MISC_DIR}/${ROOT_CERT_NAME}.key \
         -sha256 -days 3650 \
         -subj "/CN=Acme Inc." \
+        -addext "basicConstraints=critical,CA:TRUE" \
+        -addext "keyUsage=critical,keyCertSign,cRLSign" \
+        -addext "subjectKeyIdentifier=hash" \
         -out ${MISC_DIR}/${ROOT_CERT_NAME}.crt
     openssl x509 -in ${MISC_DIR}/${ROOT_CERT_NAME}.crt -outform der \
         -out ${MISC_DIR}/${ROOT_CERT_NAME}.der
-    rm -f ${MISC_DIR}/${ROOT_CERT_NAME}.crt 
+    rm -f ${MISC_DIR}/${ROOT_CERT_NAME}.crt
 
     echo "Created ${MISC_DIR}/${ROOT_CERT_NAME}.der and ${MISC_DIR}/${ROOT_CERT_NAME}.key"
 }
@@ -38,12 +64,16 @@ function create_intermediate_cert() {
     _check_openssl
     _check_root_cert
 
-    if [[ -f "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der" ]]; then
+    if [[ -f "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der" ]] && [[ "${FORCE:-}" != "1" ]]; then
         echo "Intermediate certificate already exists. Skipping creation."
         return
     fi
 
-    openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.key
+    if [[ ! -f "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.key" ]]; then
+        openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.key
+    fi
+
+    write_intermediate_extfile
     openssl req -new -key ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.key \
         -out ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.csr \
         -subj "/CN=Acme Gizmos"
@@ -52,10 +82,13 @@ function create_intermediate_cert() {
         -CAkey ${MISC_DIR}/${ROOT_CERT_NAME}.key \
         -CAcreateserial \
         -out ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.crt \
-        -days 3650 -sha256
+        -days 3650 -sha256 \
+        -CAform der \
+        -extensions v3_intermediate \
+        -extfile ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.ext
     openssl x509 -in ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.crt \
         -outform der -out ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der
-    rm -f ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.crt
+    rm -f ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.crt ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.ext
 
     echo "Created ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der and ${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.key"
 }
@@ -63,13 +96,21 @@ function create_intermediate_cert() {
 function create_end_entity_cert() {
     _check_openssl
     _check_root_cert
-    
-    if ([[ -f "${MISC_DIR}/${END_ENTITY_CERT_NAME}.der" ]] && [[ -f "${MISC_DIR}/${END_ENTITY_CERT_NAME}.key" ]]); then
+
+    if [[ ! -f "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der" ]]; then
+        create_intermediate_cert
+    fi
+
+    if ([[ -f "${MISC_DIR}/${END_ENTITY_CERT_NAME}.der" ]] && [[ -f "${MISC_DIR}/${END_ENTITY_CERT_NAME}.key" ]] && [[ "${FORCE:-}" != "1" ]]); then
         echo "End-entity certificate and key already exist. Skipping creation."
         return
     fi
 
-    openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${END_ENTITY_CERT_NAME}.key
+    if [[ ! -f "${MISC_DIR}/${END_ENTITY_CERT_NAME}.key" ]]; then
+        openssl ecparam -name prime256v1 -genkey -noout -out ${MISC_DIR}/${END_ENTITY_CERT_NAME}.key
+    fi
+
+    write_end_entity_extfile
     openssl req -new -key ${MISC_DIR}/${END_ENTITY_CERT_NAME}.key \
         -out ${MISC_DIR}/${END_ENTITY_CERT_NAME}.csr \
         -subj "/CN=Acme Gizmo CoRIM signer"
@@ -79,18 +120,20 @@ function create_end_entity_cert() {
         -CAcreateserial \
         -out ${MISC_DIR}/${END_ENTITY_CERT_NAME}.crt \
         -days 1825 -sha256 \
-        -CAform der
+        -CAform der \
+        -extensions v3_end_entity \
+        -extfile ${MISC_DIR}/${END_ENTITY_CERT_NAME}.ext
     openssl x509 -in ${MISC_DIR}/${END_ENTITY_CERT_NAME}.crt \
         -outform der -out ${MISC_DIR}/${END_ENTITY_CERT_NAME}.der
-    rm -f ${MISC_DIR}/${END_ENTITY_CERT_NAME}.crt
+    rm -f ${MISC_DIR}/${END_ENTITY_CERT_NAME}.crt ${MISC_DIR}/${END_ENTITY_CERT_NAME}.ext
 
     echo "Created ${MISC_DIR}/${END_ENTITY_CERT_NAME}.der and ${MISC_DIR}/${END_ENTITY_CERT_NAME}.key"
 }
 
 function clean_certs_artifacts() {
     pushd "$MISC_DIR" > /dev/null || exit 1
-    echo "rm -f -- *.csr *.srl"
-    rm -f -- *.csr *.srl
+    echo "rm -f -- *.csr *.srl *.ext"
+    rm -f -- *.csr *.srl *.ext
     popd > /dev/null || exit 1
 }
 
@@ -109,6 +152,19 @@ function clean_all() {
     clean_cert "$END_ENTITY_CERT_NAME"
 }
 
+function regenerate() {
+    FORCE=1
+    rm -f "${MISC_DIR}/${ROOT_CERT_NAME}.der" \
+          "${MISC_DIR}/${INTERMEDIATE_CERT_NAME}.der" \
+          "${MISC_DIR}/${END_ENTITY_CERT_NAME}.der"
+    create_root_cert
+    create_intermediate_cert
+    create_end_entity_cert
+    if [[ $_should_clean_certs_artifacts == true ]]; then
+        clean_certs_artifacts
+    fi
+}
+
 function help() {
     set +e
     read -r -d '' usage <<-EOF
@@ -123,6 +179,9 @@ function help() {
 
     create
             Create the root, intermediate, and end-entity certificates.
+
+    regenerate
+            Re-issue DER certificates with PKIX extensions, keeping existing keys.
 
     clean_certs_artifacts
             Clean output artifacts for the certificates.
@@ -187,6 +246,9 @@ case $command in
         ;;
     clean_all)
         clean_all
+        ;;
+    regenerate)
+        regenerate
         ;;
     create)
         create_root_cert

@@ -4,6 +4,7 @@
 package corim
 
 import (
+	"crypto/x509"
 	"fmt"
 	"testing"
 	"time"
@@ -667,4 +668,70 @@ func TestSignedCorim_SignVerify_with_kid_ok(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, signedCorimIn.KeyID, signedCorimOut.KeyID)
+}
+
+func TestSignedCorim_FromCOSE_x5chain_idempotent(t *testing.T) {
+	cbor, _, signed := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, certChain())
+
+	require.Len(t, signed.IntermediateCerts, 2)
+
+	require.NoError(t, signed.FromCOSE(cbor))
+	assert.Len(t, signed.IntermediateCerts, 2)
+}
+
+func TestSignedCorim_FromCOSE_x5chain_resetsIntermediatesOnShrink(t *testing.T) {
+	_, _, full := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, certChain())
+	require.Len(t, full.IntermediateCerts, 2)
+
+	singleCBOR, _, _ := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, nil)
+
+	require.NoError(t, full.FromCOSE(singleCBOR))
+	assert.NotNil(t, full.SigningCert)
+	assert.Empty(t, full.IntermediateCerts)
+}
+
+func TestSignedCorim_FromCOSE_clearsX5ChainWhenHeaderAbsent(t *testing.T) {
+	_, _, withChain := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, certChain())
+	require.NotNil(t, withChain.SigningCert)
+
+	signer, err := NewSignerFromJWK(testEndEntityKey)
+	require.NoError(t, err)
+
+	var withoutChain SignedCorim
+	withoutChain.UnsignedCorim = *unsignedCorimFromCBOR(t, testGoodUnsignedCorimCBOR)
+	withoutChain.Meta = *metaGood(t)
+
+	noChainCBOR, err := withoutChain.Sign(signer)
+	require.NoError(t, err)
+
+	require.NoError(t, withChain.FromCOSE(noChainCBOR))
+	assert.Nil(t, withChain.SigningCert)
+	assert.Empty(t, withChain.IntermediateCerts)
+}
+
+func TestSignedCorim_FromCOSE_resetsStaleIntermediateCerts(t *testing.T) {
+	cbor, _, signed := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, certChain())
+
+	signed.IntermediateCerts = append(signed.IntermediateCerts, &x509.Certificate{Raw: []byte("stale")})
+	require.Len(t, signed.IntermediateCerts, 3)
+
+	require.NoError(t, signed.FromCOSE(cbor))
+	assert.Len(t, signed.IntermediateCerts, 2)
+}
+
+func TestSignedCorim_extractX5Chain_preservesStateOnError(t *testing.T) {
+	_, _, signed := signWithChain(t, testEndEntityKey, testdata.EndEntityDer, certChain())
+
+	origSigning := signed.SigningCert
+	origIntermediates := append([]*x509.Certificate(nil), signed.IntermediateCerts...)
+
+	err := signed.extractX5Chain([]interface{}{testdata.EndEntityDer, "not-bytes"})
+	require.Error(t, err)
+
+	assert.Same(t, origSigning, signed.SigningCert)
+	require.Len(t, signed.IntermediateCerts, len(origIntermediates))
+
+	for i := range origIntermediates {
+		assert.Same(t, origIntermediates[i], signed.IntermediateCerts[i])
+	}
 }

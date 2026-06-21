@@ -117,6 +117,11 @@ func (o *SignedCorim) extractMeta(v interface{}) error {
 }
 
 func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
+	var (
+		signingCert       *x509.Certificate
+		intermediateCerts []*x509.Certificate
+	)
+
 	var buf bytes.Buffer
 
 	switch t := x5chain.(type) {
@@ -129,26 +134,42 @@ func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
 
 			switch i {
 			case 0:
-				if err := o.AddSigningCert(cert); err != nil {
-					return fmt.Errorf("decoding x5chain: %w", err)
+				parsed, err := x509.ParseCertificate(cert)
+				if err != nil {
+					return fmt.Errorf("decoding x5chain: invalid signing certificate: %w", err)
 				}
+
+				signingCert = parsed
 			default:
 				buf.Write(cert)
 			}
 		}
 
 		if buf.Len() > 0 {
-			if err := o.AddIntermediateCerts(buf.Bytes()); err != nil {
-				return fmt.Errorf("decoding x5chain: %w", err)
+			certs, err := x509.ParseCertificates(buf.Bytes())
+			if err != nil {
+				return fmt.Errorf("decoding x5chain: invalid intermediate certificates: %w", err)
 			}
+
+			if len(certs) == 0 {
+				return fmt.Errorf("decoding x5chain: no certificates found in intermediate cert data")
+			}
+
+			intermediateCerts = certs
 		}
 	case []byte:
-		if err := o.AddSigningCert(t); err != nil {
-			return fmt.Errorf("decoding x5chain: %w", err)
+		parsed, err := x509.ParseCertificate(t)
+		if err != nil {
+			return fmt.Errorf("decoding x5chain: invalid signing certificate: %w", err)
 		}
+
+		signingCert = parsed
 	default:
 		return fmt.Errorf("decoding x5chain: got %T, want []interface{} or []byte", t)
 	}
+
+	o.SigningCert = signingCert
+	o.IntermediateCerts = intermediateCerts
 
 	return nil
 }
@@ -159,6 +180,8 @@ func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
 // field while the corim-meta-map is decoded into the Meta field.
 func (o *SignedCorim) FromCOSE(buf []byte) error {
 	o.message = cose.NewSign1Message()
+	o.SigningCert = nil
+	o.IntermediateCerts = nil
 
 	// If a tagged-corim-type-choice #6.500 of tagged-signed-corim #6.502, strip the prefix.
 	// This is a remnant of an older draft of the specification before
