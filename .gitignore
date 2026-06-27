@@ -18,3 +18,9 @@ mocks/
 
 # install location for project-local tools such as golangci-lint
 tools-bin/
+
+# Private keys. Test CA keys (rootCA.key, intermediateCA.key) are generated
+# locally by scripts/gen-certs.sh and must never be committed.
+# endEntity.key is tracked because it is go:embed-ed in testdata/testdata.go.
+*.key
+!testdata/endEntity.key

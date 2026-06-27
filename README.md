@@ -28,6 +28,18 @@ make presubmit
 ```
 and check its output to make sure your code coverage figures are in line with the set target and that there are no newly introduced lint problems.
 
+## x5chain trust verification
+
+Signed CoRIM messages may carry an X.509 chain in the COSE `x5chain` protected header.
+Use [`SignedCorim.VerifyWithX5Chain`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.VerifyWithX5Chain)
+after [`FromCOSE`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.FromCOSE) to validate PKIX trust, optional CRL revocation, and the COSE signature.
+
+Load trust material with [`LoadTrustAnchors`](https://pkg.go.dev/github.com/veraison/corim/corim#LoadTrustAnchors).
+When no trust-anchor paths are supplied, verification uses the OS certificate store; for production deployments, pass explicit anchors.
+When no CRL paths are supplied, revocation checks are skipped; when CRLs are loaded, [`CrlPolicyStrict`](https://pkg.go.dev/github.com/veraison/corim/corim#CrlPolicyStrict) is the default.
+
+For external-key verification without PKIX path validation, use [`SignedCorim.Verify`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.Verify) instead.
+
 ## Extending CoRIM/CoMID
 
 The CoRIM specification provides a mechanism for adding extensions to the base
