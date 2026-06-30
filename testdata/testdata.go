@@ -1,5 +1,8 @@
 // Copyright 2021-2024 Contributors to the Veraison project.
 // SPDX-License-Identifier: Apache-2.0
+
+// Package testdata holds PUBLIC test-only X.509 material embedded for unit tests.
+// Do not use these keys or certificates as production trust material.
 package testdata
 
 import (

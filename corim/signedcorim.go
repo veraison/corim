@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/veraison/corim/extensions"
 	cose "github.com/veraison/go-cose"
@@ -20,6 +21,8 @@ var (
 	ContentType          = "application/rim+cbor"
 	NoExternalData       = []byte("")
 	HeaderLabelCorimMeta = int64(8)
+
+	errNoSign1Message = errors.New("no Sign1 message found")
 )
 
 // SignedCorim encodes a signed-corim message (i.e., a COSE Sign1 wrapped CoRIM)
@@ -117,40 +120,98 @@ func (o *SignedCorim) extractMeta(v interface{}) error {
 }
 
 func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
-	var buf bytes.Buffer
+	var (
+		signingCert       *x509.Certificate
+		intermediateCerts []*x509.Certificate
+		err               error
+	)
 
 	switch t := x5chain.(type) {
 	case []interface{}:
+		elems := make([][]byte, len(t))
 		for i, elem := range t {
-			cert, ok := elem.([]byte)
+			certDER, ok := elem.([]byte)
 			if !ok {
 				return fmt.Errorf("accessing x5chain[%d]: got %T, want []byte", i, elem)
 			}
 
-			switch i {
-			case 0:
-				if err := o.AddSigningCert(cert); err != nil {
-					return fmt.Errorf("decoding x5chain: %w", err)
-				}
-			default:
-				buf.Write(cert)
-			}
+			elems[i] = certDER
 		}
 
-		if buf.Len() > 0 {
-			if err := o.AddIntermediateCerts(buf.Bytes()); err != nil {
-				return fmt.Errorf("decoding x5chain: %w", err)
-			}
-		}
+		signingCert, intermediateCerts, err = parseX5ChainFromCertDERs(elems)
+	case [][]byte:
+		signingCert, intermediateCerts, err = parseX5ChainFromCertDERs(t)
 	case []byte:
-		if err := o.AddSigningCert(t); err != nil {
-			return fmt.Errorf("decoding x5chain: %w", err)
-		}
+		signingCert, err = parseX5ChainLeafDER(t)
 	default:
-		return fmt.Errorf("decoding x5chain: got %T, want []interface{} or []byte", t)
+		return fmt.Errorf("decoding x5chain: got %T, want []interface{}, [][]byte, or []byte", t)
 	}
 
+	if err != nil {
+		return err
+	}
+
+	o.SigningCert = signingCert
+	o.IntermediateCerts = intermediateCerts
+
 	return nil
+}
+
+func parseX5ChainFromCertDERs(elems [][]byte) (leaf *x509.Certificate, intermediates []*x509.Certificate, err error) {
+	if len(elems) == 0 {
+		return nil, nil, fmt.Errorf("decoding x5chain: empty certificate array")
+	}
+
+	leaf, err = parseX5ChainLeafDER(elems[0])
+	if err != nil {
+		return nil, nil, err
+	}
+
+	intermediates = make([]*x509.Certificate, 0, len(elems)-1)
+	for i := 1; i < len(elems); i++ {
+		var parsed *x509.Certificate
+		parsed, err = parseX5ChainIntermediateDER(elems[i], i)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		intermediates = append(intermediates, parsed)
+	}
+
+	return leaf, intermediates, nil
+}
+
+func parseX5ChainLeafDER(der []byte) (*x509.Certificate, error) {
+	if der == nil {
+		return nil, fmt.Errorf("decoding x5chain: nil signing cert")
+	}
+	if len(der) == 0 {
+		return nil, fmt.Errorf("decoding x5chain: empty signing cert")
+	}
+
+	parsed, err := x509.ParseCertificate(der)
+	if err != nil {
+		return nil, fmt.Errorf("decoding x5chain: invalid signing certificate: %w", err)
+	}
+
+	return parsed, nil
+}
+
+func parseX5ChainIntermediateDER(der []byte, index int) (*x509.Certificate, error) {
+	if len(der) == 0 {
+		return nil, fmt.Errorf("decoding x5chain: empty intermediate cert at index %d", index)
+	}
+
+	certs, err := x509.ParseCertificates(der)
+	if err != nil {
+		return nil, fmt.Errorf("decoding x5chain: invalid intermediate certificate at index %d: %w", index, err)
+	}
+
+	if len(certs) != 1 {
+		return nil, fmt.Errorf("decoding x5chain: expected 1 certificate at index %d, got %d", index, len(certs))
+	}
+
+	return certs[0], nil
 }
 
 // FromCOSE decodes and effects syntactic validation on the supplied
@@ -159,6 +220,19 @@ func (o *SignedCorim) extractX5Chain(x5chain interface{}) error {
 // field while the corim-meta-map is decoded into the Meta field.
 func (o *SignedCorim) FromCOSE(buf []byte) error {
 	o.message = cose.NewSign1Message()
+	o.SigningCert = nil
+	o.IntermediateCerts = nil
+
+	var err error
+	// Roll back partial decode on any failure. Later steps must assign to err (not :=)
+	// or this cleanup is skipped.
+	defer func() {
+		if err != nil {
+			o.message = nil
+			o.SigningCert = nil
+			o.IntermediateCerts = nil
+		}
+	}()
 
 	// If a tagged-corim-type-choice #6.500 of tagged-signed-corim #6.502, strip the prefix.
 	// This is a remnant of an older draft of the specification before
@@ -166,19 +240,19 @@ func (o *SignedCorim) FromCOSE(buf []byte) error {
 	corimTypeChoice := []byte("\xd9\x01\xf4\xd9\x01\xf6")
 	buf, _ = bytes.CutPrefix(buf, corimTypeChoice)
 
-	if err := o.message.UnmarshalCBOR(buf); err != nil {
+	if err = o.message.UnmarshalCBOR(buf); err != nil {
 		return fmt.Errorf("failed CBOR decoding for COSE-Sign1 signed CoRIM: %w", err)
 	}
 
-	if err := o.processHdrs(); err != nil {
+	if err = o.processHdrs(); err != nil {
 		return fmt.Errorf("processing COSE headers: %w", err)
 	}
 
-	if err := o.UnsignedCorim.FromCBOR(o.message.Payload); err != nil {
+	if err = o.UnsignedCorim.FromCBOR(o.message.Payload); err != nil {
 		return fmt.Errorf("failed CBOR decoding of unsigned CoRIM: %w", err)
 	}
 
-	if err := o.UnsignedCorim.Valid(); err != nil {
+	if err = o.UnsignedCorim.Valid(); err != nil {
 		return fmt.Errorf("failed validation of unsigned CoRIM: %w", err)
 	}
 
@@ -294,7 +368,7 @@ func (o *SignedCorim) Sign(signer cose.Signer) ([]byte, error) {
 // supplied public key
 func (o *SignedCorim) Verify(pk crypto.PublicKey) error {
 	if o.message == nil {
-		return errors.New("no Sign1 message found")
+		return errNoSign1Message
 	}
 
 	protected := o.message.Headers.Protected
@@ -312,6 +386,50 @@ func (o *SignedCorim) Verify(pk crypto.PublicKey) error {
 	err = o.message.Verify(NoExternalData, verifier)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// VerifyWithX5Chain validates the embedded x5chain and CoRIM COSE signature.
+// Call [SignedCorim.FromCOSE] first. For external-key verify without PKIX, use [SignedCorim.Verify].
+// Load trust material via [LoadTrustAnchors] when reading anchors/CRLs from files.
+//
+// Leaf policy rejects CA certificates. keyUsage is optional; when present,
+// digitalSignature is required. PKIX validation uses ExtKeyUsageAny.
+func (o *SignedCorim) VerifyWithX5Chain(anchors TrustAnchors) error {
+	if o.message == nil {
+		return errNoSign1Message
+	}
+
+	if o.SigningCert == nil {
+		return errors.New("x5chain: header not set in CoRIM")
+	}
+
+	chain := make([]*x509.Certificate, 0, 1+len(o.IntermediateCerts))
+	chain = append(chain, o.SigningCert)
+	chain = append(chain, o.IntermediateCerts...)
+
+	now := anchors.CurrentTime
+	if now.IsZero() {
+		now = time.Now()
+	}
+
+	if err := validateLeafSigningCert(o.SigningCert); err != nil {
+		return err
+	}
+
+	verifiedChain, err := verifyPKIXChain(chain, anchors, now)
+	if err != nil {
+		return err
+	}
+
+	if err := checkChainRevocation(verifiedChain, anchors.CRLs, anchors.CrlPolicy, now); err != nil {
+		return err
+	}
+
+	if err := o.Verify(verifiedChain[0].PublicKey); err != nil {
+		return fmt.Errorf("x5chain: COSE signature verification failed: %w", err)
 	}
 
 	return nil
