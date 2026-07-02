@@ -282,12 +282,11 @@ func main() {
 Please see [example_profile_test.go](../corim/example_profile_test.go) for the complete
 example of creating and using CoRIM profiles.
 
+## Type Choice Extensions
+
 > [!NOTE]
 > Currently, only map extensions can be associated with profiles. Type choice
-> and enum value extensions (described below) can only be registered globally.
-
-
-## Type Choice Extensions
+> and enum value extensions can only be registered globally.
 
 Type Choice extensions allow specifying alternative types for existing CoRIM
 fields by defining a type that implements an appropriate interface and
@@ -444,6 +443,10 @@ func main() {
 
 
 ## Enum extensions
+
+> [!NOTE]
+> Currently, only map extensions can be associated with profiles. Type choice
+> and enum value extensions can only be registered globally.
 
 The following enum types may be extended with additional values:
 
