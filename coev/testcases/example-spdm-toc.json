@@ -1,0 +1,324 @@
+{
+  "tagged-evidence": [
+    {
+      "ev-triples": {
+        "evidence-triples": [
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.3"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "BRP"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      3
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.4"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "FFMC"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      4
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.5"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "BCRC"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      5
+                    ]
+                  }
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "BCRD"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      7
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.7"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "FLRC"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      6
+                    ]
+                  }
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "FLRD"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      11
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.9"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "FUSE"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      13
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.11"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "NVLC"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      8
+                    ]
+                  }
+                }
+              },
+              {
+                "key": {
+                  "type": "string",
+                  "value": "NVLD"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      12
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.13"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "JTGS"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      18
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.15"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "PDI"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      26
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.16"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "BOOTS"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      43
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.18"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "DBGS"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      51
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "environment": {
+              "class": {
+                "id": {
+                  "type": "oid",
+                  "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.19"
+                }
+              }
+            },
+            "measurements": [
+              {
+                "key": {
+                  "type": "string",
+                  "value": "DVID"
+                },
+                "value": {
+                  "spdm-indirect": {
+                    "index": [
+                      52
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

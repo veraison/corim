@@ -1,0 +1,31 @@
+{
+  "ev-triples": {
+    "evidence-triples": [
+      {
+        "environment": {
+          "class": {
+            "id": {
+              "type": "oid",
+              "value": "1.3.6.1.4.1.5703.1300.1.1.10.1.10.100.3"
+            }
+          }
+        },
+        "measurements": [
+          {
+            "key": {
+              "type": "string",
+              "value": "BRP"
+            },
+            "value": {
+              "spdm-indirect": {
+                "index": [
+                  3
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
