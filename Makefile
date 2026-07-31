@@ -10,6 +10,7 @@ GOPKG += github.com/veraison/corim/cots
 GOPKG += github.com/veraison/corim/encoding
 GOPKG += github.com/veraison/corim/extensions
 GOPKG += github.com/veraison/corim/coserv
+GOPKG += github.com/veraison/corim/coev
 
 GOLINT_ARGS ?= run --timeout=3m -E dupl -E gocritic -E staticcheck -E lll -E prealloc
 

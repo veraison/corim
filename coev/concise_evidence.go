@@ -155,6 +155,21 @@ func (o TaggedConciseEvidence) Valid() error {
 	return c.Valid()
 }
 
+// MarshalCBOR implements cbor.Marshaler, delegating to ToCBOR so that
+// []TaggedConciseEvidence fields in enclosing structs are automatically encoded
+// with the CBOR Tag 571.
+// nolint:gocritic
+func (o TaggedConciseEvidence) MarshalCBOR() ([]byte, error) {
+	return o.ToCBOR()
+}
+
+// UnmarshalCBOR implements cbor.Unmarshaler, delegating to FromCBOR so that
+// []TaggedConciseEvidence fields in enclosing structs automatically strip CBOR
+// Tag 571 on decode.
+func (o *TaggedConciseEvidence) UnmarshalCBOR(data []byte) error {
+	return o.FromCBOR(data)
+}
+
 // ToCBOR serializes the target TaggedConciseEvidence to CBOR
 // nolint:gocritic
 func (o TaggedConciseEvidence) ToCBOR() ([]byte, error) {
@@ -170,7 +185,7 @@ func (o TaggedConciseEvidence) ToCBOR() ([]byte, error) {
 	return append(ConciseEvidenceTag, data...), nil
 }
 
-// FromCBOR deserializes a CBOR-encoded date into the TaggedConciseEvidence
+// FromCBOR deserializes a CBOR-encoded data into the TaggedConciseEvidence
 func (o *TaggedConciseEvidence) FromCBOR(data []byte) error {
 	if len(data) < 3 {
 		return errors.New("input CBOR data too short")

@@ -6,7 +6,7 @@
 
 
 The [`corim/corim`](corim) and [`corim/comid`](comid) packages provide a golang API for low-level manipulation of [Concise Reference Integrity Manifest (CoRIM)](https://datatracker.ietf.org/doc/draft-ietf-rats-corim/) and Concise Module Identifier (CoMID) tags respectively.
-The [`corim/coev`](coev) package provides a minimal golang implementation of TCG Concise Evidence CDDL as documented [here](https://github.com/TrustedComputingGroup/dice-coev/blob/main/concise-evidence.cddl)
+The [`corim/coev`](coev) package provides a golang implementation of TCG Concise Evidence CDDL as documented [here](https://github.com/TrustedComputingGroup/dice-coev/blob/main/concise-evidence.cddl).
 The [`corim/coserv`](coserv) package provides a golang API for working with [Concise Selector for Endorsements and Reference Values](https://datatracker.ietf.org/doc/draft-howard-rats-coserv).
 
 > [!NOTE]
