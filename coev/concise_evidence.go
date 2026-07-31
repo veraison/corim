@@ -185,7 +185,7 @@ func (o TaggedConciseEvidence) ToCBOR() ([]byte, error) {
 	return append(ConciseEvidenceTag, data...), nil
 }
 
-// FromCBOR deserializes a CBOR-encoded date into the TaggedConciseEvidence
+// FromCBOR deserializes a CBOR-encoded data into the TaggedConciseEvidence
 func (o *TaggedConciseEvidence) FromCBOR(data []byte) error {
 	if len(data) < 3 {
 		return errors.New("input CBOR data too short")
