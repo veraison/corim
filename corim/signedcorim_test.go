@@ -256,7 +256,7 @@ func TestSignedCorim_FromCOSE_fail_corim_bad_cbor(t *testing.T) {
 	var actual SignedCorim
 	err := actual.FromCOSE(tv)
 
-	assert.EqualError(t, err, "failed CBOR decoding of unsigned CoRIM: unexpected EOF")
+	assert.EqualError(t, err, "failed CBOR decoding of unsigned CoRIM: malformed CBOR: unexpected EOF")
 }
 
 func TestSignedCorim_FromCOSE_fail_invalid_corim(t *testing.T) {

@@ -279,17 +279,30 @@ func Test_structFieldsCBOR_CBOR_decode_indefinite(t *testing.T) {
 	assert.Equal(t, []int{0, 1, 2, 3, 4}, sfOut.Keys)
 }
 
+func Test_structFieldsCBOR_CBOR_decode_malformed(t *testing.T) {
+	data := []byte{
+		0xcb, 0xba, 0x5a, 0x47, 0x42, 0xe0, 0xa5, 0x4e,
+	}
+
+	dm, err := cbor.DecOptions{}.DecMode()
+	require.NoError(t, err)
+
+	sfOut := newStructFieldsCBOR()
+	err = sfOut.FromCBOR(dm, data)
+	assert.ErrorContains(t, err, "malformed CBOR")
+}
+
 func Test_structFieldsCBOR_CBOR_decode_negative(t *testing.T) {
 	dm, err := cbor.DecOptions{}.DecMode()
 	require.NoError(t, err)
 
 	sfOut := newStructFieldsCBOR()
 	err = sfOut.FromCBOR(dm, []byte{0xa1, 0xff, 0x00})
-	assert.EqualError(t, err, `map item 0: could not unmarshal key: cbor: unexpected "break" code`)
+	assert.EqualError(t, err, `malformed CBOR: cbor: unexpected "break" code`)
 	err = sfOut.FromCBOR(dm, []byte{0xbf, 0x00, 0x00})
-	assert.EqualError(t, err, `unexpected EOF`)
+	assert.EqualError(t, err, `malformed CBOR: unexpected EOF`)
 	err = sfOut.FromCBOR(dm, []byte{0xa1, 0x00, 0xff})
-	assert.EqualError(t, err, `map item 0: could not unmarshal value: cbor: unexpected "break" code`)
+	assert.EqualError(t, err, `malformed CBOR: cbor: unexpected "break" code`)
 
 	err = sfOut.FromCBOR(dm, []byte{0x00})
 	assert.EqualError(t, err, `expected map (CBOR Major Type 5), found Major Type 0`)
