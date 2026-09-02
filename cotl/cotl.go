@@ -204,12 +204,6 @@ func populateSafely(o *ConciseTlTag, content []byte) (err error) {
 		}
 	}()
 
-	// Gate on RFC 8949 well-formedness first: the corim encoding helpers do
-	// not defend against malformed map headers (they can loop indefinitely).
-	if err := dm.Wellformed(content); err != nil {
-		return fmt.Errorf("malformed CBOR: %w", err)
-	}
-
 	// Note: the corim encoding helpers (rather than plain Unmarshal) are
 	// deliberate here so that any extension structs previously passed to
 	// RegisterExtensions() are resolved through their embedded interface

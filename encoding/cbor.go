@@ -301,8 +301,8 @@ func (o *structFieldsCBOR) ToCBOR(em cbor.EncMode) ([]byte, error) {
 }
 
 func (o *structFieldsCBOR) FromCBOR(dm cbor.DecMode, data []byte) error {
-	if len(data) == 0 {
-		return errors.New("empty input")
+	if err := dm.Wellformed(data); err != nil {
+		return fmt.Errorf("malformed CBOR: %w", err)
 	}
 
 	header := data[0]
