@@ -53,8 +53,8 @@ func init() {
 	dm = d
 }
 
-// TagIdentityMap identifies a CoMID or CoSWID tag, either as the identity of
-// the CoTL itself or as an entry in its tags-list.
+// TagIdentityMap identifies a CoMID or CoSWID tag, as an entry in its tags-list or
+// as the identity of the CoTL itself
 type TagIdentityMap struct {
 	TagID      swid.TagID `cbor:"0,keyasint" json:"tag-id"`
 	TagVersion *uint      `cbor:"1,keyasint,omitempty" json:"tag-version,omitempty"`
