@@ -12,10 +12,10 @@ import (
 
 // Query is the internal representation of a Query data item
 type Query struct {
-	ArtifactType        *ArtifactType        `cbor:"0,keyasint,omitempty"`
-	EnvironmentSelector *EnvironmentSelector `cbor:"1,keyasint,omitempty"`
-	ResultType          *ResultType          `cbor:"2,keyasint,omitempty"`
-	RimSelector         *RimSelectorIDs      `cbor:"3,keyasint,omitempty"`
+	ArtifactType        *ArtifactType        `cbor:"0,keyasint,omitempty" json:"artifact-type,omitempty"`
+	EnvironmentSelector *EnvironmentSelector `cbor:"1,keyasint,omitempty" json:"environment-selector,omitempty"`
+	ResultType          *ResultType          `cbor:"2,keyasint,omitempty" json:"result-type,omitempty"`
+	RimSelector         *RimSelectorIDs      `cbor:"3,keyasint,omitempty" json:"rim-selector,omitempty"`
 }
 
 // NewEnvironmentQuery creates a new environment Query instance.

@@ -139,9 +139,9 @@ func (o *StatefulGroup) UnmarshalCBOR(data []byte) error {
 }
 
 type EnvironmentSelector struct {
-	Classes   *[]StatefulClass    `cbor:"0,keyasint,omitempty"`
-	Instances *[]StatefulInstance `cbor:"1,keyasint,omitempty"`
-	Groups    *[]StatefulGroup    `cbor:"2,keyasint,omitempty"`
+	Classes   *[]StatefulClass    `cbor:"0,keyasint,omitempty" json:"class,omitempty"`
+	Instances *[]StatefulInstance `cbor:"1,keyasint,omitempty" json:"instance,omitempty"`
+	Groups    *[]StatefulGroup    `cbor:"2,keyasint,omitempty" json:"group,omitempty"`
 }
 
 // NewEnvironmentSelector creates a new EnvironmentSelector instance
