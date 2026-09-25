@@ -136,6 +136,10 @@ func (o TaggedSVN) String() string {
 	return fmt.Sprint(uint64(o))
 }
 
+func (o TaggedSVN) Unit64() uint64 {
+	return uint64(o)
+}
+
 func (o TaggedSVN) Type() string {
 	return ExactValueType
 }
@@ -197,6 +201,10 @@ func MustNewTaggedMinSVN(val any) *SVN {
 
 func (o TaggedMinSVN) String() string {
 	return fmt.Sprint(uint64(o))
+}
+
+func (o TaggedMinSVN) Uint64() uint64 {
+	return uint64(o)
 }
 
 func (o TaggedMinSVN) Type() string {
