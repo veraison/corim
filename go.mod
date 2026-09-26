@@ -4,14 +4,14 @@ go 1.25.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.4.0
-	github.com/fxamacker/cbor/v2 v2.8.0
+	github.com/fxamacker/cbor/v2 v2.9.0
 	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/spf13/cast v1.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
-	github.com/veraison/go-cose v1.3.0
+	github.com/veraison/go-cose v1.3.1-0.20260826103205-dea543bf9b89
 	github.com/veraison/swid v1.1.1-0.20261103161241-f3ade3481f31
 	github.com/yosida95/uritemplate/v3 v3.0.2
 )

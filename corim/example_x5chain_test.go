@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/veraison/corim/testdata"
+	cose "github.com/veraison/go-cose"
 )
 
 func x5chainExampleMeta() *Meta {
@@ -55,7 +56,7 @@ func ExampleSignedCorim_VerifyWithX5Chain() {
 		log.Fatal(err)
 	}
 
-	anchors, err := LoadTrustAnchors(func(path string) ([]byte, error) {
+	anchors, err := cose.LoadTrustAnchors(func(path string) ([]byte, error) {
 		if path != "anchor.der" {
 			return nil, fmt.Errorf("unknown path %q", path)
 		}
@@ -65,33 +66,15 @@ func ExampleSignedCorim_VerifyWithX5Chain() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	anchors.RevocationMode = cose.RevocationDisabled
 
 	var signed SignedCorim
 	if err := signed.FromCOSE(cbor); err != nil {
 		log.Fatal(err)
 	}
 
-	if err := signed.VerifyWithX5Chain(anchors); err != nil {
+	if err := signed.VerifyWithX5Chain(anchors, nil); err != nil {
 		log.Fatal(err)
-	}
-	// Output:
-}
-
-func ExampleLoadTrustAnchors() {
-	anchors, err := LoadTrustAnchors(func(path string) ([]byte, error) {
-		switch path {
-		case "anchor.der":
-			return testdata.RootCA, nil
-		default:
-			return nil, fmt.Errorf("unknown path %q", path)
-		}
-	}, []string{"anchor.der"}, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if anchors.Pool == nil {
-		log.Fatal("expected explicit trust-anchor pool")
 	}
 	// Output:
 }
