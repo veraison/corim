@@ -224,3 +224,23 @@ func Test_TaggedMinSVN_Equal_False(t *testing.T) {
 
 	assert.False(t, claim.Equal(ref))
 }
+
+func Test_TaggedSVN_Return_String(t *testing.T) {
+	claim := TaggedSVN(7)
+	assert.Equal(t, "7", claim.String())
+}
+
+func Test_TaggedSVN_Return_Uint64(t *testing.T) {
+	claim := TaggedSVN(7)
+	assert.Equal(t, uint64(7), claim.Uint64())
+}
+
+func Test_TaggedMinSVN_Return_String(t *testing.T) {
+	claim := TaggedMinSVN(7)
+	assert.Equal(t, "7", claim.String())
+}
+
+func Test_TaggedMinSVN_Return_Uint64(t *testing.T) {
+	claim := TaggedMinSVN(7)
+	assert.Equal(t, uint64(7), claim.Uint64())
+}
