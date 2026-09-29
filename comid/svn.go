@@ -136,7 +136,7 @@ func (o TaggedSVN) String() string {
 	return fmt.Sprint(uint64(o))
 }
 
-func (o TaggedSVN) Unit64() uint64 {
+func (o TaggedSVN) Uint64() uint64 {
 	return uint64(o)
 }
 
