@@ -5,6 +5,7 @@ package cca
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
@@ -18,6 +19,7 @@ const PlatformProfileURI = "tag:arm.com,2025:cca_platform#1.0.0"
 const (
 	CCASoftwareComponentMkey = "cca.software-component"
 	CCAPlatformConfigMkey    = "cca.platform-config"
+	CCAPlatformMfgConfigkey  = "cca.platform-manufacturing-config"
 )
 
 func init() {
@@ -68,6 +70,10 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 	// Track what we find
 	var hasSoftwareComponent bool
 	platformConfigCount := 0
+	platformMfgConfigCount := 0
+	rotpkRegexp := regexp.MustCompile(
+		`^cca\.rotpk\.[CD]M\.[0-7]\.[0-5]$`,
+	)
 
 	for j := range refVal.Measurements.Values {
 		measurement := &refVal.Measurements.Values[j]
@@ -104,7 +110,28 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 					platformConfigCount)
 			}
 
+		case CCAPlatformMfgConfigkey:
+			// Validate platform manufacturing configuration
+			if err := validateCCAPlatformMfgConfig(measurement); err != nil {
+				return fmt.Errorf("measurement at index %d: %w", j, err)
+			}
+			platformMfgConfigCount++
+			if platformMfgConfigCount > 1 {
+				return fmt.Errorf("only one platform-manufacturing-config measurement allowed per triple, found %d",
+					platformMfgConfigCount)
+			}
+
 		default:
+
+			// Check for TBB ROTPK in the MKey
+			if rotpkRegexp.MatchString(mkeyVal) {
+				if err := validateCCATBBRoTPK(measurement); err != nil {
+					return fmt.Errorf("measurement at index %d: %w", j, err)
+				} else {
+					continue
+				}
+			}
+
 			return fmt.Errorf("measurement at index %d: invalid mkey %q, expected %q or %q",
 				j, mkeyVal, CCASoftwareComponentMkey, CCAPlatformConfigMkey)
 		}
@@ -190,6 +217,27 @@ func validateCCAPlatformConfig(measurement *comid.Measurement) error {
 	if measurement.Val.RawValueMask == nil {
 		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
 	}
+
+	return nil
+}
+
+// validateCCAPlatformMfgConfig validates a CCA Platform manufacturing configuration measurement
+func validateCCAPlatformMfgConfig(measurement *comid.Measurement) error {
+	// raw-value (key 4) and raw-value-mask (key 5) are mandatory for cca platform manufacturing config
+	if measurement.Val.RawValue == nil {
+		return fmt.Errorf("raw-value is mandatory for cca.platform-manufacturing-config")
+	}
+
+	if measurement.Val.RawValueMask == nil {
+		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-manufacturing-config")
+	}
+
+	return nil
+}
+
+func validateCCATBBRoTPK(measurement *comid.Measurement) error {
+	// Check number of Keys
+	// Check the typoe of key and the associated hashes
 
 	return nil
 }
