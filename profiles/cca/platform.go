@@ -4,7 +4,9 @@
 package cca
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
@@ -16,8 +18,10 @@ const PlatformProfileURI = "tag:arm.com,2025:cca_platform#1.0.0"
 
 // CCA Platform measurement key constants
 const (
-	CCASoftwareComponentMkey = "cca.software-component"
-	CCAPlatformConfigMkey    = "cca.platform-config"
+	CCASoftwareComponentMkey          = "cca.software-component"
+	CCAPlatformConfigMkey             = "cca.platform-config"
+	CCAPlatformManufacturingConfigKey = "cca.platform-manufacturing-config"
+	CCAMaxTBBRoTPKKeys                = 48 // In CCA Max key supported is 48
 )
 
 func init() {
@@ -68,6 +72,10 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 	// Track what we find
 	var hasSoftwareComponent bool
 	platformConfigCount := 0
+	platformManufacturingConfigCount := 0
+	rotpkRegexp := regexp.MustCompile(
+		`^cca\.rotpk\.[CD]M\.[0-7]\.[0-5]$`,
+	)
 
 	for j := range refVal.Measurements.Values {
 		measurement := &refVal.Measurements.Values[j]
@@ -104,7 +112,28 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 					platformConfigCount)
 			}
 
+		case CCAPlatformManufacturingConfigKey:
+			// Validate platform manufacturing configuration
+			if err := validateCCAPlatformManufacturingConfig(measurement); err != nil {
+				return fmt.Errorf("measurement at index %d: %w", j, err)
+			}
+			platformManufacturingConfigCount++
+			if platformManufacturingConfigCount > 1 {
+				return fmt.Errorf("only one platform-manufacturing-config measurement allowed per triple, found %d",
+					platformManufacturingConfigCount)
+			}
+
 		default:
+
+			// Check for TBB ROTPK in the MKey
+			if rotpkRegexp.MatchString(mkeyVal) {
+				if err := validateCCATBBRoTPK(measurement.Val.CryptoKeys); err != nil {
+					return fmt.Errorf("measurement at index %d: %w", j, err)
+				} else {
+					continue
+				}
+			}
+
 			return fmt.Errorf("measurement at index %d: invalid mkey %q, expected %q or %q",
 				j, mkeyVal, CCASoftwareComponentMkey, CCAPlatformConfigMkey)
 		}
@@ -187,10 +216,68 @@ func validateCCAPlatformConfig(measurement *comid.Measurement) error {
 		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
 	}
 
+	if len(measurement.Val.RawValue.Bytes()) == 0 {
+		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
+	}
+
 	if measurement.Val.RawValueMask == nil {
 		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
 	}
+	if len(*measurement.Val.RawValueMask) == 0 {
+		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
+	}
+	return nil
+}
 
+// validateCCAPlatformManufacturingConfig validates a CCA Platform manufacturing configuration measurement
+func validateCCAPlatformManufacturingConfig(measurement *comid.Measurement) error {
+	// raw-value (key 4) and raw-value-mask (key 5) are mandatory for cca platform manufacturing config
+	if measurement.Val.RawValue == nil {
+		return fmt.Errorf("raw-value is mandatory for cca.platform-manufacturing-config")
+	}
+
+	if measurement.Val.RawValueMask == nil {
+		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-manufacturing-config")
+	}
+
+	return nil
+}
+
+func validateCCATBBRoTPK(keys *comid.CryptoKeys) error {
+
+	if keys == nil {
+		return fmt.Errorf("missing crypto keys for TBB RoTPK reference value")
+	}
+
+	if len(*keys) == 0 {
+		return errors.New("no keys present")
+	}
+
+	// In CCA Implementation, for a particular type of array, the maximum number
+	//  of array entries SHALL be 8,
+	// while the maximum entries in a single array SHALL be 6.
+	// So we can have at most 48 Key Entries
+	if len(*keys) > CCAMaxTBBRoTPKKeys {
+		return fmt.Errorf("invalid number of keys in measurement maps: %d", len(*keys))
+	}
+
+	for i, key := range *keys {
+		if err := key.Valid(); err != nil {
+			return fmt.Errorf("invalid key at index %d: %w", i, err)
+		}
+
+		if key.Type() != comid.BytesType {
+			return fmt.Errorf("must be of type 'bytes' %d:, %s", i, key.Type())
+		}
+
+		b := key.Value.Bytes()
+
+		// Key Digest is always CCA Hash value that must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
+		if err := ValidateHashDigestSize(b); err != nil {
+			return fmt.Errorf("invalid key size at index %d: %w", i, err)
+		}
+
+	}
 	return nil
 }
 
