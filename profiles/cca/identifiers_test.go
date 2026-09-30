@@ -265,6 +265,41 @@ func TestNewPlatformInstanceID_WrongPrefix(t *testing.T) {
 	}
 }
 
+func TestMustNewPlatformImplementationID_ValidAndPanics(t *testing.T) {
+	// Test valid case using helper
+	t.Run("valid does not panic", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			implID := mustNewPlatformImplID()
+			impl := MustNewClassPlatformImplID(implID)
+			assert.NotNil(t, impl)
+		})
+	})
+
+	// Test invalid cases with table
+	testCases := []struct {
+		title  string
+		length int
+	}{
+		{
+			title:  "invalid length panics",
+			length: 38,
+		},
+		{
+			title:  "invalid length panics",
+			length: 33,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			implID := newPlatformImplIDWithLength(tc.length)
+			assert.Panics(t, func() {
+				MustNewClassPlatformImplID(implID)
+			})
+		})
+	}
+}
+
 func TestMustNewPlatformInstanceID_ValidAndPanics(t *testing.T) {
 	// Test valid case using helper
 	t.Run("valid does not panic", func(t *testing.T) {

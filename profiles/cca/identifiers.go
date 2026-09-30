@@ -94,15 +94,6 @@ func NewInstancePlatformInstanceID(val []byte) (*comid.Instance, error) {
 	return comid.NewUEIDInstance(comid.UEID(val))
 }
 
-// MustNewInstancePlatformInstanceID is like NewInstancePlatformInstanceID but panics on error.
-func MustNewInstancePlatformInstanceID(val []byte) *comid.Instance {
-	i, err := NewInstancePlatformInstanceID(val)
-	if err != nil {
-		panic(err)
-	}
-	return i
-}
-
 // ValidatePlatformImplID validates that the given bytes represent a valid CCA Platform Implementation ID.
 func ValidatePlatformImplID(val []byte) error {
 	if len(val) != PlatformImplIDSize {
