@@ -4,6 +4,7 @@
 package cca
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -236,9 +237,30 @@ func validateCCAPlatformMfgConfig(measurement *comid.Measurement) error {
 }
 
 func validateCCATBBRoTPK(measurement *comid.Measurement) error {
-	// Check number of Keys
-	// Check the typoe of key and the associated hashes
 
+	if measurement.Val.CryptoKeys == nil {
+		return fmt.Errorf("missing crypto keys for TBB RoTPK reference value")
+	}
+	keys := *measurement.Val.CryptoKeys
+	if len(keys) == 0 {
+		return errors.New("no keys present")
+	}
+
+	for i, key := range keys {
+		if err := key.Valid(); err != nil {
+			return fmt.Errorf("invalid key at index %d: %w", i, err)
+		}
+
+		if key.Type() != comid.BytesType {
+			fmt.Errorf("not a valid key type at index %d: %s", i, key.Type())
+		}
+		b := key.Value.Bytes()
+
+		// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
+		if err := ValidateHashDigestSize(b); err != nil {
+			return fmt.Errorf("invalid key size at index %d: %w", i, err)
+		}
+	}
 	return nil
 }
 
