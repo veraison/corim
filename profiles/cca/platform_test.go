@@ -405,6 +405,52 @@ func TestValidateCCASignerID_InvalidCases(t *testing.T) {
 	}
 }
 
+func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
+	testCases := []struct {
+		title           string
+		keys            *comid.CryptoKeys
+		expectedMessage string
+	}{
+		{
+			title:           "nil keys",
+			keys:            nil,
+			expectedMessage: "cryptokeys (signer-id) is mandatory but not set",
+		},
+		{
+			title:           "empty cryptokeys",
+			keys:            comid.NewCryptoKeys(),
+			expectedMessage: "cryptokeys must contain exactly one entry",
+		},
+		{
+			title: "multiple entries",
+			keys: func() *comid.CryptoKeys {
+				keys := comid.NewCryptoKeys()
+				keys.Add(mustNewTaggedBytesCryptoKey(32))
+				keys.Add(mustNewTaggedBytesCryptoKey(32))
+				return keys
+			}(),
+			expectedMessage: "cryptokeys must contain exactly one entry",
+		},
+		{
+			title: "wrong type (pkix-base64-key instead of bytes)",
+			keys: func() *comid.CryptoKeys {
+				keys := comid.NewCryptoKeys()
+				keys.Add(mustNewPKIXKey())
+				return keys
+			}(),
+			expectedMessage: "must be of type 'bytes'",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			err := validateCCATBBRoTPK(tc.keys)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), tc.expectedMessage)
+		})
+	}
+}
+
 // Test validateCCAPlatformAttestVerifKey
 func TestValidateCCAPlatformAttestVerifKey_AllCases(t *testing.T) {
 	testCases := []struct {

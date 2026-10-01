@@ -21,7 +21,7 @@ const (
 	CCASoftwareComponentMkey = "cca.software-component"
 	CCAPlatformConfigMkey    = "cca.platform-config"
 	CCAPlatformMfgConfigkey  = "cca.platform-manufacturing-config"
-	CCAMaxTBBRoTPKKeys       = 48 //In CCA Max key supported is 48
+	CCAMaxTBBRoTPKKeys       = 48 // In CCA Max key supported is 48
 )
 
 func init() {
@@ -127,7 +127,7 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 
 			// Check for TBB ROTPK in the MKey
 			if rotpkRegexp.MatchString(mkeyVal) {
-				if err := validateCCATBBRoTPK(measurement); err != nil {
+				if err := validateCCATBBRoTPK(measurement.Val.CryptoKeys); err != nil {
 					return fmt.Errorf("measurement at index %d: %w", j, err)
 				} else {
 					continue
@@ -237,13 +237,13 @@ func validateCCAPlatformMfgConfig(measurement *comid.Measurement) error {
 	return nil
 }
 
-func validateCCATBBRoTPK(measurement *comid.Measurement) error {
+func validateCCATBBRoTPK(keys *comid.CryptoKeys) error {
 
-	if measurement.Val.CryptoKeys == nil {
+	if keys == nil {
 		return fmt.Errorf("missing crypto keys for TBB RoTPK reference value")
 	}
-	keys := *measurement.Val.CryptoKeys
-	if len(keys) == 0 {
+
+	if len(*keys) == 0 {
 		return errors.New("no keys present")
 	}
 
@@ -251,17 +251,17 @@ func validateCCATBBRoTPK(measurement *comid.Measurement) error {
 	//  of array entries SHALL be 8,
 	// while the maximum entries in a single array SHALL be 6.
 	// So we can have at most 48 Key Entries
-	if len(keys) > CCAMaxTBBRoTPKKeys {
-		return fmt.Errorf("invalid number of keys in measurement maps %d:", len(keys))
+	if len(*keys) > CCAMaxTBBRoTPKKeys {
+		return fmt.Errorf("invalid number of keys in measurement maps %d:", len(*keys))
 	}
 
-	for i, key := range keys {
+	for i, key := range *keys {
 		if err := key.Valid(); err != nil {
 			return fmt.Errorf("invalid key at index %d: %w", i, err)
 		}
 
 		if key.Type() != comid.BytesType {
-			return fmt.Errorf("not a valid key type at index %d: %s", i, key.Type())
+			return fmt.Errorf("not a valid key type at index %d:, %s", i, key.Type())
 		}
 
 		b := key.Value.Bytes()
