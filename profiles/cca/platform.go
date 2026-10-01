@@ -261,8 +261,9 @@ func validateCCATBBRoTPK(measurement *comid.Measurement) error {
 		}
 
 		if key.Type() != comid.BytesType {
-			fmt.Errorf("not a valid key type at index %d: %s", i, key.Type())
+			return fmt.Errorf("not a valid key type at index %d: %s", i, key.Type())
 		}
+
 		b := key.Value.Bytes()
 
 		// Key Digest is always CCA Hash value that must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
