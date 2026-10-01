@@ -21,6 +21,7 @@ const (
 	CCASoftwareComponentMkey = "cca.software-component"
 	CCAPlatformConfigMkey    = "cca.platform-config"
 	CCAPlatformMfgConfigkey  = "cca.platform-manufacturing-config"
+	CCAMaxTBBRoTPKKeys       = 48 //In CCA Max key supported is 48
 )
 
 func init() {
@@ -246,6 +247,14 @@ func validateCCATBBRoTPK(measurement *comid.Measurement) error {
 		return errors.New("no keys present")
 	}
 
+	// In CCA Implementation, for a particular type of array, the maximum number
+	//  of array entries SHALL be 8,
+	// while the maximum entries in a single array SHALL be 6.
+	// So we can have at most 48 Key Entries
+	if len(keys) > CCAMaxTBBRoTPKKeys {
+		return fmt.Errorf("invalid number of keys in measurement maps %d:", len(keys))
+	}
+
 	for i, key := range keys {
 		if err := key.Valid(); err != nil {
 			return fmt.Errorf("invalid key at index %d: %w", i, err)
@@ -256,10 +265,11 @@ func validateCCATBBRoTPK(measurement *comid.Measurement) error {
 		}
 		b := key.Value.Bytes()
 
-		// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
+		// Key Digest is always CCA Hash value that must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
 		if err := ValidateHashDigestSize(b); err != nil {
 			return fmt.Errorf("invalid key size at index %d: %w", i, err)
 		}
+
 	}
 	return nil
 }
