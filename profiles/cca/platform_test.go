@@ -447,6 +447,54 @@ func TestValidateTBBRoTPK_ValidCases(t *testing.T) {
 	}
 }
 
+func TestValidatePlatformCfg_InvalidCases(t *testing.T) {
+	testCases := []struct {
+		title           string
+		meas            *comid.Measurement
+		expectedMessage string
+	}{
+		{
+			title: "no mask",
+			meas: func() *comid.Measurement {
+				mkey, err := comid.NewMkey("cca.platform-config", comid.StringType)
+				assert.NoError(t, err)
+
+				data := []byte{1, 2, 3}
+
+				m := &comid.Measurement{}
+				m.Key = mkey
+				m.SetRawValueBytes(nil, data)
+				return m
+			}(),
+			expectedMessage: "raw-value is mandatory for cca.platform-config",
+		},
+		{
+			title: "no value",
+			meas: func() *comid.Measurement {
+				mkey, err := comid.NewMkey("cca.platform-config", comid.StringType)
+				assert.NoError(t, err)
+
+				mask := []byte{0xF, 0xF, 0xF}
+				var data []byte
+
+				m := &comid.Measurement{}
+				m.Key = mkey
+				m.SetRawValueBytes(mask, data)
+				return m
+			}(),
+			expectedMessage: "raw-value-mask is mandatory for cca.platform-config",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			err := validateCCAPlatformConfig(tc.meas)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), tc.expectedMessage)
+		})
+	}
+}
+
 func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
 	testCases := []struct {
 		title           string

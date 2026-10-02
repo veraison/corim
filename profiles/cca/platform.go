@@ -216,10 +216,16 @@ func validateCCAPlatformConfig(measurement *comid.Measurement) error {
 		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
 	}
 
+	if len(measurement.Val.RawValue.Bytes()) == 0 {
+		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
+	}
+
 	if measurement.Val.RawValueMask == nil {
 		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
 	}
-
+	if len(*measurement.Val.RawValueMask) == 0 {
+		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
+	}
 	return nil
 }
 
