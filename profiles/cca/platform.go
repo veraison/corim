@@ -261,7 +261,7 @@ func validateCCATBBRoTPK(keys *comid.CryptoKeys) error {
 		}
 
 		if key.Type() != comid.BytesType {
-			return fmt.Errorf("not a valid key type at index %d:, %s", i, key.Type())
+			return fmt.Errorf("must be of type 'bytes' %d:, %s", i, key.Type())
 		}
 
 		b := key.Value.Bytes()

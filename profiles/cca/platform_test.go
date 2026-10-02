@@ -405,6 +405,48 @@ func TestValidateCCASignerID_InvalidCases(t *testing.T) {
 	}
 }
 
+func TestValidateTBBRoTPK_ValidCases(t *testing.T) {
+	testCases := []struct {
+		title           string
+		length          int
+		shouldError     bool
+		expectedMessage string
+	}{
+		{
+			title:       "valid 32 bytes",
+			length:      32,
+			shouldError: false,
+		},
+		{
+			title:       "valid 48 bytes",
+			length:      48,
+			shouldError: false,
+		},
+		{
+			title:       "valid 64 bytes",
+			length:      64,
+			shouldError: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			key := mustNewTaggedBytesCryptoKey(tc.length)
+			keys := comid.NewCryptoKeys()
+			keys.Add(key)
+
+			err := validateCCATBBRoTPK(keys)
+
+			if tc.shouldError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expectedMessage)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
 	testCases := []struct {
 		title           string
@@ -414,22 +456,12 @@ func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
 		{
 			title:           "nil keys",
 			keys:            nil,
-			expectedMessage: "cryptokeys (signer-id) is mandatory but not set",
+			expectedMessage: "missing crypto keys for TBB RoTPK reference value",
 		},
 		{
 			title:           "empty cryptokeys",
 			keys:            comid.NewCryptoKeys(),
-			expectedMessage: "cryptokeys must contain exactly one entry",
-		},
-		{
-			title: "multiple entries",
-			keys: func() *comid.CryptoKeys {
-				keys := comid.NewCryptoKeys()
-				keys.Add(mustNewTaggedBytesCryptoKey(32))
-				keys.Add(mustNewTaggedBytesCryptoKey(32))
-				return keys
-			}(),
-			expectedMessage: "cryptokeys must contain exactly one entry",
+			expectedMessage: "no keys present",
 		},
 		{
 			title: "wrong type (pkix-base64-key instead of bytes)",
@@ -439,6 +471,16 @@ func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
 				return keys
 			}(),
 			expectedMessage: "must be of type 'bytes'",
+		},
+		{
+			title: "wrong length of key",
+			keys: func() *comid.CryptoKeys {
+				key := mustNewTaggedBytesCryptoKey(16)
+				keys := comid.NewCryptoKeys()
+				keys.Add(key)
+				return keys
+			}(),
+			expectedMessage: "expected 32, 48, or 64",
 		},
 	}
 
@@ -526,6 +568,64 @@ func TestValidateCCAPlatformReferenceValue_AllCases(t *testing.T) {
 				measurement.Val.CryptoKeys.Add(signerID)
 
 				measurements := comid.NewMeasurements()
+				measurements.Values = append(measurements.Values, *measurement)
+
+				return &comid.ValueTriple{
+					Environment:  env,
+					Measurements: *measurements,
+				}
+			},
+			shouldError: false,
+		},
+		{
+			title: "valid all reference values",
+			setupRefVal: func() *comid.ValueTriple {
+				env := newCCAPlatformEnvironmentWithImplID()
+
+				// Create valid software component measurement
+				measurement, err := comid.NewMeasurement(CCASoftwareComponentMkey, "string")
+				require.NoError(t, err)
+
+				// Set digests
+				digests := &comid.Digests{}
+				hash := make([]byte, 32)
+				digests.AddDigest(comid.Sha256, hash)
+				measurement.Val.Digests = digests
+
+				// Set signer-id (cryptokeys)
+				signerID := mustNewTaggedBytesCryptoKey(32)
+				measurement.Val.CryptoKeys = comid.NewCryptoKeys()
+				measurement.Val.CryptoKeys.Add(signerID)
+
+				measurements := comid.NewMeasurements()
+				measurements.Values = append(measurements.Values, *measurement)
+
+				// Create Platform Config Measurement
+
+				measurement, err = comid.NewMeasurement(CCAPlatformConfigMkey, "string")
+				require.NoError(t, err)
+				var rv = []byte{0x1, 0x02, 0x03, 0x04}
+				var rm = []byte{0xF, 0xF, 0xF, 0xF}
+
+				measurement.SetRawValueBytes(rv, rm)
+				measurements.Values = append(measurements.Values, *measurement)
+
+				// Create Platform Manufacturing Config Claim
+				measurement, err = comid.NewMeasurement(CCAPlatformMfgConfigkey, "string")
+				require.NoError(t, err)
+				rv = []byte{0x5, 0x06, 0x07, 0x08}
+				rm = []byte{0xF, 0xF, 0xF, 0xF}
+
+				measurement.SetRawValueBytes(rv, rm)
+				measurements.Values = append(measurements.Values, *measurement)
+
+				// Create TBB RoTPK Claim
+				measurement, err = comid.NewMeasurement("cca.rotpk.CM.1.2", "string")
+				require.NoError(t, err)
+				// Set TBB RotPK Key (cryptokeys)
+				key := mustNewTaggedBytesCryptoKey(32)
+				measurement.Val.CryptoKeys = comid.NewCryptoKeys()
+				measurement.Val.CryptoKeys.Add(key)
 				measurements.Values = append(measurements.Values, *measurement)
 
 				return &comid.ValueTriple{
