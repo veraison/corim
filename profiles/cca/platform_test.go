@@ -460,13 +460,15 @@ func TestValidatePlatformCfg_InvalidCases(t *testing.T) {
 				assert.NoError(t, err)
 
 				data := []byte{1, 2, 3}
-
+				mask := []byte{}
 				m := &comid.Measurement{}
 				m.Key = mkey
-				m.SetRawValueBytes(nil, data)
+				rv, err := comid.NewRawValueWithMask(data, mask)
+				assert.NoError(t, err)
+				m.Val.RawValue = rv
 				return m
 			}(),
-			expectedMessage: "raw-value is mandatory for cca.platform-config",
+			expectedMessage: "raw-value mask cannot be empty",
 		},
 		{
 			title: "no value",
@@ -479,10 +481,45 @@ func TestValidatePlatformCfg_InvalidCases(t *testing.T) {
 
 				m := &comid.Measurement{}
 				m.Key = mkey
+				rv, err := comid.NewRawValueWithMask(data, mask)
+				assert.NoError(t, err)
+				m.Val.RawValue = rv
+				return m
+			}(),
+			expectedMessage: "raw-value cannot be empty",
+		},
+		{
+			title: "incorrect type of raw value",
+			meas: func() *comid.Measurement {
+				mkey, err := comid.NewMkey("cca.platform-config", comid.StringType)
+				assert.NoError(t, err)
+
+				mask := []byte{0xF, 0xF, 0xF}
+				var data []byte
+
+				m := &comid.Measurement{}
+				m.Key = mkey
 				m.SetRawValueBytes(mask, data)
 				return m
 			}(),
-			expectedMessage: "raw-value-mask is mandatory for cca.platform-config",
+			expectedMessage: "raw-value must be of type masked",
+		},
+		{
+			title: "unequal value and mask",
+			meas: func() *comid.Measurement {
+				mkey, err := comid.NewMkey("cca.platform-config", comid.StringType)
+				assert.NoError(t, err)
+
+				data := []byte{1, 2, 3, 4, 5}
+				mask := []byte{0x0F, 0x0F}
+				m := &comid.Measurement{}
+				m.Key = mkey
+				rv, err := comid.NewRawValueWithMask(data, mask)
+				assert.NoError(t, err)
+				m.Val.RawValue = rv
+				return m
+			}(),
+			expectedMessage: "length of raw-value bytes: 5, not equal to length of raw-value mask: 2",
 		},
 	}
 
@@ -654,8 +691,9 @@ func TestValidateCCAPlatformReferenceValue_AllCases(t *testing.T) {
 				require.NoError(t, err)
 				var rv = []byte{0x1, 0x02, 0x03, 0x04}
 				var rm = []byte{0xF, 0xF, 0xF, 0xF}
-
-				measurement.SetRawValueBytes(rv, rm)
+				raw, err := comid.NewRawValueWithMask(rv, rm)
+				require.NoError(t, err)
+				measurement.Val.RawValue = raw
 				measurements.Values = append(measurements.Values, *measurement)
 
 				// Create Platform Manufacturing Config Claim
@@ -664,7 +702,9 @@ func TestValidateCCAPlatformReferenceValue_AllCases(t *testing.T) {
 				rv = []byte{0x5, 0x06, 0x07, 0x08}
 				rm = []byte{0xF, 0xF, 0xF, 0xF}
 
-				measurement.SetRawValueBytes(rv, rm)
+				raw, err = comid.NewRawValueWithMask(rv, rm)
+				require.NoError(t, err)
+				measurement.Val.RawValue = raw
 				measurements.Values = append(measurements.Values, *measurement)
 
 				// Create TBB RoTPK Claim
