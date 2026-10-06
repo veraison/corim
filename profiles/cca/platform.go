@@ -211,35 +211,20 @@ func validateCCASignerID(keys *comid.CryptoKeys) error {
 
 // validateCCAPlatformConfig validates a CCA Platform configuration measurement
 func validateCCAPlatformConfig(measurement *comid.Measurement) error {
-	// raw-value (key 4) and raw-value-mask (key 5) are mandatory for platform config
-	if measurement.Val.RawValue == nil {
-		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
+	// raw-value (key 4), with typechoice masked-raw-value is mandatory
+	if err := validateCCARawValue(measurement.Val.RawValue); err != nil {
+		return fmt.Errorf("cca.platform-config raw value error: %w", err)
 	}
 
-	if len(measurement.Val.RawValue.Bytes()) == 0 {
-		return fmt.Errorf("raw-value is mandatory for cca.platform-config")
-	}
-
-	if measurement.Val.RawValueMask == nil {
-		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
-	}
-	if len(*measurement.Val.RawValueMask) == 0 {
-		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-config")
-	}
 	return nil
 }
 
 // validateCCAPlatformManufacturingConfig validates a CCA Platform manufacturing configuration measurement
 func validateCCAPlatformManufacturingConfig(measurement *comid.Measurement) error {
-	// raw-value (key 4) and raw-value-mask (key 5) are mandatory for cca platform manufacturing config
-	if measurement.Val.RawValue == nil {
-		return fmt.Errorf("raw-value is mandatory for cca.platform-manufacturing-config")
+	// raw-value (key 4), with typechoice masked-raw-value is mandatory
+	if err := validateCCARawValue(measurement.Val.RawValue); err != nil {
+		return fmt.Errorf("cca.platform-manufacturing-config raw value error: %w", err)
 	}
-
-	if measurement.Val.RawValueMask == nil {
-		return fmt.Errorf("raw-value-mask is mandatory for cca.platform-manufacturing-config")
-	}
-
 	return nil
 }
 
@@ -333,4 +318,29 @@ func validateCCAPlatformImplementationID(env *comid.Environment) error {
 //   - Followed by exactly 32 bytes (total 33 bytes)
 func validateCCAPlatformInstanceID(env *comid.Environment) error {
 	return psa.ValidateInstanceID(env, "")
+}
+
+// validateCCARawValue is a common function applicable to validation of CCA Platform Configuration raw-value
+// as well as CCA Platform Manufacturing Configuration raw-value
+func validateCCARawValue(rv *comid.RawValue) error {
+	if rv == nil {
+		return fmt.Errorf("raw-value is mandatory")
+	}
+
+	if rv.Type() != comid.MaskedType {
+		return fmt.Errorf("raw-value must be of type masked")
+	}
+
+	if len(rv.Bytes()) == 0 {
+		return fmt.Errorf("raw-value cannot be empty")
+	}
+
+	if len(rv.Mask()) == 0 {
+		return fmt.Errorf("raw-value mask cannot be empty")
+	}
+	if len(rv.Bytes()) != len(rv.Mask()) {
+		return fmt.Errorf("length of raw-value bytes: %d, not equal to length of raw-value mask: %d", len(rv.Bytes()), len(rv.Mask()))
+	}
+
+	return nil
 }
