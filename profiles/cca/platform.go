@@ -74,7 +74,7 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 	platformConfigCount := 0
 	platformManufacturingConfigCount := 0
 	rotpkRegexp := regexp.MustCompile(
-		`^cca\.rotpk\.[CD]M\.[0-7]\.[0-5]$`,
+		`^cca\.rotpk\.[CD]M\.[0-5]$`,
 	)
 
 	for j := range refVal.Measurements.Values {

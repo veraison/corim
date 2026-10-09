@@ -708,7 +708,7 @@ func TestValidateCCAPlatformReferenceValue_AllCases(t *testing.T) {
 				measurements.Values = append(measurements.Values, *measurement)
 
 				// Create TBB RoTPK Claim
-				measurement, err = comid.NewMeasurement("cca.rotpk.CM.1.2", "string")
+				measurement, err = comid.NewMeasurement("cca.rotpk.CM.2", "string")
 				require.NoError(t, err)
 				// Set TBB RotPK Key (cryptokeys)
 				key := mustNewTaggedBytesCryptoKey(32)
