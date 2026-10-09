@@ -58,6 +58,36 @@ value:
                         - tag: 560
                           value: !!binary |-
                             U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=
+                  - 0: "cca.platform-config"
+                    1:
+                      4:
+                        tag: 563
+                        value: 
+                          - !!binary |
+                            cmF3dmFsdWUKcmF3dmFsdWUK
+                          - !!binary |
+                            cmF3dmFsdWUKcmF3dmFsdWUK
+                  - 0: "cca.platform-manufacturing-config"
+                    1:
+                      4:
+                        tag: 563
+                        value: 
+                          - !!binary |
+                            EBA=
+                          - !!binary |
+                            //8=
+                  - 0: "cca.rotpk.CM.3"
+                    1:
+                      13:
+                        - tag: 560
+                          value: !!binary |
+                              U3h5YwdTXfPsjYsVouLcVkFBnD0wYM/jIjjA+pc/eqM=
+                        - tag: 560
+                          value: !!binary |
+                            2sRqWEFdw6ANenQYUgCOnK5k9S0DufdtdvSzZE/vxBY=
+                        - tag: 560
+                          value: !!binary |
+                            aOZWslHmfoNYvvhIOrDVHGYZ8+ehqfDnWDjUH/No9yg=
             # attest-key-triples (key 3)
             3:
               - - 0:
