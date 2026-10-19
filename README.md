@@ -18,8 +18,7 @@ The [`corim/cotl`](cotl) package provides a golang implementation of the Concise
 
 Ensure you have the following tools installed with the specified versions on your machine to ensure everything works properly:
 
-- **Go**: Version 1.22
-- **golangci-lint**: Version 1.54.2
+- **Go**: Version 1.25
 
 ## Developer tips
 
