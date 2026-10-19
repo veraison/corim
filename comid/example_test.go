@@ -169,8 +169,8 @@ func Example_encode_dependency_triples() {
 		SetTagIdentity("my-ns:acme-roadrunner-supplement", 0).
 		AddEntity("ACME Ltd.", &TestRegID, RoleCreator, RoleTagCreator)
 
-	comid.Triples.AddDomainDependency(
-		&DomainDependencyTriple{
+	comid.Triples.AddTrustDependency(
+		&TrustDependencyTriple{
 			DomainID: Environment{
 				Instance: MustNewUEIDInstance(TestUEID),
 			},
