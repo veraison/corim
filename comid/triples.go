@@ -12,15 +12,15 @@ import (
 )
 
 type Triples struct {
-	ReferenceValues    *ValueTriples             `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
-	EndorsedValues     *ValueTriples             `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
-	DevIdentityKeys    *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
-	AttestVerifKeys    *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
-	DomainDependencies *DomainDependencyTriples  `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
-	DomainMemberships  *DomainMembershipTriples  `cbor:"5,keyasint,omitempty" json:"membership-triples,omitempty"`
-	CoswidTriples      *CoswidTriples            `cbor:"6,keyasint,omitempty" json:"coswid-triples,omitempty"`
-	CondEndorseSeries  *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
-	CondEndorsements   *CondEndorseTriples       `cbor:"10,keyasint,omitempty" json:"conditional-endorsements,omitempty"`
+	ReferenceValues   *ValueTriples             `cbor:"0,keyasint,omitempty" json:"reference-values,omitempty"`
+	EndorsedValues    *ValueTriples             `cbor:"1,keyasint,omitempty" json:"endorsed-values,omitempty"`
+	DevIdentityKeys   *KeyTriples               `cbor:"2,keyasint,omitempty" json:"dev-identity-keys,omitempty"`
+	AttestVerifKeys   *KeyTriples               `cbor:"3,keyasint,omitempty" json:"attester-verification-keys,omitempty"`
+	TrustDependencies *TrustDependencyTriples   `cbor:"4,keyasint,omitempty" json:"dependency-triples,omitempty"`
+	DomainMemberships *DomainMembershipTriples  `cbor:"5,keyasint,omitempty" json:"membership-triples,omitempty"`
+	CoswidTriples     *CoswidTriples            `cbor:"6,keyasint,omitempty" json:"coswid-triples,omitempty"`
+	CondEndorseSeries *CondEndorseSeriesTriples `cbor:"8,keyasint,omitempty" json:"conditional-endorsement-series,omitempty"`
+	CondEndorsements  *CondEndorseTriples       `cbor:"10,keyasint,omitempty" json:"conditional-endorsements,omitempty"`
 	Extensions
 }
 
@@ -134,8 +134,8 @@ func (o Triples) MarshalCBOR() ([]byte, error) {
 		o.CondEndorsements = nil
 	}
 
-	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
-		o.DomainDependencies = nil
+	if o.TrustDependencies != nil && o.TrustDependencies.IsEmpty() {
+		o.TrustDependencies = nil
 	}
 
 	if o.DomainMemberships != nil && o.DomainMemberships.IsEmpty() {
@@ -179,8 +179,8 @@ func (o Triples) MarshalJSON() ([]byte, error) {
 		o.CondEndorsements = nil
 	}
 
-	if o.DomainDependencies != nil && o.DomainDependencies.IsEmpty() {
-		o.DomainDependencies = nil
+	if o.TrustDependencies != nil && o.TrustDependencies.IsEmpty() {
+		o.TrustDependencies = nil
 	}
 
 	if o.DomainMemberships != nil && o.DomainMemberships.IsEmpty() {
@@ -266,7 +266,7 @@ func (o *Triples) Valid() error {
 		(o.EndorsedValues == nil || o.EndorsedValues.IsEmpty()) &&
 		(o.AttestVerifKeys == nil || len(*o.AttestVerifKeys) == 0) &&
 		(o.DevIdentityKeys == nil || len(*o.DevIdentityKeys) == 0) &&
-		(o.DomainDependencies == nil || o.DomainDependencies.IsEmpty()) &&
+		(o.TrustDependencies == nil || o.TrustDependencies.IsEmpty()) &&
 		(o.DomainMemberships == nil || o.DomainMemberships.IsEmpty()) &&
 		(o.CoswidTriples == nil || o.CoswidTriples.IsEmpty()) &&
 		(o.CondEndorseSeries == nil || o.CondEndorseSeries.IsEmpty()) &&
@@ -302,8 +302,8 @@ func (o *Triples) Valid() error {
 		}
 	}
 
-	if o.DomainDependencies != nil {
-		if err := o.DomainDependencies.Valid(); err != nil {
+	if o.TrustDependencies != nil {
+		if err := o.TrustDependencies.Valid(); err != nil {
 			return fmt.Errorf("dependency triples: %w", err)
 		}
 	}
@@ -375,13 +375,13 @@ func (o *Triples) AddDevIdentityKey(val *KeyTriple) *Triples {
 	return o
 }
 
-// AddDomainDependency appends a domain-dependency-triple to DomainDependencies.
-func (o *Triples) AddDomainDependency(val *DomainDependencyTriple) *Triples {
+// AddTrustDependency appends a trust-dependency-triple to TrustDependencies.
+func (o *Triples) AddTrustDependency(val *TrustDependencyTriple) *Triples {
 	if o != nil {
-		if o.DomainDependencies == nil {
-			o.DomainDependencies = new(DomainDependencyTriples)
+		if o.TrustDependencies == nil {
+			o.TrustDependencies = new(TrustDependencyTriples)
 		}
-		*o.DomainDependencies = append(*o.DomainDependencies, *val)
+		*o.TrustDependencies = append(*o.TrustDependencies, *val)
 	}
 
 	return o
