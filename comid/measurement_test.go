@@ -634,3 +634,21 @@ MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE=
 	require.Len(t, *m2.Val.CryptoKeys, 1)
 	assert.Equal(t, pkText, (*m2.Val.CryptoKeys)[0].String())
 }
+
+func TestMeasurement_setters(t *testing.T) {
+	boolVal := true
+	numberMatcher := NewNumberMatcher(NumberFromInt(1))
+	textMatcher := NewTextMatcher("foo")
+	bytesMatcher := NewBytesMatcher([]byte("foo"))
+
+	m := MustNewUUIDMeasurement(TestUUID).
+		SetBool(boolVal).
+		SetNumber(numberMatcher).
+		SetText(textMatcher).
+		SetBytes(bytesMatcher)
+
+	assert.Equal(t, boolVal, *m.Val.Bool)
+	assert.Equal(t, numberMatcher, m.Val.Number)
+	assert.Equal(t, textMatcher, m.Val.Text)
+	assert.Equal(t, bytesMatcher, m.Val.Bytes)
+}
