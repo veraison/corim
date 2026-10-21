@@ -59,6 +59,7 @@ func initCBOREncMode() (en cbor.EncMode, err error) {
 		IndefLength:   cbor.IndefLengthForbidden,
 		NilContainers: cbor.NilContainerAsEmpty,
 		TimeTag:       cbor.EncTagRequired,
+		ShortestFloat: cbor.ShortestFloat16,
 	}
 	return encOpt.EncModeWithTags(comidTags())
 }
