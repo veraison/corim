@@ -131,3 +131,91 @@ func TestResultSet_SetRIMs(t *testing.T) {
 	rset := NewResultSet().SetExpiry(testExpiry).SetRIMs(*collection)
 	assert.NotNil(t, rset)
 }
+
+func TestResultSet_Valid_artifact_types(t *testing.T) {
+	var (
+		rvq = RefValQuad{}
+		evq = EndValQuad{}
+		ceq = CondEndValQuad{}
+		akq = AKQuad{}
+		tas = CoTSStmt{}
+	)
+
+	const mixed = "result set mixes results of different artifact types"
+
+	tests := []struct {
+		name   string
+		build  func(*ResultSet)
+		expErr string
+	}{
+		{"RVQ only", func(r *ResultSet) { r.AddReferenceValues(rvq) }, ""},
+		{"EVQ only", func(r *ResultSet) { r.AddEndorsedValues(evq) }, ""},
+		{"CEQ only", func(r *ResultSet) { r.AddConditionalEndorsementValues(ceq) }, ""},
+		{"EVQ and CEQ", func(r *ResultSet) {
+			r.AddEndorsedValues(evq).AddConditionalEndorsementValues(ceq)
+		}, ""},
+		{"AKQ only", func(r *ResultSet) { r.AddAttestationKeys(akq) }, ""},
+		{"TAS only", func(r *ResultSet) { r.AddCoTS(tas) }, ""},
+		{"AKQ and TAS", func(r *ResultSet) {
+			r.AddAttestationKeys(akq).AddCoTS(tas)
+		}, ""},
+		{"empty", func(r *ResultSet) {}, ""},
+		{"RVQ and EVQ", func(r *ResultSet) {
+			r.AddReferenceValues(rvq).AddEndorsedValues(evq)
+		}, mixed},
+		{"RVQ and CEQ", func(r *ResultSet) {
+			r.AddReferenceValues(rvq).AddConditionalEndorsementValues(ceq)
+		}, mixed},
+		{"RVQ and AKQ", func(r *ResultSet) {
+			r.AddReferenceValues(rvq).AddAttestationKeys(akq)
+		}, mixed},
+		{"RVQ and TAS", func(r *ResultSet) {
+			r.AddReferenceValues(rvq).AddCoTS(tas)
+		}, mixed},
+		{"EVQ and AKQ", func(r *ResultSet) {
+			r.AddEndorsedValues(evq).AddAttestationKeys(akq)
+		}, mixed},
+		{"CEQ and TAS", func(r *ResultSet) {
+			r.AddConditionalEndorsementValues(ceq).AddCoTS(tas)
+		}, mixed},
+		{"all groups", func(r *ResultSet) {
+			r.AddReferenceValues(rvq).AddEndorsedValues(evq).AddAttestationKeys(akq)
+		}, mixed},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rset := NewResultSet().SetExpiry(testExpiry)
+			tt.build(rset)
+
+			err := rset.Valid()
+			if tt.expErr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tt.expErr)
+			}
+		})
+	}
+}
+
+func TestResultSet_Valid_source_artifacts(t *testing.T) {
+	monad, err := cmw.NewMonad("application/vnd.example.refvals", []byte{0x00, 0x01})
+	require.NoError(t, err)
+
+	collection, err := cmw.NewCollection("")
+	require.NoError(t, err)
+
+	t.Run("all monads", func(t *testing.T) {
+		rset := NewResultSet().SetExpiry(testExpiry).
+			AddSourceArtifacts(*monad).
+			AddSourceArtifacts(*monad)
+		assert.NoError(t, rset.Valid())
+	})
+
+	t.Run("collection among monads", func(t *testing.T) {
+		rset := NewResultSet().SetExpiry(testExpiry).
+			AddSourceArtifacts(*monad).
+			AddSourceArtifacts(*collection)
+		assert.EqualError(t, rset.Valid(), "source artifact at index 1 must be a monad")
+	})
+}
