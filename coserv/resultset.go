@@ -5,6 +5,7 @@ package coserv
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/veraison/cmw"
@@ -113,6 +114,33 @@ func (o ResultSet) Valid() error {
 	if o.RIMs != nil {
 		if o.RIMs.GetKind() != cmw.KindCollection {
 			return errors.New("RIMs CMW must be a collection")
+		}
+	}
+
+	// Results for different artifact types are mutually exclusive
+	groups := 0
+
+	if o.RVQ != nil {
+		groups++
+	}
+
+	if o.EVQ != nil || o.CEQ != nil {
+		groups++
+	}
+
+	if o.AKQ != nil || o.TAS != nil {
+		groups++
+	}
+
+	if groups > 1 {
+		return errors.New("result set mixes results of different artifact types")
+	}
+
+	if o.SourceArtifacts != nil {
+		for i, sa := range *o.SourceArtifacts {
+			if sa.GetKind() != cmw.KindMonad {
+				return fmt.Errorf("source artifact at index %d must be a monad", i)
+			}
 		}
 	}
 
