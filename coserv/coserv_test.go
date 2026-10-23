@@ -4,6 +4,7 @@
 package coserv
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -282,14 +283,14 @@ func TestCoserv_FromCBOR_Results(t *testing.T) {
 	assert.Len(t, *(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests, 2)
 
 	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].Algorithm.Int(), comid.Sha256)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].Value, []byte{0xaa})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[0].Value, bytes.Repeat([]byte{0xaa}, 32))
 	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].Algorithm.Int(), comid.Sha256_128)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].Value, []byte{0xbb})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[0].Val.Digests)[1].Value, bytes.Repeat([]byte{0xbb}, 16))
 
 	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].Algorithm.Int(), comid.Sha256)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].Value, []byte{0xcc})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[0].Value, bytes.Repeat([]byte{0xcc}, 32))
 	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].Algorithm.Int(), comid.Sha256_128)
-	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].Value, []byte{0xdd})
+	assert.Equal(t, (*(*actual.Results.RVQ)[0].RVTriple.Measurements.Values[1].Val.Digests)[1].Value, bytes.Repeat([]byte{0xdd}, 16))
 }
 
 func TestCoserv_FromCBOR_Results_Source_Artifacts(t *testing.T) {

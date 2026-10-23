@@ -30,8 +30,8 @@
               / mval / 1: {
                 / name / 11: "Component A",
                 / digests / 2: [
-                  [ 1, h'aa' ],
-                  [ 2, h'bb' ]
+                  [ 1, h'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ],
+                  [ 2, h'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' ]
                 ]
               }
             },
@@ -39,8 +39,8 @@
               / mval / 1: {
                 / name / 11: "Component B",
                 / digests / 2: [
-                  [ 1, h'cc' ],
-                  [ 2, h'dd' ]
+                  [ 1, h'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc' ],
+                  [ 2, h'dddddddddddddddddddddddddddddddd' ]
                 ]
               }
             }
