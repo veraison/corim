@@ -111,10 +111,23 @@ func (o ResultSet) Valid() error {
 		return errors.New("missing mandatory expiry")
 	}
 
+	hasEnv := o.RVQ != nil || o.EVQ != nil || o.CEQ != nil || o.AKQ != nil || o.TAS != nil
+
 	if o.RIMs != nil {
 		if o.RIMs.GetKind() != cmw.KindCollection {
 			return errors.New("RIMs CMW must be a collection")
 		}
+
+		// rim-result is exclusive with environment-result
+		if hasEnv || o.SourceArtifacts != nil {
+			return errors.New("RIMs are exclusive with all other results")
+		}
+
+		return nil
+	}
+
+	if !hasEnv && o.SourceArtifacts == nil {
+		return errors.New("result set is empty")
 	}
 
 	// Results for different artifact types are mutually exclusive
@@ -136,7 +149,40 @@ func (o ResultSet) Valid() error {
 		return errors.New("result set mixes results of different artifact types")
 	}
 
+	// endorsed-values and trust-anchors each define both of their keys
+	if (o.EVQ != nil) != (o.CEQ != nil) {
+		return errors.New("EVQ and CEQ must be present together")
+	}
+
+	if (o.AKQ != nil) != (o.TAS != nil) {
+		return errors.New("AKQ and TAS must be present together")
+	}
+
+	if err := validateQuads("RVQ", o.RVQ); err != nil {
+		return err
+	}
+
+	if err := validateQuads("EVQ", o.EVQ); err != nil {
+		return err
+	}
+
+	if err := validateQuads("CEQ", o.CEQ); err != nil {
+		return err
+	}
+
+	if err := validateQuads("AKQ", o.AKQ); err != nil {
+		return err
+	}
+
+	if err := validateQuads("TAS", o.TAS); err != nil {
+		return err
+	}
+
 	if o.SourceArtifacts != nil {
+		if len(*o.SourceArtifacts) == 0 {
+			return errors.New("source artifacts must not be empty")
+		}
+
 		for i, sa := range *o.SourceArtifacts {
 			if sa.GetKind() != cmw.KindMonad {
 				return fmt.Errorf("source artifact at index %d must be a monad", i)
@@ -146,6 +192,20 @@ func (o ResultSet) Valid() error {
 
 	// The coherency between query and results must be checked by the Coserv's
 	// Valid()
+
+	return nil
+}
+
+func validateQuads[T interface{ Valid() error }](name string, quads *[]T) error {
+	if quads == nil {
+		return nil
+	}
+
+	for i, q := range *quads {
+		if err := q.Valid(); err != nil {
+			return fmt.Errorf("invalid %s at index %d: %w", name, i, err)
+		}
+	}
 
 	return nil
 }
