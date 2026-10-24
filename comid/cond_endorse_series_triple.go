@@ -89,12 +89,12 @@ func (o *CondEndorseSeriesCondition) UnmarshalCBOR(data []byte) error {
 // as Endorsements
 type CondEndorseSeriesRecord struct {
 	_         struct{}     `cbor:",toarray"`
-	Selection Measurements `json:"selection"`
+	Condition Measurements `json:"condition"`
 	Addition  Measurements `json:"addition"`
 }
 
 func (o CondEndorseSeriesRecord) Valid() error {
-	if err := o.Selection.Valid(); err != nil {
+	if err := o.Condition.Valid(); err != nil {
 		return fmt.Errorf("selection validation failed: %w", err)
 	}
 
@@ -107,12 +107,12 @@ func (o CondEndorseSeriesRecord) Valid() error {
 // nolint:gocritic
 func (o CondEndorseSeriesRecord) GetExtensions() extensions.IMapValue {
 	// Extensions are always the same for Selection and Addition
-	return o.Selection.GetExtensions()
+	return o.Condition.GetExtensions()
 }
 
 func (o *CondEndorseSeriesRecord) RegisterExtensions(exts extensions.Map) error {
-	if err := o.Selection.RegisterExtensions(exts); err != nil {
-		return fmt.Errorf("selection: %w", err)
+	if err := o.Condition.RegisterExtensions(exts); err != nil {
+		return fmt.Errorf("condition: %w", err)
 	}
 	if err := o.Addition.RegisterExtensions(exts); err != nil {
 		return fmt.Errorf("addition: %w", err)
@@ -129,21 +129,21 @@ func NewCondEndorseSeriesRecords() *CondEndorseSeriesRecords {
 
 // The Conditional Endorsement Series Triple is used to assert endorsed values based
 // on an initial condition match (specified by Condition StatefulEnv) followed by a series
-// condition match (specified in selection: inside conditional-series-record).
+// condition match (specified in condition inside conditional-series-record).
 type CondEndorseSeriesTriple struct {
-	_         struct{}                   `cbor:",toarray"`
-	Condition CondEndorseSeriesCondition `json:"condition"`
-	Series    CondEndorseSeriesRecords   `json:"series"`
+	_               struct{}                   `cbor:",toarray"`
+	CommonCondition CondEndorseSeriesCondition `json:"common-condition"`
+	Series          CondEndorseSeriesRecords   `json:"series"`
 }
 
 // RegisterExtensions accepts MVal and MFlag Extension points, that will be registered with
 // all Measurements contained within CondEndorseSeriesTriple structure
 func (o *CondEndorseSeriesTriple) RegisterExtensions(exts extensions.Map) error {
-	if err := o.Condition.RegisterExtensions(exts); err != nil {
-		return fmt.Errorf("condition: %w", err)
+	if err := o.CommonCondition.RegisterExtensions(exts); err != nil {
+		return fmt.Errorf("common-condition: %w", err)
 	}
 	if err := o.Series.RegisterExtensions(exts); err != nil {
-		return fmt.Errorf("selection: %w", err)
+		return fmt.Errorf("series: %w", err)
 	}
 
 	return nil
@@ -151,8 +151,8 @@ func (o *CondEndorseSeriesTriple) RegisterExtensions(exts extensions.Map) error 
 
 // nolint:gocritic
 func (o CondEndorseSeriesTriple) Valid() error {
-	if err := o.Condition.Valid(); err != nil {
-		return fmt.Errorf("condition validation failed: %w", err)
+	if err := o.CommonCondition.Valid(); err != nil {
+		return fmt.Errorf("common-condition validation failed: %w", err)
 	}
 
 	if o.Series.IsEmpty() {

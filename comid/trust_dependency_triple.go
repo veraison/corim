@@ -9,9 +9,9 @@ import (
 	"reflect"
 )
 
-// DomainDependencyTriple is the CDDL domain-dependency-triple-record:
+// TrustDependencyTriple is the CDDL trust-dependency-triple-record:
 //
-//	domain-dependency-triple-record = [
+//	trust-dependency-triple-record = [
 //	  domain-id: domain-type,
 //	  trustees: [ + domain-type ]
 //	]
@@ -20,7 +20,7 @@ import (
 // A DDT links a domain to a set of trustee domains. The domain-id's
 // trustworthiness depends on the trustees having been appraised first
 // (draft-ietf-rats-corim §5.1.11.2).
-type DomainDependencyTriple struct {
+type TrustDependencyTriple struct {
 	_        struct{}      `cbor:",toarray"`
 	DomainID Environment   `json:"domain-id"`
 	Trustees []Environment `json:"trustees"`
@@ -29,8 +29,8 @@ type DomainDependencyTriple struct {
 // Valid checks that the record has a domain-id, at least one valid trustee,
 // and that the domain-id does not directly appear in the trustees list
 // (§5.1.11.2). Transitive cycle detection across multiple records is enforced
-// by DomainDependencyTriples.Valid().
-func (o DomainDependencyTriple) Valid() error {
+// by TrustDependencyTriples.Valid().
+func (o TrustDependencyTriple) Valid() error {
 	if err := o.DomainID.Valid(); err != nil {
 		return fmt.Errorf("domain-id: %w", err)
 	}
@@ -53,13 +53,13 @@ func (o DomainDependencyTriple) Valid() error {
 	return nil
 }
 
-// DomainDependencyTriples is an array of domain-dependency-triple
+// TrustDependencyTriples is an array of trust-dependency-triple
 // (triples-map key 4: dependency-triples).
-type DomainDependencyTriples []DomainDependencyTriple
+type TrustDependencyTriples []TrustDependencyTriple
 
 // Valid checks each record and enforces the transitive acyclic constraint
 // across all records (§5.1.11.2: trust dependency graphs MUST be acyclic).
-func (o DomainDependencyTriples) Valid() error {
+func (o TrustDependencyTriples) Valid() error {
 	// Assign a stable integer index to each unique Environment.
 	var envs []Environment
 	indexOf := func(e Environment) int {
@@ -111,6 +111,6 @@ func (o DomainDependencyTriples) Valid() error {
 }
 
 // IsEmpty returns true if there are no records.
-func (o DomainDependencyTriples) IsEmpty() bool {
+func (o TrustDependencyTriples) IsEmpty() bool {
 	return len(o) == 0
 }

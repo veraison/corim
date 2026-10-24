@@ -374,6 +374,10 @@ type Mval struct {
 	CryptoKeys         *CryptoKeys         `cbor:"13,keyasint,omitempty" json:"cryptokeys,omitempty"`
 	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
 	IntRange           *RawInt             `cbor:"15,keyasint,omitempty" json:"int-range,omitempty"`
+	Bool               *bool               `cbor:"16,keyasint,omitempty" json:"bool,omitempty"`
+	Number             *NumberMatcher      `cbor:"17,keyasint,omitempty" json:"number,omitempty"`
+	Text               *TextMatcher        `cbor:"18,keyasint,omitempty" json:"text,omitempty"`
+	Bytes              *BytesMatcher       `cbor:"19,keyasint,omitempty" json:"bytes,omitempty"`
 	Extensions
 }
 
@@ -463,6 +467,10 @@ func (o Mval) Valid() error {
 		o.CryptoKeys == nil &&
 		o.IntegrityRegisters == nil &&
 		o.IntRange == nil &&
+		o.Bool == nil &&
+		o.Number == nil &&
+		o.Text == nil &&
+		o.Bytes == nil &&
 		o.IsEmpty() {
 
 		return fmt.Errorf("no measurement value set")
