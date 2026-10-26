@@ -167,7 +167,7 @@ func validateCCASoftwareComponent(measurement *comid.Measurement) error {
 
 	// version (key 0) is optional - if present, version-scheme MUST NOT be present
 	if measurement.Val.Ver != nil {
-		if measurement.Val.Ver.Scheme.String() != "" {
+		if measurement.Val.Ver.Scheme != nil {
 			return fmt.Errorf("version-scheme field MUST NOT be present in cca.software-component")
 		}
 	}
