@@ -126,10 +126,6 @@ func (o ResultSet) Valid() error {
 		return nil
 	}
 
-	if !hasEnv && o.SourceArtifacts == nil {
-		return errors.New("result set is empty")
-	}
-
 	// Results for different artifact types are mutually exclusive
 	groups := 0
 
