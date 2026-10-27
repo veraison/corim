@@ -6,6 +6,7 @@ package coserv
 import (
 	"testing"
 
+	"github.com/fxamacker/cbor/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/veraison/cmw"
@@ -249,7 +250,7 @@ func TestResultSet_Valid_empty(t *testing.T) {
 
 	t.Run("nothing", func(t *testing.T) {
 		rset := NewResultSet().SetExpiry(testExpiry)
-		assert.EqualError(t, rset.Valid(), "result set is empty")
+		assert.NoError(t, rset.Valid())
 	})
 
 	t.Run("empty quad array is present", func(t *testing.T) {
@@ -270,6 +271,41 @@ func TestResultSet_Valid_empty(t *testing.T) {
 		rset := NewResultSet().SetExpiry(testExpiry).AddSourceArtifacts(*monad)
 		assert.NoError(t, rset.Valid())
 	})
+}
+
+func TestResultSet_Valid_empty_pairs_round_trip(t *testing.T) {
+	tests := []struct {
+		name  string
+		rset  *ResultSet
+		check func(*testing.T, ResultSet)
+	}{
+		{"EVQ and CEQ", &ResultSet{EVQ: &[]EndValQuad{}, CEQ: &[]CondEndValQuad{}},
+			func(t *testing.T, r ResultSet) {
+				assert.NotNil(t, r.EVQ)
+				assert.NotNil(t, r.CEQ)
+			}},
+		{"AKQ and TAS", &ResultSet{AKQ: &[]AKQuad{}, TAS: &[]CoTSStmt{}},
+			func(t *testing.T, r ResultSet) {
+				assert.NotNil(t, r.AKQ)
+				assert.NotNil(t, r.TAS)
+			}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.rset.SetExpiry(testExpiry)
+			require.NoError(t, tt.rset.Valid())
+
+			data, err := cbor.Marshal(tt.rset)
+			require.NoError(t, err)
+
+			var actual ResultSet
+			require.NoError(t, cbor.Unmarshal(data, &actual))
+
+			tt.check(t, actual)
+			assert.NoError(t, actual.Valid())
+		})
+	}
 }
 
 func TestResultSet_Valid_rims(t *testing.T) {
