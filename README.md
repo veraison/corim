@@ -14,6 +14,12 @@ The [`corim/cotl`](cotl) package provides a golang implementation of the Concise
 > These API are still in active development (as is the underlying CoRIM spec).
 > They are **subject to change** in the future.
 
+## Profile documents
+
+The [TPM 2.0 CoRIM Reference Values Profile](docs/profiles/tpm-v1.md) is a
+draft specification for TPM and vTPM reference measurements. It includes the
+measurement mapping, verification rules, and a worked example.
+
 ## Required Tools
 
 Ensure you have the following tools installed with the specified versions on your machine to ensure everything works properly:
