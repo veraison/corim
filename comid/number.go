@@ -10,11 +10,7 @@ import (
 	"math"
 	"math/big"
 	"strings"
-
-	"github.com/veraison/corim/encoding"
 )
-
-var ErrNumberTypeMismatch = errors.New("attempting to compare Number's of different types")
 
 var (
 	// 2^64 - 1
@@ -23,39 +19,40 @@ var (
 	cborNintMin = new(big.Int).Neg(new(big.Int).Lsh(big.NewInt(1), 64))
 )
 
-// Number encapsulates a numeric value represented as either int64 or float64.
-type Number struct {
-	value any
+// Integer encapsulates a CoRIM integer value. This is a value in the range
+// [-math.Uint64Max, math.Uint64Max].
+type Integer struct {
+	value *big.Int
 }
 
-// NumberFromInt creates a new Number from the provided int.
-func NumberFromInt(value int) Number {
-	return NumberFromInt64(int64(value))
+// IntegerFromInt creates a new Integer from the provided int.
+func IntegerFromInt(value int) Integer {
+	return IntegerFromInt64(int64(value))
 }
 
-// NumberFromInt64 creates a new Number from the provided int64.
-func NumberFromInt64(value int64) Number {
+// IntegerFromInt64 creates a new Integer from the provided int64.
+func IntegerFromInt64(value int64) Integer {
 	var num big.Int
 	num.SetInt64(value)
-	return Number{&num}
+	return Integer{&num}
 }
 
-// NumberFromUint creates a new Number from the provided uint.
-func NumberFromUint(value uint) Number {
-	return NumberFromUint64(uint64(value))
+// IntegerFromUint creates a new Integer from the provided uint.
+func IntegerFromUint(value uint) Integer {
+	return IntegerFromUint64(uint64(value))
 }
 
-// NumberFromUint64 creates a new Number from the provided uint64.
-func NumberFromUint64(value uint64) Number {
+// IntegerFromUint64 creates a new Integer from the provided uint64.
+func IntegerFromUint64(value uint64) Integer {
 	var num big.Int
 	num.SetUint64(value)
-	return Number{&num}
+	return Integer{&num}
 }
 
-// MustNumberFromBig creates a new Number from the provided big.Int. It panics
+// MustIntegerFromBig creates a new Integer from the provided big.Int. It panics
 // if the provided value does not fit inside a CBOR integer.
-func MustNumberFromBig(value *big.Int) Number {
-	ret, err := NumberFromBig(value)
+func MustIntegerFromBig(value *big.Int) Integer {
+	ret, err := IntegerFromBig(value)
 	if err != nil {
 		panic(err)
 	}
@@ -63,147 +60,75 @@ func MustNumberFromBig(value *big.Int) Number {
 	return ret
 }
 
-// NumberFromBig creates a new Number from the provided big.Int. If the
+// IntegerFromBig creates a new Integer from the provided big.Int. If the
 // provided value does not fit inside a CBOR integer, an error is returned.
-func NumberFromBig(value *big.Int) (Number, error) {
+func IntegerFromBig(value *big.Int) (Integer, error) {
 	if value == nil {
-		return Number{}, errors.New("nil")
+		return Integer{}, errors.New("nil")
 	}
 
 	if value.Cmp(cborUintMax) == 1 || value.Cmp(cborNintMin) == -1 {
-		return Number{}, errors.New("outside CBOR int range")
+		return Integer{}, errors.New("outside CBOR int range")
 	}
 
-	return Number{new(big.Int).Set(value)}, nil
-}
-
-// NumberFromFloat64 creates a new Number from the provided float64.
-func NumberFromFloat64(value float64) Number {
-	return Number{value}
-}
-
-// Value returns the underlying value.
-func (o Number) Value() any {
-	if o.value == nil {
-		return nil
-	}
-
-	switch t := o.value.(type) {
-	case float64:
-		return t
-	case *big.Int:
-		return new(big.Int).Set(t)
-	default:
-		panic(fmt.Sprintf("unexpected Number value %v (%T)", t, t))
-	}
-}
-
-// IsInt returns true if the receiver encapsulates an integer.
-func (o Number) IsInt() bool {
-	_, ok := o.value.(*big.Int)
-	return ok
+	return Integer{new(big.Int).Set(value)}, nil
 }
 
 // IsInt64 returns true if the receiver encapsulates an integer that can fit
 // inside int64.
-func (o Number) IsInt64() bool {
-	b, ok := o.value.(*big.Int)
-	if !ok {
-		return false
+func (o Integer) IsInt64() bool {
+	if o.value == nil {
+		return true
 	}
 
-	return b.IsInt64()
+	return o.value.IsInt64()
 }
 
 // Uint64 returns the underlying integer value as a uint64. If the value is
-// negative or a float, 0 is returned instead.
-func (o Number) Uint64() uint64 {
-	b, ok := o.value.(*big.Int)
-	if !ok || b.Cmp(big.NewInt(0)) <= 0 {
+// negative, 0 is returned instead.
+func (o Integer) Uint64() uint64 {
+	if o.value == nil || o.value.Cmp(big.NewInt(0)) < 0 {
 		return 0
 	}
 
-	if !b.IsUint64() {
-		// should not get here as cannot create a Number from bit.Int
+	if !o.value.IsUint64() {
+		// should not get here as cannot create a Integer from bit.Int
 		// that is larger than a uint64.
 		panic("too big")
 	}
 
-	return b.Uint64()
+	return o.value.Uint64()
 }
 
-// Int64 returns the underlying value as an int64. If the underlying value is a
-// float or does not fit inside int64, 0 is returned instead.
-func (o Number) Int64() int64 {
-	b, ok := o.value.(*big.Int)
-	if !ok || !b.IsInt64() {
+// Int64 returns the underlying value as an int64. If the underlying value does
+// not fit inside int64, 0 is returned instead.
+func (o Integer) Int64() int64 {
+	if o.value == nil || !o.value.IsInt64() {
 		return 0
 	}
 
-	return b.Int64()
+	return o.value.Int64()
 }
 
-// BigInt returns a pointer to the underlying big.Int value, or the zero value
-// for big.Int if the underlying value is a float.
-func (o Number) BigInt() *big.Int {
-	ret, ok := o.value.(*big.Int)
-	if !ok {
-		return nil
+// BigInt returns a pointer to the underlying big.Int value.
+func (o Integer) BigInt() *big.Int {
+	ret := new(big.Int)
+	if o.value != nil {
+		ret.Set(o.value)
 	}
 
-	return new(big.Int).Set(ret)
-}
-
-// IsFloat64 returns true if the receiver encapsulates a float64.
-func (o Number) IsFloat64() bool {
-	_, ok := o.value.(float64)
-	return ok
-}
-
-// Float64 returns the underlying float64 value. If the underlying value is not
-// a float64, 0.0 is returned instead.
-func (o Number) Float64() float64 {
-	ret, _ := o.value.(float64)
 	return ret
 }
 
-// Compare returns -1 if the receiver is less than the provided number, 1 if
-// the receiver is greater than provided Number, or 0 if the two Number's are
+// Compare returns -1 if the receiver is less than the provided Integer, 1 if
+// the receiver is greater than provided Integer, or 0 if the two Integer's are
 // the same. (The behavior is equivalent to cmp.Compare() behavior for
 // cmd.Ordered.)
-// For floating point values, Numbers are considered equal if they within
-// predefined tolerances (see SetRelativeTolerance() and
-// SetAbsoluteTolerance()).
-// If one number is and int and the other a float, or if one or more are
-// uninitialized, an error is returned.
-func (o Number) Compare(other Number) (int, error) {
-	switch thisValue := o.value.(type) {
-	case *big.Int:
-		switch otherValue := other.value.(type) {
-		case *big.Int:
-			return thisValue.Cmp(otherValue), nil
-		default:
-			return 0, ErrNumberTypeMismatch
-		}
-	case float64:
-		switch otherValue := other.value.(type) {
-		case float64:
-			if areClose(thisValue, otherValue) {
-				return 0, nil
-			} else if thisValue < otherValue {
-				return -1, nil
-			} else {
-				return 1, nil
-			}
-		default:
-			return 0, ErrNumberTypeMismatch
-		}
-	default:
-		return 0, ErrNumberTypeMismatch
-	}
+func (o Integer) Compare(other Integer) (int, error) {
+	return o.BigInt().Cmp(other.BigInt()), nil
 }
 
-func (o Number) MarshalCBOR() ([]byte, error) {
+func (o Integer) MarshalCBOR() ([]byte, error) {
 	if o.value != nil {
 		return em.Marshal(o.value)
 	} else {
@@ -211,7 +136,7 @@ func (o Number) MarshalCBOR() ([]byte, error) {
 	}
 }
 
-func (o *Number) UnmarshalCBOR(data []byte) error {
+func (o *Integer) UnmarshalCBOR(data []byte) error {
 	if len(data) < 1 {
 		return errors.New("truncated input")
 	}
@@ -226,103 +151,59 @@ func (o *Number) UnmarshalCBOR(data []byte) error {
 		}
 
 		o.value = &value
-	case 7:
-		var value float64
-		if err := dm.Unmarshal(data, &value); err != nil {
-			return err
-		}
-
-		o.value = value
 	default:
-		return fmt.Errorf("unexpected major type %d for Number", majorType)
+		return fmt.Errorf("unexpected major type %d for Integer", majorType)
 	}
 
 	return nil
 }
 
-func (o Number) MarshalJSON() ([]byte, error) {
+func (o Integer) MarshalJSON() ([]byte, error) {
 	if o.value == nil {
-		return json.Marshal(encoding.TypeAndValue{Type: "int", Value: json.RawMessage("0")})
+		return json.Marshal(0)
 	}
 
-	encodedValue, err := json.Marshal(o.value)
-	if err != nil {
-		return nil, err
-	}
-
-	tnv := encoding.TypeAndValue{
-		Value: encodedValue,
-	}
-
-	switch t := o.value.(type) {
-	case *big.Int:
-		tnv.Type = "int"
-	case float64:
-		tnv.Type = "float"
-	default:
-		// should be unreachable as a Number can only be
-		// instantiatiated with a *big.Int or a float64
-		panic(fmt.Sprintf("unexpected Number value type %T", t))
-	}
-
-	return json.Marshal(tnv)
+	return json.Marshal(o.value)
 }
 
-func (o *Number) UnmarshalJSON(data []byte) error {
-	var tnv encoding.TypeAndValue
-	if err := json.Unmarshal(data, &tnv); err != nil {
+func (o *Integer) UnmarshalJSON(data []byte) error {
+	value, err := unmarshalBigIntFromJSON(data)
+	if err != nil {
 		return err
 	}
 
-	switch tnv.Type {
-	case "int":
-		value, err := unmarshalBigIntFromJSON(tnv.Value)
-		if err != nil {
-			return err
-		}
-
-		if value.Cmp(cborUintMax) == 1 || value.Cmp(cborNintMin) == -1 {
-			return errors.New("outside CBOR int range")
-		}
-
-		o.value = value
-	case "float":
-		var value float64
-		if err := json.Unmarshal(tnv.Value, &value); err != nil {
-			return err
-		}
-
-		o.value = value
-	default:
-		return fmt.Errorf("invalid Number value type: %q", tnv.Type)
+	if value.Cmp(cborUintMax) == 1 || value.Cmp(cborNintMin) == -1 {
+		return errors.New("outside CBOR int range")
 	}
+
+	o.value = value
 
 	return nil
 }
 
-// NumberMatcher matches Number values to other Number values, sets of Number
-// values, or Number ranges.
-type NumberMatcher = Matcher[Number]
+// IntegerMatcher matches Integer values to other Integer values, sets of Integer
+// values, or Integer ranges.
+type IntegerMatcher = Matcher[Integer]
 
-// NewNumberMatcher returns a pointer to a NumberMatcher containing the
+// NewIntegerMatcher returns a pointer to a IntegerMatcher containing the
 // provided values. If No tail values are specified, a unit matcher is created
 // using head, otherwise a set matcher containing head and tail values is
 // created.
-func NewNumberMatcher(head Number, tail ...Number) *NumberMatcher {
+func NewIntegerMatcher(head Integer, tail ...Integer) *IntegerMatcher {
 	if len(tail) == 0 {
-		return &NumberMatcher{NewUnitMatcher(head)}
+		return &IntegerMatcher{NewUnitMatcher(head)}
 	}
 
-	values := append([]Number{head}, tail...)
+	values := append([]Integer{head}, tail...)
 
-	return &NumberMatcher{MustNewSetMatcher(values...)}
+	return &IntegerMatcher{MustNewSetMatcher(values...)}
 }
 
-// MustNewNumberRange returns a pointer to a NumberMatcher that matches the
-// Number range [lower, upper] (inclusive on both ends). It panics if the upper
+// MustNewIntegerRange returns a pointer to a IntegerMatcher that matches the
+// Integer range [lower, upper] (inclusive on both ends). It panics if the upper
 // bound is less than the lower bound.
-func MustNewNumberRange(lower, upper Number) *NumberMatcher {
-	matcher, err := NewNumberRange(lower, upper)
+func MustNewIntegerRange(lower, upper Integer) *IntegerMatcher {
+	matcher, err := NewIntegerRange(lower, upper)
 	if err != nil {
 		panic(err)
 	}
@@ -330,45 +211,111 @@ func MustNewNumberRange(lower, upper Number) *NumberMatcher {
 	return matcher
 }
 
-// NewNumberRange returns a pointer to a NumberMatcher that matches the Number
+// NewIntegerRange returns a pointer to a IntegerMatcher that matches the Integer
 // range [lower, upper] (inclusive on both ends). An error is returned if the
 // upper bound is less than the lower bound.
-func NewNumberRange(lower, upper Number) (*NumberMatcher, error) {
+func NewIntegerRange(lower, upper Integer) (*IntegerMatcher, error) {
 	rang, err := NewRangeMatcher(&lower, &upper)
 	if err != nil {
 		return nil, err
 	}
 
-	return &NumberMatcher{rang}, nil
+	return &IntegerMatcher{rang}, nil
 }
 
-// NewNumberUpperBound returns a pointer to a NumberMatcher that matches any
-// Number less than or equal to the specified upper bound.
-func NewNumberUpperBound(upper Number) *NumberMatcher {
+// NewIntegerUpperBound returns a pointer to a IntegerMatcher that matches any
+// Integer less than or equal to the specified upper bound.
+func NewIntegerUpperBound(upper Integer) *IntegerMatcher {
 	rang, err := NewRangeMatcher(nil, &upper)
 	if err != nil {
 		// won't get here as one of the bounds is nil
 		panic(err)
 	}
 
-	return &NumberMatcher{rang}
+	return &IntegerMatcher{rang}
 }
 
-// NewNumberLowerBound returns a pointer to a NumberMatcher that matches any
-// Number greater than or equal to the specified lower bound.
-func NewNumberLowerBound(lower Number) *NumberMatcher {
+// NewIntegerLowerBound returns a pointer to a IntegerMatcher that matches any
+// Integer greater than or equal to the specified lower bound.
+func NewIntegerLowerBound(lower Integer) *IntegerMatcher {
 	rang, err := NewRangeMatcher(&lower, nil)
 	if err != nil {
 		// won't get here as one of the bounds is nil
 		panic(err)
 	}
 
-	return &NumberMatcher{rang}
+	return &IntegerMatcher{rang}
 }
 
-// NumberCompare returns -1 if lhs < rhs, 1 if lhs > rhs, and 0 if lhs == rhs.
-func NumberCompare(lhs, rhs Number) (int, error) {
+// IntegerCompare returns -1 if lhs < rhs, 1 if lhs > rhs, and 0 if lhs == rhs.
+func IntegerCompare(lhs, rhs Integer) (int, error) {
 	return lhs.Compare(rhs)
+}
+
+// FloatMatcher matches Float values to other Float values, sets of Float
+// values, or Float ranges.
+type FloatMatcher = Matcher[float64]
+
+// NewFloatMatcher returns a pointer to a FloatMatcher containing the
+// provided values. If No tail values are specified, a unit matcher is created
+// using head, otherwise a set matcher containing head and tail values is
+// created.
+func NewFloatMatcher(head float64, tail ...float64) *FloatMatcher {
+	if len(tail) == 0 {
+		return &FloatMatcher{NewUnitMatcher(head)}
+	}
+
+	values := append([]float64{head}, tail...)
+
+	return &FloatMatcher{MustNewSetMatcher(values...)}
+}
+
+// MustNewFloatRange returns a pointer to a FloatMatcher that matches the
+// Float range [lower, upper] (inclusive on both ends). It panics if the upper
+// bound is less than the lower bound.
+func MustNewFloatRange(lower, upper float64) *FloatMatcher {
+	matcher, err := NewFloatRange(lower, upper)
+	if err != nil {
+		panic(err)
+	}
+
+	return matcher
+}
+
+// NewFloatRange returns a pointer to a FloatMatcher that matches the Float
+// range [lower, upper] (inclusive on both ends). An error is returned if the
+// upper bound is less than the lower bound.
+func NewFloatRange(lower, upper float64) (*FloatMatcher, error) {
+	rang, err := NewRangeMatcher(&lower, &upper)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FloatMatcher{rang}, nil
+}
+
+// NewFloatUpperBound returns a pointer to a FloatMatcher that matches any
+// Float less than or equal to the specified upper bound.
+func NewFloatUpperBound(upper float64) *FloatMatcher {
+	rang, err := NewRangeMatcher(nil, &upper)
+	if err != nil {
+		// won't get here as one of the bounds is nil
+		panic(err)
+	}
+
+	return &FloatMatcher{rang}
+}
+
+// NewFloatLowerBound returns a pointer to a FloatMatcher that matches any
+// Float greater than or equal to the specified lower bound.
+func NewFloatLowerBound(lower float64) *FloatMatcher {
+	rang, err := NewRangeMatcher(&lower, nil)
+	if err != nil {
+		// won't get here as one of the bounds is nil
+		panic(err)
+	}
+
+	return &FloatMatcher{rang}
 }
 
 var relativeTolerance = 0.1e-09
@@ -396,6 +343,19 @@ func SetAbsoluteTolerance(value float64) error {
 
 	absoluteTolerance = value
 	return nil
+}
+
+// Float64Compare returns 0 if the two values are within set tolerances (see
+// SetRelativeTolerance and SetAbsoluteTolerance) of each other, otherwise -1
+// if lhs < rhs, and 1 if lhs > rhs.
+func Float64Compare(lhs, rhs float64) (int, error) {
+	if areClose(lhs, rhs) {
+		return 0, nil
+	} else if lhs < rhs {
+		return -1, nil
+	}
+
+	return 1, nil
 }
 
 func areClose(a, b float64) bool {
@@ -447,7 +407,16 @@ func unmarshalBigIntFromJSON(data []byte) (*big.Int, error) {
 
 func init() {
 	if err := RegisterMatcherDescriptor(
-		NumberCompare,
+		IntegerCompare,
+		MatcherTypeUnit,
+		MatcherTypeSet,
+		MatcherTypeRange,
+	); err != nil {
+		panic(err)
+	}
+
+	if err := RegisterMatcherDescriptor(
+		Float64Compare,
 		MatcherTypeUnit,
 		MatcherTypeSet,
 		MatcherTypeRange,

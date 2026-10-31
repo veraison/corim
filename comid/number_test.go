@@ -12,26 +12,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNumberMatcher_round_trip(t *testing.T) {
+func TestIntegerMatcher_round_trip(t *testing.T) {
 	testCases := []struct {
 		title        string
-		input        *NumberMatcher
+		input        *IntegerMatcher
 		expectedCBOR []byte
 		expectedJSON string
 	}{
 		{
 			title: "ok int64 unit",
-			input: NewNumberMatcher(
-				NumberFromInt(1),
+			input: NewIntegerMatcher(
+				IntegerFromInt(1),
 			),
 			expectedCBOR: []byte{0x01},
-			expectedJSON: `{"type":"unit","value":{"type":"int","value":1}}`,
+			expectedJSON: `{"type":"unit","value":1}`,
 		},
 		{
 			title: "ok int64 set",
-			input: NewNumberMatcher(
-				NumberFromInt(1),
-				NumberFromInt(2),
+			input: NewIntegerMatcher(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			),
 			expectedCBOR: []byte{
 				0xd9, 0x02, 0x36, // tag(566) [tagged-*-set]
@@ -39,13 +39,13 @@ func TestNumberMatcher_round_trip(t *testing.T) {
 				0x01, //             . . 1
 				0x02, //             . . 2
 			},
-			expectedJSON: `{"type":"set","value":[{"type":"int","value":1},{"type":"int","value":2}]}`,
+			expectedJSON: `{"type":"set","value":[1,2]}`,
 		},
 		{
 			title: "ok int64 range",
-			input: MustNewNumberRange(
-				NumberFromInt(1),
-				NumberFromInt(2),
+			input: MustNewIntegerRange(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			),
 			expectedCBOR: []byte{
 				0xd9, 0x02, 0x35, // tag(565) [tagged-number-range]
@@ -53,32 +53,20 @@ func TestNumberMatcher_round_trip(t *testing.T) {
 				0x01, //             . . 1
 				0x02, //             . . 2
 			},
-			expectedJSON: `{"type":"range","value":[{"type":"int","value":1},{"type":"int","value":2}]}`,
+			expectedJSON: `{"type":"range","value":[1,2]}`,
 		},
 		{
-			title: "ok float64 unit",
-			input: NewNumberMatcher(
-				NumberFromFloat64(1.1),
+			title: "ok int64 range with single bound",
+			input: NewIntegerUpperBound(
+				IntegerFromInt(2),
 			),
 			expectedCBOR: []byte{
-				0xfb, 0x3f, 0xf1, 0x99, 0x99, 0x99, 0x99, 0x99,
-				0x9a,
+				0xd9, 0x02, 0x35, // tag(565) [tagged-number-range]
+				0x82, //             . array(2)
+				0xf6, //             . . nil
+				0x02, //             . . 2
 			},
-			expectedJSON: `{"type":"unit","value":{"type":"float","value":1.1}}`,
-		},
-		{
-			title: "ok float64 range with single bound",
-			input: NewNumberUpperBound(
-				NumberFromFloat64(1.1),
-			),
-			expectedCBOR: []byte{
-				0xd9, 0x02, 0x35, //                               tag(565) [tagged-number-range]
-				0x82,                                           // . array(2)
-				0xf6,                                           // . . null
-				0xfb, 0x3f, 0xf1, 0x99, 0x99, 0x99, 0x99, 0x99, // . . 1.1
-				0x9a,
-			},
-			expectedJSON: `{"type":"range","value":[null, {"type":"float","value":1.1}]}`,
+			expectedJSON: `{"type":"range","value":[null,2]}`,
 		},
 	}
 
@@ -88,7 +76,7 @@ func TestNumberMatcher_round_trip(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedCBOR, encodedCBOR)
 
-			var matcher NumberMatcher
+			var matcher IntegerMatcher
 			err = matcher.UnmarshalCBOR(encodedCBOR)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.input, &matcher)
@@ -104,135 +92,93 @@ func TestNumberMatcher_round_trip(t *testing.T) {
 	}
 }
 
-func TestNumberMatcher_MatchesValue(t *testing.T) {
+func TestIntegerMatcher_MatchesValue(t *testing.T) {
 	testCases := []struct {
 		title    string
-		matcher  *NumberMatcher
-		value    Number
+		matcher  *IntegerMatcher
+		value    Integer
 		expected bool
 	}{
 		{
-			title:    "match unit int64",
-			matcher:  NewNumberMatcher(NumberFromInt(1)),
-			value:    NumberFromInt(1),
-			expected: true,
-		},
-		{
-			title:    "match unit flaot64",
-			matcher:  NewNumberMatcher(NumberFromFloat64(1.1)),
-			value:    NumberFromFloat64(1.1),
+			title:    "match unit",
+			matcher:  NewIntegerMatcher(IntegerFromInt(1)),
+			value:    IntegerFromInt(1),
 			expected: true,
 		},
 		{
 			title: "match set",
-			matcher: NewNumberMatcher(
-				NumberFromFloat64(1.0),
-				NumberFromFloat64(2.1),
-				NumberFromInt(3),
+			matcher: NewIntegerMatcher(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
+				IntegerFromInt(3),
 			),
-			value:    NumberFromFloat64(1.0),
+			value:    IntegerFromInt(1),
 			expected: true,
 		},
 		{
 			title: "match range",
-			matcher: MustNewNumberRange(
-				NumberFromFloat64(1.0),
-				NumberFromFloat64(3.0),
+			matcher: MustNewIntegerRange(
+				IntegerFromInt(1),
+				IntegerFromInt(3),
 			),
-			value:    NumberFromFloat64(2.0),
-			expected: true,
-		},
-		{
-			title: "match range inf",
-			matcher: MustNewNumberRange(
-				NumberFromFloat64(math.Inf(-1)),
-				NumberFromFloat64(math.Inf(1)),
-			),
-			value:    NumberFromFloat64(1e52),
+			value:    IntegerFromInt(2),
 			expected: true,
 		},
 		{
 			title: "match upper bound",
-			matcher: NewNumberUpperBound(
-				NumberFromFloat64(3.0),
+			matcher: NewIntegerUpperBound(
+				IntegerFromInt(3),
 			),
-			value:    NumberFromFloat64(2.0),
+			value:    IntegerFromInt(2),
 			expected: true,
 		},
 		{
 			title: "match lower bound",
-			matcher: NewNumberLowerBound(
-				NumberFromFloat64(1.0),
+			matcher: NewIntegerLowerBound(
+				IntegerFromInt(1),
 			),
-			value:    NumberFromFloat64(2.0),
+			value:    IntegerFromInt(2),
 			expected: true,
 		},
 		{
-			title:    "fail unit int64",
-			matcher:  NewNumberMatcher(NumberFromInt(1)),
-			value:    NumberFromInt(2),
+			title:    "fail unit",
+			matcher:  NewIntegerMatcher(IntegerFromInt(1)),
+			value:    IntegerFromInt(2),
 			expected: false,
 		},
 		{
-			title:    "fail unit float64",
-			matcher:  NewNumberMatcher(NumberFromFloat64(1.1)),
-			value:    NumberFromFloat64(1.0),
-			expected: false,
-		},
-		{
-			title:    "fail unit mixed",
-			matcher:  NewNumberMatcher(NumberFromFloat64(1.0)),
-			value:    NumberFromInt(1),
-			expected: false,
-		},
-		{
-			title:    "fail unit NaN",
-			matcher:  NewNumberMatcher(NumberFromFloat64(math.NaN())),
-			value:    NumberFromFloat64(1.0),
-			expected: false,
-		},
-		{
-			title: "fail set mixed",
-			matcher: NewNumberMatcher(
-				NumberFromFloat64(1.0),
-				NumberFromFloat64(2.1),
-				NumberFromInt(3),
+			title: "fail set",
+			matcher: NewIntegerMatcher(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
+				IntegerFromInt(3),
 			),
-			value:    NumberFromInt(2.0),
+			value:    IntegerFromInt(4),
 			expected: false,
 		},
 		{
 			title: "fail range",
-			matcher: MustNewNumberRange(
-				NumberFromFloat64(1.0),
-				NumberFromFloat64(3.0),
+			matcher: MustNewIntegerRange(
+				IntegerFromInt(1),
+				IntegerFromInt(3),
 			),
-			value:    NumberFromFloat64(4.0),
+			value:    IntegerFromInt(4),
 			expected: false,
 		},
 		{
-			title: "fail range mixed",
-			matcher: MustNewNumberRange(
-				NumberFromFloat64(1.0),
-				NumberFromFloat64(3.0),
+			title: "fail upper bound",
+			matcher: NewIntegerUpperBound(
+				IntegerFromInt(1),
 			),
-			value:    NumberFromInt(2),
+			value:    IntegerFromInt(2),
 			expected: false,
 		},
 		{
-			title: "fail upper bound mixed",
-			matcher: NewNumberUpperBound(
-				NumberFromFloat64(1.0),
+			title: "fail lower bound",
+			matcher: NewIntegerLowerBound(
+				IntegerFromInt(3),
 			),
-			value:    NumberFromInt(2),
-			expected: false,
-		},
-		{
-			title: "fail lower bound mixed",
-			matcher: NewNumberLowerBound(
-				NumberFromFloat64(3.0),
-			),
-			value:    NumberFromInt(2),
+			value:    IntegerFromInt(2),
 			expected: false,
 		},
 	}
@@ -245,55 +191,55 @@ func TestNumberMatcher_MatchesValue(t *testing.T) {
 	}
 }
 
-func TestNumberMatcher_IterValues(t *testing.T) {
+func TestIntegerMatcher_IterValues(t *testing.T) {
 	testCases := []struct {
 		title    string
-		matcher  *NumberMatcher
-		expected []Number
+		matcher  *IntegerMatcher
+		expected []Integer
 	}{
 		{
 			title:    "unit",
-			matcher:  NewNumberMatcher(NumberFromInt(1)),
-			expected: []Number{NumberFromInt(1)},
+			matcher:  NewIntegerMatcher(IntegerFromInt(1)),
+			expected: []Integer{IntegerFromInt(1)},
 		},
 		{
 			title: "set",
-			matcher: NewNumberMatcher(
-				NumberFromInt(1),
-				NumberFromInt(2),
+			matcher: NewIntegerMatcher(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			),
-			expected: []Number{
-				NumberFromInt(1),
-				NumberFromInt(2),
+			expected: []Integer{
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			},
 		},
 		{
 			title: "range",
-			matcher: MustNewNumberRange(
-				NumberFromInt(1),
-				NumberFromInt(2),
+			matcher: MustNewIntegerRange(
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			),
-			expected: []Number{
-				NumberFromInt(1),
-				NumberFromInt(2),
+			expected: []Integer{
+				IntegerFromInt(1),
+				IntegerFromInt(2),
 			},
 		},
 		{
 			title: "range lower bound",
-			matcher: NewNumberLowerBound(
-				NumberFromInt(1),
+			matcher: NewIntegerLowerBound(
+				IntegerFromInt(1),
 			),
-			expected: []Number{
-				NumberFromInt(1),
+			expected: []Integer{
+				IntegerFromInt(1),
 			},
 		},
 		{
 			title: "range upper bound",
-			matcher: NewNumberUpperBound(
-				NumberFromInt(2),
+			matcher: NewIntegerUpperBound(
+				IntegerFromInt(2),
 			),
-			expected: []Number{
-				NumberFromInt(2),
+			expected: []Integer{
+				IntegerFromInt(2),
 			},
 		},
 	}
@@ -306,39 +252,34 @@ func TestNumberMatcher_IterValues(t *testing.T) {
 	}
 }
 
-func TestNumberMatcher_range_bounds(t *testing.T) {
-	matcher := MustNewNumberRange(NumberFromInt(1), NumberFromInt(2))
-	assert.Equal(t, NumberFromInt(1), *matcher.Variant().(RangeMatcher[Number]).Lower())
-	assert.Equal(t, NumberFromInt(2), *matcher.Variant().(RangeMatcher[Number]).Upper())
+func TestIntegerMatcher_range_bounds(t *testing.T) {
+	matcher := MustNewIntegerRange(IntegerFromInt(1), IntegerFromInt(2))
+	assert.Equal(t, IntegerFromInt(1), *matcher.Variant().(RangeMatcher[Integer]).Lower())
+	assert.Equal(t, IntegerFromInt(2), *matcher.Variant().(RangeMatcher[Integer]).Upper())
 
-	matcher = NewNumberLowerBound(NumberFromInt(1))
-	assert.Equal(t, NumberFromInt(1), *matcher.Variant().(RangeMatcher[Number]).Lower())
-	assert.Equal(t, (*Number)(nil), matcher.Variant().(RangeMatcher[Number]).Upper())
+	matcher = NewIntegerLowerBound(IntegerFromInt(1))
+	assert.Equal(t, IntegerFromInt(1), *matcher.Variant().(RangeMatcher[Integer]).Lower())
+	assert.Equal(t, (*Integer)(nil), matcher.Variant().(RangeMatcher[Integer]).Upper())
 
-	matcher = NewNumberUpperBound(NumberFromInt(2))
-	assert.Equal(t, (*Number)(nil), matcher.Variant().(RangeMatcher[Number]).Lower())
-	assert.Equal(t, NumberFromInt(2), *matcher.Variant().(RangeMatcher[Number]).Upper())
+	matcher = NewIntegerUpperBound(IntegerFromInt(2))
+	assert.Equal(t, (*Integer)(nil), matcher.Variant().(RangeMatcher[Integer]).Lower())
+	assert.Equal(t, IntegerFromInt(2), *matcher.Variant().(RangeMatcher[Integer]).Upper())
 }
 
-func TestNumber_zero_value(t *testing.T) {
-	var zero Number
-	assert.Equal(t, nil, zero.Value())
-	assert.Equal(t, (*big.Int)(nil), zero.BigInt())
+func TestInteger_zero_value(t *testing.T) {
+	var zero Integer
+	assert.Equal(t, new(big.Int), zero.BigInt())
+	assert.True(t, zero.IsInt64())
 
-	_, err := zero.Compare(NumberFromInt(0))
-	assert.EqualError(t, err, ErrNumberTypeMismatch.Error())
+	cmp, err := zero.Compare(IntegerFromInt(0))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, cmp)
 
-	_, err = zero.Compare(NumberFromFloat64(0))
-	assert.EqualError(t, err, ErrNumberTypeMismatch.Error())
-
-	_, err = NumberFromInt(0).Compare(zero)
-	assert.EqualError(t, err, ErrNumberTypeMismatch.Error())
-
-	_, err = NumberFromFloat64(0).Compare(zero)
-	assert.EqualError(t, err, ErrNumberTypeMismatch.Error())
+	cmp, err = IntegerFromInt(0).Compare(zero)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, cmp)
 
 	assert.Equal(t, int64(0), zero.Int64())
-	assert.Equal(t, 0.0, zero.Float64())
 
 	encodedCBOR, err := zero.MarshalCBOR()
 	assert.NoError(t, err)
@@ -346,149 +287,92 @@ func TestNumber_zero_value(t *testing.T) {
 
 	encodedJSON, err := zero.MarshalJSON()
 	assert.NoError(t, err)
-	assert.JSONEq(t, `{"type":"int","value":0}`, string(encodedJSON))
+	assert.JSONEq(t, "0", string(encodedJSON))
 
-	var zero2 Number
-	_, err = zero2.Compare(zero)
-	assert.EqualError(t, err, ErrNumberTypeMismatch.Error())
+	var zero2 Integer
+	cmp, err = zero2.Compare(zero)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, cmp)
 }
 
-func TestNumber_misc(t *testing.T) {
-	number := NumberFromInt(1)
-	assert.True(t, number.IsInt64())
-	assert.False(t, number.IsFloat64())
-	assert.EqualValues(t, big.NewInt(1), number.Value())
-	assert.EqualValues(t, 1, number.Int64())
-	assert.Equal(t, 0.0, number.Float64())
-
-	number = NumberFromFloat64(1.0)
-	assert.False(t, number.IsInt64())
-	assert.True(t, number.IsFloat64())
-	assert.Equal(t, int64(0), number.Int64())
-	assert.Equal(t, 1.0, number.Float64())
+func TestInteger_misc(t *testing.T) {
+	integer := IntegerFromInt(1)
+	assert.True(t, integer.IsInt64())
+	assert.EqualValues(t, int64(1), integer.Int64())
 }
 
-func Test_tolerance(t *testing.T) {
-	n1 := NumberFromFloat64(1.0)
-	n2 := NumberFromFloat64(1.0 + 1e-15)
-	result, _ := n1.Compare(n2)
-	assert.Equal(t, 0, result)
-
-	err := SetRelativeTolerance(1e-15)
-	assert.NoError(t, err)
-	result, _ = n1.Compare(n2)
-	assert.Equal(t, -1, result)
-
-	// reset back to default
-	err = SetRelativeTolerance(1e-9)
-	assert.NoError(t, err)
-
-	n2 = NumberFromFloat64(1.01)
-	result, _ = n1.Compare(n2)
-	assert.Equal(t, -1, result)
-
-	err = SetAbsoluteTolerance(1e-1)
-	assert.NoError(t, err)
-
-	result, _ = n1.Compare(n2)
-	assert.Equal(t, 0, result)
-
-	err = SetAbsoluteTolerance(-1.0)
-	assert.ErrorContains(t, err, "tolerance cannot be negative")
-
-	err = SetRelativeTolerance(-1.0)
-	assert.ErrorContains(t, err, "tolerance cannot be negative")
-}
-
-func TestNumber_big(t *testing.T) {
-	number := NumberFromUint(1)
-	assert.EqualValues(t, big.NewInt(1), number.Value())
+func TestInteger_big(t *testing.T) {
+	number := IntegerFromUint(1)
 	assert.EqualValues(t, big.NewInt(1), number.BigInt())
 
-	number, err := NumberFromBig(big.NewInt(1))
+	number, err := IntegerFromBig(big.NewInt(1))
 	assert.NoError(t, err)
-	assert.EqualValues(t, big.NewInt(1), number.Value())
+	assert.EqualValues(t, big.NewInt(1), number.BigInt())
 
-	number = MustNumberFromBig(new(big.Int).Lsh(big.NewInt(1), 63))
-	assert.True(t, number.IsInt())
+	number = MustIntegerFromBig(new(big.Int).Lsh(big.NewInt(1), 63))
 	assert.False(t, number.IsInt64())
 	assert.Equal(t, uint64(1)<<63, number.Uint64())
 
-	_, err = NumberFromBig(new(big.Int).Lsh(big.NewInt(1), 64))
+	_, err = IntegerFromBig(new(big.Int).Lsh(big.NewInt(1), 64))
 	assert.ErrorContains(t, err, "outside CBOR int range")
 
 	assert.Panics(t, func() {
-		MustNumberFromBig(new(big.Int).Lsh(big.NewInt(1), 64))
+		MustIntegerFromBig(new(big.Int).Lsh(big.NewInt(1), 64))
 	})
 
-	_, err = NumberFromBig(nil)
+	_, err = IntegerFromBig(nil)
 	assert.ErrorContains(t, err, "nil")
 
-	assert.Equal(t, uint64(0), NumberFromInt(-1).Uint64())
+	assert.Equal(t, uint64(0), IntegerFromInt(-1).Uint64())
 }
 
-func TestNumber_UnmarshalJSON(t *testing.T) {
+func TestInteger_UnmarshalJSON(t *testing.T) {
 	testCases := []struct {
 		title    string
 		input    string
-		expected Number
+		expected Integer
 		err      string
 	}{
 		{
-			title:    "ok int",
-			input:    `{"type":"int","value":1}`,
-			expected: NumberFromInt(1),
+			title:    "ok",
+			input:    `1`,
+			expected: IntegerFromInt(1),
 		},
 		{
-			title:    "ok int exp",
-			input:    `{"type":"int","value":1e2}`,
-			expected: NumberFromInt(100),
-		},
-		{
-			title:    "ok float",
-			input:    `{"type":"float","value":1e-2}`,
-			expected: NumberFromFloat64(0.01),
+			title:    "ok exp",
+			input:    `1e2`,
+			expected: IntegerFromInt(100),
 		},
 		{
 			title: "err invalid number",
-			input: `{"type":"int","value":"foo"}`,
+			input: `"foo"`,
 			err:   "not a JSON number",
 		},
 		{
-			title: "err bad type",
-			input: `{"type":"foo","value":1}`,
-			err:   `invalid Number value type: "foo"`,
-		},
-		{
-			title: "err invalid number",
-			input: `{"type":"int","value":"foo"}`,
-			err:   "not a JSON number",
-		},
-		{
-			title: "err int factional",
-			input: `{"type":"int","value":1.1}`,
+			title: "err factional",
+			input: `1.1`,
 			err:   `JSON number "1.1" has a non-zero fractional part`,
 		},
 		{
-			title: "err int out of range",
-			input: `{"type":"int","value":18446744073709551616}`,
+			title: "err out of range",
+			input: `18446744073709551616`,
 			err:   "outside CBOR int range",
 		},
 		{
-			title: "err int factional pathological",
-			input: `{"type":"int","value":1.00000000000000000000000000000000000000000000001}`,
+			title: "err factional pathological",
+			input: `1.00000000000000000000000000000000000000000000001`,
 			err:   `has a non-zero fractional part`,
 		},
 		{
 			title: "err string with number",
-			input: `{"type":"int","value":"42"}`,
+			input: `"42"`,
 			err:   "not a JSON number",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			var number Number
+			var number Integer
 			err := number.UnmarshalJSON([]byte(tc.input))
 
 			if tc.err == "" {
@@ -499,4 +383,125 @@ func TestNumber_UnmarshalJSON(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFloatMatcher_MatchesValue(t *testing.T) {
+	testCases := []struct {
+		title    string
+		matcher  *FloatMatcher
+		value    float64
+		expected bool
+	}{
+		{
+			title:    "match unit",
+			matcher:  NewFloatMatcher(1.1),
+			value:    1.1,
+			expected: true,
+		},
+		{
+			title:    "match set",
+			matcher:  NewFloatMatcher(1.1, 2.2, 3.3),
+			value:    2.2,
+			expected: true,
+		},
+		{
+			title:    "match range",
+			matcher:  MustNewFloatRange(1.0, 3.0),
+			value:    2.0,
+			expected: true,
+		},
+		{
+			title:    "match range inf",
+			matcher:  MustNewFloatRange(math.Inf(-1), math.Inf(1)),
+			value:    1e52,
+			expected: true,
+		},
+		{
+			title:    "match upper bound",
+			matcher:  NewFloatUpperBound(3.0),
+			value:    2.0,
+			expected: true,
+		},
+		{
+			title:    "match lower bound",
+			matcher:  NewFloatLowerBound(1.0),
+			value:    2.0,
+			expected: true,
+		},
+		{
+			title:    "fail unit",
+			matcher:  NewFloatMatcher(1.1),
+			value:    1.0,
+			expected: false,
+		},
+		{
+			title:    "fail unit NaN",
+			matcher:  NewFloatMatcher(math.NaN()),
+			value:    1.0,
+			expected: false,
+		},
+		{
+			title:    "fail set mixed",
+			matcher:  NewFloatMatcher(1.0, 2.1, 3.0),
+			value:    2.0,
+			expected: false,
+		},
+		{
+			title:    "fail range",
+			matcher:  MustNewFloatRange(1.0, 3.0),
+			value:    4.0,
+			expected: false,
+		},
+		{
+			title:    "fail upper bound",
+			matcher:  NewFloatUpperBound(1.0),
+			value:    2.0,
+			expected: false,
+		},
+		{
+			title:    "fail lower bound",
+			matcher:  NewFloatLowerBound(3.0),
+			value:    2.0,
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			ret := tc.matcher.MatchesValue(tc.value)
+			assert.Equal(t, tc.expected, ret)
+		})
+	}
+}
+
+func Test_tolerance(t *testing.T) {
+	n1 := 1.0
+	n2 := 1.0 + 1e-15
+	result, _ := Float64Compare(n1, n2)
+	assert.Equal(t, 0, result)
+
+	err := SetRelativeTolerance(1e-15)
+	assert.NoError(t, err)
+	result, _ = Float64Compare(n1, n2)
+	assert.Equal(t, -1, result)
+
+	// reset back to default
+	err = SetRelativeTolerance(1e-9)
+	assert.NoError(t, err)
+
+	n2 = 1.01
+	result, _ = Float64Compare(n1, n2)
+	assert.Equal(t, -1, result)
+
+	err = SetAbsoluteTolerance(1e-1)
+	assert.NoError(t, err)
+
+	result, _ = Float64Compare(n1, n2)
+	assert.Equal(t, 0, result)
+
+	err = SetAbsoluteTolerance(-1.0)
+	assert.ErrorContains(t, err, "tolerance cannot be negative")
+
+	err = SetRelativeTolerance(-1.0)
+	assert.ErrorContains(t, err, "tolerance cannot be negative")
 }

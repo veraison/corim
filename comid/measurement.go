@@ -375,9 +375,10 @@ type Mval struct {
 	IntegrityRegisters *IntegrityRegisters `cbor:"14,keyasint,omitempty" json:"integrity-registers,omitempty"`
 	IntRange           *RawInt             `cbor:"15,keyasint,omitempty" json:"int-range,omitempty"`
 	Bool               *bool               `cbor:"16,keyasint,omitempty" json:"bool,omitempty"`
-	Number             *NumberMatcher      `cbor:"17,keyasint,omitempty" json:"number,omitempty"`
+	Integer            *IntegerMatcher     `cbor:"17,keyasint,omitempty" json:"integer,omitempty"`
 	Text               *TextMatcher        `cbor:"18,keyasint,omitempty" json:"text,omitempty"`
 	Bytes              *BytesMatcher       `cbor:"19,keyasint,omitempty" json:"bytes,omitempty"`
+	Float              *FloatMatcher       `cbor:"20,keyasint,omitempty" json:"float,omitempty"`
 	Extensions
 }
 
@@ -468,9 +469,10 @@ func (o Mval) Valid() error {
 		o.IntegrityRegisters == nil &&
 		o.IntRange == nil &&
 		o.Bool == nil &&
-		o.Number == nil &&
+		o.Integer == nil &&
 		o.Text == nil &&
 		o.Bytes == nil &&
+		o.Float == nil &&
 		o.IsEmpty() {
 
 		return fmt.Errorf("no measurement value set")
@@ -800,11 +802,20 @@ func (o *Measurement) SetBool(value bool) *Measurement {
 	return o
 }
 
-// SetNumber sets the supplied NumberMatcher in the measurement-values-map of the
+// SetInteger sets the supplied IntegerMatcher in the measurement-values-map of the
 // target measurement
-func (o *Measurement) SetNumber(value *NumberMatcher) *Measurement {
+func (o *Measurement) SetInteger(value *IntegerMatcher) *Measurement {
 	if o != nil {
-		o.Val.Number = value
+		o.Val.Integer = value
+	}
+	return o
+}
+
+// SetFloat sets the supplied FloatMatcher in the measurement-values-map of the
+// target measurement
+func (o *Measurement) SetFloat(value *FloatMatcher) *Measurement {
+	if o != nil {
+		o.Val.Float = value
 	}
 	return o
 }

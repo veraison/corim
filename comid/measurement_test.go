@@ -637,18 +637,21 @@ MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE=
 
 func TestMeasurement_setters(t *testing.T) {
 	boolVal := true
-	numberMatcher := NewNumberMatcher(NumberFromInt(1))
+	integerMatcher := NewIntegerMatcher(IntegerFromInt(1))
 	textMatcher := NewTextMatcher("foo")
 	bytesMatcher := NewBytesMatcher([]byte("foo"))
+	floatMatcher := NewFloatMatcher(1.0)
 
 	m := MustNewUUIDMeasurement(TestUUID).
 		SetBool(boolVal).
-		SetNumber(numberMatcher).
+		SetInteger(integerMatcher).
 		SetText(textMatcher).
-		SetBytes(bytesMatcher)
+		SetBytes(bytesMatcher).
+		SetFloat(floatMatcher)
 
 	assert.Equal(t, boolVal, *m.Val.Bool)
-	assert.Equal(t, numberMatcher, m.Val.Number)
+	assert.Equal(t, integerMatcher, m.Val.Integer)
 	assert.Equal(t, textMatcher, m.Val.Text)
 	assert.Equal(t, bytesMatcher, m.Val.Bytes)
+	assert.Equal(t, floatMatcher, m.Val.Float)
 }
