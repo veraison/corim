@@ -12,7 +12,7 @@ require (
 	github.com/veraison/cmw v0.2.0
 	github.com/veraison/eat v0.0.0-20210331113810-3da8a4dd42ff
 	github.com/veraison/go-cose v1.3.0
-	github.com/veraison/swid v1.1.1-0.20251003121634-fd1f7f1e1897
+	github.com/veraison/swid v1.1.1-0.20261103161241-f3ade3481f31
 	github.com/yosida95/uritemplate/v3 v3.0.2
 )
 
