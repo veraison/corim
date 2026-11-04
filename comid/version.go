@@ -4,6 +4,7 @@
 package comid
 
 import (
+	"encoding/base64"
 	"fmt"
 
 	"github.com/veraison/swid"
@@ -42,6 +43,13 @@ func (o Version) Valid() error {
 	if o.Version == "" {
 		return fmt.Errorf("empty version")
 	}
+
+	if o.Scheme != nil && o.Scheme.String() == "binary" {
+		if _, err := base64.RawURLEncoding.DecodeString(o.Version); err != nil {
+			return fmt.Errorf("invalid base64url_nopad value for binary version scheme: %w", err)
+		}
+	}
+
 	return nil
 }
 

@@ -16,12 +16,22 @@ func TestVersion_Valid_OK(t *testing.T) {
 	v.SetScheme(swid.VersionSchemeSemVer)
 
 	assert.Nil(t, v.Valid())
+
+	v.SetVersion("abcd")
+	v.SetScheme(swid.VersionSchemeBinary)
+
+	assert.Nil(t, v.Valid())
 }
 
 func TestVersion_Valid_NOK(t *testing.T) {
 	v := NewVersion()
 
 	assert.EqualError(t, v.Valid(), "empty version")
+
+	v.SetScheme(swid.VersionSchemeBinary)
+	v.SetVersion("1.2")
+
+	assert.EqualError(t, v.Valid(), "invalid base64url_nopad value for binary version scheme: illegal base64 data at input byte 1")
 }
 
 func TestVersion_Equal_True(t *testing.T) {
