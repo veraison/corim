@@ -14,6 +14,17 @@ The [`corim/cotl`](cotl) package provides a golang implementation of the Concise
 > These API are still in active development (as is the underlying CoRIM spec).
 > They are **subject to change** in the future.
 
+## Compatibility
+
+This implementation is fully compliant with revision 11 of the specification
+draft. There is partial support for features from subsequent revisions:
+
+Feature | Revision | Supported?
+--|--|--
+scalar matchers (mval code points 16-20) | 12 | ✅
+"binary" version scheme | 12 | ✅
+multiple signatures | 12 | :x:
+
 ## Profile documents
 
 The [TPM 2.0 CoRIM Reference Values Profile](docs/profiles/tpm-v1.md) is a
