@@ -53,11 +53,19 @@ var (
 // cmp.Ordered].
 type Compare[T any] func(lhs T, rhs T) (int, error)
 
+// Validate returns an error if the specified value is invalid for a matcher.
+// This can be used add additional constraints on top of a type.
+type Validate[T any] func(T) error
+
 // RegisterMatcherDescriptor registers an equality function for type T. Each
 // type must specify two things: a compare function for that type, and which
 // matchers are supported by the type (note: MatcherTypeUnit must always be
 // specified).
-func RegisterMatcherDescriptor[T any](compare Compare[T], supportedVariants ...MatcherType) error {
+func RegisterMatcherDescriptor[T any](
+	compare Compare[T],
+	validate Validate[T],
+	supportedVariants ...MatcherType,
+) error {
 	key := typeName[T]()
 	if _, ok := matcherDescriptorRegistry[key]; ok {
 		return fmt.Errorf("equal for %T already registered", key)
@@ -69,6 +77,7 @@ func RegisterMatcherDescriptor[T any](compare Compare[T], supportedVariants ...M
 
 	matcherDescriptorRegistry[key] = matcherDescriptor[T]{
 		Compare:           compare,
+		Validate:          validate,
 		SupportedVariants: supportedVariants,
 	}
 
@@ -85,7 +94,7 @@ type TextMatcher = Matcher[string]
 // created.
 func NewTextMatcher(head string, tail ...string) *TextMatcher {
 	if len(tail) == 0 {
-		return &TextMatcher{NewUnitMatcher(head)}
+		return &TextMatcher{MustNewUnitMatcher(head)}
 	}
 
 	values := append([]string{head}, tail...)
@@ -103,7 +112,7 @@ type BytesMatcher = Matcher[[]byte]
 // created.
 func NewBytesMatcher(head []byte, tail ...[]byte) *BytesMatcher {
 	if len(tail) == 0 {
-		return &BytesMatcher{NewUnitMatcher(head)}
+		return &BytesMatcher{MustNewUnitMatcher(head)}
 	}
 
 	values := append([][]byte{head}, tail...)
@@ -323,9 +332,25 @@ type UnitMatcher[T any] struct {
 	value T
 }
 
-// NewUnitMatcher returns a new Unit that matches the provided value.
-func NewUnitMatcher[T any](value T) UnitMatcher[T] {
-	return UnitMatcher[T]{value}
+// MustNewUnitMatcher returns a new Unit that matches the provided value. It
+// panics if the value is invalid.
+func MustNewUnitMatcher[T any](value T) UnitMatcher[T] {
+	ret, err := NewUnitMatcher(value)
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+// NewUnitMatcher returns a new Unit that matches the provided value. If the
+// value is invalid, an error is returned instead.
+func NewUnitMatcher[T any](value T) (UnitMatcher[T], error) {
+	if err := validate(value); err != nil {
+		return UnitMatcher[T]{}, err
+	}
+
+	return UnitMatcher[T]{value}, nil
 }
 
 func (o UnitMatcher[T]) MatcherType() MatcherType {
@@ -397,18 +422,11 @@ func MustNewSetMatcher[T any](values ...T) SetMatcher[T] {
 // returned if fewer than two values are provided, or if there are duplicates
 // among the values.
 func NewSetMatcher[T any](values ...T) (SetMatcher[T], error) {
-	var ret SetMatcher[T]
-	for _, value := range values {
-		if !ret.Add(value) {
-			return SetMatcher[T]{}, fmt.Errorf("duplicate: %v", value)
-		}
+	if err := validateSet(values); err != nil {
+		return SetMatcher[T]{}, err
 	}
 
-	if ret.Len() < 2 {
-		return SetMatcher[T]{}, errors.New("must specify at least two distinct elements")
-	}
-
-	return ret, nil
+	return SetMatcher[T]{values}, nil
 }
 
 // Contains returns true of the receiver contains the provided value.
@@ -468,8 +486,8 @@ func (o SetMatcher[T]) IterValues() iter.Seq[T] {
 }
 
 func (o SetMatcher[T]) MarshalCBOR() ([]byte, error) {
-	if o.Len() < 2 {
-		return nil, errors.New("set must contain at least two entries")
+	if err := validateSet(o.values); err != nil {
+		return nil, err
 	}
 
 	return em.Marshal(o.values)
@@ -481,22 +499,18 @@ func (o *SetMatcher[T]) UnmarshalCBOR(data []byte) error {
 		return err
 	}
 
-	if len(values) < 2 {
-		return errors.New("set must contain at least two entries")
+	if err := validateSet(values); err != nil {
+		return err
 	}
 
-	for _, value := range values {
-		if !o.Add(value) {
-			return fmt.Errorf("duplicate: %v", value)
-		}
-	}
+	o.values = values
 
 	return nil
 }
 
 func (o SetMatcher[T]) MarshalJSON() ([]byte, error) {
-	if o.Len() < 2 {
-		return nil, errors.New("set must contain at least two entries")
+	if err := validateSet(o.values); err != nil {
+		return nil, err
 	}
 
 	return json.Marshal(o.values)
@@ -508,15 +522,11 @@ func (o *SetMatcher[T]) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(values) < 2 {
-		return errors.New("set must contain at least two entries")
+	if err := validateSet(values); err != nil {
+		return err
 	}
 
-	for _, value := range values {
-		if !o.Add(value) {
-			return fmt.Errorf("duplicate: %v", value)
-		}
-	}
+	o.values = values
 
 	return nil
 }
@@ -542,8 +552,8 @@ func MustNewRangeMatcher[T any](lower, upper *T) RangeMatcher[T] {
 // NewRangeMatcher returns a RangeMatcher for the range [lower, upper]. If
 // lower is greater than upper, an error is returned.
 func NewRangeMatcher[T any](lower, upper *T) (RangeMatcher[T], error) {
-	if lower != nil && upper != nil && lessThan[T]()(*upper, *lower) {
-		return RangeMatcher[T]{}, errors.New("upper bound cannot be less than lower bound")
+	if err := validateRange(lower, upper); err != nil {
+		return RangeMatcher[T]{}, err
 	}
 
 	return RangeMatcher[T]{lower: lower, upper: upper}, nil
@@ -613,6 +623,10 @@ func (o *RangeMatcher[T]) UnmarshalCBOR(data []byte) error {
 		return err
 	}
 
+	if err := validateRange(bounds[0], bounds[1]); err != nil {
+		return err
+	}
+
 	o.lower = bounds[0]
 	o.upper = bounds[1]
 
@@ -629,14 +643,63 @@ func (o *RangeMatcher[T]) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	if err := validateRange(bounds[0], bounds[1]); err != nil {
+		return err
+	}
+
 	o.lower = bounds[0]
 	o.upper = bounds[1]
 
 	return nil
 }
 
+func validateRange[T any](lower, upper *T) error {
+	if lower == nil && upper == nil {
+		return errors.New("both range bounds cannot be null")
+	}
+
+	if lower != nil && upper != nil && lessThan[T]()(*upper, *lower) {
+		return errors.New("upper bound cannot be less than lower bound")
+	}
+
+	if lower != nil {
+		if err := validate(*lower); err != nil {
+			return fmt.Errorf("lower bound: %w", err)
+		}
+	}
+
+	if upper != nil {
+		if err := validate(*upper); err != nil {
+			return fmt.Errorf("upper bound: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func validateSet[T any](values []T) error {
+	if len(values) < 2 {
+		return errors.New("set must contain at least two distinct elements")
+	}
+
+	for i := 0; i < len(values); i++ {
+		if err := validate(values[i]); err != nil {
+			return fmt.Errorf("value[%d]: %w", i, err)
+		}
+
+		for j := i + 1; j < len(values); j++ {
+			if equal[T]()(values[i], values[j]) {
+				return fmt.Errorf("duplicate: %v", values[i])
+			}
+		}
+	}
+
+	return nil
+}
+
 type matcherDescriptor[T any] struct {
 	Compare           Compare[T]
+	Validate          Validate[T]
 	SupportedVariants []MatcherType
 }
 
@@ -644,6 +707,16 @@ func typeName[T any]() string {
 	var zero T
 	t := reflect.TypeOf(&zero).Elem()
 	return t.String()
+}
+
+func validate[T any](value T) error {
+	key := typeName[T]()
+	desc, ok := matcherDescriptorRegistry[key]
+	if ok {
+		return desc.(matcherDescriptor[T]).Validate(value)
+	} else {
+		return errors.New("type %T has no matcher validator registered")
+	}
 }
 
 type matchTest[T any] func(lhs, rhs T) bool
@@ -700,6 +773,7 @@ var matcherDescriptorRegistry = map[string]any{
 			MatcherTypeUnit,
 			MatcherTypeSet,
 		},
+		Validate: func(string) error { return nil },
 		Compare: func(lhs, rhs string) (int, error) {
 			return cmp.Compare(lhs, rhs), nil
 		},
@@ -709,6 +783,7 @@ var matcherDescriptorRegistry = map[string]any{
 			MatcherTypeUnit,
 			MatcherTypeSet,
 		},
+		Validate: func([]byte) error { return nil },
 		Compare: func(lhs, rhs []byte) (int, error) {
 			return bytes.Compare(lhs, rhs), nil
 		},

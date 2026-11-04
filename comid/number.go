@@ -191,7 +191,7 @@ type IntegerMatcher = Matcher[Integer]
 // created.
 func NewIntegerMatcher(head Integer, tail ...Integer) *IntegerMatcher {
 	if len(tail) == 0 {
-		return &IntegerMatcher{NewUnitMatcher(head)}
+		return &IntegerMatcher{MustNewUnitMatcher(head)}
 	}
 
 	values := append([]Integer{head}, tail...)
@@ -259,10 +259,10 @@ type FloatMatcher = Matcher[float64]
 // NewFloatMatcher returns a pointer to a FloatMatcher containing the
 // provided values. If No tail values are specified, a unit matcher is created
 // using head, otherwise a set matcher containing head and tail values is
-// created.
+// created. It panics is any of the values are NaN.
 func NewFloatMatcher(head float64, tail ...float64) *FloatMatcher {
 	if len(tail) == 0 {
-		return &FloatMatcher{NewUnitMatcher(head)}
+		return &FloatMatcher{MustNewUnitMatcher(head)}
 	}
 
 	values := append([]float64{head}, tail...)
@@ -272,7 +272,7 @@ func NewFloatMatcher(head float64, tail ...float64) *FloatMatcher {
 
 // MustNewFloatRange returns a pointer to a FloatMatcher that matches the
 // Float range [lower, upper] (inclusive on both ends). It panics if the upper
-// bound is less than the lower bound.
+// bound is less than the lower bound or either of the values is NaN.
 func MustNewFloatRange(lower, upper float64) *FloatMatcher {
 	matcher, err := NewFloatRange(lower, upper)
 	if err != nil {
@@ -284,7 +284,7 @@ func MustNewFloatRange(lower, upper float64) *FloatMatcher {
 
 // NewFloatRange returns a pointer to a FloatMatcher that matches the Float
 // range [lower, upper] (inclusive on both ends). An error is returned if the
-// upper bound is less than the lower bound.
+// upper bound is less than the lower bound or either of the values is NaN.
 func NewFloatRange(lower, upper float64) (*FloatMatcher, error) {
 	rang, err := NewRangeMatcher(&lower, &upper)
 	if err != nil {
@@ -295,7 +295,8 @@ func NewFloatRange(lower, upper float64) (*FloatMatcher, error) {
 }
 
 // NewFloatUpperBound returns a pointer to a FloatMatcher that matches any
-// Float less than or equal to the specified upper bound.
+// Float less than or equal to the specified upper bound. It panics if the
+// provided value is NaN.
 func NewFloatUpperBound(upper float64) *FloatMatcher {
 	rang, err := NewRangeMatcher(nil, &upper)
 	if err != nil {
@@ -307,7 +308,8 @@ func NewFloatUpperBound(upper float64) *FloatMatcher {
 }
 
 // NewFloatLowerBound returns a pointer to a FloatMatcher that matches any
-// Float greater than or equal to the specified lower bound.
+// Float greater than or equal to the specified lower bound. It panics if
+// the provided value is NaN.
 func NewFloatLowerBound(lower float64) *FloatMatcher {
 	rang, err := NewRangeMatcher(&lower, nil)
 	if err != nil {
@@ -408,6 +410,7 @@ func unmarshalBigIntFromJSON(data []byte) (*big.Int, error) {
 func init() {
 	if err := RegisterMatcherDescriptor(
 		IntegerCompare,
+		func(Integer) error { return nil },
 		MatcherTypeUnit,
 		MatcherTypeSet,
 		MatcherTypeRange,
@@ -417,6 +420,17 @@ func init() {
 
 	if err := RegisterMatcherDescriptor(
 		Float64Compare,
+		func(value float64) error {
+			if math.IsNaN(value) {
+				return errors.New("NaN")
+			}
+
+			if math.Inf(1) == value || math.Inf(-1) == value {
+				return errors.New("Inf")
+			}
+
+			return nil
+		},
 		MatcherTypeUnit,
 		MatcherTypeSet,
 		MatcherTypeRange,
