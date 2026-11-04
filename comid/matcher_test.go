@@ -248,7 +248,7 @@ func TestBytesMatcher_CompareAgainstReference(t *testing.T) {
 
 func TestNewSet_negative(t *testing.T) {
 	_, err := NewSetMatcher("foo")
-	assert.ErrorContains(t, err, "must specify at least two distinct elements")
+	assert.ErrorContains(t, err, "set must contain at least two distinct elements")
 }
 
 func TestSet_Add(t *testing.T) {

@@ -4,7 +4,6 @@
 package comid
 
 import (
-	"math"
 	"math/big"
 	"slices"
 	"testing"
@@ -411,12 +410,6 @@ func TestFloatMatcher_MatchesValue(t *testing.T) {
 			expected: true,
 		},
 		{
-			title:    "match range inf",
-			matcher:  MustNewFloatRange(math.Inf(-1), math.Inf(1)),
-			value:    1e52,
-			expected: true,
-		},
-		{
 			title:    "match upper bound",
 			matcher:  NewFloatUpperBound(3.0),
 			value:    2.0,
@@ -431,12 +424,6 @@ func TestFloatMatcher_MatchesValue(t *testing.T) {
 		{
 			title:    "fail unit",
 			matcher:  NewFloatMatcher(1.1),
-			value:    1.0,
-			expected: false,
-		},
-		{
-			title:    "fail unit NaN",
-			matcher:  NewFloatMatcher(math.NaN()),
 			value:    1.0,
 			expected: false,
 		},
@@ -504,4 +491,125 @@ func Test_tolerance(t *testing.T) {
 
 	err = SetRelativeTolerance(-1.0)
 	assert.ErrorContains(t, err, "tolerance cannot be negative")
+}
+
+func TestFloatMatcher_UnmarshalCBOR_negative(t *testing.T) {
+	testCases := []struct {
+		title string
+		bytes []byte
+		err   string
+	}{
+		{
+			title: "err range bound both null",
+			bytes: []byte{
+				0xd9, 0x02, 0x35, // tag(565) [tagged-*-range]
+				0x82, //             . array(2)
+				0xf6, //             . . null
+				0xf6, //             . . null
+			},
+			err: "both range bounds cannot be null",
+		},
+		{
+			title: "err range lower higher than upper",
+			bytes: []byte{
+				0xd9, 0x02, 0x35, // tag(565) [tagged-*-range]
+				0x82,             // . array(2)
+				0xf9, 0x40, 0x00, // . . 2.0
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "upper bound cannot be less than lower bound",
+		},
+		{
+			title: "err range contains NaN",
+			bytes: []byte{
+				0xd9, 0x02, 0x35, // tag(565) [tagged-*-range]
+				0x82,             // . array(2)
+				0xf9, 0x7e, 0x00, // . . NaN
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "lower bound: NaN",
+		},
+		{
+			title: "err range contains Inf",
+			bytes: []byte{
+				0xd9, 0x02, 0x35, // tag(565) [tagged-*-range]
+				0x82,             // . array(2)
+				0xf9, 0x7c, 0x00, // . . Inf
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "lower bound: Inf",
+		},
+		{
+			title: "err set with duplicates",
+			bytes: []byte{
+				0xd9, 0x02, 0x36, // tag(566) [tagged-*-set]
+				0x82,             // . array(2)
+				0xf9, 0x3c, 0x00, // . . 1.0
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "duplicate: 1",
+		},
+		{
+			title: "err set with NaN",
+			bytes: []byte{
+				0xd9, 0x02, 0x36, // tag(566) [tagged-*-set]
+				0x82,             // . array(2)
+				0xf9, 0x7e, 0x00, // . . NaN
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "value[0]: NaN",
+		},
+		{
+			title: "err set with -Inf",
+			bytes: []byte{
+				0xd9, 0x02, 0x36, // tag(566) [tagged-*-set]
+				0x82,             // . array(2)
+				0xf9, 0xfc, 0x00, // . . -Inf
+				0xf9, 0x3c, 0x00, // . . 1.0
+			},
+			err: "value[0]: Inf",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			var matcher FloatMatcher
+			err := matcher.UnmarshalCBOR(tc.bytes)
+			assert.ErrorContains(t, err, tc.err)
+		})
+	}
+
+}
+
+func TestFloatMatcher_UnmarshalJSON_negative(t *testing.T) {
+	testCases := []struct {
+		title string
+		text  string
+		err   string
+	}{
+		{
+			title: "err range bound both null",
+			text:  `{"type":"range","value":[null,null]}`,
+			err:   "both range bounds cannot be null",
+		},
+		{
+			title: "err range lower higher than upper",
+			text:  `{"type":"range","value":[2,1]}`,
+			err:   "upper bound cannot be less than lower bound",
+		},
+		{
+			title: "err set with duplicates",
+			text:  `{"type":"set","value":[1,1]}`,
+			err:   "duplicate: 1",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			var matcher FloatMatcher
+			err := matcher.UnmarshalJSON([]byte(tc.text))
+			assert.ErrorContains(t, err, tc.err)
+		})
+	}
+
 }
