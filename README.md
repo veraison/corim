@@ -49,11 +49,18 @@ and check its output to make sure your code coverage figures are in line with th
 
 Signed CoRIM messages may carry an X.509 chain in the COSE `x5chain` protected header.
 Use [`SignedCorim.VerifyWithX5Chain`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.VerifyWithX5Chain)
-after [`FromCOSE`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.FromCOSE) to validate PKIX trust, optional CRL revocation, and the COSE signature.
+after [`FromCOSE`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.FromCOSE) (or after a successful [`Sign`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.Sign)) to validate PKIX trust, CRL revocation, and the COSE signature.
 
-Load trust material with [`LoadTrustAnchors`](https://pkg.go.dev/github.com/veraison/corim/corim#LoadTrustAnchors).
-When no trust-anchor paths are supplied, verification uses the OS certificate store; for production deployments, pass explicit anchors.
-When no CRL paths are supplied, revocation checks are skipped; when CRLs are loaded, [`CrlPolicyStrict`](https://pkg.go.dev/github.com/veraison/corim/corim#CrlPolicyStrict) is the default.
+PKIX/CRL behavior is implemented by [`github.com/veraison/go-cose`](https://pkg.go.dev/github.com/veraison/go-cose).
+Configure trust with [`cose.TrustAnchors`](https://pkg.go.dev/github.com/veraison/go-cose#TrustAnchors) and optional [`cose.X5ChainVerifyOptions`](https://pkg.go.dev/github.com/veraison/go-cose#X5ChainVerifyOptions); load files with [`cose.LoadTrustAnchors`](https://pkg.go.dev/github.com/veraison/go-cose#LoadTrustAnchors).
+See the go-cose docs for PEM/DER rules, CRL matching, and [`CRLPolicy`](https://pkg.go.dev/github.com/veraison/go-cose#CRLPolicy).
+
+Defaults that commonly trip callers:
+- Verification fails closed for a zero-value `TrustAnchors`, or one loaded with no anchor paths: there is no OS-store fallback. Set `Anchors` and/or `UseSystemRoots`.
+- Default [`RevocationFullChain`](https://pkg.go.dev/github.com/veraison/go-cose#RevocationFullChain) requires CRLs; set [`RevocationDisabled`](https://pkg.go.dev/github.com/veraison/go-cose#RevocationDisabled) when revocation is not required.
+
+The `x5chain` header must be leaf-first (RFC 9360 §2). `FromCOSE` and `Sign` reject other orders, including when the caller only uses [`Verify`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.Verify) with an external key.
+Use `errors.Is` with `ErrX5ChainNoTrust`, `ErrX5ChainCRLMissing`, `ErrX5ChainRevoked`, or `ErrX5ChainSignature` to distinguish failures.
 
 For external-key verification without PKIX path validation, use [`SignedCorim.Verify`](https://pkg.go.dev/github.com/veraison/corim/corim#SignedCorim.Verify) instead.
 
