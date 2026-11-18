@@ -24,7 +24,7 @@ type EatCWTClaim struct {
 
 	eat.CWTClaims
 
-	// Partial list of claims defined by draft-ietf-rats-eat-12
+	// Partial list of claims defined by RFC 9711
 	HardwareModelLabel    *[]byte              `cbor:"259,keyasint,omitempty" json:"hwmodel,omitempty"`
 	HardwareVersionScheme *HardwareVersionType `cbor:"260,keyasint,omitempty" json:"hwvers,omitempty"`
 
