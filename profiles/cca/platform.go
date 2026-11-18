@@ -11,7 +11,7 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
-	"github.com/veraison/corim/profiles/psa"
+	"github.com/veraison/corim/profiles/common/arm"
 )
 
 const PlatformProfileURI = "tag:arm.com,2025:cca_platform#1.0.0"
@@ -65,7 +65,7 @@ func (o PlatformTriplesExtensions) ValidTriples(triples *comid.Triples) error {
 // validateCCAPlatformReferenceValue validates a Reference Value of CCA Platform Endorsements.
 func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 	// Validate Implementation ID in Environment (Section 3.1.2)
-	if err := validateCCAPlatformImplementationID(&refVal.Environment); err != nil {
+	if err := arm.ValidateImplementationID(&refVal.Environment, ""); err != nil {
 		return fmt.Errorf("environment: %w", err)
 	}
 
@@ -161,7 +161,7 @@ func validateCCASoftwareComponent(measurement *comid.Measurement) error {
 	}
 
 	// Validate cryptokeys (key 13) - mandatory, exactly one signer-id
-	if err := validateCCASignerID(measurement.Val.CryptoKeys); err != nil {
+	if err := arm.ValidateSignerID(measurement.Val.CryptoKeys, 0, 0); err != nil {
 		return fmt.Errorf("cryptokeys: %w", err)
 	}
 
@@ -198,15 +198,6 @@ func validateCCADigests(digests *comid.Digests) error {
 	}
 
 	return nil
-}
-
-// validateCCASignerID validates the cryptokeys field (signer-id) - key 13
-//
-//	a) CryptoKeys field is set and contains exactly one entry
-//	b) The type of CryptoKey is TaggedBytes (Type() returns "bytes")
-//	c) The length of the value is 32, 48, or 64 bytes
-func validateCCASignerID(keys *comid.CryptoKeys) error {
-	return psa.ValidateSignerID(keys, 0, 0)
 }
 
 // validateCCAPlatformConfig validates a CCA Platform configuration measurement
@@ -270,13 +261,13 @@ func validateCCATBBRoTPK(keys *comid.CryptoKeys) error {
 // The CPAK public key must use pkix-base64-key-type and there must be exactly one key.
 func validateCCAPlatformAttestVerifKey(avk *comid.KeyTriple) error {
 	// Validate Implementation ID in Environment (Section 3.1.2)
-	if err := validateCCAPlatformImplementationID(&avk.Environment); err != nil {
+	if err := arm.ValidateImplementationID(&avk.Environment, ""); err != nil {
 		return fmt.Errorf("environment: %w", err)
 	}
 
 	// Validate Instance ID in Environment (Section 3.1.2)
 	// Instance ID is REQUIRED for Attestation Verification Keys
-	if err := validateCCAPlatformInstanceID(&avk.Environment); err != nil {
+	if err := arm.ValidateInstanceID(&avk.Environment, ""); err != nil {
 		return fmt.Errorf("environment: %w", err)
 	}
 
@@ -301,23 +292,6 @@ func validateCCAPlatformAttestVerifKey(avk *comid.KeyTriple) error {
 	}
 
 	return nil
-}
-
-// validateCCAPlatformImplementationID validates the CCA Platform Implementation ID
-// The Implementation ID must be:
-//   - A tagged-bytes type (CBOR tag 560)
-//   - Exactly 32 bytes in length
-func validateCCAPlatformImplementationID(env *comid.Environment) error {
-	return psa.ValidateImplementationID(env, "")
-}
-
-// validateCCAPlatformInstanceID validates the CCA Platform Instance ID per Section 3.1.2
-// The Instance ID must be:
-//   - A tagged-ueid-type (CBOR tag 550)
-//   - The first byte MUST be 0x01 (RAND type)
-//   - Followed by exactly 32 bytes (total 33 bytes)
-func validateCCAPlatformInstanceID(env *comid.Environment) error {
-	return psa.ValidateInstanceID(env, "")
 }
 
 // validateCCARawValue is a common function applicable to validation of CCA Platform Configuration raw-value
