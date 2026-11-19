@@ -9,6 +9,7 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
+	"github.com/veraison/corim/profiles/common/arm"
 )
 
 const ProfileURI = "tag:arm.com,2025:psa#1.0.0"
@@ -63,7 +64,7 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 	prefix := fmt.Sprintf("reference value at index %d", tripleIndex)
 
 	// Validate Implementation ID in Environment (Section 3.2)
-	if err := ValidateImplementationID(&refVal.Environment, prefix); err != nil {
+	if err := arm.ValidateImplementationID(&refVal.Environment, prefix); err != nil {
 		return err
 	}
 
@@ -80,7 +81,7 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 		// - Must have exactly one entry
 		// - Entry must be tagged-bytes (type "bytes")
 		// - Byte length must be 32, 48, or 64 (psa-hash-type)
-		if err := ValidateSignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
+		if err := arm.ValidateSignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
 			return err
 		}
 	}
@@ -112,69 +113,19 @@ func validatePSAMkey(key *comid.Mkey, tripleIndex, measurementIndex int) error {
 	return nil
 }
 
-// ValidateSignerID validates the cryptokeys field (signer-id)
-//
-//	a) CryptoKeys field is set and contains exactly one entry
-//	b) The type of CryptoKey is TaggedBytes (Type() returns "bytes")
-//	c) The length of the value is 32, 48, or 64
-func ValidateSignerID(keys *comid.CryptoKeys, tripleIndex, measurementIndex int) error {
-	prefix := fmt.Sprintf("reference value at index %d, measurement at index %d", tripleIndex, measurementIndex)
-
-	// a) CryptoKeys field MUST be set (mandatory per PSA profile)
-	if keys == nil {
-		return fmt.Errorf("%s: cryptokeys (signer-id) is mandatory but not set", prefix)
-	}
-
-	// a) Must contain exactly one entry
-	if len(*keys) == 0 {
-		return fmt.Errorf("%s: cryptokeys must contain exactly one entry, got 0", prefix)
-	}
-
-	if len(*keys) != 1 {
-		return fmt.Errorf("%s: cryptokeys must contain exactly one entry, got %d", prefix, len(*keys))
-	}
-
-	key := (*keys)[0]
-	if key == nil {
-		return fmt.Errorf("%s: cryptokeys entry is nil", prefix)
-	}
-
-	// b) The CryptoKey must be of type "bytes" (TaggedBytes)
-	if key.Type() != "bytes" {
-		return fmt.Errorf("%s: cryptokeys (signer-id) must be of type 'bytes', got '%s'", prefix, key.Type())
-	}
-
-	// c) Byte length must be 32, 48, or 64 (psa-hash-type: SHA-256, SHA-384, or SHA-512)
-	tb, ok := key.Value.(comid.TaggedBytes)
-	if !ok {
-		tbPtr, ok := key.Value.(*comid.TaggedBytes)
-		if !ok {
-			return fmt.Errorf("%s: failed to extract TaggedBytes from cryptokeys", prefix)
-		}
-		tb = *tbPtr
-	}
-
-	switch len(tb) {
-	case 32, 48, 64:
-		return nil
-	default:
-		return fmt.Errorf("%s: signer-id must be 32, 48, or 64 bytes (got %d)", prefix, len(tb))
-	}
-}
-
 // validatePSAAttestVerifKey validates Attestation Verification Keys
 // The IAK public key must use pkix-base64-key-type and there must be exactly one key.
 func validatePSAAttestVerifKey(avk *comid.KeyTriple, index int) error {
 	prefix := fmt.Sprintf("attester verification key at index %d", index)
 
 	// Validate Implementation ID in Environment (Section 3.2)
-	if err := ValidateImplementationID(&avk.Environment, prefix); err != nil {
+	if err := arm.ValidateImplementationID(&avk.Environment, prefix); err != nil {
 		return err
 	}
 
 	// Validate Instance ID in Environment (Section 3.2)
 	// Instance ID is required for Attestation Verification Keys
-	if err := ValidateInstanceID(&avk.Environment, prefix); err != nil {
+	if err := arm.ValidateInstanceID(&avk.Environment, prefix); err != nil {
 		return err
 	}
 
@@ -196,71 +147,6 @@ func validatePSAAttestVerifKey(avk *comid.KeyTriple, index int) error {
 	if key.Type() != comid.PKIXBase64KeyType {
 		return fmt.Errorf("%s: verification-key must be of type '%s', got '%s'",
 			prefix, comid.PKIXBase64KeyType, key.Type())
-	}
-
-	return nil
-}
-
-// ValidateImplementationID validates the Implementation ID
-// The Implementation ID must be:
-//   - A tagged-bytes type (CBOR tag 560)
-//   - Exactly 32 bytes in length
-func ValidateImplementationID(env *comid.Environment, prefix string) error {
-	// Implementation ID is in Environment.Class.ClassID
-	if env.Class == nil {
-		return fmt.Errorf("%s: environment.class is required", prefix)
-	}
-
-	if env.Class.ClassID == nil {
-		return fmt.Errorf("%s: environment.class.id (implementation-id) is required", prefix)
-	}
-
-	classID := env.Class.ClassID
-
-	// Must be of type "bytes" (tagged-bytes, CBOR tag 560)
-	if classID.Type() != "bytes" {
-		return fmt.Errorf("%s: implementation-id must be of type 'bytes', got '%s'", prefix, classID.Type())
-	}
-
-	// Must be exactly 32 bytes
-	idBytes := classID.Bytes()
-	if len(idBytes) != 32 {
-		return fmt.Errorf("%s: implementation-id must be exactly 32 bytes (got %d)", prefix, len(idBytes))
-	}
-
-	return nil
-}
-
-// ValidateInstanceID validates the Instance ID (UEID) per PSA Endorsements Section 3.2
-// The Instance ID must be:
-//   - A tagged-ueid-type (CBOR tag 550)
-//   - The first byte MUST be 0x01 (RAND type)
-//   - Followed by exactly 32 bytes (total 33 bytes)
-func ValidateInstanceID(env *comid.Environment, prefix string) error {
-	// Instance ID is in Environment.Instance
-	if env.Instance == nil {
-		return fmt.Errorf("%s: environment.instance (instance-id) is required", prefix)
-	}
-
-	instance := env.Instance
-
-	// Must be of type "ueid" (tagged-ueid-type, CBOR tag 550)
-	if instance.Type() != comid.UEIDType {
-		return fmt.Errorf("%s: instance-id must be of type '%s', got '%s'",
-			prefix, comid.UEIDType, instance.Type())
-	}
-
-	// Get the UEID bytes
-	ueidBytes := instance.Bytes()
-
-	// PSA Instance ID must be exactly 33 bytes (1 byte RAND type + 32 bytes identifier)
-	if len(ueidBytes) != 33 {
-		return fmt.Errorf("%s: instance-id must be exactly 33 bytes (got %d)", prefix, len(ueidBytes))
-	}
-
-	// The first byte MUST be 0x01 (RAND type per EAT UEID specification)
-	if ueidBytes[0] != 0x01 {
-		return fmt.Errorf("%s: instance-id must have RAND type (0x01), got 0x%02x", prefix, ueidBytes[0])
 	}
 
 	return nil
