@@ -63,17 +63,8 @@ func MustNewClassRealmRIM(val []byte) *comid.Class {
 // ValidateRealmRIM validates that the given bytes represent a valid CCA Realm Initial Measurement.
 // The RIM can be 32, 48, or 64 bytes (SHA-256, SHA-384, or SHA-512 hash digest).
 func ValidateRealmRIM(val []byte) error {
-	if err := ValidateHashDigestSize(val); err != nil {
+	if err := arm.ValidateHashDigestSize(val); err != nil {
 		return fmt.Errorf("%w: %w", ErrWrongRIMSize, err)
-	}
-	return nil
-}
-
-// ValidateHashDigestSize validates that the given bytes represent a valid hash digest.
-// Valid hash digest sizes are 32, 48, or 64 bytes (SHA-256, SHA-384, or SHA-512).
-func ValidateHashDigestSize(val []byte) error {
-	if len(val) != 32 && len(val) != 48 && len(val) != 64 {
-		return fmt.Errorf("%w: got %d bytes, expected 32, 48, or 64", arm.ErrWrongHashDigestSize, len(val))
 	}
 	return nil
 }

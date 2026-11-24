@@ -29,68 +29,6 @@ func TestPlatformProfile_Registered(t *testing.T) {
 	assert.NotNil(t, triples)
 }
 
-// Test validateCCADigests
-func TestValidateCCADigests_AllCases(t *testing.T) {
-	testCases := []struct {
-		title           string
-		digests         *comid.Digests
-		shouldError     bool
-		expectedMessage string
-	}{
-		{
-			title: "valid digest with SHA-256 (32 bytes)",
-			digests: func() *comid.Digests {
-				d := &comid.Digests{}
-				d.AddDigest(comid.Sha256, make([]byte, 32))
-				return d
-			}(),
-			shouldError: false,
-		},
-		{
-			title: "valid digest with SHA-384 (48 bytes)",
-			digests: func() *comid.Digests {
-				d := &comid.Digests{}
-				d.AddDigest(comid.Sha384, make([]byte, 48))
-				return d
-			}(),
-			shouldError: false,
-		},
-		{
-			title: "valid digest with SHA-512 (64 bytes)",
-			digests: func() *comid.Digests {
-				d := &comid.Digests{}
-				d.AddDigest(comid.Sha512, make([]byte, 64))
-				return d
-			}(),
-			shouldError: false,
-		},
-		{
-			title:           "nil digests",
-			digests:         nil,
-			shouldError:     true,
-			expectedMessage: "digests field is mandatory",
-		},
-		{
-			title:           "empty digests",
-			digests:         &comid.Digests{},
-			shouldError:     true,
-			expectedMessage: "digests must contain at least one entry",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.title, func(t *testing.T) {
-			err := validateCCADigests(tc.digests)
-			if tc.shouldError {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), tc.expectedMessage)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
 func TestValidateTBBRoTPK_ValidCases(t *testing.T) {
 	testCases := []struct {
 		title           string
@@ -260,52 +198,6 @@ func TestValidateTBBRoTPK_InvalidCases(t *testing.T) {
 			err := validateCCATBBRoTPK(tc.keys)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedMessage)
-		})
-	}
-}
-
-// Test validateCCAPlatformAttestVerifKey
-func TestValidateCCAPlatformAttestVerifKey_AllCases(t *testing.T) {
-	testCases := []struct {
-		title           string
-		setupAVK        func() *comid.KeyTriple
-		shouldError     bool
-		expectedMessage string
-	}{
-		{
-			title: "valid PKIX key with environment",
-			setupAVK: func() *comid.KeyTriple {
-				key := mustNewPKIXKey()
-				env := testhelpers.NewPlatformEnvironmentWithImplID()
-				return &comid.KeyTriple{
-					Environment: env,
-					VerifKeys:   comid.CryptoKeys{key},
-				}
-			},
-			shouldError: false,
-		},
-		{
-			title: "missing environment",
-			setupAVK: func() *comid.KeyTriple {
-				return &comid.KeyTriple{}
-			},
-			shouldError:     true,
-			expectedMessage: "", // Will fail on environment validation
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.title, func(t *testing.T) {
-			avk := tc.setupAVK()
-			err := validateCCAPlatformAttestVerifKey(avk)
-			if tc.shouldError {
-				assert.Error(t, err)
-				if tc.expectedMessage != "" {
-					assert.Contains(t, err.Error(), tc.expectedMessage)
-				}
-			} else {
-				assert.NoError(t, err)
-			}
 		})
 	}
 }

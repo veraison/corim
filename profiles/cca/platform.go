@@ -52,11 +52,7 @@ func (o PlatformTriplesExtensions) ValidTriples(triples *comid.Triples) error {
 
 	// Validate Attestation Verification Keys (Section 3.1.4)
 	if triples.AttestVerifKeys != nil {
-		for i, avk := range *triples.AttestVerifKeys {
-			if err := validateCCAPlatformAttestVerifKey(&avk); err != nil {
-				return fmt.Errorf("platform attestation verification key at index %d: %w", i, err)
-			}
-		}
+		return arm.ValidateKeyTriples(triples.AttestVerifKeys)
 	}
 
 	return nil
@@ -96,7 +92,7 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 		switch mkeyVal {
 		case CCASoftwareComponentMkey:
 			// Validate software component
-			if err := validateCCASoftwareComponent(measurement); err != nil {
+			if err := arm.ValidatePlatformSoftwareComponent(measurement); err != nil {
 				return fmt.Errorf("measurement at index %d: %w", j, err)
 			}
 			hasSoftwareComponent = true
@@ -153,53 +149,6 @@ func validateCCAPlatformReferenceValue(refVal *comid.ValueTriple) error {
 	return nil
 }
 
-// validateCCASoftwareComponent validates a CCA Platform software component measurement
-func validateCCASoftwareComponent(measurement *comid.Measurement) error {
-	// Validate digests (key 2) - mandatory
-	if err := validateCCADigests(measurement.Val.Digests); err != nil {
-		return fmt.Errorf("digests: %w", err)
-	}
-
-	// Validate cryptokeys (key 13) - mandatory, exactly one signer-id
-	if err := arm.ValidateSignerID(measurement.Val.CryptoKeys, 0, 0); err != nil {
-		return fmt.Errorf("cryptokeys: %w", err)
-	}
-
-	// version (key 0) is optional - if present, version-scheme MUST NOT be present
-	if measurement.Val.Ver != nil {
-		if measurement.Val.Ver.Scheme != nil {
-			return fmt.Errorf("version-scheme field MUST NOT be present in cca.software-component")
-		}
-	}
-	return nil
-}
-
-// validateCCADigests validates the digests field (key 2)
-func validateCCADigests(digests *comid.Digests) error {
-	// Digests field is mandatory
-	if digests == nil {
-		return fmt.Errorf("digests field is mandatory but not set")
-	}
-
-	// Must have at least one digest
-	if len(*digests) == 0 {
-		return fmt.Errorf("digests must contain at least one entry")
-	}
-
-	// Validate each digest entry
-	for i, digest := range *digests {
-		// For CCA, we accept both integer and text algorithm IDs
-		// The hash value size is what matters most for validation
-
-		// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
-		if err := ValidateHashDigestSize(digest.Value); err != nil {
-			return fmt.Errorf("digest at index %d: %w", i, err)
-		}
-	}
-
-	return nil
-}
-
 // validateCCAPlatformConfig validates a CCA Platform configuration measurement
 func validateCCAPlatformConfig(measurement *comid.Measurement) error {
 	// raw-value (key 4), with typechoice masked-raw-value is mandatory
@@ -249,48 +198,11 @@ func validateCCATBBRoTPK(keys *comid.CryptoKeys) error {
 		b := key.Value.Bytes()
 
 		// Key Digest is always CCA Hash value that must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
-		if err := ValidateHashDigestSize(b); err != nil {
+		if err := arm.ValidateHashDigestSize(b); err != nil {
 			return fmt.Errorf("invalid key size at index %d: %w", i, err)
 		}
 
 	}
-	return nil
-}
-
-// validateCCAPlatformAttestVerifKey validates CCA Platform Attestation Verification Keys
-// The CPAK public key must use pkix-base64-key-type and there must be exactly one key.
-func validateCCAPlatformAttestVerifKey(avk *comid.KeyTriple) error {
-	// Validate Implementation ID in Environment (Section 3.1.2)
-	if err := arm.ValidateImplementationID(&avk.Environment, ""); err != nil {
-		return fmt.Errorf("environment: %w", err)
-	}
-
-	// Validate Instance ID in Environment (Section 3.1.2)
-	// Instance ID is REQUIRED for Attestation Verification Keys
-	if err := arm.ValidateInstanceID(&avk.Environment, ""); err != nil {
-		return fmt.Errorf("environment: %w", err)
-	}
-
-	// Must have exactly one key
-	if len(avk.VerifKeys) == 0 {
-		return fmt.Errorf("verification-keys must contain exactly one entry, got 0")
-	}
-
-	if len(avk.VerifKeys) != 1 {
-		return fmt.Errorf("verification-keys must contain exactly one entry, got %d", len(avk.VerifKeys))
-	}
-
-	key := avk.VerifKeys[0]
-	if key == nil {
-		return fmt.Errorf("verification-key entry is nil")
-	}
-
-	// "The CPAK public key uses the tagged-pkix-base64-key-type variant" (CBOR tag 554)
-	if key.Type() != comid.PKIXBase64KeyType {
-		return fmt.Errorf("verification-key must be of type '%s', got '%s'",
-			comid.PKIXBase64KeyType, key.Type())
-	}
-
 	return nil
 }
 

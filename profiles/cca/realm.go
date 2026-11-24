@@ -9,6 +9,7 @@ import (
 	"github.com/veraison/corim/comid"
 	"github.com/veraison/corim/corim"
 	"github.com/veraison/corim/extensions"
+	"github.com/veraison/corim/profiles/common/arm"
 )
 
 const RealmProfileURI = "tag:arm.com,2025:cca_realm#1.0.0"
@@ -142,7 +143,7 @@ func validateCCARealmRIM(env *comid.Environment) error {
 	rimBytes := classID.Bytes()
 
 	// RIM should be a valid hash digest (32, 48, or 64 bytes for SHA-256, SHA-384, SHA-512)
-	if err := ValidateHashDigestSize(rimBytes); err != nil {
+	if err := arm.ValidateHashDigestSize(rimBytes); err != nil {
 		return fmt.Errorf("RIM must be 32, 48, or 64 bytes")
 	}
 
@@ -172,7 +173,7 @@ func validateCCARealmMeasurement(measurement *comid.Measurement) error {
 	digest := (*digests)[0]
 
 	// Hash value must be 32, 48, or 64 bytes (SHA-256, SHA-384, SHA-512)
-	if err := ValidateHashDigestSize(digest.Value); err != nil {
+	if err := arm.ValidateHashDigestSize(digest.Value); err != nil {
 		return fmt.Errorf("hash value must be 32, 48, or 64 bytes")
 	}
 
