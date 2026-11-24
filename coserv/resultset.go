@@ -154,24 +154,24 @@ func (o ResultSet) Valid() error {
 		return errors.New("AKQ and TAS must be present together")
 	}
 
-	if err := validateQuads("RVQ", o.RVQ); err != nil {
-		return err
+	if err := validateQuads(o.RVQ); err != nil {
+		return fmt.Errorf("invalid RVQ: %w", err)
 	}
 
-	if err := validateQuads("EVQ", o.EVQ); err != nil {
-		return err
+	if err := validateQuads(o.EVQ); err != nil {
+		return fmt.Errorf("invalid EVQ: %w", err)
 	}
 
-	if err := validateQuads("CEQ", o.CEQ); err != nil {
-		return err
+	if err := validateQuads(o.CEQ); err != nil {
+		return fmt.Errorf("invalid CEQ: %w", err)
 	}
 
-	if err := validateQuads("AKQ", o.AKQ); err != nil {
-		return err
+	if err := validateQuads(o.AKQ); err != nil {
+		return fmt.Errorf("invalid AKQ: %w", err)
 	}
 
-	if err := validateQuads("TAS", o.TAS); err != nil {
-		return err
+	if err := validateQuads(o.TAS); err != nil {
+		return fmt.Errorf("invalid TAS: %w", err)
 	}
 
 	if o.SourceArtifacts != nil {
@@ -192,14 +192,14 @@ func (o ResultSet) Valid() error {
 	return nil
 }
 
-func validateQuads[T interface{ Valid() error }](name string, quads *[]T) error {
+func validateQuads[T interface{ Valid() error }](quads *[]T) error {
 	if quads == nil {
 		return nil
 	}
 
 	for i, q := range *quads {
 		if err := q.Valid(); err != nil {
-			return fmt.Errorf("invalid %s at index %d: %w", name, i, err)
+			return fmt.Errorf("quad at index %d: %w", i, err)
 		}
 	}
 
