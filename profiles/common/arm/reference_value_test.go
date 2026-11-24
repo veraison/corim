@@ -1,3 +1,6 @@
+// Copyright 2026 Contributors to the Veraison project.
+// SPDX-License-Identifier: Apache-2.0
+
 package arm
 
 import (
@@ -63,7 +66,7 @@ func TestValidateCCASignerID_ValidAndInvalidLengths(t *testing.T) {
 			keys := comid.NewCryptoKeys()
 			keys.Add(key)
 
-			err := ValidateSignerID(keys, 0, 0)
+			err := validateSignerID(keys, 0, 0)
 
 			if tc.shouldError {
 				assert.Error(t, err)
@@ -114,9 +117,71 @@ func TestValidateCCASignerID_InvalidCases(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			err := ValidateSignerID(tc.keys, 0, 0)
+			err := validateSignerID(tc.keys, 0, 0)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedMessage)
+		})
+	}
+}
+
+// Test TestValidateSWComponentDigests
+func TestValidateSWComponentDigests_AllCases(t *testing.T) {
+	testCases := []struct {
+		title           string
+		digests         *comid.Digests
+		shouldError     bool
+		expectedMessage string
+	}{
+		{
+			title: "valid digest with SHA-256 (32 bytes)",
+			digests: func() *comid.Digests {
+				d := &comid.Digests{}
+				d.AddDigest(comid.Sha256, make([]byte, 32))
+				return d
+			}(),
+			shouldError: false,
+		},
+		{
+			title: "valid digest with SHA-384 (48 bytes)",
+			digests: func() *comid.Digests {
+				d := &comid.Digests{}
+				d.AddDigest(comid.Sha384, make([]byte, 48))
+				return d
+			}(),
+			shouldError: false,
+		},
+		{
+			title: "valid digest with SHA-512 (64 bytes)",
+			digests: func() *comid.Digests {
+				d := &comid.Digests{}
+				d.AddDigest(comid.Sha512, make([]byte, 64))
+				return d
+			}(),
+			shouldError: false,
+		},
+		{
+			title:           "nil digests",
+			digests:         nil,
+			shouldError:     true,
+			expectedMessage: "digests field is mandatory",
+		},
+		{
+			title:           "empty digests",
+			digests:         &comid.Digests{},
+			shouldError:     true,
+			expectedMessage: "digests must contain at least one entry",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			err := validateSWComponentDigests(tc.digests)
+			if tc.shouldError {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expectedMessage)
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

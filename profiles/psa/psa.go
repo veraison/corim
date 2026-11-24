@@ -49,11 +49,7 @@ func (o TriplesExtensions) ValidTriples(triples *comid.Triples) error {
 
 	// Validate Attestation Verification Keys (Section 3.4)
 	if triples.AttestVerifKeys != nil {
-		for i, avk := range *triples.AttestVerifKeys {
-			if err := validatePSAAttestVerifKey(&avk, i); err != nil {
-				return err
-			}
-		}
+		return arm.ValidateKeyTriples(triples.AttestVerifKeys)
 	}
 
 	return nil
@@ -76,12 +72,7 @@ func validatePSAReferenceValue(refVal *comid.ValueTriple, tripleIndex int) error
 			return err
 		}
 
-		// Validate cryptokeys field (signer-id):
-		// - cryptokeys (key 13) is MANDATORY
-		// - Must have exactly one entry
-		// - Entry must be tagged-bytes (type "bytes")
-		// - Byte length must be 32, 48, or 64 (psa-hash-type)
-		if err := arm.ValidateSignerID(measurement.Val.CryptoKeys, tripleIndex, j); err != nil {
+		if err := arm.ValidatePlatformSoftwareComponent(measurement); err != nil {
 			return err
 		}
 	}
@@ -108,45 +99,6 @@ func validatePSAMkey(key *comid.Mkey, tripleIndex, measurementIndex int) error {
 	if key.Value.String() != PSASoftwareComponentMkey {
 		return fmt.Errorf("%s: mkey must be %q, got %q",
 			prefix, PSASoftwareComponentMkey, key.Value.String())
-	}
-
-	return nil
-}
-
-// validatePSAAttestVerifKey validates Attestation Verification Keys
-// The IAK public key must use pkix-base64-key-type and there must be exactly one key.
-func validatePSAAttestVerifKey(avk *comid.KeyTriple, index int) error {
-	prefix := fmt.Sprintf("attester verification key at index %d", index)
-
-	// Validate Implementation ID in Environment (Section 3.2)
-	if err := arm.ValidateImplementationID(&avk.Environment, prefix); err != nil {
-		return err
-	}
-
-	// Validate Instance ID in Environment (Section 3.2)
-	// Instance ID is required for Attestation Verification Keys
-	if err := arm.ValidateInstanceID(&avk.Environment, prefix); err != nil {
-		return err
-	}
-
-	// Must have exactly one key
-	if len(avk.VerifKeys) == 0 {
-		return fmt.Errorf("%s: verification-keys must contain exactly one entry, got 0", prefix)
-	}
-
-	if len(avk.VerifKeys) != 1 {
-		return fmt.Errorf("%s: verification-keys must contain exactly one entry, got %d", prefix, len(avk.VerifKeys))
-	}
-
-	key := avk.VerifKeys[0]
-	if key == nil {
-		return fmt.Errorf("%s: verification-key entry is nil", prefix)
-	}
-
-	// "The IAK public key uses the tagged-pkix-base64-key-type variant"
-	if key.Type() != comid.PKIXBase64KeyType {
-		return fmt.Errorf("%s: verification-key must be of type '%s', got '%s'",
-			prefix, comid.PKIXBase64KeyType, key.Type())
 	}
 
 	return nil

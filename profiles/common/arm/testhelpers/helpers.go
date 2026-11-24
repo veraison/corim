@@ -89,3 +89,11 @@ func MustNewTaggedBytesCryptoKey(length int) *comid.CryptoKey {
 	}
 	return key
 }
+
+// NewTestEnvironment creates a valid Environment with Instance (no Implementation ID)
+func NewTestEnvironment() comid.Environment {
+	inst := comid.MustNewUUIDInstance(comid.TestUUID)
+	return comid.Environment{
+		Instance: inst,
+	}
+}
