@@ -355,37 +355,37 @@ func TestResultSet_Valid_quads(t *testing.T) {
 		{"RVQ nil triple", func(r *ResultSet) {
 			r.AddReferenceValues(rvq).
 				AddReferenceValues(RefValQuad{Authorities: rvq.Authorities})
-		}, "invalid RVQ at index 1: missing reference value triple"},
+		}, "invalid RVQ: quad at index 1: missing reference value triple"},
 		{"RVQ missing authorities", func(r *ResultSet) {
 			r.AddReferenceValues(RefValQuad{RVTriple: rvq.RVTriple})
-		}, "invalid RVQ at index 0: missing authorities"},
+		}, "invalid RVQ: quad at index 0: missing authorities"},
 		{"RVQ empty authorities", func(r *ResultSet) {
 			r.AddReferenceValues(RefValQuad{
 				Authorities: comid.NewCryptoKeys(),
 				RVTriple:    rvq.RVTriple,
 			})
-		}, "invalid RVQ at index 0: invalid authorities: no keys to validate"},
+		}, "invalid RVQ: quad at index 0: invalid authorities: no keys to validate"},
 		{"RVQ invalid triple", func(r *ResultSet) {
 			r.AddReferenceValues(RefValQuad{
 				Authorities: rvq.Authorities,
 				RVTriple:    &comid.ValueTriple{},
 			})
-		}, "invalid RVQ at index 0: invalid reference value triple: "},
+		}, "invalid RVQ: quad at index 0: invalid reference value triple: "},
 		{"EVQ nil triple", func(r *ResultSet) {
 			r.AddEndorsedValues(EndValQuad{Authorities: evq.Authorities}).
 				AddConditionalEndorsementValues(ceq)
-		}, "invalid EVQ at index 0: missing endorsed value triple"},
+		}, "invalid EVQ: quad at index 0: missing endorsed value triple"},
 		{"CEQ nil triple", func(r *ResultSet) {
 			r.AddEndorsedValues(evq).
 				AddConditionalEndorsementValues(ceq).
 				AddConditionalEndorsementValues(CondEndValQuad{Authorities: ceq.Authorities})
-		}, "invalid CEQ at index 1: missing conditional endorsement triple"},
+		}, "invalid CEQ: quad at index 1: missing conditional endorsement triple"},
 		{"AKQ nil triple", func(r *ResultSet) {
 			r.AddAttestationKeys(AKQuad{Authorities: akq.Authorities}).AddCoTS(tas)
-		}, "invalid AKQ at index 0: missing attestation key triple"},
+		}, "invalid AKQ: quad at index 0: missing attestation key triple"},
 		{"TAS nil CoTS", func(r *ResultSet) {
 			r.AddAttestationKeys(akq).AddCoTS(CoTSStmt{Authorities: tas.Authorities})
-		}, "invalid TAS at index 0: missing CoTS"},
+		}, "invalid TAS: quad at index 0: missing CoTS"},
 	}
 
 	for _, tt := range tests {

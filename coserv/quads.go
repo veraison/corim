@@ -36,12 +36,7 @@ type CoTSStmt struct {
 	CoTS        *cots.ConciseTaStore `cbor:"2,keyasint"`
 }
 
-func validateQuad(
-	authorities *comid.CryptoKeys,
-	triple interface{ Valid() error },
-	missing bool,
-	name string,
-) error {
+func validateAuthorities(authorities *comid.CryptoKeys) error {
 	if authorities == nil {
 		return errors.New("missing authorities")
 	}
@@ -50,38 +45,90 @@ func validateQuad(
 		return fmt.Errorf("invalid authorities: %w", err)
 	}
 
-	if missing {
-		return fmt.Errorf("missing %s", name)
-	}
-
-	if err := triple.Valid(); err != nil {
-		return fmt.Errorf("invalid %s: %w", name, err)
-	}
-
 	return nil
 }
 
 // Valid checks that the RefValQuad has authorities and a valid triple
 func (o RefValQuad) Valid() error {
-	return validateQuad(o.Authorities, o.RVTriple, o.RVTriple == nil, "reference value triple")
+	if err := validateAuthorities(o.Authorities); err != nil {
+		return err
+	}
+
+	if o.RVTriple == nil {
+		return errors.New("missing reference value triple")
+	}
+
+	if err := o.RVTriple.Valid(); err != nil {
+		return fmt.Errorf("invalid reference value triple: %w", err)
+	}
+
+	return nil
 }
 
 // Valid checks that the EndValQuad has authorities and a valid triple
 func (o EndValQuad) Valid() error {
-	return validateQuad(o.Authorities, o.EVTriple, o.EVTriple == nil, "endorsed value triple")
+	if err := validateAuthorities(o.Authorities); err != nil {
+		return err
+	}
+
+	if o.EVTriple == nil {
+		return errors.New("missing endorsed value triple")
+	}
+
+	if err := o.EVTriple.Valid(); err != nil {
+		return fmt.Errorf("invalid endorsed value triple: %w", err)
+	}
+
+	return nil
 }
 
 // Valid checks that the CondEndValQuad has authorities and a valid triple
 func (o CondEndValQuad) Valid() error {
-	return validateQuad(o.Authorities, o.CETriple, o.CETriple == nil, "conditional endorsement triple")
+	if err := validateAuthorities(o.Authorities); err != nil {
+		return err
+	}
+
+	if o.CETriple == nil {
+		return errors.New("missing conditional endorsement triple")
+	}
+
+	if err := o.CETriple.Valid(); err != nil {
+		return fmt.Errorf("invalid conditional endorsement triple: %w", err)
+	}
+
+	return nil
 }
 
 // Valid checks that the AKQuad has authorities and a valid triple
 func (o AKQuad) Valid() error {
-	return validateQuad(o.Authorities, o.AKTriple, o.AKTriple == nil, "attestation key triple")
+	if err := validateAuthorities(o.Authorities); err != nil {
+		return err
+	}
+
+	if o.AKTriple == nil {
+		return errors.New("missing attestation key triple")
+	}
+
+	if err := o.AKTriple.Valid(); err != nil {
+		return fmt.Errorf("invalid attestation key triple: %w", err)
+	}
+
+	return nil
 }
 
 // Valid checks that the CoTSStmt has authorities and a valid CoTS
 func (o CoTSStmt) Valid() error {
-	return validateQuad(o.Authorities, o.CoTS, o.CoTS == nil, "CoTS")
+	if err := validateAuthorities(o.Authorities); err != nil {
+		return err
+	}
+
+	if o.CoTS == nil {
+		return errors.New("missing CoTS")
+	}
+
+	if err := o.CoTS.Valid(); err != nil {
+		return fmt.Errorf("invalid CoTS: %w", err)
+	}
+
+	return nil
 }
